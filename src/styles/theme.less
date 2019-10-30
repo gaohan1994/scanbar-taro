@@ -1,0 +1,54 @@
+/**
+ * @Author: Ghan 
+ * @Date: 2019-10-30 11:33:11 
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2019-10-30 11:44:02
+ */
+
+// placeholer-text-color: placeholer颜色
+@placeholer-text-color: #cccccc;
+// base-font-color: 字体颜色
+@base-font-color: #333333;
+
+// 标题字体大小
+@title-text-fontsize: 18;
+// 标题字体颜色
+@title-text-color: @base-font-color;
+
+// 普通文字字体大小
+@normal-text-fontsize: 14;
+// 普通文字字体颜色
+@normal-text-color: @base-font-color;
+
+// 小文本文字字体大小
+@small-text-fontsize: 12;
+// 小文本文字字体颜色
+@small-text-color: @base-font-color;
+
+.title-text {
+  font-size: @title-text-fontsize;
+  color: @title-text-color;
+  font-weight: bold;
+}
+
+.normal-text {
+  font-size: @normal-text-fontsize;
+  color: @normal-text-color;
+}
+
+.small-text {
+  font-size: @small-text-fontsize;
+  color: @small-text-color;
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+}
+
+.flex (@alignItems: 'flex-start', @justifyContent: 'flex-start', @flexDirection: 'row') {
+  display: flex;
+  align-items: @alignItems;
+  justify-content: @justifyContent;
+  flex-direction: @flexDirection;
+} 

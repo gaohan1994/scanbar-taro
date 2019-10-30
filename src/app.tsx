@@ -1,12 +1,10 @@
-import '@tarojs/async-await'
-import Taro, { Component, Config } from '@tarojs/taro'
-import { Provider } from '@tarojs/redux'
-
-import Index from './pages/index'
-
-import configStore from './store'
-
-import './app.less'
+import '@tarojs/async-await';
+import Taro, { Component, Config } from '@tarojs/taro';
+import { Provider } from '@tarojs/redux';
+import Home from './pages/home/home';
+import configStore from './store';
+import "./styles/reset.less";
+import 'taro-ui/dist/style/index.scss';
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -14,7 +12,7 @@ import './app.less'
 //   require('nerv-devtools')
 // }
 
-const store = configStore()
+const store = configStore();
 
 class App extends Component {
 
@@ -27,33 +25,48 @@ class App extends Component {
    */
   config: Config = {
     pages: [
-      'pages/index/index'
+      'pages/home/home',
+      'pages/test/test',
+      'pages/test/test.date.picker',
+      'pages/test/test.notice',
+      'pages/test/test.accordion',
     ],
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
       navigationBarTitleText: 'WeChat',
       navigationBarTextStyle: 'black'
+    },
+    tabBar: {
+      color: "#ACACAC",
+      selectedColor: "#2EAAF8",
+      backgroundColor: "#ffffff",
+      borderStyle: 'black',
+      list: [{
+        pagePath: "pages/home/home",
+        iconPath: "./assets/tab-bar/icon_nav_home.png",
+        selectedIconPath: "./assets/tab-bar/icon_nav_home_xuan.png",
+        text: "首页"
+      }, {
+        pagePath: "pages/test/test",
+        iconPath: "./assets/tab-bar/icon_nav_user.png",
+        selectedIconPath: "./assets/tab-bar/icon_nav_user_xuan.png",
+        text: "测试"
+      }]
     }
-  }
+  };
 
-  componentDidMount () {}
-
-  componentDidShow () {}
-
-  componentDidHide () {}
-
-  componentDidCatchError () {}
-
-  // 在 App 类中的 render() 函数没有实际作用
-  // 请勿修改此函数
+  /**
+   * 在 App 类中的 render() 函数没有实际作用
+   * 请勿修改此函数
+   */
   render () {
     return (
       <Provider store={store}>
-        <Index />
+        <Home />
       </Provider>
-    )
+    );
   }
 }
 
-Taro.render(<App />, document.getElementById('app'))
+Taro.render(<App />, document.getElementById('app'));
