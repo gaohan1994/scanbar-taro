@@ -14,6 +14,8 @@ class TestMain extends Taro.Component<Props, any> {
           <AtListItem title='DatePicker' note="日期选择器" onClick={() => Taro.navigateTo({url: '/pages/test/test.date.picker'})} />
           <AtListItem title='Notice' note="通告栏" onClick={() => Taro.navigateTo({url: '/pages/test/test.notice'})} />
           <AtListItem title='Accordion' note="手风琴" onClick={() => Taro.navigateTo({url: '/pages/test/test.accordion'})} />
+          <AtListItem title='Control' note="控制组件" onClick={() => Taro.navigateTo({url: '/pages/test/test.control'})} />
+          <AtListItem title='ListView' note="列表组件" onClick={() => Taro.navigateTo({url: '/pages/test/test.listview'})} />
         </AtList>
       </View>
     );

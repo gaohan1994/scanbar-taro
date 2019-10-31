@@ -1,0 +1,29 @@
+@import "../../../styles/theme.less";
+@import "./test.main.less";
+
+@list-left-width: 200px;
+
+.@{test-prefix}-list {
+  .container;
+  display: flex;
+  flex-direction: row;
+
+  &-left {
+    width: @list-left-width;
+    &-item {
+      padding-top: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid;
+      .flex('center', 'center');
+    }
+  }
+  &-right {
+    display: flex;
+    flex: 1;
+
+    &-item {
+      padding: 20px;
+      border-bottom: 1px solid;
+    }
+  }
+}

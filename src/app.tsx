@@ -30,6 +30,8 @@ class App extends Component {
       'pages/test/test.date.picker',
       'pages/test/test.notice',
       'pages/test/test.accordion',
+      'pages/test/test.control',
+      'pages/test/test.listview',
     ],
     window: {
       backgroundTextStyle: 'light',
