@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-10-30 11:33:11 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-01 10:30:36
+ * @Last Modified time: 2019-11-01 14:05:51
  */
 
 // 主色调
@@ -12,7 +12,7 @@
 // base-font-color: 字体颜色
 @base-font-color: #666666;
 // 标题字体大小
-@title-text-fontsize: 30px;
+@title-text-fontsize: 36px;
 // 标题字体颜色
 @title-text-color: @base-font-color;
 // 普通文字字体大小
@@ -26,9 +26,9 @@
 // primary-button-size: 按钮大小 
 @primary-button-size: 80px;
 
-.title-text {
+.title-text (@color: @title-text-color) {
   font-size: @title-text-fontsize;
-  color: @title-text-color;
+  color: @color;
   font-weight: bold;
 }
 
@@ -138,4 +138,13 @@
 .theme-input-placeholder {
   font-size: @normal-text-fontsize;
   color: #cccccc;
+}
+
+.theme-card {
+  border-radius: 20px;
+  background-color: #ffffff;
+}
+
+.theme-shadow {
+  box-shadow: 0px 1px 15px #e6f3fd;
 }
