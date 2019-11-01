@@ -26,6 +26,15 @@ class App extends Component {
   config: Config = {
     pages: [
       'pages/home/home',
+
+      /**
+       * @todo [sign相关页面]
+       */
+      'pages/sign/login',
+
+      /**
+       * @todo [测试页面]
+       */
       'pages/test/test',
       'pages/test/test.date.picker',
       'pages/test/test.notice',
@@ -35,9 +44,9 @@ class App extends Component {
     ],
     window: {
       backgroundTextStyle: 'light',
-      navigationBarBackgroundColor: '#fff',
+      navigationBarBackgroundColor: '#2a86fc',
       navigationBarTitleText: 'WeChat',
-      navigationBarTextStyle: 'black'
+      navigationBarTextStyle: 'white',
     },
     tabBar: {
       color: "#ACACAC",
