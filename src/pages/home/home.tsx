@@ -10,31 +10,37 @@ const NavItems = [
     image: '//net.huanmusic.com/weapp/icon_menu_order.png',
     value: '商品管理',
     subTitle: 'Commodity management',
+    url: '/pages/',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_order.png',
     value: '会员管理',
     subTitle: 'Member management',
+    url: '/pages/member/member',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_order.png',
     value: '收款',
     subTitle: 'Gathering',
+    url: '/pages/',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_order.png',
     value: '采购收货',
     subTitle: 'Procurement',
+    url: '/pages/',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_order.png',
     value: '采购下单',
     subTitle: 'Purchasing order',
+    url: '/pages/',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_order.png',
     value: '更多',
     subTitle: 'Even more',
+    url: '/pages/',
   }
 ];
 
@@ -57,6 +63,15 @@ class Home extends Component {
   config: Config = {
     navigationBarTitleText: '首页'
   };
+
+  /**
+   * @todo [跳转函数]
+   *
+   * @memberof Home
+   */
+  public onNavHandle = ({url}: {url: string}) => {
+    Taro.navigateTo({url});
+  }
 
   render () {
     return (
@@ -90,7 +105,7 @@ class Home extends Component {
                   shadow={false} 
                   card-class={`home-bar-card ${(index + 1) % 3 !== 0 ? 'home-bar-card-right' : ''}`} 
                 >
-                  <View className="home-bar-card-content">
+                  <View className="home-bar-card-content" onClick={() => this.onNavHandle(item)}>
                     <Image className="home-icon" src={item.image} />
                     <Text className="normal-text">{item.value}</Text>
                     <Text className="home-small-text">{item.subTitle}</Text>

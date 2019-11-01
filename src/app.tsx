@@ -25,12 +25,30 @@ class App extends Component {
    */
   config: Config = {
     pages: [
+      /**
+       * @todo [首页相关页面]
+       */
       'pages/home/home',
 
       /**
        * @todo [sign相关页面]
        */
       'pages/sign/login',
+
+      /**
+       * @todo [报表相关页面]
+       */
+      'pages/report/report',
+
+      /**
+       * @todo [我的相关页面]
+       */
+      'pages/user/user',
+
+      /**
+       * @todo [会员相关]
+       */
+      'pages/member/member',
 
       /**
        * @todo [测试页面]
@@ -58,6 +76,16 @@ class App extends Component {
         iconPath: "./assets/tab-bar/icon_nav_home.png",
         selectedIconPath: "./assets/tab-bar/icon_nav_home_xuan.png",
         text: "首页"
+      }, {
+        pagePath: "pages/report/report",
+        iconPath: "./assets/tab-bar/icon_nav_home.png",
+        selectedIconPath: "./assets/tab-bar/icon_nav_home_xuan.png",
+        text: "报表"
+      }, {
+        pagePath: "pages/user/user",
+        iconPath: "./assets/tab-bar/icon_nav_home.png",
+        selectedIconPath: "./assets/tab-bar/icon_nav_home_xuan.png",
+        text: "我的"
       }, {
         pagePath: "pages/test/test",
         iconPath: "./assets/tab-bar/icon_nav_user.png",
