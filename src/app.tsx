@@ -59,6 +59,7 @@ class App extends Component {
       'pages/test/test.accordion',
       'pages/test/test.control',
       'pages/test/test.listview',
+      'pages/test/test.cart',
     ],
     window: {
       backgroundTextStyle: 'light',
