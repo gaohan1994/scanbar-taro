@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-10-30 11:33:11 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-01 14:05:51
+ * @Last Modified time: 2019-11-05 14:27:26
  */
 
 // 主色调
@@ -127,12 +127,24 @@
   padding-right: @value;
 }
 
+.config-button(
+  @background-color: @theme-color, 
+  @height: @primary-button-size, 
+  @border-radius: @primary-button-size / 2, 
+  @font-size: @title-text-fontsize,
+  @font-color: #ffffff
+) {
+  background-color: @background-color !important;
+  border-color: @background-color !important;
+  height: @height !important;
+  line-height: @height !important;
+  border-radius: @border-radius !important;
+  font-size: @font-size !important;
+  color: @font-color !important;
+}
+
 .theme-button {
-  background-color: @theme-color !important;
-  height: @primary-button-size !important;
-  line-height: @primary-button-size !important;
-  border-radius: @primary-button-size / 2 !important;
-  font-size: @title-text-fontsize !important;
+  .config-button(@theme-color, @primary-button-size, @primary-button-size / 2,  @title-text-fontsize);
 }
 
 .theme-input-placeholder {
@@ -147,4 +159,50 @@
 
 .theme-shadow {
   box-shadow: 0px 1px 15px #e6f3fd;
+}
+
+/**
+ * @Author: Ghan 
+ * @Date: 2019-10-30 11:33:11 
+ * @Last Modified by: Ghan
+ * Modal 部分配置
+ */
+ @modal-button-height: 60px;                 // modal 按钮高度
+
+ .component-modal-cancel-button {
+   .config-button(#999999, @modal-button-height, @modal-button-height / 2,  30px);
+   .padding(80px, lr) !important;
+ }
+ 
+ .component-modal-confirm-button {
+   .config-button(@theme-color, @modal-button-height, @modal-button-height / 2,  30px);
+   .padding(80px, lr) !important;
+ }
+
+ 
+/**
+ * @Author: Ghan 
+ * @Date: 2019-10-30 11:33:11 
+ * @Last Modified by: Ghan
+ * ListRow 部分配置 
+ */
+@list-row-button-height: 44px;
+@list-row-prefix: component-list-row;
+
+.@{list-row-prefix} {
+  &-extra {
+    display: flex;
+    flex-direction: row;
+  }
+  &-button {
+    .margin(15px, l) !important;
+  }
+  &-cancel-button {
+    .config-button(#D4D8DB, @list-row-button-height, @list-row-button-height / 2,  22px);
+    .padding(20px, lr) !important;
+  }
+  &-confirm-button {
+    .config-button(@theme-color, @list-row-button-height, @list-row-button-height / 2,  22px);
+    .padding(20px, lr) !important;
+  }
 }

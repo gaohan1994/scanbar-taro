@@ -29,9 +29,6 @@ type State = {
 };
 
 export class TestListView extends Taro.Component<Props, State> {
-  private leftListRef: any;
-  private rightListRef: any;
-
   constructor (props: Props) {
     super(props);
     this.state = {
@@ -91,7 +88,6 @@ export class TestListView extends Taro.Component<Props, State> {
         <ScrollView
           scrollY={true}
           className="test-list-left"
-          ref={ref => this.leftListRef = ref}
           scrollIntoView={this.state.currentMenuId}
         >
           {
@@ -132,7 +128,6 @@ export class TestListView extends Taro.Component<Props, State> {
             className="test-list-right"
             scrollWithAnimation={true}
             enableBackToTop={true}
-            ref={ref => this.rightListRef = ref}
             onScroll={this.onScroll}
           >
             {

@@ -18,6 +18,8 @@ class TestMain extends Taro.Component<Props, any> {
           <AtListItem title='Accordion' note="手风琴" onClick={() => Taro.navigateTo({url: '/pages/test/test.accordion'})} />
           <AtListItem title='Control' note="控制组件" onClick={() => Taro.navigateTo({url: '/pages/test/test.control'})} />
           <AtListItem title='ListView' note="列表组件" onClick={() => Taro.navigateTo({url: '/pages/test/test.listview'})} />
+          <AtListItem title='Modal' note="模态窗" onClick={() => Taro.navigateTo({url: '/pages/test/test.modal'})} />
+          <AtListItem title='Form' note="表单" onClick={() => Taro.navigateTo({url: '/pages/test/test.form'})} />
         </AtList>
       </View>
     );

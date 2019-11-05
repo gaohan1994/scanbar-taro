@@ -1,0 +1,32 @@
+@import "../../styles/theme.less";
+
+@modal-header-font: 32px;                   // modal 标题字体大小
+@modal-button-font: 30px;                   // modal 标题按钮字体大小
+@modal-font-color: #ffffff;               // modal 字体颜色
+@modal-button-height: 60px;                 // modal 按钮高度
+@modal-button-cancel-color: #999999;      // modal 取消按钮颜色
+@modal-button-confirm-color: @theme-color;  // modal 确认按钮颜色
+
+@modal-prefix: component-modal;
+
+.@{modal-prefix} {
+  &-header {
+    .padding(22px, tb);
+    .flex(center, center, row);
+    color: @modal-font-color;
+    font-size: @modal-header-font;
+    background: linear-gradient(0deg,rgba(42,134,252,1) 2%,rgba(69,150,255,1) 100%);
+  }
+  &-buttons {
+    flex: 1;
+    .flex(center, space-between);
+    .padding(42px, lr);
+    .padding(50px, b);
+  }
+  &-content {
+    .padding(32px);
+    .flex(center, center);
+    font-size: 26px;
+    color: @base-font-color;
+  }
+}

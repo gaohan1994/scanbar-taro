@@ -60,6 +60,8 @@ class App extends Component {
       'pages/test/test.control',
       'pages/test/test.listview',
       'pages/test/test.cart',
+      'pages/test/test.modal',
+      'pages/test/test.form',
     ],
     window: {
       backgroundTextStyle: 'light',
