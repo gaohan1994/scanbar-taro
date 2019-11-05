@@ -1,9 +1,68 @@
 @import "../../styles/theme.less";
 
 @cart-prefix: cart;
+@cart-height: 128px;        // 购物车背景图高度
+@cart-button-font: 30px;    // 结算按钮字体大小
+@cart-button-width: 190px;  // 结算按钮大小
+@cart-icon-size: 136px;     // 购物车icon大小
+
+@cart-list-header-font-color: #808080; // 购物车列表头部字体颜色
 
 .@{cart-prefix} {
   position: fixed;
   bottom: 0;
   z-index: 999;
+  &-bg {
+    position: relative;
+    .padding(@cart-button-width + 40px, r);
+    width: 750px;
+    height: @cart-height;
+    .background-image('//net.huanmusic.com/weapp/bmg_bottom_close.png');
+  }
+  &-right {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: @cart-button-width;
+    height: 100%;
+    .flex(center, center, column);
+    color: #ffffff;
+    font-size: @cart-button-font;
+    &-disabled {
+      .background-image('//net.huanmusic.com/weapp/bt_bottom_close_unselected.png');
+    }
+    &-active {
+      .background-image('//net.huanmusic.com/weapp/bt_bottom_close_pitch.png');
+    }
+  }
+  &-left {
+    .flex(center, flex-end);
+    height: 100%;
+  }
+  &-icon {
+    position: absolute;
+    left: 40px;
+    bottom: 55px;
+    &-image {
+      width: @cart-icon-size;
+      height: @cart-icon-size;
+    }
+  }
+  &-list {
+    &-header {
+      .padding(22px, tb);
+      .padding(38px, lr);
+      background-color: #f8f8f8;
+      .flex(center, space-between, row);
+      color: @cart-list-header-font-color;
+      &-empty {
+        .flex(center, center, row);
+        &-icon {
+          width: 25px;
+          height: 25px;
+          .margin(10px, r);
+        }
+      }
+    }
+  }
 }

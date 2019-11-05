@@ -3,8 +3,8 @@ import Taro, { Component, Config } from '@tarojs/taro';
 import { Provider } from '@tarojs/redux';
 import Home from './pages/home/home';
 import configStore from './store';
-import "./styles/reset.less";
 import 'taro-ui/dist/style/index.scss';
+import "./styles/reset.less";
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
