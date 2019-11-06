@@ -2,10 +2,11 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-01 15:50:37
+ * @Last Modified time: 2019-11-06 10:30:16
  */
 import Taro from '@tarojs/taro';
 import { View } from '@tarojs/components';
+import { AtButton } from 'taro-ui';
 
 interface MemberMainProps { }
 
@@ -24,6 +25,9 @@ class MemberMain extends Taro.Component<MemberMainProps> {
   render () {
     return (
       <View>
+        <AtButton onClick={() => Taro.navigateTo({url: '/pages/member/member.detail'})}>
+          detail
+        </AtButton>
         会员主页
       </View>
     );

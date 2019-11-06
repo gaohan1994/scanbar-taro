@@ -49,6 +49,7 @@ class App extends Component {
        * @todo [会员相关]
        */
       'pages/member/member',
+      'pages/member/member.detail',
 
       /**
        * @todo [测试页面]

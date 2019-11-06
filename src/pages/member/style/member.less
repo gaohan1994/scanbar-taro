@@ -1,0 +1,45 @@
+@import "../../../styles/theme.less";
+
+@member-prefix: member;
+@member-card-width: 690px;
+@member-avator-size: 150px;
+
+.@{member-prefix} {
+  .padding(30px, lr);
+  &-pos {
+    margin-top: -150px;
+  }
+  &-bg {
+    height: 255px;
+    width: 100%;
+  }
+  &-card {
+    position: relative;
+    background-color: #ffffff;
+  }
+  &-buttons {
+    .padding(15px, tb);
+    &-button {
+      flex: 1;
+      .flex(center, center, column);
+    }
+  }
+  &-detail {
+    .flex(center, center, column);
+    .padding((@member-avator-size / 3) + 20px, t);
+    &-img {
+      position: absolute;
+      left: (@member-card-width - @member-avator-size) / 2;
+      top: -(@member-avator-size / 2);
+      .theme-shadow();
+      border-radius: @member-avator-size / 2;
+    }
+    &-avator {
+      width: 150px;
+      height: 150px;
+    }
+  }
+  &-edit {
+    .margin(80px, t);
+  }
+}
