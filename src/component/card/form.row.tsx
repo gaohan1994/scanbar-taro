@@ -2,16 +2,16 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 14:41:35 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-05 14:42:17
+ * @Last Modified time: 2019-11-06 14:46:10
  * 
  * @todo [fockedTaroUiListItem,增加以及修改了一些属性]
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import classnames from 'classnames';
-import './form.card.less';
 import '../../styles/index.css';
-import { AtButton } from 'taro-ui';
+import './form.card.less';
+import { AtButton, AtInput } from 'taro-ui';
 
 interface ListRowButton {
   onPress: () => void;
@@ -32,6 +32,12 @@ export interface FormRowProps {
   extraThumbClick?: () => any;  // 右边图片点击事件
   className?: any;              // 外部className
   buttons?: ListRowButton[];    // ListRow 的右侧按钮
+  isInput?: boolean;            // 是否显示输入框
+  inputValue?: string;          // 右侧输入框
+  inputPlaceHolder?: string;    // 右侧输入框默认值
+  inputName?: string;           // 输入框的name
+  inputOnChange?: (params: any) => any; // 输入改变函数
+  inputType?: 'text' | 'number' | 'password' | 'phone'; // 输入框类型
 }
 
 interface FormRowState { }
@@ -50,6 +56,12 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
     onClick: () => {/** */},
     extraThumbClick: () => {/** */},
     buttons: [],
+    isInput: false,
+    inputValue: '',
+    inputName: 'form.row.name',
+    inputPlaceHolder: '',
+    inputType: 'text',
+    inputOnChange: () => { /** */ },
   };
 
   render () {
@@ -64,6 +76,13 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
       extraThumb,
       extraThumbClick,
       buttons,
+
+      isInput,
+      inputType,
+      inputName,
+      inputValue,
+      inputPlaceHolder,
+      inputOnChange,
     } = this.props;
 
     const rootClass = classnames(
@@ -122,6 +141,21 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
                     </AtButton>
                   );
                 })}
+              </View>
+            )}
+
+            {isInput === true && (
+              <View>
+                <AtInput 
+                  className="component-list-row-input"
+                  name={inputName || 'form.row.name'}
+                  value={inputValue} 
+                  onChange={inputOnChange}
+                  type={inputType}
+                  placeholder={inputPlaceHolder}
+                  border={false}
+                  placeholderStyle="component-list-row-input-placeholder"
+                />
               </View>
             )}
 

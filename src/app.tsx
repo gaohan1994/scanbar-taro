@@ -50,6 +50,7 @@ class App extends Component {
        */
       'pages/member/member',
       'pages/member/member.detail',
+      'pages/member/member.add',
 
       /**
        * @todo [测试页面]
