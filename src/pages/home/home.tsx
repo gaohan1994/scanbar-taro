@@ -22,7 +22,7 @@ const NavItems = [
     image: '//net.huanmusic.com/weapp/icon_menu_order.png',
     value: '收款',
     subTitle: 'Gathering',
-    url: '/pages/',
+    url: '/pages/pay/pay.receive',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_order.png',

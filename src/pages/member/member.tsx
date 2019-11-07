@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-06 14:13:19
+ * @Last Modified time: 2019-11-06 16:13:12
  */
 import Taro from '@tarojs/taro';
 import { View } from '@tarojs/components';
@@ -30,6 +30,9 @@ class MemberMain extends Taro.Component<MemberMainProps> {
         </AtButton>
         <AtButton onClick={() => Taro.navigateTo({url: '/pages/member/member.add'})}>
           add
+        </AtButton>
+        <AtButton onClick={() => Taro.navigateTo({url: '/pages/member/member.edit'})}>
+          edit
         </AtButton>
       </View>
     );

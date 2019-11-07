@@ -1,0 +1,75 @@
+@import "../../../styles/theme.less";
+
+@pay-prefix: pay;
+@pay-receive-image-size: 58px;
+@pay-receive-background-image-width: 590px;
+@pay-receive-background-image-height: 770px;
+@pay-receive-code-size: 406px;
+@pay-font-size: 55px;
+@pay-font-color: #FC4E44;
+@pay-receive-cash-form-width: 690px;
+
+.@{pay-prefix} {
+
+  &-receive {
+    background: linear-gradient(0deg,rgba(0,0,0,1) 0%,rgba(255,255,255,1) 0%,rgba(42,134,252,1) 0%,rgba(42,134,252,1) 100%);
+    .flex(center, flex-start, column);
+
+    &-header {
+      .margin(60px, t);
+      .flex(center, space-around, row);
+      width: 100%;
+      &-item {
+        .flex(center, center, column);
+        .padding(22px, tb);
+        &-image {
+          width: @pay-receive-image-size;
+          height: @pay-receive-image-size;
+          .margin(22px, b);
+        }
+        &-text {
+          font-size: 28px;
+          color: #ffffff;
+        }
+        &-active {
+          border-bottom: 3px solid #ffffff;
+        }
+      }
+    }
+    &-content {
+      position: relative;
+      .background-image('//net.huanmusic.com/weapp/img_code.png');
+      width: @pay-receive-background-image-width;
+      height: @pay-receive-background-image-height;
+      .margin(70px, t);
+      .flex(center, flex-start, column);
+      &-cash {
+        position: relative;
+        width: @pay-receive-cash-form-width;
+        .margin(50px, t);
+        &-button {
+          .margin(34px, t);
+        }
+      }
+      &-code {
+        position: relative;
+        width: @pay-receive-code-size;
+        height: @pay-receive-code-size;
+        .margin(77px, t);
+      }
+      &-text {
+        font-size: 26px;
+        color: #c7c7c7;
+      }
+      &-price {
+        position: absolute;
+        bottom: 60px;
+        width: @pay-receive-background-image-width;
+        text-align: center;
+        font-size: @pay-font-size;
+        color: @pay-font-color;
+        font-weight: bold;
+      }
+    }
+  }
+}

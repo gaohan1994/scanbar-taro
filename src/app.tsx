@@ -51,6 +51,12 @@ class App extends Component {
       'pages/member/member',
       'pages/member/member.detail',
       'pages/member/member.add',
+      'pages/member/member.edit',
+
+      /**
+       * @todo [支付相关]
+       */
+      'pages/pay/pay.receive',
 
       /**
        * @todo [测试页面]
