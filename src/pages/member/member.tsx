@@ -2,11 +2,12 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-06 16:13:12
+ * @Last Modified time: 2019-11-08 10:31:18
  */
 import Taro from '@tarojs/taro';
 import { View } from '@tarojs/components';
 import { AtButton } from 'taro-ui';
+import MemberAction from '../../actions/member.action';
 
 interface MemberMainProps { }
 
@@ -21,6 +22,10 @@ class MemberMain extends Taro.Component<MemberMainProps> {
   config: Taro.Config = {
     navigationBarTitleText: '会员管理'
   };
+
+  componentDidShow () {
+    MemberAction.memberList();
+  }
 
   render () {
     return (

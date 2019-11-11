@@ -1,8 +1,10 @@
-/*
+/**
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-06 15:29:31
+ * @Last Modified time: 2019-11-11 10:11:32
+ * 
+ * @todo 添加会员页面
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Picker } from '@tarojs/components';
@@ -11,6 +13,10 @@ import FormCard from '../../component/card/form.card';
 import { FormRowProps } from '../../component/card/form.row';
 import { AtButton, AtMessage } from 'taro-ui';
 import FormRow from '../../component/card/form.row';
+import Validator from '../../common/util/validator';
+import invariant from 'invariant';
+import { MemberInfoAddParams } from '../../constants/member/member';
+import { MemberAction } from '../../actions';
 
 const cssPrefix: string = 'member';
 
@@ -29,7 +35,7 @@ class MemberMain extends Taro.Component<Props, State> {
     sex: 'male',
     phone: '',
     name: '',
-    birthday: '1990-01-01',
+    birthday: '',
     memberStatus: true,
   };
   /**
@@ -98,16 +104,67 @@ class MemberMain extends Taro.Component<Props, State> {
   }
 
   /**
+   * @todo [判断是否通过校验]
+   *
+   * @memberof MemberMain
+   */
+  public validate = (): { success: boolean, result: any } => {
+    const { phone, name } = this.state;
+    const helper = new Validator();
+    helper.add(phone, [{
+      strategy: 'isNonEmpty',
+      errorMsg: '请输入会员手机号',
+    }, {
+      strategy: 'isNumberVali',
+      errorMsg: '请输入正确的手机号码'
+    }]);
+
+    helper.add(name, [{
+      strategy: 'isNonEmpty',
+      errorMsg: '请输入会员姓名',
+    }]);
+
+    const result = helper.start();
+    if (result) {
+      return { success: false, result: result.msg };
+    }
+    return { success: true, result: { phoneNumber: phone, username: name } };
+  }
+
+  /**
    * @todo [添加会员事件]
    * @todo [先校验用户输入，然后提交接口判断返回]
    *
    * @memberof MemberMain
    */
-  public onAddMember = () => {
-    Taro.showToast({
-      title: '添加会员成功',
-      icon: 'success'
-    });
+  public onAddMember = async () => {
+    try {
+      const { success, result } = this.validate();
+      invariant(success, result || ' ');
+
+      const params: MemberInfoAddParams = {
+        ...result,
+        birthDate: this.state.birthday,
+        merchantId: 1,
+        sex: this.state.sex === 'male' ? 0 : 1,
+        status: this.state.memberStatus === true ? 0 : 1,
+      };
+      const addResult = await MemberAction.memberAdd({payload: params});
+      invariant(addResult.success, addResult.result || ' ');
+      Taro.showToast({
+        title: '添加会员成功',
+        icon: 'success',
+        mask: true,
+        success: () => {
+          Taro.navigateTo({url: `/pages/member/member`});
+        }
+      });
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
   }
 
   render () {

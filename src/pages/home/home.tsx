@@ -4,6 +4,7 @@ import { View, Image, Text } from '@tarojs/components';
 import './style/home.less';
 import classnames from 'classnames';
 import { Card } from '../../component/common/card/card.common';
+import { LoginManager } from '../../common/sdk';
 
 const NavItems = [
   {
@@ -63,6 +64,11 @@ class Home extends Component {
   config: Config = {
     navigationBarTitleText: '首页'
   };
+
+  async componentDidShow () {
+    const userinfo = await LoginManager.login();
+    console.log('userinfo: ', userinfo);
+  }
 
   /**
    * @todo [跳转函数]
