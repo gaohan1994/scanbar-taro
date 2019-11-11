@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-04 13:49:58 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-04 15:44:51
+ * @Last Modified time: 2019-11-11 17:13:50
  * 
  * @Usage
  * ```jsx
@@ -27,7 +27,7 @@ import { AtModal, AtButton } from 'taro-ui';
 import { View } from '@tarojs/components';
 import "./modal.less";
 import { AtModalProps } from 'taro-ui/@types/modal';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import classnames from 'classnames';
 
 const ModalCssPrefix = 'component-modal';

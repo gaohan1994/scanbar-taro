@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-11 10:11:32
+ * @Last Modified time: 2019-11-11 10:41:10
  * 
  * @todo 添加会员页面
  */
@@ -15,8 +15,8 @@ import { AtButton, AtMessage } from 'taro-ui';
 import FormRow from '../../component/card/form.row';
 import Validator from '../../common/util/validator';
 import invariant from 'invariant';
-import { MemberInfoAddParams } from '../../constants/member/member';
 import { MemberAction } from '../../actions';
+import { MemberInterface } from '../../constants';
 
 const cssPrefix: string = 'member';
 
@@ -142,7 +142,7 @@ class MemberMain extends Taro.Component<Props, State> {
       const { success, result } = this.validate();
       invariant(success, result || ' ');
 
-      const params: MemberInfoAddParams = {
+      const params: MemberInterface.MemberInfoAddParams = {
         ...result,
         birthDate: this.state.birthday,
         merchantId: 1,

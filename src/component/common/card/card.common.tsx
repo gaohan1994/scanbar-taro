@@ -8,7 +8,8 @@ import Taro from '@tarojs/taro';
 import { View } from '@tarojs/components';
 import { ViewProps } from '@tarojs/components/types/View';
 import classnames from 'classnames';
-import { merge } from 'lodash';
+// import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import './card.less';
 
 interface CardProps extends ViewProps {

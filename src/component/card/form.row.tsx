@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 14:41:35 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-06 14:46:10
+ * @Last Modified time: 2019-11-11 15:19:09
  * 
  * @todo [fockedTaroUiListItem,增加以及修改了一些属性]
  */
@@ -29,6 +29,7 @@ export interface FormRowProps {
   disabled?: boolean;           // 是否禁用
   hasBorder?: boolean;          // 是否有底部border
   extraThumb?: string;          // 右边图片
+  onClick?: () => any;          // 点击事件
   extraThumbClick?: () => any;  // 右边图片点击事件
   className?: any;              // 外部className
   buttons?: ListRowButton[];    // ListRow 的右侧按钮
@@ -76,6 +77,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
       extraThumb,
       extraThumbClick,
       buttons,
+      onClick,
 
       isInput,
       inputType,
@@ -99,7 +101,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
     extraText = String(extraText);
     title = String(title);
     return (
-      <View className={rootClass}>
+      <View className={rootClass} onClick={onClick}>
         <View className='at-list__item-container'>
           {thumb && (
             <View className='at-list__item-thumb item-thumb'>

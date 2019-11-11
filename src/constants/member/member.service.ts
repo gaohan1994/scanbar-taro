@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:01:17 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-08 11:05:44
+ * @Last Modified time: 2019-11-11 15:48:11
  * 
  * @todo [会员相关的接口]
  * ```js
@@ -14,7 +14,7 @@
 
 import requestHttp from "../../common/request/request.http";
 import MemberInterfaceMap from './member';
-import { MemberInfoAddParams } from './member';
+import { MemberInterface } from './member';
 import { HTTPInterface } from '../index';
 
 class MemberService {
@@ -24,7 +24,7 @@ class MemberService {
    *
    * @memberof MemberService
    */
-  public memberList = async (params?: any): Promise<HTTPInterface.ResponseArray<any>> => {
+  public memberList = async (params?: any): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.get(MemberInterfaceMap.memberInfoList(params));
   }
 
@@ -33,8 +33,12 @@ class MemberService {
    *
    * @memberof MemberService
    */
-  public memberAdd = async (params: MemberInfoAddParams): Promise<HTTPInterface.ResponseResultBase<any>> => {
+  public memberAdd = async (params: MemberInterface.MemberInfoAddParams): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.post(MemberInterfaceMap.memberInfoAdd, params);
+  }
+
+  public memberSearch = async (params?: MemberInterface.MemberInfoSearchFidle): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.get(MemberInterfaceMap.memberInfoSearch(params));
   }
 }
 

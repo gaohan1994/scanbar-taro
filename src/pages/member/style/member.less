@@ -3,15 +3,30 @@
 @member-prefix: member;
 @member-card-width: 690px;
 @member-avator-size: 150px;
+@member-search-icon-size: 28px;
+@member-search-add-icon-size: 40px;
+@member-search-input-font-size: 26px;
+@member-search-zindex: 99;
+@member-list-loading-size: 100px;
 
 .@{member-prefix} {
   .padding(30px, lr);
+  position: relative;
   &-pos {
     margin-top: -150px;
   }
   &-bg {
     height: 255px;
     width: 100%;
+    &-color {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 166px;
+      width: 100%;
+      background-color: @theme-color;
+    }
   }
   &-card {
     position: relative;
@@ -41,5 +56,57 @@
   }
   &-edit {
     .margin(80px, t);
+  }
+  &-main {
+    display: flex;
+    flex-direction: column;
+    &-header {
+      .flex(center, space-between, row);
+      .padding(20px, tb);
+      .padding(30px, lr);
+      width: 100%;
+      &-add {
+        z-index: @member-search-zindex;
+        .flex(center, center, row);
+        &-icon {
+          width: @member-search-add-icon-size;
+          height: @member-search-add-icon-size;
+          .margin(4px, r);
+        }
+        &-text {
+          font-size: @member-search-icon-size;
+          color: #ffffff;
+        }
+      }
+      &-search {
+        z-index: @member-search-zindex;
+        width: 580px;
+        height: 60px;
+        border-radius: 30px;
+        background-color: #ffffff;
+        .flex(center, center, row);
+        &-icon {
+          width: @member-search-icon-size;
+          height: @member-search-icon-size;
+          .margin(15px, r);
+        }
+        &-input {
+          font-size: @member-search-input-font-size;
+          color: @base-font-color;
+          width: 520px - 50px;
+          &-holder {
+            color: @placeholer-text-color;
+          }
+        }
+      }
+    }
+  }
+  &-list {
+    flex: 1
+  }
+  &-loading {
+    position: relative;
+    width: 100%;
+    height: @member-list-loading-size;
   }
 }

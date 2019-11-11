@@ -2,44 +2,35 @@
  * @Author: Ghan 
  * @Date: 2019-11-11 10:00:37 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-11 10:08:54
+ * @Last Modified time: 2019-11-11 14:03:27
  * 
  * @todo [类型定义库]
  */
+
+export { default as MemberService } from './member/member.service';
+export { MemberInterface, default as MemberInterfaceMap } from './member/member';
 
 export const ResponseCode = {
   success: 'response.success'
 };
 
 export declare namespace HTTPInterface {
+
   /**
-   * @Author: Ghan 
-   * @Date: 2019-11-08 10:04:18 
-   * @Last Modified by: Ghan
-   * @Last Modified time: 2019-11-08 15:55:00
-   * @todo [通用类别]
+   * @interface FetchField
+   * 通用分页请求函数
    */
+  type FetchField = {
+    pageNum: number;
+    pageSize?: number;
+  };
+
   type ResponseResultBase<T> = {
     code: string;
     msg: string;
     data: T
   };
 
-  /**
-   * @todo [通用数组返回类型]
-   * ```js
-   * {
-   *  code: 'response.success',
-   *  msg: '操作成功',
-   *  data: {
-   *    total: 1,
-   *    rows: [
-   *      {...xxx}
-   *    ]
-   *  }
-   * }
-   * ```
-   */
   type ResponseArray<T> = ResponseResultBase<{total: number, rows: T[]}>;
 }
 

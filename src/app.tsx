@@ -12,7 +12,7 @@ import "./styles/reset.less";
 //   require('nerv-devtools')
 // }
 
-const store = configStore();
+export const store = configStore();
 
 class App extends Component {
 
@@ -49,8 +49,22 @@ class App extends Component {
        * @todo [会员相关]
        */
       'pages/member/member',
-      'pages/member/member.detail',
       'pages/member/member.add',
+      /**
+       * @param {id} number
+       * 
+       * ```js
+       * Taro.navigateTo({url: 'pages/member/member.detail?id=1',});
+       * ```
+       */
+      'pages/member/member.detail',
+      /**
+       * @param {id} number
+       * 
+       * ```js
+       * Taro.navigateTo({url: 'pages/member/member.edit?id=1',});
+       * ```
+       */
       'pages/member/member.edit',
 
       /**

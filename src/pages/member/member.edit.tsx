@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-06 15:31:15
+ * @Last Modified time: 2019-11-11 15:22:20
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Picker } from '@tarojs/components';
@@ -42,6 +42,10 @@ class MemberMain extends Taro.Component<Props, State> {
   config: Taro.Config = {
     navigationBarTitleText: '会员编辑'
   };
+
+  componentWillMount() {
+    console.log('this.$router.params:', this.$router.params);
+  }
 
   /**
    * @todo [切换会员性别]
