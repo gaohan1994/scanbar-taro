@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-11 19:28:43
+ * @Last Modified time: 2019-11-12 10:27:29
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Input, Image, Text } from '@tarojs/components';
@@ -52,7 +52,9 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
   };
   
   componentDidShow () {
-    this.fetchMember(1);
+    if (this.state.lastIsSearch === false && this.state.searchValue === '') {
+      this.fetchMember(1);
+    }
   }
 
   /**
@@ -126,8 +128,8 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
       this.changeRefreshing(false);
       this.changeLoading(false);
     } catch (error) {
-      this.changeLoading(false);
       this.changeRefreshing(false);
+      this.changeLoading(false);
       Taro.showToast({
         title: error.message,
         icon: 'none'
@@ -153,6 +155,19 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
         return;
       }
       const currentPage = typeof page === 'number' ? page : pageNum;
+      if (currentPage === 1) {
+        if (this.state.refreshing === true) {
+          return;
+        } else {
+          this.changeRefreshing(true);
+        }
+      } else {
+        if (this.state.loading === true) {
+          return;
+        } else {
+          this.changeLoading(true);
+        }
+      }
       const params: MemberInterface.MemberInfoSearchFidle = {
         pageNum: currentPage,
         pageSize,
@@ -166,12 +181,16 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
       } else {
         pageNum += 1;
       }
+      this.changeRefreshing(false);
+      this.changeLoading(false);
     } catch (error) {
       Taro.showToast({
         title: error.message,
         icon: 'none'
       });
       this.changeLastIsSearch(false);
+      this.changeRefreshing(false);
+      this.changeLoading(false);
     }
   }
 
@@ -184,8 +203,17 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
     }
   }
 
+  public refresh = async (): Promise<void> => {
+    const { lastIsSearch } = this.state;
+    if (lastIsSearch === false) {
+      this.fetchMember(1);
+    } else {
+      this.searchMember(1);
+    }
+  }
+
   render () {
-    const { loading } = this.state;
+    const { loading, refreshing } = this.state;
     const { memberListByDate } = this.props;
     return (
       <View className={`container ${cssPrefix}-main`}>
@@ -213,7 +241,14 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
         <ScrollView 
           scrollY={true}
           className={`${cssPrefix} ${cssPrefix}-list`}
+          onScrollToUpper={this.refresh}
+          onScrollToLower={this.loadMore}
         >
+          {refreshing === true && (
+            <View className={`${cssPrefix}-loading`}>
+              <AtActivityIndicator mode='center' />
+            </View>
+          )}
           {memberListByDate && memberListByDate.length > 0 ? (
             memberListByDate.map((dateList) => {
               const formData: FormRowProps[] = dateList.data.map((member) => {
@@ -231,11 +266,10 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
             <View>暂无数据</View>
           )}
           {loading === true && (
-            <AtActivityIndicator mode='center' />
+            <View className={`${cssPrefix}-loading`}>
+              <AtActivityIndicator mode='center' />
+            </View>
           )}
-          <View className={`${cssPrefix}-loading`}>
-            <AtActivityIndicator mode='center' />
-          </View>
         </ScrollView>
       </View>
     );

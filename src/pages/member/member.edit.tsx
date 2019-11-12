@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-11 15:22:20
+ * @Last Modified time: 2019-11-12 11:19:04
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Picker } from '@tarojs/components';
@@ -11,10 +11,19 @@ import FormCard from '../../component/card/form.card';
 import { FormRowProps } from '../../component/card/form.row';
 import { AtButton, AtMessage } from 'taro-ui';
 import FormRow from '../../component/card/form.row';
+import { MemberAction } from '../../actions';
+import invariant from 'invariant';
+import { MemberInterface } from '../../constants';
+import Validator from '../../common/util/validator';
+import { AppReducer } from '../../reducers';
+import { getMemberDetail } from '../../reducers/app.member';
+import { connect } from '@tarojs/redux';
 
 const cssPrefix: string = 'member';
 
-interface Props { }
+interface Props { 
+  memberDetail: MemberInterface.MemberInfo;
+}
 
 interface State { 
   sex: 'male' | 'female'; // 会员性别
@@ -22,6 +31,8 @@ interface State {
   name: string;           // 会员姓名
   birthday: string;       // 会员生日
   memberStatus: boolean;  // 会员状态
+  cardNo: string;         // 会员卡号
+  createTime: string;     // 开卡时间
 }
 
 class MemberMain extends Taro.Component<Props, State> {
@@ -31,6 +42,8 @@ class MemberMain extends Taro.Component<Props, State> {
     name: '',
     birthday: '1990-01-01',
     memberStatus: true,
+    cardNo: '',
+    createTime: '',
   };
   /**
    * 指定config的类型声明为: Taro.Config
@@ -44,7 +57,38 @@ class MemberMain extends Taro.Component<Props, State> {
   };
 
   componentWillMount() {
-    console.log('this.$router.params:', this.$router.params);
+    const { id } = this.$router.params;
+    if (!id) {
+      console.error('请传入会员id');
+      return;
+    }
+    this.fetchMemberDetail(id);
+  }
+
+  public fetchMemberDetail = async (id: string) => {
+    try {
+      Taro.showLoading();
+      const { success, result } = await MemberAction.memberDetail({id: Number(id)});
+      invariant(success, result || ' ');
+      const memberInfo: MemberInterface.MemberInfo = result;
+      this.setState({
+        sex: memberInfo.sex === '1' ? 'male' : 'female',
+        phone: memberInfo.phoneNumber,
+        name: memberInfo.username,
+        birthday: memberInfo.birthDate || '',
+        memberStatus: memberInfo.status === 0 ? true : false,
+        cardNo: memberInfo.cardNo || '',
+        createTime: memberInfo.createTime,
+      }, () => {
+        Taro.hideLoading();
+      });
+    } catch (error) {
+      Taro.hideLoading();
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
   }
 
   /**
@@ -102,29 +146,80 @@ class MemberMain extends Taro.Component<Props, State> {
   }
 
   /**
+   * @todo [判断是否通过校验]
+   *
+   * @memberof MemberMain
+   */
+  public validate = (): { success: boolean, result: any } => {
+    const { phone, name } = this.state;
+    const helper = new Validator();
+    helper.add(phone, [{
+      strategy: 'isNonEmpty',
+      errorMsg: '请输入会员手机号',
+    }, {
+      strategy: 'isNumberVali',
+      errorMsg: '请输入正确的手机号码'
+    }]);
+
+    helper.add(name, [{
+      strategy: 'isNonEmpty',
+      errorMsg: '请输入会员姓名',
+    }]);
+
+    const result = helper.start();
+    if (result) {
+      return { success: false, result: result.msg };
+    }
+    return { success: true, result: { phoneNumber: phone, username: name } };
+  }
+
+  /**
    * @todo [添加会员事件]
    * @todo [先校验用户输入，然后提交接口判断返回]
    *
    * @memberof MemberMain
    */
-  public onAddMember = () => {
-    Taro.showToast({
-      title: '添加会员成功',
-      icon: 'success'
-    });
+  public onSaveMember = async () => {
+    try {
+      Taro.showLoading();
+      const { success, result } = this.validate();
+      invariant(success, result || ' ');
+
+      const { memberDetail } = this.props;
+      const params: MemberInterface.MemberInfoEditParams = {
+        ...result,
+        merchantId: memberDetail.merchantId,
+        sex: this.state.sex === 'male' ? '1' : '0',
+        status: this.state.memberStatus === true ? 0 : 1,
+        birthDate: this.state.birthday,
+        cardNo: memberDetail.cardNo,
+        id: memberDetail.id,
+      };
+      const editResult = await MemberAction.memberEdit(params);
+      invariant(editResult.success, editResult.result || ' ');
+      Taro.hideLoading();
+      Taro.showToast({
+        title: '修改成功',
+        icon: 'success',
+        success: () => {
+          Taro.navigateTo({url: `/pages/member/member.detail?id=${memberDetail.id}`});
+        }
+      });
+    } catch (error) {
+      Taro.hideLoading();
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
   }
 
   render () {
     const memberDetailForm: FormRowProps[] = [
       {
         title: '卡号',
-        buttons: [
-          {
-            title: '保存后自动生成',
-            type: 'cancel',
-            onPress: () => { /** */ }
-          }
-        ]
+        extraText: this.state.cardNo,
+        disabled: false,
       },
       {
         title: '手机号',
@@ -162,23 +257,11 @@ class MemberMain extends Taro.Component<Props, State> {
     const memberStoreDetail: FormRowProps[] = [
       {
         title: '开卡门店',
-        buttons: [
-          {
-            title: '保存后自动生成',
-            type: 'cancel',
-            onPress: () => { /** */ }
-          }
-        ]
+        extraText: '开卡门店'
       },
       {
         title: '开卡时间',
-        buttons: [
-          {
-            title: '保存后自动生成',
-            type: 'cancel',
-            onPress: () => { /** */ }
-          }
-        ]
+        extraText: this.state.createTime
       },
     ];
     const memberStatusForm: FormRowProps[] = [
@@ -220,7 +303,7 @@ class MemberMain extends Taro.Component<Props, State> {
           <View className={`${cssPrefix}-edit`}>
             <AtButton 
               className="theme-button "
-              onClick={this.onAddMember}
+              onClick={this.onSaveMember}
             >
               保存
             </AtButton>
@@ -231,4 +314,8 @@ class MemberMain extends Taro.Component<Props, State> {
   }
 }
 
-export default MemberMain;
+const mapState = (state: AppReducer.AppState) => ({
+  memberDetail: getMemberDetail(state)
+});
+
+export default connect(mapState)(MemberMain);

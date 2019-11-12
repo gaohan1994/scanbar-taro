@@ -68,14 +68,11 @@ export class TestListView extends Taro.Component<Props, State> {
   public onScroll = (event: any) => {
     const { target } = event;
     const { scrollTop } = target;
-    console.log('target: ', target);
     /**
      * @todo [index] 根据高度判断滑动到第几个item
      */
     const index: number = Math.floor(scrollTop / ItemHeight);
-    console.log('index: ', index);
     const currentItem = ListData[index];
-    console.log('currentItem: ', currentItem);
     if (currentItem && currentItem.id && currentItem.menuId && this.state.currentMenuId !== currentItem.menuId) {
       this.changeCurrentMenu({id: currentItem.menuId});
     }

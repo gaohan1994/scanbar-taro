@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:01:17 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-11 15:48:11
+ * @Last Modified time: 2019-11-12 11:12:41
  * 
  * @todo [会员相关的接口]
  * ```js
@@ -39,6 +39,14 @@ class MemberService {
 
   public memberSearch = async (params?: MemberInterface.MemberInfoSearchFidle): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.get(MemberInterfaceMap.memberInfoSearch(params));
+  }
+
+  public memberDetail = async (params: MemberInterface.MemberInfoDetail): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.get(MemberInterfaceMap.memberInfoDetail(params));
+  }
+
+  public memberEdit = async (params: MemberInterface.MemberInfoEditParams): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.post(MemberInterfaceMap.memberInfoEdit, params);
   }
 }
 

@@ -2,10 +2,11 @@
  * @Author: Ghan 
  * @Date: 2019-11-11 10:23:20 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-11 17:13:55
+ * @Last Modified time: 2019-11-12 10:08:59
  */
 import merge from 'lodash/merge';
 import { MemberInterface, MemberInterfaceMap } from '../constants';
+import { AppReducer } from '.';
 
 /**
  * @interface MemberReducer
@@ -22,10 +23,13 @@ export declare namespace MemberReducer {
 
   interface MemberInitState {
     memberList: MemberList;
+    memberDetail: MemberInterface.MemberInfo;
   }
 
   interface MemberAction {
-    type: MemberInterface.MemberReducerType;
+    type: 
+      | MemberInterface.RECEIVE_MEMBER_DETAIL
+      | MemberInterface.RECEIVE_MEMBER_LIST;
     payload: any;
   }
 }
@@ -34,6 +38,15 @@ const initState: MemberReducer.MemberInitState = {
   memberList: {
     total: 0,
     data: []
+  },
+  memberDetail: {
+    createTime: '',
+    id: 0,
+    merchantId: 0,
+    phoneNumber: '',
+    sex: '0',
+    status: 1,
+    username: '',
   },
 };
 
@@ -52,8 +65,17 @@ export default function memberReducer (state: MemberReducer.MemberInitState = in
         }
       };
     }
+    case MemberInterfaceMap.reducerInterfaces.RECEIVE_MEMBER_DETAIL: {
+      const { payload: { data } } = action;
+      return {
+        ...state,
+        memberDetail: data
+      };
+    }
     default: {
       return {...state};
     }
   }
 }
+
+export const getMemberDetail = (state: AppReducer.AppState) => state.member.memberDetail;

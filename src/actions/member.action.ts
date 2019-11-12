@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:28:21 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-11 17:42:01
+ * @Last Modified time: 2019-11-12 11:15:51
  */
 import memberService from "../constants/member/member.service";
 import { ResponseCode, ActionsInterface, MemberInterface, MemberInterfaceMap } from '../constants/index';
@@ -151,11 +151,33 @@ class MemberAction {
       store.dispatch({
         type: MemberInterfaceMap.reducerInterfaces.RECEIVE_MEMBER_LIST,
         payload: {
-          rows: result.data,
+          ...result.data,
           page: params && params.pageNum || 1,
         }
       });
       return { success: true, result: result.data };
+    } else {
+      return { success: false, result: result.msg }; 
+    }
+  }
+
+  public memberDetail = async (params: MemberInterface.MemberInfoDetail) => {
+    const result = await memberService.memberDetail(params);
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: MemberInterfaceMap.reducerInterfaces.RECEIVE_MEMBER_DETAIL,
+        payload: {data: result.data}
+      });
+      return { success: true, result: result.data };
+    } else {
+      return { success: false, result: result.msg }; 
+    }
+  }
+
+  public memberEdit = async (params: MemberInterface.MemberInfoEditParams) => {
+    const result = await memberService.memberEdit(params);
+    if (result.code === ResponseCode.success) {
+      return { success: true, result: result.msg };
     } else {
       return { success: false, result: result.msg }; 
     }
