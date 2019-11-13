@@ -31,6 +31,11 @@ class App extends Component {
       'pages/home/home',
 
       /**
+       * @todo [开单页面]
+       */
+      'pages/product/product.order',
+
+      /**
        * @todo [sign相关页面]
        */
       'pages/sign/login',

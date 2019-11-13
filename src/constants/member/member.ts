@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:09:10 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-12 11:00:49
+ * @Last Modified time: 2019-11-13 10:15:29
  */
 import { jsonToQueryString, HTTPInterface } from '../index';
 

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-11 10:23:20 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-12 10:08:59
+ * @Last Modified time: 2019-11-13 10:34:36
  */
 import merge from 'lodash/merge';
 import { MemberInterface, MemberInterfaceMap } from '../constants';

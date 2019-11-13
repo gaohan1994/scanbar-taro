@@ -98,10 +98,12 @@ class Home extends Component {
             </View>
           </View>
         </Card>
-        <Card card-class="home-order">
-          <Image src="//net.huanmusic.com/weapp/icon_home_bill.png" className="home-order-icon" />
-          <Text className="home-order-text" >开单</Text>
-        </Card>
+        <View onClick={() => Taro.navigateTo({url: '/pages/product/product.order'})}>
+          <Card card-class="home-order">
+            <Image src="//net.huanmusic.com/weapp/icon_home_bill.png" className="home-order-icon" />
+            <Text className="home-order-text" >开单</Text>
+          </Card>
+        </View>
         <View className="home-bar">
           {
             NavItems.map((item, index) => {

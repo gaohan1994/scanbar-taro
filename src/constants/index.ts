@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-11 10:00:37 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-11 14:03:27
+ * @Last Modified time: 2019-11-13 13:59:25
  * 
  * @todo [类型定义库]
  */
@@ -10,8 +10,12 @@
 export { default as MemberService } from './member/member.service';
 export { MemberInterface, default as MemberInterfaceMap } from './member/member';
 
+export { default as ProductService } from './product/product.service';
+export { ProductInterface, default as ProductInterfaceMap } from './product/product';
+
 export const ResponseCode = {
-  success: 'response.success'
+  success: 'response.success',
+  error: '服务器开了个小差',
 };
 
 export declare namespace HTTPInterface {

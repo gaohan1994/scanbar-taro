@@ -1,3 +1,9 @@
+/**
+ * @Author: Ghan 
+ * @Date: 2019-11-12 14:01:28 
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2019-11-12 15:58:42
+ */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import "./style/pay.less";
@@ -5,8 +11,6 @@ import classnames from 'classnames';
 import { AtActivityIndicator, AtButton } from 'taro-ui';
 import FormCard from '../../component/card/form.card';
 import { FormRowProps } from '../../component/card/form.row';
-import { arrayOf } from 'prop-types';
-
 const Items = [
   {
     title: '收款码',

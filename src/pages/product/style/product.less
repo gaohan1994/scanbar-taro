@@ -1,0 +1,91 @@
+@import "../../../styles/theme.less";
+@import "../../../component/cart/cart.less";
+
+@product-prefix: product;
+@product-search-width: 550px;
+@product-header-height: 20px + 20px + 60px;
+@product-list-left-bg-color: #f6f6f6;
+@product-list-type-height: 94px;
+@product-list-type-header-font: 28px;
+
+.@{product-prefix} {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  &-header {
+    position: fixed;
+    background-color: @theme-color;
+    .flex(center, space-between, row);
+    .padding(20px);
+    top: 0;
+    left: 0;
+    right: 0;
+    &-button {
+      color: @theme-color;
+      background-color: #ffffff;
+      height: 60px;
+      .padding(18px, lr);
+      .flex(center, center);
+      border-radius: 30px;
+      font-size: @normal-text-fontsize;
+    }
+    &-search {
+      width: @product-search-width !important;
+    }
+  }
+  &-list {
+    &-container {
+      position: fixed;
+      top: @product-header-height;
+      display: flex;
+      flex-direction: row;
+    }
+    &-left {
+      width: 150px;
+      display: flex;
+      flex-direction: column;
+      background-color: @product-list-left-bg-color;
+      &-item {
+        .flex(center, center, row);
+        position: relative;
+        height: @product-list-type-height;
+        color: @base-font-color;
+        font-size: @normal-text-fontsize;
+        &-active {
+          background-color: #ffffff;
+          &-bge {
+            position: absolute;
+            height: @product-list-type-height;
+            width: 2px;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background-color: @theme-color;
+          }
+        }
+      }
+    }
+    &-right {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      &-header {
+        .padding(20px);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        &-bge {
+          background-color: @theme-color;
+          width: 2px;
+          height: 28px;
+          .margin(10px, r);
+        }
+        &-text {
+          font-size: @product-list-type-header-font;
+          color: @base-font-color;
+          font-weight: bold;         
+        }
+      }
+    }
+  }
+}
