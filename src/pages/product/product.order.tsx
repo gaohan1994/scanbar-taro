@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-13 15:52:56
+ * @Last Modified time: 2019-11-13 16:00:06
  * 
  * @todo 开单页面
  */
@@ -86,7 +86,6 @@ class ProductOrder extends Taro.Component<Props, State> {
   }
 
   public getScrollProductId = (productList: ProductInterface.ProductInfo[]) => {
-    console.log('productList[0]: ', productList[0]);
     return productList.length > 0 
       ? productList[0]
         ? productList[0].id
@@ -111,7 +110,6 @@ class ProductOrder extends Taro.Component<Props, State> {
       query
         .select('.product-component-base1')
         .boundingClientRect((rect: any) => {
-          console.log('rect: ', rect);
           ItemHeight = rect.height;
         })
         .exec();
@@ -129,7 +127,6 @@ class ProductOrder extends Taro.Component<Props, State> {
         query
           .select('.product-component-base1')
           .boundingClientRect((rect: any) => {
-            console.log('rect: ', rect);
             ItemHeight = rect.height;
             resolve(rect.height);
           })
@@ -149,15 +146,11 @@ class ProductOrder extends Taro.Component<Props, State> {
     const { pureProductList, productList } = this.props;
 
     const ProductItemHeight = await this.getItemHeight();
-    console.log('scrollTop: ', scrollTop);
-    console.log('ProductItemHeight: ', ProductItemHeight);
     /**
      * @todo [index] 根据高度判断滑动到第几个item
      */
     const index: number = Math.ceil(scrollTop / ProductItemHeight);
     const currentItem = pureProductList[index] || {};
-    console.log('index: ', index);
-    console.log('currentItem: ', currentItem);
     if (currentItem && currentItem.id && currentItem.type && currentType.id !== currentItem.type) {
       const currentList = productList.find((l) => l.typeInfo.id === currentItem.type);
       if (currentList !== undefined) {
@@ -218,7 +211,7 @@ class ProductOrder extends Taro.Component<Props, State> {
             </View>
             <ScrollView 
               scrollY={true}
-              className={`${cssPrefix}-list-right`}
+              className={`${cssPrefix}-list-right ${cssPrefix}-list-right-container`}
               scrollIntoView={`product${this.state.scrollProductId}`}
               onScroll={this.onScroll}
             >
