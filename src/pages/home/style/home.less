@@ -5,8 +5,22 @@
 
 .@{home-prefix} {
   .flex(center, flex-start, column);
-  .padding(30px, lr);
   background-color: #f8f8f8;
+
+  &-swiper {
+    width: 100%;
+    height: 400px;
+    &-image {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  &-grid {
+    width: 100%;
+    background-color: #ffffff;
+  }
+
   &-bg {
     .background-image('//net.huanmusic.com/weapp/bg_member.png');
     width: 100%;

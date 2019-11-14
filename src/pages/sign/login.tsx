@@ -71,7 +71,7 @@ class Login extends Taro.Component<Props, State> {
     return (
       <View className={classnames(['container', 'sign'])} >
         <View className="sign-card">
-          <View className="sign-card-title">欢迎使用进销存产品</View>
+          <View className="sign-card-title">福建师范大学二手市场</View>
           <View className="sign-card-input">
             <CTInput
               name="username"

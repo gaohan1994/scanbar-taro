@@ -1,49 +1,11 @@
 import { ComponentClass } from 'react';
 import Taro, { Component, Config } from '@tarojs/taro';
-import { View, Image, Text } from '@tarojs/components';
+import { View, Image, Text, Swiper, SwiperItem } from '@tarojs/components';
 import './style/home.less';
 import classnames from 'classnames';
-import { Card } from '../../component/common/card/card.common';
 import { LoginManager } from '../../common/sdk';
-
-const NavItems = [
-  {
-    image: '//net.huanmusic.com/weapp/icon_menu_order.png',
-    value: '商品管理',
-    subTitle: 'Commodity management',
-    url: '/pages/',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/icon_menu_order.png',
-    value: '会员管理',
-    subTitle: 'Member management',
-    url: '/pages/member/member',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/icon_menu_order.png',
-    value: '收款',
-    subTitle: 'Gathering',
-    url: '/pages/pay/pay.receive',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/icon_menu_order.png',
-    value: '采购收货',
-    subTitle: 'Procurement',
-    url: '/pages/',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/icon_menu_order.png',
-    value: '采购下单',
-    subTitle: 'Purchasing order',
-    url: '/pages/',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/icon_menu_order.png',
-    value: '更多',
-    subTitle: 'Even more',
-    url: '/pages/',
-  }
-];
+import { AtTabs, AtTabsPane, AtGrid } from 'taro-ui';
+import TradeList from '../../component/product/list';
 
 type PageState = {};
 type IProps = {};
@@ -52,7 +14,11 @@ interface Home {
   props: IProps;
 }
 
-class Home extends Component {
+interface State {
+  current: any;
+}
+
+class Home extends Component<any, State> {
 
   /**
    * 指定config的类型声明为: Taro.Config
@@ -64,6 +30,18 @@ class Home extends Component {
   config: Config = {
     navigationBarTitleText: '首页'
   };
+
+  constructor () {
+    super(...arguments);
+    this.state = {
+      current: 0,
+    };
+  }
+  handleClick (value: any) {
+    this.setState({
+      current: value
+    });
+  }
 
   async componentDidShow () {
     const userinfo = await LoginManager.login();
@@ -80,48 +58,89 @@ class Home extends Component {
   }
 
   render () {
+    const swiperData = [1, 2, 3, 4, 5];
+    const tabList = [{ title: '二手图书' }, { title: '推荐小物' }, { title: '美妆口红' }, { title: '科技数码' }, { title: '二手电动车' }];
     return (
       <View className={classnames(['container', 'home'])}>
-        <View className="home-name">
-          <Image src="//net.huanmusic.com/weapp/icon_shop.png" className={classnames(['home-name-icon', 'home-icon'])} />
-          <Text className="home-name-text">可乐便利店</Text>
-        </View>
-        <Card card-class="home-card">
-          <View className="home-buttons">
-            <View className="home-buttons-button home-buttons-button-border">
-              <View className="normal-text">今日销售额 ></View>
-              <View className="home-money">100000.00</View>
-            </View>
-            <View className="home-buttons-button home-buttons-button-end">
-              <View className="normal-text">今日销售额 ></View>
-              <View className="home-money">100000.00</View>
-            </View>
-          </View>
-        </Card>
-        <View onClick={() => Taro.navigateTo({url: '/pages/product/product.order'})}>
-          <Card card-class="home-order">
-            <Image src="//net.huanmusic.com/weapp/icon_home_bill.png" className="home-order-icon" />
-            <Text className="home-order-text" >开单</Text>
-          </Card>
-        </View>
-        <View className="home-bar">
+        <Swiper
+          className='home-swiper'
+          indicatorColor='#999'
+          indicatorActiveColor='#333'
+          circular={true}
+          indicatorDots={true}
+          autoplay={true}
+        >
           {
-            NavItems.map((item, index) => {
+            swiperData.map((item) => {
               return (
-                <Card 
-                  key={item.value}
-                  shadow={false} 
-                  card-class={`home-bar-card ${(index + 1) % 3 !== 0 ? 'home-bar-card-right' : ''}`} 
-                >
-                  <View className="home-bar-card-content" onClick={() => this.onNavHandle(item)}>
-                    <Image className="home-icon" src={item.image} />
-                    <Text className="normal-text">{item.value}</Text>
-                    <Text className="home-small-text">{item.subTitle}</Text>
-                  </View>
-                </Card>
+                <SwiperItem key={item}>
+                  <Image 
+                    className='home-swiper-image'
+                    src="https://img11.360buyimg.com/babel/s700x360_jfs/t1/4776/39/2280/143162/5b9642a5E83bcda10/d93064343eb12276.jpg!q90!cc_350x180" 
+                  />
+                </SwiperItem>
               );
             })
           }
+        </Swiper>
+        <View className='home-grid'>
+          <AtGrid 
+            
+            data={
+              [
+                {
+                  image: 'https://img12.360buyimg.com/jdphoto/s72x72_jfs/t6160/14/2008729947/2754/7d512a86/595c3aeeNa89ddf71.png',
+                  value: '书籍笔记'
+                },
+                {
+                  image: 'https://img20.360buyimg.com/jdphoto/s72x72_jfs/t15151/308/1012305375/2300/536ee6ef/5a411466N040a074b.png',
+                  value: '日用电器'
+                },
+                {
+                  image: 'https://img10.360buyimg.com/jdphoto/s72x72_jfs/t5872/209/5240187906/2872/8fa98cd/595c3b2aN4155b931.png',
+                  value: '零食水果'
+                },
+                {
+                  image: 'https://img12.360buyimg.com/jdphoto/s72x72_jfs/t10660/330/203667368/1672/801735d7/59c85643N31e68303.png',
+                  value: '生活用品'
+                },
+                {
+                  image: 'https://img14.360buyimg.com/jdphoto/s72x72_jfs/t17251/336/1311038817/3177/72595a07/5ac44618Na1db7b09.png',
+                  value: '服饰鞋包'
+                },
+                {
+                  image: 'https://img30.360buyimg.com/jdphoto/s72x72_jfs/t5770/97/5184449507/2423/294d5f95/595c3b4dNbc6bc95d.png',
+                  value: '美妆捡漏'
+                }
+              ]
+            } 
+          />
+        </View>
+
+        <View className="home-grid">
+          <AtTabs 
+            current={this.state.current} 
+            tabList={tabList} 
+            scroll={true}
+            onClick={(params) => this.handleClick(params)}
+          >
+            <AtTabsPane current={this.state.current} index={0} >
+              <TradeList />
+            </AtTabsPane>
+            <AtTabsPane current={this.state.current} index={1}>
+              <TradeList />
+            </AtTabsPane>
+            <AtTabsPane current={this.state.current} index={2}>
+              <TradeList />
+            </AtTabsPane>
+            <AtTabsPane current={this.state.current} index={3}>
+              <TradeList />
+            </AtTabsPane>
+            <AtTabsPane current={this.state.current} index={4}>
+              <TradeList />
+            </AtTabsPane>
+            
+          </AtTabs>
         </View>
       </View>
     );
