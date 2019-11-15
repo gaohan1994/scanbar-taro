@@ -51,9 +51,11 @@ export declare namespace ProductInterface {
   }
 
   type RECEIVE_PRODUCT_LIST = string;
+  type RECEIVE_PRODUCT_SEARCH_LIST = string;
 
   interface ReducerInterface {
     RECEIVE_PRODUCT_LIST: RECEIVE_PRODUCT_LIST;
+    RECEIVE_PRODUCT_SEARCH_LIST: RECEIVE_PRODUCT_SEARCH_LIST;
   }
 }
 
@@ -64,7 +66,8 @@ interface ProductInterfaceMap {
 class ProductInterfaceMap {
 
   public reducerInterfaces: ProductInterface.ReducerInterface = {
-    RECEIVE_PRODUCT_LIST: 'RECEIVE_PRODUCT_LIST'
+    RECEIVE_PRODUCT_LIST: 'RECEIVE_PRODUCT_LIST',
+    RECEIVE_PRODUCT_SEARCH_LIST: 'RECEIVE_PRODUCT_SEARCH_LIST',
   };
 
   public productInfoGetList = (params?: ProductInterface.ProductInfoGetListFetchFidle) => {

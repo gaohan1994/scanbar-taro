@@ -1,11 +1,13 @@
 import Taro from "@tarojs/taro";
 import { HTTP_STATUS } from './config';
+import { ResponseCode } from '../../constants/index';
 
 const customInterceptor = (chain) => {
 
   const requestParams = chain.requestParams;
 
   return chain.proceed(requestParams).then(res => {
+    console.log('res: ', res);
     if (res.statusCode === HTTP_STATUS.NOT_FOUND) {
       return Promise.reject("请求资源不存在");
 
@@ -23,9 +25,15 @@ const customInterceptor = (chain) => {
       // pageToLogin()
       return Promise.reject("需要鉴权");
 
-    } else if (res.statusCode === HTTP_STATUS.SUCCESS) {
+    } 
+    // else if (res.data && res.data.code === ResponseCode.unauthorized) {
+    //   console.log('unauthorized');
+    //   Taro.navigateTo({url: '/pages/sign/login'});
+    //   return res.data;
+    // }
+    else if (res.statusCode === HTTP_STATUS.SUCCESS) {
       return res.data;
-    }
+    } 
   });
 };
 

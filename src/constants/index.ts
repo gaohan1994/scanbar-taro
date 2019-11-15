@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-11 10:00:37 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-13 13:59:25
+ * @Last Modified time: 2019-11-14 14:49:01
  * 
  * @todo [类型定义库]
  */
@@ -16,6 +16,7 @@ export { ProductInterface, default as ProductInterfaceMap } from './product/prod
 export const ResponseCode = {
   success: 'response.success',
   error: '服务器开了个小差',
+  unauthorized: 'unauthorized',
 };
 
 export declare namespace HTTPInterface {

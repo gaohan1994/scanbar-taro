@@ -66,8 +66,11 @@ class Home extends Component {
   };
 
   async componentDidShow () {
-    const userinfo = await LoginManager.login();
-    console.log('userinfo: ', userinfo);
+    
+    const result = await LoginManager.login({phoneNumber: '15659995443', password: '111111'});
+    console.log('result: ', result);
+    // const userinfo = await LoginManager.getUserToken();
+    // console.log('userinfo: ', userinfo);
   }
 
   /**

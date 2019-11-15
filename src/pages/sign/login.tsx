@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 10:07:05 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-01 10:41:56
+ * @Last Modified time: 2019-11-14 11:50:11
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
@@ -10,6 +10,7 @@ import './style/login.less';
 import classnames from 'classnames';
 import CTInput from '../../component/sign/input/input';
 import { AtButton } from 'taro-ui';
+import { LoginManager } from '../../common/sdk';
 
 type Props = {};
 
@@ -65,6 +66,7 @@ class Login extends Taro.Component<Props, State> {
   }
   public onLogin = () => {
     console.log('onLogin: ');
+    LoginManager.login({phoneNumber: '15659995443', password: '111111'});
   }
 
   render () {

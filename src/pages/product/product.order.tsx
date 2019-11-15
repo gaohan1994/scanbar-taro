@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-13 16:00:06
+ * @Last Modified time: 2019-11-14 11:06:11
  * 
  * @todo 开单页面
  */
@@ -12,7 +12,7 @@ import "./style/product.less";
 import "../member/style/member.less";
 import CartBar from '../../component/cart/cart';
 import { ProductAction } from '../../actions';
-import { getProductList } from '../../reducers/app.product';
+import { getProductList, getProductSearchList } from '../../reducers/app.product';
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
 import { ProductInterface } from '../../constants';
@@ -27,14 +27,40 @@ const memberPrefix = 'member';
 const cssPrefix = 'product';
 
 interface Props { 
+  /**
+   * @param {productList} 商品数据，商品在分类里
+   *
+   * @type {ProductInterface.ProductList[]}
+   * @memberof Props
+   */
   productList: ProductInterface.ProductList[];
+  /**
+   * @param {pureProductList} 所有商品去掉分类之后合成的数组
+   *
+   * @type {ProductInterface.ProductInfo[]}
+   * @memberof Props
+   */
   pureProductList: ProductInterface.ProductInfo[];
+  productSearchList: ProductInterface.ProductList[];
+  pureProductSearchList: ProductInterface.ProductInfo[];
 }
 
 interface State {
+  /**
+   * @param {currentType} 左边当前分类
+   *
+   * @type {ProductInterface.ProductTypeInfo}
+   * @memberof State
+   */
   currentType: ProductInterface.ProductTypeInfo;
+  /**
+   * @param {scrollProductId} 右边滑动的id
+   *
+   * @type {number}
+   * @memberof State
+   */
   scrollProductId: number;
-  typeAnimating: boolean;
+  searchValue: string;                            
 }
 
 class ProductOrder extends Taro.Component<Props, State> {
@@ -46,7 +72,7 @@ class ProductOrder extends Taro.Component<Props, State> {
       createTime: ''
     },
     scrollProductId: -1,
-    typeAnimating: false,
+    searchValue: ''
   };
 
   componentDidShow () {
@@ -85,6 +111,27 @@ class ProductOrder extends Taro.Component<Props, State> {
     ProductAction.productInfoGetList();
   }
 
+  public searchData = async () => {
+    const { searchValue } = this.state;
+    try {
+      if (searchValue === '') {
+        /**
+         * @todo 如果输入的是空则清空搜索
+         */
+        ProductAction.productInfoEmptySearchList();
+      } else {
+        const { success, result } = await ProductAction.productInfoSearchList({words: searchValue});
+        invariant(success, result || ResponseCode.error);
+        console.log('result: ', result);
+      }
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
+
   public getScrollProductId = (productList: ProductInterface.ProductInfo[]) => {
     return productList.length > 0 
       ? productList[0]
@@ -100,6 +147,7 @@ class ProductOrder extends Taro.Component<Props, State> {
    */
   public onTypeClick = (params: ProductInterface.ProductList) => {
     const { typeInfo, productList } = params;
+    this.onInput({detail: {value: ''}});
     this.changeCurrentType(typeInfo);
     this.changeScrollProductId(this.getScrollProductId(productList));
   }
@@ -159,9 +207,20 @@ class ProductOrder extends Taro.Component<Props, State> {
     }
   }
 
+  /**
+   * @todo 绑定输入事件
+   *
+   * @memberof ProductOrder
+   */
+  public onInput = ({detail}: any) => {
+    console.log('detail: ', detail);
+    this.setState({searchValue: detail.value}, () => {
+      this.searchData();
+    });
+  }
+
   render () {
-    const { currentType } = this.state;
-    const { productList } = this.props;
+    const { searchValue } = this.state;
     return (
       <View className={`container ${cssPrefix}`}>
         <View className={`${cssPrefix}-header`}>
@@ -169,7 +228,9 @@ class ProductOrder extends Taro.Component<Props, State> {
             <Image src="//net.huanmusic.com/weapp/icon_import.png" className={`${memberPrefix}-main-header-search-icon`} />
             <Input 
               className={`${memberPrefix}-main-header-search-input`} 
-              placeholder="请输入手机号/姓名"
+              placeholder="请输入商品名称或条码"
+              value={searchValue}
+              onInput={this.onInput}
               placeholderClass={`${memberPrefix}-main-header-search-input-holder`}
             />
           </View>
@@ -177,74 +238,121 @@ class ProductOrder extends Taro.Component<Props, State> {
         </View>
         
         <View className={`${cssPrefix}-list-container container`}>
+          {this.renderLeft()}  
+          {this.renderRight()}
+        </View>
+        <CartBar />
+      </View>
+    );
+  }
+
+  /**
+   * @todo [当有搜索商品数据的时候左边不显示active菜单但是点击事件依然可以触发，点击菜单的时候清空搜索并跳转至正常位置]
+   *
+   * @private
+   * @memberof ProductOrder
+   */
+  private renderLeft = () => {
+    const { currentType, searchValue } = this.state; 
+    const { productList, pureProductSearchList } = this.props;
+    return (
+      <ScrollView 
+        scrollY={true}
+        className={`${cssPrefix}-list-left`}
+      >
+        {
+          productList && productList.length > 0
+            ? productList.map((list) => {
+              
+              return (
+                <View 
+                  key={list.typeInfo.id}
+                  className={classnames(`${cssPrefix}-list-left-item`, {
+                    [`${cssPrefix}-list-left-item-active`]: searchValue === '' && pureProductSearchList.length === 0 && list.typeInfo.id === currentType.id
+                  })}
+                  onClick={() => this.onTypeClick(list)}
+                >
+                  {searchValue === '' && pureProductSearchList.length === 0 && list.typeInfo.id === currentType.id && (
+                    <View className={`${cssPrefix}-list-left-item-active-bge`} />
+                  )}
+                  {list.typeInfo.name}
+                </View>
+              );
+            })
+            : <View />
+        }
+      </ScrollView>
+    );
+  }
+
+  private renderRight = () => {
+    const { productList, pureProductSearchList } = this.props;
+    const { currentType, scrollProductId, searchValue } = this.state;
+
+    if (pureProductSearchList.length === 0 && searchValue === '') {
+      return (
+        <View className={`${cssPrefix}-list-right`}>
+          <View className={`${cssPrefix}-list-right-header`}>
+            <View className={`${cssPrefix}-list-right-header-bge`}/>
+            <Text className={`${cssPrefix}-list-right-header-text`}>{currentType.name}</Text>
+          </View>
           <ScrollView 
             scrollY={true}
-            className={`${cssPrefix}-list-left`}
+            className={`${cssPrefix}-list-right ${cssPrefix}-list-right-container`}
+            scrollIntoView={`product${scrollProductId}`}
+            onScroll={this.onScroll}
           >
             {
               productList && productList.length > 0
                 ? productList.map((list) => {
-                  const { currentType } = this.state; 
                   return (
-                    <View 
-                      key={list.typeInfo.id}
-                      className={classnames(`${cssPrefix}-list-left-item`, {
-                        [`${cssPrefix}-list-left-item-active`]: list.typeInfo.id === currentType.id
-                      })}
-                      onClick={() => this.onTypeClick(list)}
-                    >
-                      {list.typeInfo.id === currentType.id && (
-                        <View className={`${cssPrefix}-list-left-item-active-bge`} />
-                      )}
-                      {list.typeInfo.name}
+                    <View key={list.typeInfo.id}>
+                      {
+                        list.productList.map((product) => {
+                          return (
+                            <View    
+                              id={`product${product.id}`}
+                              className="product-component-base1"
+                              key={product.id}
+                            >
+                              <ProductComponent
+                                product={product}
+                              />  
+                            </View>
+                          );
+                        })
+                      }
                     </View>
                   );
                 })
                 : <View />
             }
-          </ScrollView>
-
-          <View className={`${cssPrefix}-list-right`}>
-            <View className={`${cssPrefix}-list-right-header`}>
-              <View className={`${cssPrefix}-list-right-header-bge`}/>
-              <Text className={`${cssPrefix}-list-right-header-text`}>{currentType.name}</Text>
-            </View>
-            <ScrollView 
-              scrollY={true}
-              className={`${cssPrefix}-list-right ${cssPrefix}-list-right-container`}
-              scrollIntoView={`product${this.state.scrollProductId}`}
-              onScroll={this.onScroll}
-            >
-              {
-                productList && productList.length > 0
-                  ? productList.map((list) => {
-                    return (
-                      <View key={list.typeInfo.id}>
-                        {
-                          list.productList.map((product) => {
-                            return (
-                              <View    
-                                id={`product${product.id}`}
-                                className="product-component-base1"
-                                key={product.id}
-                              >
-                                <ProductComponent
-                                  product={product}
-                                />  
-                              </View>
-                            );
-                          })
-                        }
-                      </View>
-                    );
-                  })
-                  : <View />
-              }
-            </ScrollView>  
-          </View>
-          
+          </ScrollView>  
         </View>
-        <CartBar />
+      );
+    } 
+    return (
+      <View className={`${cssPrefix}-list-right`}>
+        <ScrollView 
+          scrollY={true}
+          className={`${cssPrefix}-list-right ${cssPrefix}-list-right-container`}
+        >
+          {
+            pureProductSearchList.map((product) => {
+              return (
+                <View    
+                  id={`product${product.id}`}
+                  className="product-component-base1"
+                  key={product.id}
+                >
+                  <ProductComponent
+                    product={product}
+                  />  
+                </View>
+              );
+            })
+          }
+        </ScrollView>  
       </View>
     );
   }
@@ -252,7 +360,6 @@ class ProductOrder extends Taro.Component<Props, State> {
 
 const mapState = (state: AppReducer.AppState) => {
   const productList = getProductList(state) || [];
-
   const pureProductList: ProductInterface.ProductInfo[] = [];
   productList.forEach((list) => {
     list.productList.forEach((item) => {
@@ -260,9 +367,19 @@ const mapState = (state: AppReducer.AppState) => {
     });
   });
 
+  const productSearchList = getProductSearchList(state) || [];
+  const pureProductSearchList: any[] = [];
+  productSearchList.forEach((list) => {
+    list.productList.forEach((item) => {
+      pureProductSearchList.push(item);
+    });
+  });
+
   return {
     productList,
     pureProductList,
+    productSearchList,
+    pureProductSearchList,
   };
 };
 

@@ -1,11 +1,13 @@
 import Taro from '@tarojs/taro';
 import getBaseUrl from './base.url';
 import interceptors from './interceptors';
+import { LoginManager } from '../sdk';
 
 interceptors.forEach(i => Taro.addInterceptor(i));
 
 class HttpRequest {
   baseOptions(params: any, method: string = "GET"): Promise<any> {
+    const { result } = LoginManager.getUserToken();
     let { url, data } = params;
     const BASE_URL = getBaseUrl(url);
     let contentType = "application/json";
@@ -15,10 +17,13 @@ class HttpRequest {
       data: data,
       method: method,
       header: {
-        'content-type': contentType,
-        // 'Authorization': Taro.getStorageSync('Authorization')
+        'content-type': contentType
       }
     };
+
+    if (result !== '') {
+      option.header.Authorization = result;
+    }
     return Taro.request(option);
   }
 
