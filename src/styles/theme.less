@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-10-30 11:33:11 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-13 09:53:36
+ * @Last Modified time: 2019-11-18 16:23:47
  */
 
 // 主色调
@@ -165,6 +165,25 @@
  * @Author: Ghan 
  * @Date: 2019-10-30 11:33:11 
  * @Last Modified by: Ghan
+ * 通用css配置
+ */
+.fixed-header () {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.fixed-container (@top) {
+  position: fixed;
+  top: @top;
+  width: 100%;
+}
+
+/**
+ * @Author: Ghan 
+ * @Date: 2019-10-30 11:33:11 
+ * @Last Modified by: Ghan
  * Modal 部分配置
  */
  @modal-button-height: 60px;                 // modal 按钮高度
@@ -210,6 +229,58 @@
     &-placeholder {
       font-size: 26px !important;
       color: #cccccc !important;
+    }
+  }
+}
+
+@select-cancel-color: #F8F8FA;
+@select-button-size: 60px;
+@select-button-radius: 20px;
+@select-button-font-size: 28px;
+@select-reset-color: #999999;
+@select-prefix: product-manage-select-modal;
+
+.@{select-prefix} {
+  &-button {
+    .margin(15px, r) !important;
+    .margin(25px, t) !important;
+    &-cancel {
+      .config-button(
+        @select-cancel-color, 
+        @select-button-size, 
+        @select-button-radius,
+        @select-button-font-size,
+        #999999,
+      ); 
+    }
+    &-confirm {
+      .config-button(
+        @theme-color, 
+        @select-button-size, 
+        @select-button-radius,
+        @select-button-font-size,
+        #ffffff,
+      ); 
+    }
+    &-reset {
+      .config-button(
+        @select-reset-color,
+        @select-button-size, 
+        @select-button-size / 2,
+        @select-button-font-size,
+        #ffffff,
+      ); 
+      .padding(86px, lr) !important;
+    }
+    &-submit {
+      .config-button(
+        @theme-color, 
+        @select-button-size, 
+        @select-button-size / 2,
+        @select-button-font-size,
+        #ffffff,
+      ); 
+      .padding(86px, lr) !important;
     }
   }
 }

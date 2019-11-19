@@ -12,14 +12,18 @@
 @product-price-color: #FC4E44;
 @product-normal-color: #cccccc;
 
+@product-padding: 10px;
+@product-manage-padding: 25px;
+
 .@{product-prefix} {
   width: 100%;
-  .padding(10px);
+  .padding(@product-padding);
   &-border {
     border-bottom: 1px solid @product-border-color;
   }
 
   &-content {
+    position: relative;
     .flex(center, flex-start, row);
     .padding(10px, tb);
     &-cover {
@@ -63,5 +67,29 @@
   &-normal {
     font-size: @product-price-font;
     color: @product-normal-color;
+  }
+
+  &-manage {
+    width: 100%;
+    .padding(@product-manage-padding);
+    &-detail {
+      display: flex;
+      flex-direction: column;
+    }
+    &-corner {
+      position: absolute;
+      right: 0px;
+      bottom: 10px;
+    }
+    &-font {
+      font-size: 28px;
+      color: @base-font-color;
+      &-theme {
+        color: @theme-color;
+      }
+      &-price {
+        color: @product-price-color;
+      }
+    }
   }
 }

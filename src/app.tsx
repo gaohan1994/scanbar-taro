@@ -32,8 +32,18 @@ class App extends Component {
 
       /**
        * @todo [开单页面]
+       * @todo [商品管理页面]
+       * 
+       * @todo [商品详情]
+       * ```js
+       * Taro.navigateTo({
+       *  url: `/pages/product/product.detail?id=${product.id}`
+       * });
+       * ```
        */
       'pages/product/product.order',
+      'pages/product/product.manage',
+      'pages/product/product.detail',
 
       /**
        * @todo [sign相关页面]

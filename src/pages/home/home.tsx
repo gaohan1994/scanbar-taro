@@ -11,7 +11,7 @@ const NavItems = [
     image: '//net.huanmusic.com/weapp/icon_menu_order.png',
     value: '商品管理',
     subTitle: 'Commodity management',
-    url: '/pages/',
+    url: '/pages/product/product.manage',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_order.png',

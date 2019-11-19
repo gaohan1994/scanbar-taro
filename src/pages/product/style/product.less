@@ -7,6 +7,9 @@
 @product-list-left-bg-color: #f6f6f6;
 @product-list-type-height: 94px;
 @product-list-type-header-font: 28px;
+@product-section-color: #F8F8FA;
+
+@product-select-title-font: 32px;
 
 .@{product-prefix} {
   display: flex;
@@ -32,11 +35,21 @@
     &-search {
       width: @product-search-width !important;
     }
+    &-item {
+      .flex(center, center, column);
+      &-icon {
+        width: 34px;
+        height: 34px;
+      }
+      &-text {
+        font-size: 24px;
+        color: #ffffff;
+      }
+    }
   }
   &-list {
     &-container {
-      position: fixed;
-      top: @product-header-height;
+      .fixed-container(@product-header-height);
       display: flex;
       flex-direction: row;
     }
@@ -89,6 +102,90 @@
           font-weight: bold;         
         }
       }
+    }
+    &-section {
+      background-color: @product-section-color;
+      .padding(20px, tb);
+      .padding(25px, lr);
+      .flex(center, flex-start, row);
+      &-icon {
+        height: 28px;
+        width: 4px;
+        background-color: @theme-color;
+        .margin(12px, r);
+      }
+      &-title {
+        font-size: 32px;
+        color: @base-font-color;
+        font-weight: bold;
+      }
+    }
+  }
+  &-select {
+    &-header {
+      position: relative;
+      font-size: 38px;
+      color: @base-font-color;
+      font-weight: bold;
+      .padding(40px, t);
+      .flex(center, center, row);
+      &-close {
+        position: absolute;
+        left: 56px;
+        top: 44px;
+        width: 24px;
+        height: 24px;
+        &-image {
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+    &-content {
+      display: flex;
+      flex-direction: column;
+      .padding(35px, lr);
+      &-item {
+        display: flex;
+        flex-direction: column;
+        .padding(40px, tb);
+        &-title {
+          font-size: @product-select-title-font;
+          color: @base-font-color;
+          font-weight: bold;
+        }
+        &-buttons {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+        }
+      }
+    }
+    &-border {
+      border-bottom: 1px solid #f9f9f9;;
+    }
+    &-form {
+      .flex(center, space-around, row);
+      .margin(35px, t);
+    }
+  }
+
+  &-detail {
+    &-cover {
+      width: 100%;
+      height: 380px;
+      &-image {
+        width: 100%;
+        height: 100%;
+      }
+    }
+    &-list {
+      width: 100%;
+      .padding(30px, lr);
+      .padding(20px, t);
+    }
+    &-submit {
+      .margin(60px, tb);
     }
   }
 }

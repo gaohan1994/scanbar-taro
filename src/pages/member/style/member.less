@@ -8,6 +8,8 @@
 @member-search-input-font-size: 26px;
 @member-search-zindex: 99;
 @member-list-loading-size: 100px;
+@member-header-bg-size: 166px;
+@member-header-size: @member-header-bg-size - 66px;
 
 .@{member-prefix} {
   .padding(30px, lr);
@@ -60,11 +62,15 @@
   &-main {
     display: flex;
     flex-direction: column;
+    position: relative;
     &-header {
-      .flex(center, space-between, row);
       .padding(20px, tb);
       .padding(30px, lr);
-      width: 100%;
+      position: fixed;
+      .flex(center, space-between, row);
+      top: 0;
+      left: 0;
+      right: 0;
       &-add {
         z-index: @member-search-zindex;
         .flex(center, center, row);
@@ -102,7 +108,12 @@
     }
   }
   &-list {
-    flex: 1
+    flex: 1;
+    &-container {
+      position: fixed;
+      top: @member-header-size;
+      width: 100%;
+    }
   }
   &-loading {
     position: relative;

@@ -238,39 +238,41 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
             <Text className={`${cssPrefix}-main-header-add-text`}>添加</Text>
           </View>
         </View>
-        <ScrollView 
-          scrollY={true}
-          className={`${cssPrefix} ${cssPrefix}-list`}
-          onScrollToUpper={this.refresh}
-          onScrollToLower={this.loadMore}
-        >
-          {refreshing === true && (
-            <View className={`${cssPrefix}-loading`}>
-              <AtActivityIndicator mode='center' />
-            </View>
-          )}
-          {memberListByDate && memberListByDate.length > 0 ? (
-            memberListByDate.map((dateList) => {
-              const formData: FormRowProps[] = dateList.data.map((member) => {
-                return {
-                  title: `姓名: ${member.username}`,
-                  onClick: () => Taro.navigateTo({url: `/pages/member/member.detail?id=${member.id}`})
-                };
-              });
-              formData.unshift({title: dateList.date});
-              return (
-                <FormCard items={formData} key={dateList.date} />
-              );
-            })
-          ) : (
-            <View>暂无数据</View>
-          )}
-          {loading === true && (
-            <View className={`${cssPrefix}-loading`}>
-              <AtActivityIndicator mode='center' />
-            </View>
-          )}
-        </ScrollView>
+        <View className={`${cssPrefix}-list-container`}>
+          <ScrollView 
+            scrollY={true}
+            className={`${cssPrefix} ${cssPrefix}-list`}
+            onScrollToUpper={this.refresh}
+            onScrollToLower={this.loadMore}
+          >
+            {refreshing === true && (
+              <View className={`${cssPrefix}-loading`}>
+                <AtActivityIndicator mode='center' />
+              </View>
+            )}
+            {memberListByDate && memberListByDate.length > 0 ? (
+              memberListByDate.map((dateList) => {
+                const formData: FormRowProps[] = dateList.data.map((member) => {
+                  return {
+                    title: `姓名: ${member.username}`,
+                    onClick: () => Taro.navigateTo({url: `/pages/member/member.detail?id=${member.id}`})
+                  };
+                });
+                formData.unshift({title: dateList.date});
+                return (
+                  <FormCard items={formData} key={dateList.date} />
+                );
+              })
+            ) : (
+              <View>暂无数据</View>
+            )}
+            {loading === true && (
+              <View className={`${cssPrefix}-loading`}>
+                <AtActivityIndicator mode='center' />
+              </View>
+            )}
+          </ScrollView>
+        </View>
       </View>
     );
   }
