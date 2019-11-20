@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-18 16:58:00
+ * @Last Modified time: 2019-11-19 16:59:15
  * 
  * @todo [商品相关的类型定义]
  */
@@ -44,6 +44,7 @@ export declare namespace ProductInterface {
     saleType: number;     // 销售类型（0：按件卖[默认]；1称重）
     status: number;       // 状态(0：启用;1：停用)
     type: number;         // 品类id
+    typeName: string;     // 品类名称
     barcode: string;      // 条码
     brand: string;        // 品牌
     pictures: string;     // 图片
@@ -133,6 +134,7 @@ interface ProductInterfaceMap {
   reducerInterfaces: ProductInterface.ReducerInterface;
   productInfoType: string;
   productInfoSupplier: string;
+  productInfoEdit: string;
   productInfoGetList (params?: ProductInterface.ProductInfoGetListFetchFidle): string;
   productInfoList (params?: ProductInterface.ProductInfoListFetchFidle): string;
   productInfoDetail (params: ProductInterface.ProductDetailFetchFidle): string;
@@ -152,6 +154,7 @@ class ProductInterfaceMap {
 
   public productInfoType = '/product/productInfo/type';
   public productInfoSupplier = '/product/productInfo/supplier';
+  public productInfoEdit = '/product/productInfo/edit';
 
   public productInfoGetList = (params?: ProductInterface.ProductInfoGetListFetchFidle) => {
     return `/product/productInfo/getList${params ? jsonToQueryString(params) : ''}`;

@@ -87,6 +87,10 @@ class ProductAction {
       return result;
     }
   }
+
+  public productInfoEdit = async (params: Partial<ProductInterface.ProductInfo>) => {
+    return ProductService.productInfoEdit(params);
+  }
 }
 
 export default new ProductAction();

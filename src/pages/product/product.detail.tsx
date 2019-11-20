@@ -1,25 +1,51 @@
 import Taro from '@tarojs/taro';
-import { View, Image } from '@tarojs/components';
+import { View, Image, Picker } from '@tarojs/components';
 import { ProductAction } from '../../actions';
 import invariant from 'invariant';
 import { ResponseCode, ProductInterface } from '../../constants/index';
 import './style/product.less';
 import { AppReducer } from '../../reducers';
-import { getProductDetail } from '../../reducers/app.product';
+import { getProductDetail, getProductType } from '../../reducers/app.product';
 import { connect } from '@tarojs/redux';
 import { FormRowProps } from '../../component/card/form.row';
 import FormCard from '../../component/card/form.card';
-import { AtButton } from 'taro-ui';
+import { AtButton, AtActivityIndicator } from 'taro-ui';
 import merge from 'lodash/merge';
+import classnames from 'classnames';
+import FormRow from '../../component/card/form.row';
+import Modal from '../../component/modal/modal';
 
 const cssPrefix = 'product';
 
+/**
+ * @param {productDetail} 商品详情
+ * @param {productType} 商品品类
+ * @param {productTypeSelector} 商品品类picker选择器数据
+ *
+ * @author Ghan
+ * @interface Props
+ */
 interface Props { 
   productDetail: ProductInterface.ProductInfo;
+  productType: ProductInterface.ProductType[];
+  productTypeSelector: string[];
 }
 
 interface State {
+  /**
+   * @param {productDetail} 商品详情 
+   */
   productDetail: ProductInterface.ProductInfo;
+  /**
+   * @param {productChangeDetail} 修改了哪些商品项
+   */
+  productChangeDetail: Partial<ProductInterface.ProductInfo>;
+  typeModalVisible: boolean;
+  typePickerValue: number;
+  costModalVisible: boolean;
+  priceModalVisible: boolean;
+  memberPriceModalVisible: boolean;
+  numberModalVisible: boolean;
 }
 
 class ProductDetail extends Taro.Component<Props, State> {
@@ -37,6 +63,7 @@ class ProductDetail extends Taro.Component<Props, State> {
         saleType: -1,
         status: -1,
         type: -1,
+        typeName: '',
         barcode: '',
         brand: '',
         pictures: '',
@@ -49,7 +76,14 @@ class ProductDetail extends Taro.Component<Props, State> {
         createBy: '',
         createTime: '',
         updateTime: '',
-      }
+      },
+      productChangeDetail: {},
+      typeModalVisible: true,
+      typePickerValue: 2,
+      costModalVisible: false,
+      priceModalVisible: false,
+      memberPriceModalVisible: false,
+      numberModalVisible: false,
     };
   }
 
@@ -64,9 +98,26 @@ class ProductDetail extends Taro.Component<Props, State> {
 
   public fetchProductDetail = async (id: string) => {
     try {
+      /**
+       * @todo 初始化商品详情
+       */
       const result = await ProductAction.productInfoDetail({id: Number(id)});
       invariant(result.code === ResponseCode.success, ResponseCode.error);
-      this.setState({ productDetail: merge({}, result.data)});
+      const productDetail: ProductInterface.ProductInfo = merge({}, result.data);
+      this.setState({ 
+        productDetail,
+        productChangeDetail: {}
+      });
+
+      /**
+       * @todo 初始化typepicker的位置
+       */
+      const typeResult = await ProductAction.productInfoType();  
+      invariant(typeResult.code === ResponseCode.success, ResponseCode.error);
+      const productType: ProductInterface.ProductType[] = typeResult.data;
+      this.setState({
+        typePickerValue: productType.findIndex(t => t.id === productDetail.type)
+      });
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -75,8 +126,157 @@ class ProductDetail extends Taro.Component<Props, State> {
     }
   }
 
+  /**
+   * @todo 修改商品类别
+   *
+   * @memberof ProductDetail
+   */
+  public changeProductType = (event: any) => {
+    try {
+      const { productType } = this.props;
+      const typeIndex: number = event.detail.value;
+      const type = productType[typeIndex];
+
+      if (!type) {
+        throw new Error('未找到指定的品类，请联系客服');
+      }
+
+      this.setState(prevState => {
+        return {
+          ...prevState,
+          productChangeDetail: {
+            ...prevState.productChangeDetail,
+            type: type.id,
+            typeName: type.name
+          }
+        };
+      });
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
+
+  public changeModalVisible = (key: string, visible?: boolean) => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        [key]: typeof visible === 'boolean' ? visible : !prevState[key]
+      };
+    });
+  }
+
+  public onCostChange = (value: string) => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        productChangeDetail: {
+          ...prevState.productChangeDetail,
+          cost: Number(value),
+        }
+      };
+    });
+  }
+
+  public onPriceChange = (value: string) => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        productChangeDetail: {
+          ...prevState.productChangeDetail,
+          price: Number(value)
+        }
+      };
+    });
+  }
+  public onMemberPriceChange = (value: string) => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        productChangeDetail: {
+          ...prevState.productChangeDetail,
+          memberPrice: Number(value)
+        }
+      };
+    });
+  }
+
+  public onNumberChange = (value: string) => {
+    this.setState({
+      productChangeDetail: {
+        ...this.state.productChangeDetail,
+        number: Number(value)
+      }
+    });
+  }
+
+  /**
+   * @todo 保存函数
+   *
+   * @memberof ProductDetail
+   */
+  public submit = async () => {
+    try {
+      Taro.showLoading();
+      const { productChangeDetail } = this.state;
+      const { productDetail } = this.props;
+      /**
+       * @todo 如果没有修改则退出该页面
+       */
+      const keys = Object.keys(productChangeDetail);
+      if (keys.length === 0) {
+        Taro.navigateBack();
+        return;
+      }
+
+      /**
+       * @todo 组成请求函数
+       */
+      let payload: Partial<ProductInterface.ProductInfo> = {
+        id: productDetail.id
+      };
+      
+      keys.forEach((key) => {
+
+        /**
+         * @todo 价格只有改动过的才提交
+         */
+        if (
+          key === 'cost' ||
+          key === 'memberPrice' ||
+          key === 'price'
+        ) {
+          if (Number(productChangeDetail[key]) !== Number(productDetail[key])) {
+            payload[key] = Number(productChangeDetail[key]);
+          }
+        } else {
+          payload[key] = productChangeDetail[key];
+        }
+      });
+      const result = await ProductAction.productInfoEdit(payload);
+      Taro.hideLoading();
+      invariant(result.code === ResponseCode.success, result.msg || ResponseCode.error);
+      Taro.showToast({
+        title: '保存成功!',
+        icon: 'success',
+        success: () => {
+          Taro.navigateBack();
+        }
+      });
+    } catch (error) {
+      Taro.hideLoading();
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
+
   render () {
-    const { productDetail } = this.props;
+    const { productDetail, productChangeDetail, typePickerValue } = this.state;
+    const { productTypeSelector } = this.props;
     const formName: FormRowProps[] = [
       {
         title: '条码',
@@ -92,72 +292,276 @@ class ProductDetail extends Taro.Component<Props, State> {
       },
       {
         title: '名称',
-        extraText: productDetail.name,
+        extraText: productChangeDetail.name || productDetail.name,
         hasBorder: false
       }
     ];
     const formDetail: FormRowProps[] = [
       {
-        title: '类别',
-        extraText: '饮料',
-        arrow: 'right'
-      },
-      {
         title: '规格',
       },
       {
         title: '单位',
-        extraText: productDetail.unit || '未指定',
+        extraText: productChangeDetail.unit || productDetail.unit || '未指定',
       },
       {
         title: '品牌',
-        extraText: productDetail.brand || '未指定',
+        extraText: productChangeDetail.brand || productDetail.brand || '未指定',
         hasBorder: false
+      },
+    ];
+    const formNumber: FormRowProps[] = [
+      {
+        title: '库存',
+        extraText: `${productChangeDetail.number || productDetail.number}`,
+        onClick: () => this.changeModalVisible('numberModalVisible', true)
       },
     ];
     const formPrice: FormRowProps[] = [
       {
-        title: '进价',
-        extraText: `￥${productDetail.cost}`,
-        arrow: 'right'
+        title: '进价（￥）',
+        extraText: `${productChangeDetail.cost || productDetail.cost}`,
+        onClick: () => this.changeModalVisible('costModalVisible', true)
       },
       {
-        title: '售价',
-        extraText: `￥${productDetail.price}`,
-        arrow: 'right'
+        title: '售价（￥）',
+        extraText: `${productChangeDetail.price || productDetail.price}`,
+        onClick: () => this.changeModalVisible('priceModalVisible', true)
       },
       {
-        title: '会员价',
-        extraText: `￥${productDetail.memberPrice}`,
-        arrow: 'right',
+        title: '会员价（￥）',
+        extraText: `${productChangeDetail.memberPrice || productDetail.memberPrice}`,
+        onClick: () => this.changeModalVisible('memberPriceModalVisible', true),
         hasBorder: false
       },
     ];
+    
+    if (productDetail.id !== -1) {
+      return (
+        <View className="container">
+          <View className={`${cssPrefix}-detail-cover`}>
+            <Image src={productDetail.pictures} className={`${cssPrefix}-detail-cover-image`} />
+          </View>
+          <View className={`${cssPrefix}-detail-list`}>
+            <FormCard items={formName} />
+            <FormCard items={formPrice} />
+            <View 
+              className={classnames('component-form', {
+                'component-form-shadow': true
+              })}
+            >
+              <Picker 
+                mode="selector"
+                range={productTypeSelector}
+                onChange={this.changeProductType}
+                value={typePickerValue}
+              >
+                <FormRow 
+                  title="类别"
+                  extraText={productChangeDetail.typeName || productDetail.typeName}
+                  arrow="right"
+                />
+              </Picker>
+            </View>
+            <FormCard items={formNumber} />
+            <FormCard items={formDetail} />
+  
+            <View className={`${cssPrefix}-detail-submit`}>
+              <AtButton
+                className={`theme-button`}
+                onClick={() => this.submit()}
+              >
+                保存
+              </AtButton>
+            </View>
+          </View>
+          {this.renderModals()}
+        </View>
+      );
+    }
     return (
       <View className="container">
-        <View className={`${cssPrefix}-detail-cover`}>
-          <Image src={productDetail.pictures} className={`${cssPrefix}-detail-cover-image`} />
-        </View>
-        <View className={`${cssPrefix}-detail-list`}>
-          <FormCard items={formName} />
-          <FormCard items={formDetail} />
-          <FormCard items={formPrice} />
+        <AtActivityIndicator mode="center" />
+      </View>
+    );
+  }
 
-          <View className={`${cssPrefix}-detail-submit`}>
-            <AtButton
-              className={`theme-button`}
-            >
-              保存
-            </AtButton>
+  private generateModalButtons = (confirmCallback: any, cancelCallback: any) => {
+    return [
+      {
+        title: '取消',
+        type: 'cancel',
+        onPress: cancelCallback
+      },
+      {
+        title: '确定',
+        type: 'confirm',
+        onPress: confirmCallback
+      },
+    ];
+  }
+
+  private renderModals = () => {
+    const { 
+      costModalVisible, 
+      priceModalVisible, 
+      memberPriceModalVisible,
+      numberModalVisible,
+      productDetail,
+      productChangeDetail
+    } = this.state;
+
+    const costForm: FormRowProps[] = [
+      {
+        title: '进价调整为',
+        isInput: true,
+        inputValue: `${productChangeDetail.cost || ''}`,
+        inputOnChange: this.onCostChange,
+      },
+      {
+        title: '进价差额',
+        extraText: `${productChangeDetail.cost !== undefined && String(productChangeDetail.cost) !== '' 
+          ? Number(productChangeDetail.cost) - Number(productDetail.cost) 
+          : '0'}`,
+        hasBorder: false,
+      },
+    ];
+    const priceForm: FormRowProps[] = [
+      {
+        title: '售价调整为',
+        isInput: true,
+        inputValue: `${productChangeDetail.price || ''}`,
+        inputOnChange: this.onPriceChange,
+      },
+      {
+        title: '售价差额',
+        extraText: `${productChangeDetail.price !== undefined && String(productChangeDetail.price) !== '' 
+          ? Number(productChangeDetail.price) - Number(productDetail.price) 
+          : '0'}`,
+        hasBorder: false,
+      },
+    ];
+    const memberPriceForm: FormRowProps[] = [
+      {
+        title: '进价调整为',
+        isInput: true,
+        inputValue: `${productChangeDetail.memberPrice || ''}`,
+        inputOnChange: this.onMemberPriceChange,
+      },
+      {
+        title: '进价差额',
+        extraText: `${productChangeDetail.memberPrice !== undefined && String(productChangeDetail.memberPrice) !== '' 
+          ? Number(productChangeDetail.memberPrice) - Number(productDetail.memberPrice) 
+          : '0'}`,
+        hasBorder: false,
+      },
+    ];
+
+    const numberForm: FormRowProps[] = [
+      {
+        title: '库存调整为',
+        isInput: true,
+        inputValue: `${productChangeDetail.number || ''}`,
+        inputOnChange: this.onNumberChange,
+      },
+      {
+        title: '库存差额',
+        extraText: `${productChangeDetail.number !== undefined && String(productChangeDetail.number) !== '' 
+          ? Number(productChangeDetail.number) - Number(productDetail.number) 
+          : '0'}`,
+        hasBorder: false,
+      },
+    ];
+
+    const costButtons = this.generateModalButtons(
+      () => this.changeModalVisible('costModalVisible', false),
+      () => {
+        this.onCostChange('');
+        this.changeModalVisible('costModalVisible', false);
+      }
+    );
+    const priceButtons = this.generateModalButtons(
+      () => this.changeModalVisible('priceModalVisible', false), 
+      () => {
+        this.onPriceChange('');
+        this.changeModalVisible('priceModalVisible', false)
+      }
+    );
+    const memberPriceButtons = this.generateModalButtons(
+      () => this.changeModalVisible('memberPriceModalVisible', false), 
+      () => {
+        this.onMemberPriceChange('');
+        this.changeModalVisible('memberPriceModalVisible', false);
+      }
+    );
+    const numberButtons = this.generateModalButtons(
+      () => this.changeModalVisible('numberModalVisible', false), 
+      () => {
+        this.onNumberChange('');
+        this.changeModalVisible('numberModalVisible', false);
+      }
+    );
+    return (  
+      <View>
+        <Modal 
+          isOpened={numberModalVisible}
+          header="库存调整"
+          onClose={() => this.changeModalVisible('numberModalVisible', false)}
+          buttons={numberButtons}
+        >
+          <View className={`${cssPrefix}-detail-modal`}>
+            <View className={`${cssPrefix}-detail-modal-text`}>系统库存: {productDetail.number}</View>
+            <FormCard items={numberForm} />
           </View>
-        </View>
+        </Modal>
+        <Modal 
+          isOpened={costModalVisible}
+          header="进价调整"
+          onClose={() => this.changeModalVisible('costModalVisible', false)}
+          buttons={costButtons}
+        >
+          <View className={`${cssPrefix}-detail-modal`}>
+            <View className={`${cssPrefix}-detail-modal-text`}>系统进价: {productDetail.cost}</View>
+            <FormCard items={costForm} />
+          </View>
+        </Modal>
+        <Modal 
+          isOpened={priceModalVisible}
+          header="售价调整"
+          onClose={() => this.changeModalVisible('priceModalVisible', false)}
+          buttons={priceButtons}
+        >
+          <View className={`${cssPrefix}-detail-modal`}>
+            <View className={`${cssPrefix}-detail-modal-text`}>系统售价: {productDetail.price}</View>
+            <FormCard items={priceForm} />
+          </View>
+        </Modal>
+        <Modal 
+          isOpened={memberPriceModalVisible}
+          header="会员价调整"
+          onClose={() => this.changeModalVisible('memberPriceModalVisible', false)}
+          buttons={memberPriceButtons}
+        >
+          <View className={`${cssPrefix}-detail-modal`}>
+            <View className={`${cssPrefix}-detail-modal-text`}>系统会员价: {productDetail.memberPrice}</View>
+            <FormCard items={memberPriceForm} />
+          </View>
+        </Modal>
       </View>
     );
   }
 }
 
-const mapState = (state: AppReducer.AppState) => ({
-  productDetail: getProductDetail(state)
-});
+const mapState = (state: AppReducer.AppState) => {
+  const productType = getProductType(state);
+  const productTypeSelector = productType.map((type) => {
+    return type.name;
+  });
+  return {
+    productDetail: getProductDetail(state),
+    productType,
+    productTypeSelector,
+  };
+};
 
 export default connect(mapState)(ProductDetail);

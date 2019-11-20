@@ -1,6 +1,7 @@
 @import "../../styles/theme.less";
 
 @form-prefix: component-form;
+@form-input-width: 200px;
 
 .@{form-prefix} {
   .margin(10px, t);
@@ -10,5 +11,8 @@
   }
   &-shadow {
     .theme-shadow;
+  }
+  &-input {
+    width: @form-input-width;
   }
 }

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 14:41:35 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-11 15:19:09
+ * @Last Modified time: 2019-11-20 10:38:47
  * 
  * @todo [fockedTaroUiListItem,增加以及修改了一些属性]
  */
@@ -147,9 +147,9 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
             )}
 
             {isInput === true && (
-              <View>
+              <View className="component-form-input">
                 <AtInput 
-                  className="component-list-row-input"
+                  className={classnames('component-list-row-input')}
                   name={inputName || 'form.row.name'}
                   value={inputValue} 
                   onChange={inputOnChange}

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:16:32 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-18 16:51:16
+ * @Last Modified time: 2019-11-19 16:00:47
  */
 import requestHttp from "../../common/request/request.http";
 import ProductInterfaceMap, { ProductInterface } from "./product";
@@ -43,6 +43,10 @@ class ProductService {
    */
   public productInfoDetail = async (params: ProductInterface.ProductDetailFetchFidle): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.get(ProductInterfaceMap.productInfoDetail(params));
+  }
+
+  public productInfoEdit = async (params: Partial<ProductInterface.ProductInfo>): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.post(ProductInterfaceMap.productInfoEdit, params);
   }
 }
 
