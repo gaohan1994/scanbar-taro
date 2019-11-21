@@ -52,6 +52,7 @@
     &-container {
       position: absolute;
       top: @product-header-height;
+      bottom: @cart-height + 10px;
       width: 100%;
       display: flex;
       flex-direction: row;
@@ -85,9 +86,6 @@
       display: flex;
       flex-direction: column;
       flex: 1;
-      &-container {
-        .padding(@cart-height, b);
-      }
       &-header {
         .padding(20px);
         display: flex;

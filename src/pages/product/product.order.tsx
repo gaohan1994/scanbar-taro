@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-14 11:06:11
+ * @Last Modified time: 2019-11-21 17:09:04
  * 
  * @todo 开单页面
  */
@@ -20,8 +20,10 @@ import classnames from 'classnames';
 import ProductComponent from '../../component/product/product';
 import invariant from 'invariant';
 import { ResponseCode } from '../../constants/index';
+import merge from 'lodash/merge';
 
 let ItemHeight: number = -1;
+let SectionHeight: number = -1;
 
 const memberPrefix = 'member';
 const cssPrefix = 'product';
@@ -64,7 +66,7 @@ interface State {
 }
 
 class ProductOrder extends Taro.Component<Props, State> {
-
+  
   readonly state: State = {
     currentType: {
       name: '',
@@ -75,6 +77,8 @@ class ProductOrder extends Taro.Component<Props, State> {
     searchValue: ''
   };
 
+  private productScrollList?: Array<ProductInterface.ProductList & { scrollHeight: number }> = undefined;
+  
   componentDidShow () {
     this.init();
   }
@@ -148,8 +152,10 @@ class ProductOrder extends Taro.Component<Props, State> {
   public onTypeClick = (params: ProductInterface.ProductList) => {
     const { typeInfo, productList } = params;
     this.onInput({detail: {value: ''}});
-    this.changeCurrentType(typeInfo);
     this.changeScrollProductId(this.getScrollProductId(productList));
+    setTimeout(() => {
+      this.changeCurrentType(typeInfo);
+    }, 100);
   }
 
   public initItemHeight = () => {
@@ -183,6 +189,42 @@ class ProductOrder extends Taro.Component<Props, State> {
     }
   }
 
+  public getSectionHeight = async () => {
+    if (SectionHeight === -1) {
+      const query = Taro.createSelectorQuery().in(this.$scope);
+      query
+        .select('.product-component-section-header-height')
+        .boundingClientRect((rect: any) => {
+          SectionHeight = rect.height;
+        })
+        .exec();
+    }
+  }
+
+  public configItemsHeight = (itemHeight: number): Array<ProductInterface.ProductList & { scrollHeight: number }> => {
+    if (this.productScrollList) {
+      return this.productScrollList;
+    }
+    const productList: ProductInterface.ProductList[] = merge([], this.props.productList);
+    let productScrollList: Array<ProductInterface.ProductList & { scrollHeight: number }> = [];
+
+    for (let i = 0; i < productList.length; i++) {
+      const list = productList[i];
+      let beforeHeight: number = 0;
+      if (productScrollList.length > 0) {
+        productScrollList.forEach(list => {
+          beforeHeight += list.scrollHeight;
+        });
+      } 
+      productScrollList.push({
+        ...list,
+        scrollHeight: list.productList.length * itemHeight + beforeHeight + (i * SectionHeight)
+      });
+    }
+    this.productScrollList = productScrollList;
+    return productScrollList;
+  }
+
   /**
    * @todo [监听滚动并设置跳转事件]
    *
@@ -191,18 +233,24 @@ class ProductOrder extends Taro.Component<Props, State> {
   public onScroll = async (event: any) => {
     const { target: { scrollTop } } = event;
     const { currentType } = this.state;
-    const { pureProductList, productList } = this.props;
 
     const ProductItemHeight = await this.getItemHeight();
-    /**
-     * @todo [index] 根据高度判断滑动到第几个item
-     */
-    const index: number = Math.ceil(scrollTop / ProductItemHeight);
-    const currentItem = pureProductList[index] || {};
-    if (currentItem && currentItem.id && currentItem.type && currentType.id !== currentItem.type) {
-      const currentList = productList.find((l) => l.typeInfo.id === currentItem.type);
-      if (currentList !== undefined) {
-        this.changeCurrentType(currentList.typeInfo);
+    const productScrollList = this.configItemsHeight(ProductItemHeight);
+
+    for (let i = productScrollList.length - 1; i >= 0; i--) {
+      if (i === 0 && scrollTop < productScrollList[i].scrollHeight) {
+        if (currentType.name !== productScrollList[i].typeInfo.name) {
+          this.changeCurrentType(productScrollList[i].typeInfo);
+          return;
+        }
+      }
+      if (scrollTop > productScrollList[i].scrollHeight) {
+        console.log('currentType: ', currentType);
+        console.log('productScrollList[i]: ', productScrollList[i]);
+        if (currentType.name !== productScrollList[i + 1].typeInfo.name) {
+          this.changeCurrentType(productScrollList[i + 1].typeInfo);
+          return;
+        }
       }
     }
   }
@@ -213,7 +261,6 @@ class ProductOrder extends Taro.Component<Props, State> {
    * @memberof ProductOrder
    */
   public onInput = ({detail}: any) => {
-    console.log('detail: ', detail);
     this.setState({searchValue: detail.value}, () => {
       this.searchData();
     });
@@ -237,7 +284,7 @@ class ProductOrder extends Taro.Component<Props, State> {
           <View className={`${cssPrefix}-header-button`}>无码商品</View>
         </View>
         
-        <View className={`${cssPrefix}-list-container container`}>
+        <View className={`${cssPrefix}-list-container`}>
           {this.renderLeft()}  
           {this.renderRight()}
         </View>
@@ -292,7 +339,7 @@ class ProductOrder extends Taro.Component<Props, State> {
     if (pureProductSearchList.length === 0 && searchValue === '') {
       return (
         <View className={`${cssPrefix}-list-right`}>
-          <View className={`${cssPrefix}-list-right-header`}>
+          <View className={`${cssPrefix}-list-right-header product-component-section-header-height`}>
             <View className={`${cssPrefix}-list-right-header-bge`}/>
             <Text className={`${cssPrefix}-list-right-header-text`}>{currentType.name}</Text>
           </View>
@@ -304,9 +351,18 @@ class ProductOrder extends Taro.Component<Props, State> {
           >
             {
               productList && productList.length > 0
-                ? productList.map((list) => {
+                ? productList.map((list, index) => {
+                  const { typeInfo } = list;
                   return (
-                    <View key={list.typeInfo.id}>
+                    <View key={typeInfo.id}>
+                      {
+                        index !== 0 && (
+                          <View className={`${cssPrefix}-list-right-header `}>
+                            <View className={`${cssPrefix}-list-right-header-bge`}/>
+                            <Text className={`${cssPrefix}-list-right-header-text`}>{typeInfo.name}</Text>
+                          </View>
+                        )
+                      }
                       {
                         list.productList.map((product) => {
                           return (
