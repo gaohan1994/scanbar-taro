@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-15 11:17:25 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-18 16:42:57
+ * @Last Modified time: 2019-11-20 13:53:20
  * 
  * @todo [商品管理页面]
  */
@@ -132,7 +132,7 @@ class ProductManage extends Taro.Component<Props, State> {
   }
 
   public onAddClick = () => {
-    console.log('onAddClick: ');
+    Taro.navigateTo({url: `/pages/product/product.add`});
   }
 
   render () {

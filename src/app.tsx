@@ -44,6 +44,7 @@ class App extends Component {
       'pages/product/product.order',
       'pages/product/product.manage',
       'pages/product/product.detail',
+      'pages/product/product.add',
 
       /**
        * @todo [sign相关页面]

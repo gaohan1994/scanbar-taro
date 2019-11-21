@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:16:32 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-19 16:00:47
+ * @Last Modified time: 2019-11-21 13:50:49
  */
 import requestHttp from "../../common/request/request.http";
 import ProductInterfaceMap, { ProductInterface } from "./product";
@@ -47,6 +47,19 @@ class ProductService {
 
   public productInfoEdit = async (params: Partial<ProductInterface.ProductInfo>): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.post(ProductInterfaceMap.productInfoEdit, params);
+  }
+
+  /**
+   * @todo 自动生成条码
+   *
+   * @memberof ProductService
+   */
+  public productInfoGetBarcode = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.get(ProductInterfaceMap.productInfoGetBarcode);
+  }
+
+  public productInfoAdd = async (params: ProductInterface.ProductInfoAdd): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.post(ProductInterfaceMap.productInfoAdd, params);
   }
 }
 

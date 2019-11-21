@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-19 16:59:15
+ * @Last Modified time: 2019-11-21 13:52:09
  * 
  * @todo [商品相关的类型定义]
  */
@@ -109,6 +109,12 @@ export declare namespace ProductInterface {
     updateTime: string;
   }
 
+  interface ProductInfoAdd extends Partial<ProductInterface.ProductInfo> {
+    barcode: string;
+    name: string;
+    picStrs?: string[];
+  }
+
   interface ProductDetailFetchFidle {
     id: number;
   }
@@ -135,6 +141,8 @@ interface ProductInterfaceMap {
   productInfoType: string;
   productInfoSupplier: string;
   productInfoEdit: string;
+  productInfoGetBarcode: string;
+  productInfoAdd: string;
   productInfoGetList (params?: ProductInterface.ProductInfoGetListFetchFidle): string;
   productInfoList (params?: ProductInterface.ProductInfoListFetchFidle): string;
   productInfoDetail (params: ProductInterface.ProductDetailFetchFidle): string;
@@ -149,12 +157,13 @@ class ProductInterfaceMap {
     RECEIVE_PRODUCT_TYPE: 'RECEIVE_PRODUCT_TYPE',
     RECEIVE_PRODUCT_SUPPLIER: 'RECEIVE_PRODUCT_SUPPLIER',
     RECEIVE_PRODUCT_DETAIL: 'RECEIVE_PRODUCT_DETAIL',
-
   };
 
   public productInfoType = '/product/productInfo/type';
   public productInfoSupplier = '/product/productInfo/supplier';
   public productInfoEdit = '/product/productInfo/edit';
+  public productInfoGetBarcode = '/product/productInfo/genBarcode';
+  public productInfoAdd = '/product/productInfo/add';
 
   public productInfoGetList = (params?: ProductInterface.ProductInfoGetListFetchFidle) => {
     return `/product/productInfo/getList${params ? jsonToQueryString(params) : ''}`;

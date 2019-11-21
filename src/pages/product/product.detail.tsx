@@ -14,6 +14,22 @@ import merge from 'lodash/merge';
 import classnames from 'classnames';
 import FormRow from '../../component/card/form.row';
 import Modal from '../../component/modal/modal';
+import "../../component/card/form.card.less";
+
+export function generateModalButtons (confirmCallback: any, cancelCallback: any) {
+  return [
+    {
+      title: '取消',
+      type: 'cancel',
+      onPress: cancelCallback
+    },
+    {
+      title: '确定',
+      type: 'confirm',
+      onPress: confirmCallback
+    },
+  ];
+}
 
 const cssPrefix = 'product';
 
@@ -386,21 +402,6 @@ class ProductDetail extends Taro.Component<Props, State> {
     );
   }
 
-  private generateModalButtons = (confirmCallback: any, cancelCallback: any) => {
-    return [
-      {
-        title: '取消',
-        type: 'cancel',
-        onPress: cancelCallback
-      },
-      {
-        title: '确定',
-        type: 'confirm',
-        onPress: confirmCallback
-      },
-    ];
-  }
-
   private renderModals = () => {
     const { 
       costModalVisible, 
@@ -473,28 +474,28 @@ class ProductDetail extends Taro.Component<Props, State> {
       },
     ];
 
-    const costButtons = this.generateModalButtons(
+    const costButtons = generateModalButtons(
       () => this.changeModalVisible('costModalVisible', false),
       () => {
         this.onCostChange('');
         this.changeModalVisible('costModalVisible', false);
       }
     );
-    const priceButtons = this.generateModalButtons(
+    const priceButtons = generateModalButtons(
       () => this.changeModalVisible('priceModalVisible', false), 
       () => {
         this.onPriceChange('');
         this.changeModalVisible('priceModalVisible', false)
       }
     );
-    const memberPriceButtons = this.generateModalButtons(
+    const memberPriceButtons = generateModalButtons(
       () => this.changeModalVisible('memberPriceModalVisible', false), 
       () => {
         this.onMemberPriceChange('');
         this.changeModalVisible('memberPriceModalVisible', false);
       }
     );
-    const numberButtons = this.generateModalButtons(
+    const numberButtons = generateModalButtons(
       () => this.changeModalVisible('numberModalVisible', false), 
       () => {
         this.onNumberChange('');
