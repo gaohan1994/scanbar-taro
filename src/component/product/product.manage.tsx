@@ -1,7 +1,7 @@
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import './product.less';
-import { ProductInterface } from 'src/constants';
+import { ProductInterface } from '../../constants';
 
 const cssPrefix = 'component-product';
 interface Props { 

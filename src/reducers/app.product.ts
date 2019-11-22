@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:26:45 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-18 16:53:49
+ * @Last Modified time: 2019-11-22 14:21:30
  */
 
 import { ProductInterface, ProductInterfaceMap } from "../constants";
@@ -54,6 +54,7 @@ const initState: ProductReducer.InitState = {
     saleType: -1,
     status: -1,
     type: -1,
+    typeName: '',
     barcode: '',
     brand: '',
     pictures: '',

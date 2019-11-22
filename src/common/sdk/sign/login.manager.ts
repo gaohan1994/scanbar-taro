@@ -2,13 +2,13 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 17:10:29 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-14 14:47:32
+ * @Last Modified time: 2019-11-22 11:34:41
  */
 
 import Taro from '@tarojs/taro';
 import md5 from 'blueimp-md5';
-import requestHttp from '../request/request.http';
-import { ResponseCode, ActionsInterface } from '../../constants/index';
+import requestHttp from '../../request/request.http';
+import { ResponseCode, ActionsInterface } from '../../../constants/index';
 import invariant from 'invariant';
 
 export const CentermOAuthKey: string = 'CentermOAuthToken';

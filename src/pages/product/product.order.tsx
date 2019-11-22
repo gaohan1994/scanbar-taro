@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-21 17:09:04
+ * @Last Modified time: 2019-11-21 17:37:27
  * 
  * @todo 开单页面
  */
@@ -126,7 +126,6 @@ class ProductOrder extends Taro.Component<Props, State> {
       } else {
         const { success, result } = await ProductAction.productInfoSearchList({words: searchValue});
         invariant(success, result || ResponseCode.error);
-        console.log('result: ', result);
       }
     } catch (error) {
       Taro.showToast({
@@ -245,8 +244,6 @@ class ProductOrder extends Taro.Component<Props, State> {
         }
       }
       if (scrollTop > productScrollList[i].scrollHeight) {
-        console.log('currentType: ', currentType);
-        console.log('productScrollList[i]: ', productScrollList[i]);
         if (currentType.name !== productScrollList[i + 1].typeInfo.name) {
           this.changeCurrentType(productScrollList[i + 1].typeInfo);
           return;

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-15 11:17:25 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-20 13:53:20
+ * @Last Modified time: 2019-11-21 18:07:01
  * 
  * @todo [商品管理页面]
  */
@@ -165,10 +165,10 @@ class ProductManage extends Taro.Component<Props, State> {
           </View>
         </View>
 
-        <View className={`${cssPrefix}-list-container`}>
+        <View className={`${cssPrefix}-manage-list`}>
           <ScrollView
             scrollY={true}
-            className={`${cssPrefix}-list-right`}
+            className={`${cssPrefix}-manage-list-container`}
           >
             {
               productIndexList.map((list) => {

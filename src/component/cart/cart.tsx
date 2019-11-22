@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-05 15:59:06
+ * @Last Modified time: 2019-11-22 17:07:15
  * 
  * @todo [购物车组件]
  */
@@ -11,8 +11,20 @@ import { View, Image, Text } from '@tarojs/components';
 import "./cart.less";
 import { AtFloatLayout } from 'taro-ui';
 import classnames from 'classnames';
+import { AppReducer } from '../../reducers';
+import { getProductCartList, getChangeWeigthProduct } from '../../common/sdk/product/product.sdk.reducer';
+import { connect } from '@tarojs/redux';
+import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
+import Modal from '../modal/modal';
+import FormCard from '../card/form.card';
+import { FormRowProps } from '../card/form.row';
+import { ProductInterface } from '../../constants';
+import { store } from '../../app';
 
-interface CartBarProps { }
+interface CartBarProps { 
+  productCartList: Array<ProductCartInterface.ProductCartInfo>;
+  changeWeightProduct: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo;
+}
 
 interface CartBarState { 
   cartListVisible: boolean; // 是否显示购物车列表
@@ -39,7 +51,6 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
   }
 
   render () {
-
     const buttonClassNames = classnames(
       'cart-right',
       {
@@ -50,20 +61,8 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
 
     return (
       <View>
-        <AtFloatLayout
-          isOpened={this.state.cartListVisible}
-          onClose={() => this.onChangeCartListVisible(false)}
-        >
-          <View className="cart-list-header">
-            <View>已选择商品（3）</View>
-            <View className="cart-list-header-empty">
-              <Image src="//net.huanmusic.com/weapp/icon_empty.png" className="cart-list-header-empty-icon" />
-              <Text>清空购物车</Text>
-            </View>
-          </View>
-          content
-        </AtFloatLayout>
-
+        {this.renderContent()}
+        {this.renderWeightProductModal()}
         <View className="cart">
           <View className="cart-bg">
             <View className="cart-icon" onClick={() => this.onChangeCartListVisible()} >
@@ -80,6 +79,85 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       </View>
     );
   }
+
+  private renderContent = () => {
+    const { cartListVisible } = this.state;
+    const { productCartList } = this.props;
+    return (
+      <AtFloatLayout
+        isOpened={cartListVisible}
+        onClose={() => this.onChangeCartListVisible(false)}
+      >
+        <View className="cart-list-header">
+          <View>已选择商品（3）</View>
+          <View className="cart-list-header-empty">
+            <Image src="//net.huanmusic.com/weapp/icon_empty.png" className="cart-list-header-empty-icon" />
+            <Text>清空购物车</Text>
+          </View>
+        </View>
+        {
+          productCartList.length > 0 && productCartList.map((item) => {
+            return (
+              <View key={item.id}>
+                {item.name}
+              </View>
+            );
+          })
+        }
+      </AtFloatLayout>
+    );
+  }
+
+  private onWeightProductClose = () => {
+    productSdk.closeWeightModal();
+  }
+
+  private renderWeightProductModal = () => {
+    const { changeWeightProduct } = this.props;
+    const weightForm: FormRowProps[] = [
+      {
+        title: '重量',
+        isInput: true,
+        inputPlaceHolder: '请输入重量'
+      },
+      {
+        title: `原价￥${changeWeightProduct.price}`,
+        isInput: true,
+        inputPlaceHolder: '修改价格'
+      }
+    ];
+    const weightButtons = [
+      {
+        title: '取消',
+        type: 'cancel',
+        onPress: () => this.onWeightProductClose()
+      },
+      {
+        title: '确定',
+        type: 'confirm',
+        onPress: () => this.onWeightProductClose()
+      },
+    ];
+    const isOpen = typeof changeWeightProduct.id === 'number' && changeWeightProduct.id !== -1;
+    return (
+      <Modal 
+        isOpened={isOpen}
+        header="库存调整"
+        onClose={() => this.onWeightProductClose()}
+        buttons={weightButtons}
+      >
+        <View className="test-modal-form">
+          <View>上好佳芒果味硬糖</View>
+          <FormCard items={weightForm} />
+        </View>
+      </Modal>
+    );
+  }
 }
 
-export default CartBar;
+const select = (state: AppReducer.AppState) => ({
+  productCartList: getProductCartList(state),
+  changeWeightProduct: getChangeWeigthProduct(state),
+});
+
+export default connect(select)(CartBar as any);
