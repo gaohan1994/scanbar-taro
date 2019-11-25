@@ -78,7 +78,7 @@ class ProductDetail extends Taro.Component<Props, State> {
         price: -1,
         saleType: -1,
         status: -1,
-        type: -1,
+        typeId: -1,
         typeName: '',
         barcode: '',
         brand: '',
@@ -132,7 +132,7 @@ class ProductDetail extends Taro.Component<Props, State> {
       invariant(typeResult.code === ResponseCode.success, ResponseCode.error);
       const productType: ProductInterface.ProductType[] = typeResult.data;
       this.setState({
-        typePickerValue: productType.findIndex(t => t.id === productDetail.type)
+        typePickerValue: productType.findIndex(t => t.id === productDetail.typeId)
       });
     } catch (error) {
       Taro.showToast({

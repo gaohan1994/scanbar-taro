@@ -5,6 +5,7 @@ import './style/home.less';
 import classnames from 'classnames';
 import { Card } from '../../component/common/card/card.common';
 import { LoginManager } from '../../common/sdk';
+import invariant from 'invariant';
 
 const NavItems = [
   {
@@ -65,12 +66,22 @@ class Home extends Component {
     navigationBarTitleText: '首页'
   };
 
-  async componentDidShow () {
-    
-    const result = await LoginManager.login({phoneNumber: '15659995443', password: '111111'});
-    console.log('result: ', result);
-    // const userinfo = await LoginManager.getUserToken();
-    // console.log('userinfo: ', userinfo);
+  async componentDidMount () {
+    try {
+      // LoginManager.logout();
+      const userinfo = await LoginManager.getUserInfo();
+      // const result = await LoginManager.login({phoneNumber: '15659995443', password: '111111'});
+      invariant(userinfo.success, userinfo.msg || ' ');
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none',
+        duration: 500,
+        success: () => {
+          Taro.navigateTo({ url: '/pages/sign/login' });
+        }
+      });
+    }
   }
 
   /**

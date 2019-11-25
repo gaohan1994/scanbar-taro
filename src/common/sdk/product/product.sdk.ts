@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-22 17:05:19
+ * @Last Modified time: 2019-11-25 17:52:27
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -17,7 +17,7 @@
  * });
  * ```
  */
-import { ProductInterface } from '../../../constants';
+import { ProductInterface, ProductService } from '../../../constants';
 import { store } from '../../../app';
 import { ProductSDKReducer } from './product.sdk.reducer';
 
@@ -65,7 +65,7 @@ export declare namespace ProductCartInterface {
     order: ProductOrderPayload;
     pic?: string;
     productInfoList: Array<{
-      activities: ProductOrderActivity;
+      activities: Array<Partial<ProductOrderActivity>>;
       barcode: string;
       brand: string;
       discountAmount: number;
@@ -78,13 +78,16 @@ export declare namespace ProductCartInterface {
       transAmount: number;
       type: number;
     }>;
+    transProp: boolean;   // true=正常支付流程,false=订单再次支付],直接收款=true
   }
 
   type MANAGE_CART_PRODUCT = string;
   type MANAGE_CART_WEIGHT_PRODUCT = string;
   type CHANGE_WEIGHT_PRODUCT_MODAL = string;
+  type MANAGE_EMPTY_CART = string;
 
   type ReducerInterface = {
+    MANAGE_EMPTY_CART: MANAGE_EMPTY_CART;
     MANAGE_CART_PRODUCT: MANAGE_CART_PRODUCT;
     MANAGE_CART_WEIGHT_PRODUCT: MANAGE_CART_WEIGHT_PRODUCT;
     CHANGE_WEIGHT_PRODUCT_MODAL: CHANGE_WEIGHT_PRODUCT_MODAL;
@@ -92,13 +95,15 @@ export declare namespace ProductCartInterface {
 
   type ProductCartAdd = string;
   type ProductCartReduce = string;
+  type ProductCartEmpty= string;
   type ProductCartManageType = {
-    ADD: string;
-    REDUCE: string;
+    ADD: ProductCartAdd;
+    REDUCE: ProductCartReduce;
+    EMPTY: ProductCartEmpty;
   };
 
   interface ProductSDKManageInterface {
-    type: ProductCartAdd | ProductCartReduce;
+    type: ProductCartAdd | ProductCartReduce | ProductCartEmpty;
     product: ProductInterface.ProductInfo | ProductCartInfo;
   }
 }
@@ -108,9 +113,11 @@ class ProductSDK {
   public productCartManageType: ProductCartInterface.ProductCartManageType = {
     ADD: 'ADD',
     REDUCE: 'REDUCE',
+    EMPTY: 'EMPTY',
   };
 
   public reducerInterface: ProductCartInterface.ReducerInterface = {
+    MANAGE_EMPTY_CART: 'MANAGE_EMPTY_CART',
     MANAGE_CART_PRODUCT: 'MANAGE_CART_PRODUCT',
     MANAGE_CART_WEIGHT_PRODUCT: 'MANAGE_CART_WEIGHT_PRODUCT',
     CHANGE_WEIGHT_PRODUCT_MODAL: 'CHANGE_WEIGHT_PRODUCT_MODAL',
@@ -118,6 +125,10 @@ class ProductSDK {
   
   public isWeighProduct (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo): product is ProductCartInterface.ProductCartInfo {
     return product.saleType === 1;
+  }
+
+  public isCartProduct (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo): product is ProductCartInterface.ProductCartInfo {
+    return product !== undefined && (<ProductCartInterface.ProductCartInfo> product).sellNum !== undefined;
   }
 
   /**
@@ -157,13 +168,44 @@ class ProductSDK {
    *
    * @memberof ProductSDK
    */
-  public reduce = (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo) => {
-    console.log('reduce');
+  public reduce = (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, sellNum?: number) => {
+    if (this.isWeighProduct(product)) {
+      const reducer: ProductSDKReducer.ProductManageWeightCart = {
+        type: this.reducerInterface.MANAGE_CART_WEIGHT_PRODUCT,
+        payload: {
+          type: this.productCartManageType.REDUCE,
+          product: {
+            ...product,
+            sellNum: sellNum || 1
+          }
+        }
+      };
+      store.dispatch(reducer);
+    } else {
+      const reducer: ProductSDKReducer.ProductManageCart = {
+        type: this.reducerInterface.MANAGE_CART_PRODUCT,
+        payload: {
+          type: this.productCartManageType.REDUCE,
+          product
+        }
+      };
+      store.dispatch(reducer);
+    }
+  }
+
+  public empty = () => {
+    store.dispatch({
+      type: this.reducerInterface.MANAGE_EMPTY_CART,
+      payload: {}
+    });
   }
 
   public manage = (params: ProductCartInterface.ProductSDKManageInterface) => {
     const { product, type } = params;
-
+    if (type === this.productCartManageType.EMPTY) {
+      this.empty();
+      return;
+    }
     if (this.isWeighProduct(product)) {
       if (type === this.productCartManageType.ADD) {
         store.dispatch({
@@ -187,6 +229,47 @@ class ProductSDK {
       type: this.reducerInterface.CHANGE_WEIGHT_PRODUCT_MODAL,
       payload: {product: {}}
     });
+  }
+
+  /**
+   * @todo 获取商品的数量
+   *
+   * @memberof ProductSDK
+   */
+  public getProductNumber = (products?: ProductCartInterface.ProductCartInfo[]) => {
+    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+    const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.sellNum;
+    const total = productList.reduce(reduceCallback, 0);
+    return total;
+  }
+
+  /**
+   * @todo 获取商品的价格
+   *
+   * @memberof ProductSDK
+   */
+  public getProductPrice = (products?: ProductCartInterface.ProductCartInfo[]) => {
+    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+    const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.price;
+    const total = productList.reduce(reduceCallback, 0);
+    return total;
+  }
+
+  /**
+   * @todo 获取商品的会员价
+   *
+   * @memberof ProductSDK
+   */
+  public getProductMemberPrice = (products?: ProductCartInterface.ProductCartInfo[]) => {
+    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+    const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.memberPrice;
+    const total = productList.reduce(reduceCallback, 0);
+    return total;
+  }
+
+  public cashierPay = async (params: ProductCartInterface.ProductPayPayload) => {
+    const result = await ProductService.cashierPay(params);
+    return result;
   }
 }
 

@@ -2,22 +2,26 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 17:10:29 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-22 11:34:41
+ * @Last Modified time: 2019-11-25 17:19:36
  */
 
 import Taro from '@tarojs/taro';
 import md5 from 'blueimp-md5';
 import requestHttp from '../../request/request.http';
 import { ResponseCode, ActionsInterface } from '../../../constants/index';
-import invariant from 'invariant';
 
 export const CentermOAuthKey: string = 'CentermOAuthToken';
 
-declare namespace LoginInterface {
+export declare namespace LoginInterface {
 
   interface OAuthTokenParams {
     phoneNumber: string;
     password: string;
+  }
+
+  interface AuthMenu {
+    id: number;
+    name: string;
   }
 
   interface CheckPermissionsResult {
@@ -26,19 +30,36 @@ declare namespace LoginInterface {
     declinedPermissions?: Array<string>;
   }
 
+  interface LoginMangerInfo<T> {
+    success: boolean;
+    result: T;
+    msg: string;
+  }
+
   interface OAuthToken {
     token: string;
     phone: string;
     loginId: string;
     name: string;
+    menus: AuthMenu[];
   }
 
   interface LoginManagerConfig {
     oatuhToken: string;
   }
+
+  type RECEIVE_AUTH = string;
+  interface ReducerInterface {
+    RECEIVE_AUTH: RECEIVE_AUTH;
+  }
 }
 
 class LoginManager {
+
+  public reducerInterface: LoginInterface.ReducerInterface = {
+    RECEIVE_AUTH: 'RECEIVE_AUTH'
+  };
+
   public LoginManagerConfig: LoginInterface.LoginManagerConfig = {
     oatuhToken: '/oauth/token',
   };
@@ -57,26 +78,25 @@ class LoginManager {
    *
    * @memberof LoginManager
    */
-  public login = async (params: LoginInterface.OAuthTokenParams): Promise<any> => {
-    try {
-      const payload: LoginInterface.OAuthTokenParams = {
-        ...params,
-        password: md5(params.password)
-      };
-      const { success, result } = await this.autoToken(payload);
-      invariant(success, result || ResponseCode.error);
-      return new Promise((resolve, reject) => {
+  public login = async (params: LoginInterface.OAuthTokenParams): Promise<LoginInterface.LoginMangerInfo<LoginInterface.OAuthToken>> => {
+    const payload: LoginInterface.OAuthTokenParams = {
+      ...params,
+      password: md5(params.password)
+    };
+    const { success, result } = await this.autoToken(payload);
+
+    if (success === true) {
+      return new Promise((resolve) => {
         Taro
           .setStorage({ key: CentermOAuthKey, data: JSON.stringify(result) })
           .then(() => {
-            resolve({success: true, result});
+            resolve({success: true, result, msg: ''});
           })
-          .catch(error => reject({success: false, result: error.message}));
+          .catch(error => resolve({success: false, result: {} as any, msg: error.message || '登录失败'}));
       });
-    } catch (error) {
-      Taro.showToast({
-        title: error.message,
-        icon: 'none'
+    } else {
+      return new Promise((resolve) => {
+        resolve({success: false, result: {} as any, msg: result || '登录失败'});
       });
     }
   }
@@ -104,23 +124,27 @@ class LoginManager {
    *
    * @memberof LoginManager
    */
-  public getUserInfo = () => {
-    return new Promise((resolve, reject) => {
+  public getUserInfo = (): Promise<LoginInterface.LoginMangerInfo<LoginInterface.OAuthToken>> => {
+    return new Promise((resolve) => {
       Taro
         .getStorage({key: CentermOAuthKey})
         .then(data => {
-          resolve({success: true, result: JSON.parse(data.data)});
+          if (data.data !== '') {
+            resolve({success: true, result: JSON.parse(data.data), msg: ''});
+          } else {
+            resolve({success: false, result: {} as any, msg: '请先登录'});
+          }
         })
         .catch(error => {
-          reject({success: false, result: error.message});
+          resolve({success: false, result: {} as any, msg: error.message});
         });
     });
   }
 
   public getUserToken = (): ActionsInterface.ActionBase<string> => {
     const userinfo = Taro.getStorageSync(CentermOAuthKey);
-    if (userinfo && userinfo.token) {
-      return { success: true, result: userinfo.token };
+    if (userinfo) {
+      return { success: true, result: JSON.parse(userinfo).token };
     } else {
       return { success: false, result: '' };
     }

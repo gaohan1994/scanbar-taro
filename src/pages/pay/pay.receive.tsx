@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-12 14:01:28 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-12 15:58:42
+ * @Last Modified time: 2019-11-25 20:02:51
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
@@ -11,6 +11,12 @@ import classnames from 'classnames';
 import { AtActivityIndicator, AtButton } from 'taro-ui';
 import FormCard from '../../component/card/form.card';
 import { FormRowProps } from '../../component/card/form.row';
+import { getPayReceive } from '../../reducers/app.pay';
+import { AppReducer } from '../../reducers';
+import { ProductInterface } from '../../constants';
+import { connect } from '@tarojs/redux';
+import getBaseUrl from '../../common/request/base.url';
+
 const Items = [
   {
     title: '收款码',
@@ -31,12 +37,24 @@ const Items = [
 
 const cssPrefix = 'pay';
 
-interface Props { }
+interface Props { 
+  payDetail: Partial<ProductInterface.CashierPay> & {
+    totalAmount: number;
+  };
+}
 interface State { 
   tab: 'receive' | 'cash';
 }
 
 class PayReceive extends Taro.Component<Props, State> {
+
+  static defaultProps = {
+    payDetail: {
+      codeUrl: '',
+      totalAmount: -1
+    }
+  };
+  
   readonly state: State = {
     tab: 'receive',
   };
@@ -116,15 +134,24 @@ class PayReceive extends Taro.Component<Props, State> {
    */
   private renderContent = () => {
     const { tab } = this.state;
+    const { payDetail } = this.props;
 
+    console.log(`${getBaseUrl('').replace('api', '')}${payDetail.codeUrl}`);
     if (tab === 'receive') {
       return (
         <View className={`${cssPrefix}-receive-content`}>
           <View className={`${cssPrefix}-receive-content-code`}>
-            <AtActivityIndicator mode='center' />
+            {payDetail.codeUrl ? (
+              <Image 
+                className={`${cssPrefix}-receive-content-code-image`}
+                src={`${getBaseUrl('').replace('api', '')}${payDetail.codeUrl}`} 
+              />
+            ) : (
+              <AtActivityIndicator mode='center' />
+            )}
           </View>
           <Text className={`${cssPrefix}-receive-content-text`}>请用手机扫一扫二维码，进行付款</Text>
-          <View className={`${cssPrefix}-receive-content-price`}>￥26.50</View>
+          <View className={`${cssPrefix}-receive-content-price`}>￥{payDetail.totalAmount}</View>
         </View>
       );
     } else if (tab === 'cash') {
@@ -159,4 +186,8 @@ class PayReceive extends Taro.Component<Props, State> {
   }
 }
 
-export default PayReceive;
+const select = (state: AppReducer.AppState) => ({
+  payDetail: getPayReceive(state),
+});
+
+export default connect(select)(PayReceive);

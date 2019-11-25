@@ -2,14 +2,14 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-22 17:07:15
+ * @Last Modified time: 2019-11-25 14:04:10
  * 
  * @todo [购物车组件]
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import "./cart.less";
-import { AtFloatLayout } from 'taro-ui';
+import { AtFloatLayout, AtButton } from 'taro-ui';
 import classnames from 'classnames';
 import { AppReducer } from '../../reducers';
 import { getProductCartList, getChangeWeigthProduct } from '../../common/sdk/product/product.sdk.reducer';
@@ -19,7 +19,8 @@ import Modal from '../modal/modal';
 import FormCard from '../card/form.card';
 import { FormRowProps } from '../card/form.row';
 import { ProductInterface } from '../../constants';
-import { store } from '../../app';
+
+const cssPrefix = 'cart';
 
 interface CartBarProps { 
   productCartList: Array<ProductCartInterface.ProductCartInfo>;
@@ -50,6 +51,27 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     });
   }
 
+  public manageProduct = (
+    type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce, 
+    product: ProductCartInterface.ProductCartInfo
+  ) => {
+    productSdk.manage({type, product});
+  }
+
+  public onPayHandle = () => {
+    const { productCartList } = this.props;
+    if (productCartList.length > 0) {
+      Taro.navigateTo({
+        url: `/pages/product/product.pay`
+      });
+    } else {
+      Taro.showToast({
+        title: '请选择要结算的商品',
+        icon: 'none'
+      });
+    }
+  }
+
   render () {
     const buttonClassNames = classnames(
       'cart-right',
@@ -71,7 +93,10 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
             <View className="cart-left">
               left
             </View>
-            <View className={buttonClassNames}>
+            <View 
+              className={buttonClassNames}
+              onClick={() => this.onPayHandle()}
+            >
               结算
             </View>
           </View>
@@ -90,7 +115,10 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       >
         <View className="cart-list-header">
           <View>已选择商品（3）</View>
-          <View className="cart-list-header-empty">
+          <View 
+            className="cart-list-header-empty"
+            onClick={() => productSdk.manage({type: productSdk.productCartManageType.EMPTY, product: {} as any})}
+          >
             <Image src="//net.huanmusic.com/weapp/icon_empty.png" className="cart-list-header-empty-icon" />
             <Text>清空购物车</Text>
           </View>
@@ -98,14 +126,47 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
         {
           productCartList.length > 0 && productCartList.map((item) => {
             return (
-              <View key={item.id}>
-                {item.name}
+              <View key={item.id} >
+                {this.renderProduct(item)}
               </View>
             );
           })
         }
       </AtFloatLayout>
     );
+  }
+
+  private renderProduct = (product: ProductCartInterface.ProductCartInfo) => {
+    return (
+      <View className={`${cssPrefix}-product`}>
+        <View className={`${cssPrefix}-product-container`}>
+          <Text className={`${cssPrefix}-product-container-name`}>{product.name}</Text>
+          <Text className={`${cssPrefix}-product-container-normal`}>
+            <Text className={`${cssPrefix}-product-container-price`}>{product.price}</Text>
+            / {product.unit}
+          </Text>
+          <View className={`${cssPrefix}-product-stepper`}>            
+            <AtButton
+              type="secondary"
+              size="small"
+              circle={true}
+              onClick={() => this.manageProduct(productSdk.productCartManageType.REDUCE, product)}
+            >
+              -
+            </AtButton>
+            <Text>{product.sellNum}</Text>
+            <AtButton
+              type="primary"
+              size="small"
+              circle={true}
+              onClick={() => this.manageProduct(productSdk.productCartManageType.ADD, product)}
+            >
+              +
+            </AtButton>
+          </View>
+        </View>
+      </View>
+    ); 
   }
 
   private onWeightProductClose = () => {

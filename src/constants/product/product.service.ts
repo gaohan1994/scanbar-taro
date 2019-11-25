@@ -2,11 +2,12 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:16:32 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-21 13:50:49
+ * @Last Modified time: 2019-11-25 19:36:53
  */
 import requestHttp from "../../common/request/request.http";
 import ProductInterfaceMap, { ProductInterface } from "./product";
 import { HTTPInterface } from "..";
+import { ProductCartInterface } from "../../common/sdk/product/product.sdk";
 
 class ProductService {
 
@@ -60,6 +61,10 @@ class ProductService {
 
   public productInfoAdd = async (params: ProductInterface.ProductInfoAdd): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.post(ProductInterfaceMap.productInfoAdd, params);
+  }
+
+  public cashierPay = async (params: ProductCartInterface.ProductPayPayload): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.post(ProductInterfaceMap.cashierPay, params);
   }
 }
 

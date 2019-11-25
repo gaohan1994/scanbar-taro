@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-21 13:52:09
+ * @Last Modified time: 2019-11-25 19:31:38
  * 
  * @todo [商品相关的类型定义]
  */
@@ -43,7 +43,7 @@ export declare namespace ProductInterface {
     price: number;        // 售价
     saleType: number;     // 销售类型（0：按件卖[默认]；1称重）
     status: number;       // 状态(0：启用;1：停用)
-    type: number;         // 品类id
+    typeId: number;       // 品类id
     typeName: string;     // 品类名称
     barcode: string;      // 条码
     brand: string;        // 品牌
@@ -119,12 +119,18 @@ export declare namespace ProductInterface {
     id: number;
   }
 
+  interface CashierPay {
+    codeUrl: string;
+    orderNo: string;
+  }
+
   type RECEIVE_PRODUCT_LIST = string;
   type RECEIVE_PRODUCT_SEARCH_LIST = string;
   type RECEIVE_PRODUCT_MANAGE_LIST = string;
   type RECEIVE_PRODUCT_TYPE = string;
   type RECEIVE_PRODUCT_SUPPLIER = string;
   type RECEIVE_PRODUCT_DETAIL = string;
+  type RECEIVE_PAY_DETAIL = string;
 
   interface ReducerInterface {
     RECEIVE_PRODUCT_LIST: RECEIVE_PRODUCT_LIST;
@@ -133,6 +139,7 @@ export declare namespace ProductInterface {
     RECEIVE_PRODUCT_TYPE: RECEIVE_PRODUCT_TYPE;
     RECEIVE_PRODUCT_SUPPLIER: RECEIVE_PRODUCT_SUPPLIER;
     RECEIVE_PRODUCT_DETAIL: RECEIVE_PRODUCT_DETAIL;
+    RECEIVE_PAY_DETAIL: RECEIVE_PAY_DETAIL;
   }
 }
 
@@ -143,6 +150,7 @@ interface ProductInterfaceMap {
   productInfoEdit: string;
   productInfoGetBarcode: string;
   productInfoAdd: string;
+  cashierPay: string;
   productInfoGetList (params?: ProductInterface.ProductInfoGetListFetchFidle): string;
   productInfoList (params?: ProductInterface.ProductInfoListFetchFidle): string;
   productInfoDetail (params: ProductInterface.ProductDetailFetchFidle): string;
@@ -157,6 +165,7 @@ class ProductInterfaceMap {
     RECEIVE_PRODUCT_TYPE: 'RECEIVE_PRODUCT_TYPE',
     RECEIVE_PRODUCT_SUPPLIER: 'RECEIVE_PRODUCT_SUPPLIER',
     RECEIVE_PRODUCT_DETAIL: 'RECEIVE_PRODUCT_DETAIL',
+    RECEIVE_PAY_DETAIL: 'RECEIVE_PAY_DETAIL',
   };
 
   public productInfoType = '/product/productInfo/type';
@@ -164,6 +173,7 @@ class ProductInterfaceMap {
   public productInfoEdit = '/product/productInfo/edit';
   public productInfoGetBarcode = '/product/productInfo/genBarcode';
   public productInfoAdd = '/product/productInfo/add';
+  public cashierPay = '/cashier/pay';
 
   public productInfoGetList = (params?: ProductInterface.ProductInfoGetListFetchFidle) => {
     return `/product/productInfo/getList${params ? jsonToQueryString(params) : ''}`;

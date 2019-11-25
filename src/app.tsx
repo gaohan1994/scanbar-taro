@@ -42,6 +42,7 @@ class App extends Component {
        * ```
        */
       'pages/product/product.order',
+      'pages/product/product.pay',
       'pages/product/product.manage',
       'pages/product/product.detail',
       'pages/product/product.add',
@@ -85,6 +86,11 @@ class App extends Component {
 
       /**
        * @todo [支付相关]
+       * ```js
+       * Taro.navigateTo({
+       *  url: `/pages/pay/pay.receive`
+       * })
+       * ```
        */
       'pages/pay/pay.receive',
 

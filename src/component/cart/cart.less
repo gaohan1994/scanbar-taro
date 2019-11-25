@@ -5,8 +5,12 @@
 @cart-button-font: 30px;    // 结算按钮字体大小
 @cart-button-width: 190px;  // 结算按钮大小
 @cart-icon-size: 136px;     // 购物车icon大小
-
+@product-border-color: #f9f9f9;
+@product-name-color: #4f4f4f;
+@product-price-font: 32px;
+@product-price-color: #FC4E44;
 @cart-list-header-font-color: #808080; // 购物车列表头部字体颜色
+@product-normal-color: #cccccc;
 
 .@{cart-prefix} {
   position: fixed;
@@ -63,6 +67,32 @@
           .margin(10px, r);
         }
       }
+    }
+  }
+
+  &-product {
+    .padding(35px);
+    &-border {
+      border-bottom: 1px solid @product-border-color;
+    }
+    &-container {
+      .flex(center, space-between, row);
+      &-name {
+        width: 300px;
+        font-size: @normal-text-fontsize;
+        color: @product-name-color;
+      }
+      &-price {
+        font-size: @product-price-font;
+        color: @product-price-color;
+      }
+      &-normal {
+        font-size: @normal-text-fontsize;
+        color: @product-normal-color;
+      }
+    }
+    &-stepper {
+      .flex(center, center, row);
     }
   }
 }

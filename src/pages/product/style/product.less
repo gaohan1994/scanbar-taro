@@ -10,6 +10,7 @@
 @product-list-type-header-font: 28px;
 @product-section-color: #F8F8FA;
 @product-select-title-font: 32px;
+@product-pay-footer-right: 410px;
 
 .@{product-prefix} {
   display: flex;
@@ -217,6 +218,102 @@
         display: flex;
         flex-direction: column;
         flex: 1;
+      }
+    }
+  }
+  
+  &-pay {
+    .padding(20px);
+    &-card {
+      .margin(20px, t);
+    }
+    &-container {
+      // position: absolute;
+      // top: 0;
+      // bottom: @cart-height + 10px;
+      // width: 100%;
+      // display: flex;
+      // flex-direction: column;
+    }
+    &-list {
+      .padding(20px);
+      // display: flex;
+      // flex: 1;
+      // .padding(30px, lr);
+    }
+    &-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 999;
+      &-bg {
+        position: relative;
+        .padding(@product-pay-footer-right, r);
+        width: 750px;
+        height: @cart-height;
+        .background-image('//net.huanmusic.com/weapp/bmg_bottom_close.png');
+      }
+      &-right {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: @product-pay-footer-right;
+        height: 100%;
+        .flex(center, center, column);
+        color: #ffffff;
+        font-size: @cart-button-font;
+        &-disabled {
+          .background-image('//net.huanmusic.com/weapp/bt_put_bottom_close_und.png');
+        }
+        &-active {
+          .background-image('//net.huanmusic.com/weapp/bt_put_bottom_close_pitch.png');
+        }
+      }
+      &-left {
+        .flex(center, space-around);
+        height: 100%;
+        &-item {
+          .flex(center, center, column);
+          &-icon {
+            width: 35px;
+            height: 35px;
+          }
+          &-font {
+            font-size: 26px;
+            color: #ffffff;
+            .margin(7px, t);
+          }
+        }
+      }
+    }
+  }
+  &-row {
+    .padding(24px, tb);
+    .padding(40px, lr);
+    &-border {
+      border-bottom: 1PX solid #d6e4ef;
+    }
+    &-normal {
+      font-size: 26px;
+      color: @base-font-color;
+    }
+    &-name {
+      font-size: 30px;
+      color: #444444;
+    }
+    &-price {
+      font-size: 26px;
+      color: #fc4e44;
+    }
+    &-content {
+      display: flex;
+      flex-direction: column;
+      &-item {
+        .flex(center, space-between, row);
+      }
+      &-top {
+        .margin(20px, t);
       }
     }
   }

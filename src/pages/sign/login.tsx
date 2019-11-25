@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 10:07:05 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-14 11:50:11
+ * @Last Modified time: 2019-11-25 16:29:20
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
@@ -11,6 +11,7 @@ import classnames from 'classnames';
 import CTInput from '../../component/sign/input/input';
 import { AtButton } from 'taro-ui';
 import { LoginManager } from '../../common/sdk';
+import invariant from 'invariant';
 
 type Props = {};
 
@@ -64,9 +65,19 @@ class Login extends Taro.Component<Props, State> {
   public getDisabled = (): boolean => {
     return false;
   }
-  public onLogin = () => {
-    console.log('onLogin: ');
-    LoginManager.login({phoneNumber: '15659995443', password: '111111'});
+  public onLogin = async () => {
+    try {
+      Taro.showLoading();
+      const { username, password } = this.state;
+      const result = await LoginManager.login({phoneNumber: username, password: password});
+      invariant(result.success, result.msg || '登录失败');
+      Taro.navigateBack();
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
   }
 
   render () {

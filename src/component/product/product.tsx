@@ -2,13 +2,25 @@ import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import './product.less';
 import { ProductInterface } from '../../constants';
+import { connect } from '@tarojs/redux';
+import { AppReducer } from '../../reducers';
+import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
+import { AtButton } from 'taro-ui';
+import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 
 const cssPrefix = 'component-product';
 interface Props { 
   product: ProductInterface.ProductInfo;
+  productInCart?: ProductCartInterface.ProductCartInfo;
 }
 
 class ProductComponent extends Taro.Component<Props> {
+
+  public manageProduct = (type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce) => {
+    const { product } = this.props;
+    productSdk.manage({type, product});
+  }
+
   render () {
     const { product } = this.props;
     return (
@@ -25,10 +37,64 @@ class ProductComponent extends Taro.Component<Props> {
               /{product.unit}
             </Text>
           </View>
+
+          {this.renderStepper()}
         </View>
+      </View>
+    );
+  }
+
+  private renderStepper = () => {
+    const { productInCart } = this.props;
+
+    return (
+      <View className={`${cssPrefix}-stepper`}>
+        {productInCart !== undefined ? (
+          <View className={`${cssPrefix}-stepper-container`}>            
+            <AtButton
+              type="secondary"
+              size="small"
+              circle={true}
+              onClick={() => this.manageProduct(productSdk.productCartManageType.REDUCE)}
+            >
+              -
+            </AtButton>
+            <Text>{productInCart.sellNum}</Text>
+            <AtButton
+              type="primary"
+              size="small"
+              circle={true}
+              onClick={() => this.manageProduct(productSdk.productCartManageType.ADD)}
+            >
+              +
+            </AtButton>
+          </View>
+        ) : (
+          <View className={`${cssPrefix}-stepper-container`}>            
+            <AtButton
+              type="primary"
+              size="small"
+              circle={true}
+              onClick={() => this.manageProduct(productSdk.productCartManageType.ADD)}
+            >
+              +
+            </AtButton>
+          </View>
+        )}
+        
       </View>
     );
   }
 }
 
-export default ProductComponent;
+const select = (state: AppReducer.AppState, ownProps: Props) => {
+  const { product } = ownProps;
+  const productCartList = getProductCartList(state);
+  const productInCart = product !== undefined && productCartList.find(p => p.id === product.id);
+  return {
+    product,
+    productInCart,
+  };
+};
+
+export default connect(select)(ProductComponent as any);

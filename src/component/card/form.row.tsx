@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 14:41:35 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-20 10:38:47
+ * @Last Modified time: 2019-11-25 14:19:14
  * 
  * @todo [fockedTaroUiListItem,增加以及修改了一些属性]
  */
@@ -25,6 +25,7 @@ export interface FormRowProps {
   thumb?: string;               // 图片
   title?: string;               // 左边标题
   extraText?: string;           // 右边文字
+  extraTextStyle?: string;      // 右边文字颜色
   iconInfo?: any;               // Icon相关信息
   disabled?: boolean;           // 是否禁用
   hasBorder?: boolean;          // 是否有底部border
@@ -53,6 +54,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
     hasBorder: true,
     extraText: '',
     extraThumb: '',
+    extraTextStyle: undefined,
     iconInfo: {},
     onClick: () => {/** */},
     extraThumbClick: () => {/** */},
@@ -75,6 +77,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
       hasBorder,
       arrow,
       extraThumb,
+      extraTextStyle,
       extraThumbClick,
       buttons,
       onClick,
@@ -121,7 +124,16 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
           </View>
 
           <View className='at-list__item-extra item-extra component-list-row-extra'>
-            {extraText && <View className='item-extra__info'>{extraText}</View>}
+            {extraText && (
+              <View 
+                className={classnames({
+                  'item-extra__info': extraTextStyle !== 'price',
+                  'component-form-price': extraTextStyle === 'price'
+                })} 
+              >
+                {extraText}
+              </View>
+            )}
 
             {buttons && buttons.length > 0 && (
               <View className="component-form-buttons">

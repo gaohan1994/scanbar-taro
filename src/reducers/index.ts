@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import permission from './app.permission';
 import member, { MemberReducer } from './app.member';
 import product, { ProductReducer } from './app.product';
+import pay, { PayReducer } from './app.pay';
 import productSDK, { ProductSDKReducer } from '../common/sdk/product/product.sdk.reducer';
 
 export declare namespace AppReducer {
@@ -9,6 +10,7 @@ export declare namespace AppReducer {
     member: MemberReducer.MemberInitState;
     product: ProductReducer.InitState;
     productSDK: ProductSDKReducer.State;
+    pay: PayReducer.State;
   }
 }
 
@@ -17,4 +19,5 @@ export default combineReducers({
   member,
   product,
   productSDK,
+  pay,
 });

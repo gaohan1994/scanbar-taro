@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-20 13:37:23 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-21 14:21:57
+ * @Last Modified time: 2019-11-25 17:29:42
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Picker } from '@tarojs/components';
@@ -250,7 +250,7 @@ class ProductAdd extends Taro.Component<Props, State> {
       if (addResult.code === ResponseCode.success) {
         resolve(addResult);
       } else {
-        reject(addResult.msg);
+        reject({message: addResult.msg});
       }
     });
   }
