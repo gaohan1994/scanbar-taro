@@ -358,6 +358,11 @@
   resolved "https://registry.npmjs.org/@types/node/-/node-12.12.0.tgz#ff3201972d6dc851a9275308a17b9b5094e68057"
   integrity sha512-6N8Sa5AaENRtJnpKXZgvc119PKxT1Lk9VPy4kfT8JF23tIe1qDfaGkBR2DRKJFIA7NptMz+fps//C6aLi1Uoug==
 
+"@types/numeral@^0.0.26":
+  version "0.0.26"
+  resolved "https://registry.npmjs.org/@types/numeral/-/numeral-0.0.26.tgz#cfab9842ef9349ce714b06722940ca7ebf8a6298"
+  integrity sha512-DwCsRqeOWopdEsm5KLTxKVKDSDoj+pzZD1vlwu1GQJ6IF3RhjuleYlRwyRH6MJLGaf3v8wFTnC6wo3yYfz0bnA==
+
 "@types/prop-types@*":
   version "15.7.3"
   resolved "https://registry.npmjs.org/@types/prop-types/-/prop-types-15.7.3.tgz#2ab0d5da2e5815f94b0b9d4b95d1e5f243ab2ca7"
@@ -5936,6 +5941,11 @@ number-is-nan@^1.0.0:
   version "1.0.1"
   resolved "https://registry.npmjs.org/number-is-nan/-/number-is-nan-1.0.1.tgz#097b602b53422a522c1afb8790318336941a011d"
   integrity sha1-CXtgK1NCKlIsGvuHkDGDNpQaAR0=
+
+numeral@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.npmjs.org/numeral/-/numeral-2.0.6.tgz#4ad080936d443c2561aed9f2197efffe25f4e506"
+  integrity sha1-StCAk21EPCVhrtnyGX7//iX05QY=
 
 oauth-sign@~0.9.0:
   version "0.9.0"

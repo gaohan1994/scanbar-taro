@@ -4,7 +4,7 @@ import { AppReducer } from '../reducers';
 export declare namespace PayReducer {
 
   interface PayReceive extends Partial<ProductInterface.CashierPay> {
-    totalAmount: number;
+    transAmount: number;
   }
 
   interface State {
@@ -20,7 +20,7 @@ export declare namespace PayReducer {
 const initState: PayReducer.State = {
   payReceive: {
     codeUrl: '',
-    totalAmount: -1,
+    transAmount: -1,
   }
 };
 

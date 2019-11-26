@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-25 17:52:27
+ * @Last Modified time: 2019-11-26 10:13:19
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -20,6 +20,7 @@
 import { ProductInterface, ProductService } from '../../../constants';
 import { store } from '../../../app';
 import { ProductSDKReducer } from './product.sdk.reducer';
+import numeral from 'numeral';
 
 export declare namespace ProductCartInterface {
   interface ProductCartInfo extends ProductInterface.ProductInfo {
@@ -123,6 +124,166 @@ class ProductSDK {
     CHANGE_WEIGHT_PRODUCT_MODAL: 'CHANGE_WEIGHT_PRODUCT_MODAL',
   };
   
+  /**
+   * @param {erase}
+   * [抹零金额]
+   *
+   * @private
+   * @type {string}
+   * @memberof ProductSDK
+   */
+  private erase?: string | number;
+  /**
+   * @param {member} 
+   * [会员]
+   * @private
+   * @type {*}
+   * @memberof ProductSDK
+   */
+  private member?: any;
+
+  constructor () {
+    this.erase = undefined;
+    this.member = undefined;
+  }
+
+  public setErase = (erase: string): this => {
+    this.erase = erase;
+    return this;
+  }
+
+  public setMember = (member: any): this => {
+    this.member = member;
+    return this;
+  }
+
+  public getErase = (): number => {
+    if (this.erase !== undefined) {
+      return numeral(this.erase).value();
+    } else {
+      return 0;
+    }
+  }
+
+  /**
+   * @todo 获取商品的数量
+   *
+   * @memberof ProductSDK
+   */
+  public getProductNumber = (products?: ProductCartInterface.ProductCartInfo[]) => {
+    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+    const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.sellNum;
+    const total = productList.reduce(reduceCallback, 0);
+    return total;
+  }
+
+  /**
+   * @todo 获取商品的价格
+   *
+   * @memberof ProductSDK
+   */
+  public getProductPrice = (products?: ProductCartInterface.ProductCartInfo[]) => {
+    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+    const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.price;
+    const total = productList.reduce(reduceCallback, 0);
+    return total;
+  }
+
+  /**
+   * @todo 计算交易价格
+   * 
+   * ```ts
+   * import productSdk from 'xxx';
+   * 
+   * const total = productSdk
+   * .setErase(1)
+   * .setMember(member)
+   * .getProductTransPrice()
+   * 
+   * ```
+   *
+   * @memberof ProductSDK
+   */
+  public getProductTransPrice = (products?: ProductCartInterface.ProductCartInfo[]) => {
+    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+    const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.price;
+    let total: number = productList.reduce(reduceCallback, 0);
+    
+    // 计算抹零价格
+    total = total - this.getErase();
+    if (this.member) {
+      // 这里计算会员价格
+    }
+    return total;
+  }
+
+  /**
+   * @todo 返回支付需要的数据格式
+   * 
+   * ```ts
+   * import productSdk from 'xxx';
+   * const payload = productSdk
+   * .setErase(1)
+   * .setMember(member)
+   * .getProductInterfacePayload()
+   * ```
+   *
+   * @memberof ProductSDK
+   */
+  public getProductInterfacePayload = (products?: ProductCartInterface.ProductCartInfo[]): ProductCartInterface.ProductPayPayload => {
+    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+
+    const payload: ProductCartInterface.ProductPayPayload = {
+      flag: false,
+      order: {
+        authCode: '-1',
+        discount: 0,
+        erase: this.getErase(),
+        memberId: -1,
+        orderNo: '',
+        orderSource: 1,
+        payType: 2,
+        terminalCd: '-1',
+        terminalSn: '-1',
+        totalAmount: this.getProductPrice(),
+        totalNum: this.getProductNumber(),
+        transAmount: this.getProductTransPrice(),
+      },
+      productInfoList: productList.map((item) => {
+        return {
+          activities: [],
+          barcode: item.barcode,
+          brand: item.brand,
+          discountAmount: 0,
+          discountType: 0,
+          productId: item.id,
+          productName: item.name,
+          sellNum: item.sellNum,
+          standard: item.standard,
+          totalAmount: item.price * item.sellNum,
+          transAmount: item.price * item.sellNum,
+          type: item.typeId,
+        };
+      }),
+      transProp: true
+    };
+    console.log('payload: ', payload);
+    return payload;
+  }
+
+  /**
+   * @todo 获取商品的会员价
+   *
+   * @memberof ProductSDK
+   */
+  public getProductMemberPrice = (products?: ProductCartInterface.ProductCartInfo[]) => {
+    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+    const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.memberPrice;
+    const total = productList.reduce(reduceCallback, 0);
+    return total;
+  }
+
+
   public isWeighProduct (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo): product is ProductCartInterface.ProductCartInfo {
     return product.saleType === 1;
   }
@@ -229,42 +390,6 @@ class ProductSDK {
       type: this.reducerInterface.CHANGE_WEIGHT_PRODUCT_MODAL,
       payload: {product: {}}
     });
-  }
-
-  /**
-   * @todo 获取商品的数量
-   *
-   * @memberof ProductSDK
-   */
-  public getProductNumber = (products?: ProductCartInterface.ProductCartInfo[]) => {
-    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
-    const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.sellNum;
-    const total = productList.reduce(reduceCallback, 0);
-    return total;
-  }
-
-  /**
-   * @todo 获取商品的价格
-   *
-   * @memberof ProductSDK
-   */
-  public getProductPrice = (products?: ProductCartInterface.ProductCartInfo[]) => {
-    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
-    const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.price;
-    const total = productList.reduce(reduceCallback, 0);
-    return total;
-  }
-
-  /**
-   * @todo 获取商品的会员价
-   *
-   * @memberof ProductSDK
-   */
-  public getProductMemberPrice = (products?: ProductCartInterface.ProductCartInfo[]) => {
-    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
-    const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.memberPrice;
-    const total = productList.reduce(reduceCallback, 0);
-    return total;
   }
 
   public cashierPay = async (params: ProductCartInterface.ProductPayPayload) => {

@@ -1,5 +1,5 @@
 import Taro from '@tarojs/taro';
-import { View, Text, Image } from '@tarojs/components';
+import { View, Text, Image, Input } from '@tarojs/components';
 import { AppReducer } from '../../reducers';
 import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
 import { connect } from '@tarojs/redux';
@@ -13,6 +13,8 @@ import invariant from 'invariant';
 import { ResponseCode } from '../../constants/index';
 import { store } from '../../app';
 import { ProductInterfaceMap } from '../../constants';
+import Modal from '../../component/modal/modal';
+import numeral from 'numeral';
 
 const cssPrefix = 'product';
 
@@ -20,46 +22,69 @@ interface Props {
   productCartList: ProductCartInterface.ProductCartInfo[];
 }
 
-class ProductPay extends Taro.Component<Props> {
+interface State {
+  eraseModal: boolean;
+  eraseValue: string;
+  memberModal: boolean;
+  memberValue: string;
+}
+
+class ProductPay extends Taro.Component<Props, State> {
+
+  state = {
+    eraseModal: false,
+    eraseValue: '',
+    memberModal: false,
+    memberValue: '',
+  };
+  
+  public changeModalVisible = (key: string, visible?: boolean) => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        [key]: typeof visible === 'boolean' ? visible : !prevState[key]
+      };
+    });
+  }
+
+  public onChangeValue = (key: string, value: string) => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        [key]: value
+      };
+    });
+  }
+
+  public getTransValue = (): number => {
+    const { eraseValue } = this.state;
+    productSdk.setErase(eraseValue);
+    return productSdk.getProductTransPrice();
+  }
+
+  public onScanMember = () => {
+    try {
+      Taro
+      .scanCode()
+      .then(res => {
+        console.log('res: ', res);
+      });
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
 
   public onPayHandle = async () => {
     try {
       Taro.showLoading();
-      const { productCartList } = this.props;
-      const payload: ProductCartInterface.ProductPayPayload = {
-        flag: false,
-        order: {
-          authCode: '-1',
-          discount: 0,
-          erase: 0,
-          memberId: -1,
-          orderNo: '',
-          orderSource: 1,
-          payType: 2,
-          terminalCd: '-1',
-          terminalSn: '-1',
-          totalAmount: productSdk.getProductPrice(),
-          totalNum: productSdk.getProductNumber(),
-          transAmount: productSdk.getProductPrice(),
-        },
-        productInfoList: productCartList.map((item) => {
-          return {
-            activities: [],
-            barcode: item.barcode,
-            brand: item.brand,
-            discountAmount: 0,
-            discountType: 0,
-            productId: item.id,
-            productName: item.name,
-            sellNum: item.sellNum,
-            standard: item.standard,
-            totalAmount: item.price * item.sellNum,
-            transAmount: item.price * item.sellNum,
-            type: item.typeId,
-          };
-        }),
-        transProp: true
-      };
+      const { eraseValue } = this.state;
+      if (eraseValue !== '') {
+        productSdk.setErase(eraseValue);
+      }
+      const payload = productSdk.getProductInterfacePayload();
       const result = await productSdk.cashierPay(payload);
       invariant(result.code === ResponseCode.success, result.msg || ResponseCode.error);
       Taro.hideLoading();
@@ -68,7 +93,7 @@ class ProductPay extends Taro.Component<Props> {
         payload: { 
           payReceive: {
             ...result.data,
-            totalAmount: payload.order.totalAmount
+            transAmount: payload.order.transAmount
           }
         }
       });
@@ -97,7 +122,107 @@ class ProductPay extends Taro.Component<Props> {
           {/* </ScrollView> */}
         </View>
         {this.renderFooter()}
+        {this.renderEraseModal()}
+        {this.renderMemberModal()}
       </View>
+    );
+  }
+
+  private renderMemberModal = () => {
+    const { memberModal, memberValue } = this.state;
+    const buttons = [
+      {
+        title: '取消',
+        type: 'cancel',
+        onPress: () => {
+          this.onChangeValue('eraseValue', '');
+          this.changeModalVisible('eraseModal', false);
+        },
+      },
+      {
+        title: '确定',
+        type: 'confirm',
+        onPress: () => this.changeModalVisible('eraseModal', false)
+      },
+    ];
+    return (
+      <Modal
+        isOpened={memberModal}
+        buttons={buttons}
+        header="选择会员"
+      >
+        <View className={`product-detail-modal`}>
+          <View className={`product-detail-modal-text`}>优惠后金额: {productSdk.getProductPrice()}</View>
+          <View 
+            className={classnames('component-form', {
+              'component-form-shadow': true
+            })}
+          >
+            <View className={`${cssPrefix}-pay-member-input`}>
+              <Input 
+                className={`${cssPrefix}-pay-member-input-box`}
+                placeholder="请输入卡号、手机号或姓名"
+                value={memberValue}
+                onInput={({detail: { value }}) => this.onChangeValue('memberValue', value)}
+              />
+              <View
+                className={`${cssPrefix}-pay-member-input-icon`} 
+                onClick={() => this.onScanMember()}
+              >
+                <Image 
+                  src="//net.huanmusic.com/weapp/icon_close_scan.png"
+                  className={`${cssPrefix}-pay-member-input-icon-img`} 
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
+
+  private renderEraseModal = () => {
+    const { eraseModal, eraseValue } = this.state;
+    const eraseButtons = [
+      {
+        title: '取消',
+        type: 'cancel',
+        onPress: () => {
+          this.onChangeValue('eraseValue', '');
+          this.changeModalVisible('eraseModal', false);
+        },
+      },
+      {
+        title: '确定',
+        type: 'confirm',
+        onPress: () => this.changeModalVisible('eraseModal', false)
+      },
+    ];
+    const eraseForm: FormRowProps[] = [
+      {
+        title: '抹零金额（￥）',
+        isInput: true,
+        inputValue: eraseValue,
+        inputType: 'number',
+        inputOnChange: (value) => this.onChangeValue('eraseValue', value)
+      },
+      {
+        title: '应收金额（￥）',
+        extraText: `￥${numeral(productSdk.getProductPrice() - numeral(eraseValue).value()).format('0.00')}`,
+        hasBorder: false
+      },
+    ];
+    return (
+      <Modal
+        isOpened={eraseModal}
+        buttons={eraseButtons}
+        header="抹零"
+      >
+        <View className={`product-detail-modal`}>
+          <View className={`product-detail-modal-text`}>优惠后金额: {productSdk.getProductPrice()}</View>
+          <FormCard items={eraseForm} />
+        </View>
+      </Modal>
     );
   }
 
@@ -154,7 +279,7 @@ class ProductPay extends Taro.Component<Props> {
       // },
       {
         title: '应收金额',
-        extraText: `￥${productSdk.getProductPrice()}`,
+        extraText: `￥${numeral(productSdk.getProductTransPrice()).format('0.00')}`,
         hasBorder: false
       },
     ];
@@ -165,17 +290,24 @@ class ProductPay extends Taro.Component<Props> {
 
   private renderFooter = () => {
     const { productCartList } = this.props;
+    const { eraseValue } = this.state;
     return (
       <View className={`${cssPrefix}-pay-footer`}>
         <View className={`${cssPrefix}-pay-footer-bg`}>
           <View className={`${cssPrefix}-pay-footer-left`}>
-            <View className={`${cssPrefix}-pay-footer-left-item`}>
+            <View 
+              className={`${cssPrefix}-pay-footer-left-item`}
+              onClick={() => this.changeModalVisible('memberModal', true)}
+            >
               <Image src='//net.huanmusic.com/weapp/icon_member.png' className={`${cssPrefix}-pay-footer-left-item-icon`} />
               <Text className={`${cssPrefix}-pay-footer-left-item-font`}>会员</Text>
             </View>
-            <View className={`${cssPrefix}-pay-footer-left-item`}>
+            <View 
+              className={`${cssPrefix}-pay-footer-left-item`}
+              onClick={() => this.changeModalVisible('eraseModal', true)}
+            >
               <Image src='//net.huanmusic.com/weapp/icon_molin.png' className={`${cssPrefix}-pay-footer-left-item-icon`} />
-              <Text className={`${cssPrefix}-pay-footer-left-item-font`}>抹零</Text>
+              <Text className={`${cssPrefix}-pay-footer-left-item-font`}>{eraseValue === '' ? '抹零' : '已抹零'}</Text>
             </View>
           </View>
           <View
@@ -185,7 +317,7 @@ class ProductPay extends Taro.Component<Props> {
             })}
             onClick={() => this.onPayHandle()}
           >
-            收款￥{productSdk.getProductPrice()}
+            收款￥{numeral(this.getTransValue()).format('0.00')}
           </View>
         </View>
       </View>

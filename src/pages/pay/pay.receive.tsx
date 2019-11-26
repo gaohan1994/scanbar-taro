@@ -2,11 +2,12 @@
  * @Author: Ghan 
  * @Date: 2019-11-12 14:01:28 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-25 20:02:51
+ * @Last Modified time: 2019-11-26 10:28:52
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import "./style/pay.less";
+import '../product/style/product.less';
 import classnames from 'classnames';
 import { AtActivityIndicator, AtButton } from 'taro-ui';
 import FormCard from '../../component/card/form.card';
@@ -16,6 +17,7 @@ import { AppReducer } from '../../reducers';
 import { ProductInterface } from '../../constants';
 import { connect } from '@tarojs/redux';
 import getBaseUrl from '../../common/request/base.url';
+import numeral from 'numeral';
 
 const Items = [
   {
@@ -39,7 +41,7 @@ const cssPrefix = 'pay';
 
 interface Props { 
   payDetail: Partial<ProductInterface.CashierPay> & {
-    totalAmount: number;
+    transAmount: number;
   };
 }
 interface State { 
@@ -51,7 +53,7 @@ class PayReceive extends Taro.Component<Props, State> {
   static defaultProps = {
     payDetail: {
       codeUrl: '',
-      totalAmount: -1
+      transAmount: -1
     }
   };
   
@@ -136,7 +138,6 @@ class PayReceive extends Taro.Component<Props, State> {
     const { tab } = this.state;
     const { payDetail } = this.props;
 
-    console.log(`${getBaseUrl('').replace('api', '')}${payDetail.codeUrl}`);
     if (tab === 'receive') {
       return (
         <View className={`${cssPrefix}-receive-content`}>
@@ -151,7 +152,7 @@ class PayReceive extends Taro.Component<Props, State> {
             )}
           </View>
           <Text className={`${cssPrefix}-receive-content-text`}>请用手机扫一扫二维码，进行付款</Text>
-          <View className={`${cssPrefix}-receive-content-price`}>￥{payDetail.totalAmount}</View>
+          <View className={`${cssPrefix}-receive-content-price`}>￥{numeral(payDetail.transAmount).format('0.00')}</View>
         </View>
       );
     } else if (tab === 'cash') {
