@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-15 11:17:25 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-21 18:07:01
+ * @Last Modified time: 2019-11-27 17:23:06
  * 
  * @todo [商品管理页面]
  */
@@ -11,7 +11,7 @@ import { View, Image, Input, ScrollView, Text } from '@tarojs/components';
 import "./style/product.less";
 import "../member/style/member.less";
 import { ProductAction } from '../../actions';
-import { ResponseCode, ProductInterface } from '../../constants/index';
+import { ResponseCode, ProductInterface, ProductService } from '../../constants/index';
 import invariant from 'invariant';
 import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
@@ -19,6 +19,7 @@ import { getProductManageList, getProductManageListIndexes, getProductType, getP
 import ProductManageComponent from '../../component/product/product.manage';
 import { AtFloatLayout, AtButton } from 'taro-ui';
 import classnames from 'classnames';
+import productSdk from '../../common/sdk/product/product.sdk';
 
 const memberPrefix = 'member';
 const cssPrefix = 'product';
@@ -82,6 +83,46 @@ class ProductManage extends Taro.Component<Props, State> {
     });
   }
 
+  public onScanProduct = async () => {
+    try {
+      const result = await productSdk.scanProduct();
+      Taro.showLoading();
+      if (result.code === ResponseCode.success) {
+        // 说明有这个商品，去自己的库里查查看
+        const { code, data } = await ProductService.productInfoScanGet({barcode: result.data.barcode});
+        Taro.hideLoading();
+        if (code === ResponseCode.success) {
+          // 说明自己的库里也有这个商品跳转到详情
+          Taro.navigateTo({
+            url: `/pages/product/product.detail?id=${data.id}`
+          });
+          return;
+        }
+        Taro.showModal({
+          title: '提示',
+          content: `商品${result.data.barcode}不存在，是否现在建档？`,
+          success: ({confirm}) => {
+            if (confirm) {
+              Taro.navigateTo({
+                url: `/pages/product/product.add?scanProduct=${JSON.stringify(result.data)}`
+              });
+            }
+          }
+        });
+        return;
+      } else {
+        Taro.hideLoading();
+        throw new Error('没有找到对应的商品！');
+      }
+    } catch (error) {
+      Taro.hideLoading();
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
+
   public submit = async () => {
     try {
       const { selectStatus, selectSupplierId, selectTypeId } = this.state;
@@ -111,6 +152,7 @@ class ProductManage extends Taro.Component<Props, State> {
 
   public init = async () => {
     try {
+      Taro.showLoading();
       const { success, result } = await ProductAction.productInfoList();
       invariant(success, result || ResponseCode.error);
 
@@ -119,7 +161,10 @@ class ProductManage extends Taro.Component<Props, State> {
 
       const supplierResult = await ProductAction.productInfoSupplier();
       invariant(supplierResult.code === ResponseCode.success, supplierResult.msg);
+
+      Taro.hideLoading();
     } catch (error) {
+      Taro.hideLoading();
       Taro.showToast({
         title: error.message,
         icon: 'none'
@@ -148,6 +193,11 @@ class ProductManage extends Taro.Component<Props, State> {
               placeholder="请输入商品名称或条码"
               placeholderClass={`${memberPrefix}-main-header-search-input-holder`}
             />
+            <View
+              onClick={() => this.onScanProduct()}
+            >
+              <Image src="//net.huanmusic.com/weapp/icon_commodity_scan.png" className={`${memberPrefix}-main-header-search-scan`} />
+            </View>
           </View>
           <View 
             className={`${cssPrefix}-header-item`} 

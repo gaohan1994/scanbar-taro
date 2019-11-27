@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-26 10:13:19
+ * @Last Modified time: 2019-11-27 16:27:35
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -17,10 +17,13 @@
  * });
  * ```
  */
-import { ProductInterface, ProductService } from '../../../constants';
+import Taro from '@tarojs/taro';
+import { ProductInterface, ProductService, MemberInterface, HTTPInterface } from '../../../constants';
 import { store } from '../../../app';
 import { ProductSDKReducer } from './product.sdk.reducer';
 import numeral from 'numeral';
+import merge from 'lodash/merge';
+import productService from '../../../constants/product/product.service';
 
 export declare namespace ProductCartInterface {
   interface ProductCartInfo extends ProductInterface.ProductInfo {
@@ -86,12 +89,18 @@ export declare namespace ProductCartInterface {
   type MANAGE_CART_WEIGHT_PRODUCT = string;
   type CHANGE_WEIGHT_PRODUCT_MODAL = string;
   type MANAGE_EMPTY_CART = string;
+  type ADD_SUSPENSION_CART = string;
+  type DELETE_SUSPENSION_CART = string;
+  type EMPTY_SUSPENSION_CART = string;
 
   type ReducerInterface = {
     MANAGE_EMPTY_CART: MANAGE_EMPTY_CART;
     MANAGE_CART_PRODUCT: MANAGE_CART_PRODUCT;
     MANAGE_CART_WEIGHT_PRODUCT: MANAGE_CART_WEIGHT_PRODUCT;
     CHANGE_WEIGHT_PRODUCT_MODAL: CHANGE_WEIGHT_PRODUCT_MODAL;
+    ADD_SUSPENSION_CART: ADD_SUSPENSION_CART;
+    DELETE_SUSPENSION_CART: DELETE_SUSPENSION_CART;
+    EMPTY_SUSPENSION_CART: EMPTY_SUSPENSION_CART;
   };
 
   type ProductCartAdd = string;
@@ -122,6 +131,9 @@ class ProductSDK {
     MANAGE_CART_PRODUCT: 'MANAGE_CART_PRODUCT',
     MANAGE_CART_WEIGHT_PRODUCT: 'MANAGE_CART_WEIGHT_PRODUCT',
     CHANGE_WEIGHT_PRODUCT_MODAL: 'CHANGE_WEIGHT_PRODUCT_MODAL',
+    ADD_SUSPENSION_CART: 'ADD_SUSPENSION_CART',
+    DELETE_SUSPENSION_CART: 'DELETE_SUSPENSION_CART',
+    EMPTY_SUSPENSION_CART: 'EMPTY_SUSPENSION_CART',
   };
   
   /**
@@ -140,7 +152,7 @@ class ProductSDK {
    * @type {*}
    * @memberof ProductSDK
    */
-  private member?: any;
+  private member?: MemberInterface.MemberInfo;
 
   constructor () {
     this.erase = undefined;
@@ -152,7 +164,7 @@ class ProductSDK {
     return this;
   }
 
-  public setMember = (member: any): this => {
+  public setMember = (member: MemberInterface.MemberInfo): this => {
     this.member = member;
     return this;
   }
@@ -163,6 +175,16 @@ class ProductSDK {
     } else {
       return 0;
     }
+  }
+
+  /**
+   * @todo 重置函数
+   *
+   * @memberof ProductSDK
+   */
+  public reset = () => {
+    this.member = undefined;
+    this.erase = 0;
   }
 
   /**
@@ -190,6 +212,23 @@ class ProductSDK {
   }
 
   /**
+   * @todo 获取商品会员价格
+   *
+   * @memberof ProductSDK
+   */
+  public getProductMemberPrice = (products?: ProductCartInterface.ProductCartInfo[], force?: boolean): number => {
+    const hasMember = force ? force : this.member !== undefined;
+    if (hasMember) {
+      const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+      const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.memberPrice;
+      const total = productList.reduce(reduceCallback, 0);
+      return total;
+    } else {
+      return this.getProductPrice();
+    }
+  }
+
+  /**
    * @todo 计算交易价格
    * 
    * ```ts
@@ -204,16 +243,11 @@ class ProductSDK {
    *
    * @memberof ProductSDK
    */
-  public getProductTransPrice = (products?: ProductCartInterface.ProductCartInfo[]) => {
-    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
-    const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.price;
-    let total: number = productList.reduce(reduceCallback, 0);
-    
-    // 计算抹零价格
+  public getProductTransPrice = () => {
+    // 计算如果有会员的话使用会员价格，如果没有会员则返回原价
+    let total: number = this.getProductMemberPrice();
+    // 抹零价格在会员价之后减去
     total = total - this.getErase();
-    if (this.member) {
-      // 这里计算会员价格
-    }
     return total;
   }
 
@@ -232,14 +266,13 @@ class ProductSDK {
    */
   public getProductInterfacePayload = (products?: ProductCartInterface.ProductCartInfo[]): ProductCartInterface.ProductPayPayload => {
     const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
-
     const payload: ProductCartInterface.ProductPayPayload = {
       flag: false,
       order: {
         authCode: '-1',
         discount: 0,
         erase: this.getErase(),
-        memberId: -1,
+        memberId: this.member !== undefined ? this.member.id : -1,
         orderNo: '',
         orderSource: 1,
         payType: 2,
@@ -271,18 +304,27 @@ class ProductSDK {
     return payload;
   }
 
-  /**
-   * @todo 获取商品的会员价
-   *
-   * @memberof ProductSDK
-   */
-  public getProductMemberPrice = (products?: ProductCartInterface.ProductCartInfo[]) => {
-    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
-    const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.memberPrice;
-    const total = productList.reduce(reduceCallback, 0);
-    return total;
+  public getDirectProductInterfacePayload = (money: number): ProductCartInterface.ProductPayPayload  => {
+    return {
+      flag: true,
+      order: {
+        authCode: '-1',
+        discount: 0,
+        erase: 0,
+        memberId: -1,
+        orderNo: '',
+        orderSource: 1,
+        payType: 2,
+        terminalCd: '-1',
+        terminalSn: '-1',
+        totalAmount: money,
+        totalNum: 0,
+        transAmount: money,
+      },
+      productInfoList: [],
+      transProp: true
+    };
   }
-
 
   public isWeighProduct (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo): product is ProductCartInterface.ProductCartInfo {
     return product.saleType === 1;
@@ -395,6 +437,42 @@ class ProductSDK {
   public cashierPay = async (params: ProductCartInterface.ProductPayPayload) => {
     const result = await ProductService.cashierPay(params);
     return result;
+  }
+
+  public suspensionCart = async () => {
+    const state = await store.getState();
+    if (state.productSDK.productCartList.length > 0) {
+      const reducer: ProductSDKReducer.AddSuspensionCartPayload & { type: ProductCartInterface.ADD_SUSPENSION_CART } = {
+        type: this.reducerInterface.ADD_SUSPENSION_CART,
+        payload: {
+          productCartList: merge([], state.productSDK.productCartList)
+        }
+      };
+      store.dispatch(reducer);
+    }
+  }
+
+  public scanProduct = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return new Promise((resolve) => {
+      Taro
+      .scanCode()
+      .then(async (barcode) => {
+        Taro.showLoading();
+        const payload: ProductInterface.ProductInfoScanGetFetchFidle = {
+          barcode: barcode.result
+        };
+        const result = await productService.productInfoScan(payload);
+        Taro.hideLoading();
+        resolve({
+          ...result,
+          data: {
+            ...result.data || {},
+            barcode: barcode.result
+          }
+        });
+      })
+      .catch(error => resolve(error));
+    });
   }
 }
 

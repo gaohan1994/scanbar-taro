@@ -7,27 +7,29 @@ import { Card } from '../../component/common/card/card.common';
 import { LoginManager } from '../../common/sdk';
 import invariant from 'invariant';
 
+const cssPrefix = 'home';
+
 const NavItems = [
   {
-    image: '//net.huanmusic.com/weapp/icon_menu_order.png',
+    image: '//net.huanmusic.com/weapp/icon_menu_commodity.png',
     value: '商品管理',
     subTitle: 'Commodity management',
     url: '/pages/product/product.manage',
   },
   {
-    image: '//net.huanmusic.com/weapp/icon_menu_order.png',
+    image: '//net.huanmusic.com/weapp/-icon_menu_member.png',
     value: '会员管理',
     subTitle: 'Member management',
     url: '/pages/member/member',
   },
   {
-    image: '//net.huanmusic.com/weapp/icon_menu_order.png',
+    image: '//net.huanmusic.com/weapp/-icon_menu_proceeds.png',
     value: '收款',
     subTitle: 'Gathering',
-    url: '/pages/pay/pay.receive',
+    url: '/pages/pay/pay.input',
   },
   {
-    image: '//net.huanmusic.com/weapp/icon_menu_order.png',
+    image: '//net.huanmusic.com/weapp/icon_menu_procurement.png',
     value: '采购收货',
     subTitle: 'Procurement',
     url: '/pages/',
@@ -39,10 +41,16 @@ const NavItems = [
     url: '/pages/',
   },
   {
-    image: '//net.huanmusic.com/weapp/icon_menu_order.png',
+    image: '//net.huanmusic.com/weapp/icon_menu_more.png',
     value: '更多',
     subTitle: 'Even more',
     url: '/pages/',
+  },
+  {
+    image: '//net.huanmusic.com/weapp/icon_menu_more.png',
+    value: '测试主页',
+    subTitle: 'Even more',
+    url: '/pages/test/test',
   }
 ];
 
@@ -96,46 +104,49 @@ class Home extends Component {
   render () {
     return (
       <View className={classnames(['container', 'home'])}>
-        <View className="home-name">
-          <Image src="//net.huanmusic.com/weapp/icon_shop.png" className={classnames(['home-name-icon', 'home-icon'])} />
-          <Text className="home-name-text">可乐便利店</Text>
-        </View>
-        <Card card-class="home-card">
-          <View className="home-buttons">
-            <View className="home-buttons-button home-buttons-button-border">
-              <View className="normal-text">今日销售额 ></View>
-              <View className="home-money">100000.00</View>
-            </View>
-            <View className="home-buttons-button home-buttons-button-end">
-              <View className="normal-text">今日销售额 ></View>
-              <View className="home-money">100000.00</View>
-            </View>
+        <View className={`${cssPrefix}-bg`} />
+        <View className={`${cssPrefix}-container`}>
+          <View className="home-name">
+            <Image src="//net.huanmusic.com/weapp/icon_shop.png" className={classnames(['home-name-icon', 'home-icon'])} />
+            <Text className="home-name-text">可乐便利店</Text>
           </View>
-        </Card>
-        <View onClick={() => Taro.navigateTo({url: '/pages/product/product.order'})}>
-          <Card card-class="home-order">
-            <Image src="//net.huanmusic.com/weapp/icon_home_bill.png" className="home-order-icon" />
-            <Text className="home-order-text" >开单</Text>
+          <Card card-class="home-card">
+            <View className="home-buttons">
+              <View className="home-buttons-button home-buttons-button-border">
+                <View className="normal-text">今日销售额 ></View>
+                <View className="home-money">100000.00</View>
+              </View>
+              <View className="home-buttons-button home-buttons-button-end">
+                <View className="normal-text">今日销售额 ></View>
+                <View className="home-money">100000.00</View>
+              </View>
+            </View>
           </Card>
-        </View>
-        <View className="home-bar">
-          {
-            NavItems.map((item, index) => {
-              return (
-                <Card 
-                  key={item.value}
-                  shadow={false} 
-                  card-class={`home-bar-card ${(index + 1) % 3 !== 0 ? 'home-bar-card-right' : ''}`} 
-                >
-                  <View className="home-bar-card-content" onClick={() => this.onNavHandle(item)}>
-                    <Image className="home-icon" src={item.image} />
-                    <Text className="normal-text">{item.value}</Text>
-                    <Text className="home-small-text">{item.subTitle}</Text>
-                  </View>
-                </Card>
-              );
-            })
-          }
+          <View onClick={() => Taro.navigateTo({url: '/pages/product/product.order'})}>
+            <Card card-class="home-order">
+              <Image src="//net.huanmusic.com/weapp/icon_home_bill.png" className="home-order-icon" />
+              <Text className="home-order-text" >开单</Text>
+            </Card>
+          </View>
+          <View className="home-bar">
+            {
+              NavItems.map((item, index) => {
+                return (
+                  <Card 
+                    key={item.value}
+                    shadow={false} 
+                    card-class={`home-bar-card ${(index + 1) % 3 !== 0 ? 'home-bar-card-right' : ''}`} 
+                  >
+                    <View className="home-bar-card-content" onClick={() => this.onNavHandle(item)}>
+                      <Image className="home-icon home-card-icon" src={item.image} />
+                      <Text className="normal-text">{item.value}</Text>
+                      <Text className="home-small-text">{item.subTitle}</Text>
+                    </View>
+                  </Card>
+                );
+              })
+            }
+          </View>
         </View>
       </View>
     );

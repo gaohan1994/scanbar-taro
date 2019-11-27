@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-12 14:01:28 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-26 10:28:52
+ * @Last Modified time: 2019-11-27 16:25:20
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
@@ -12,12 +12,15 @@ import classnames from 'classnames';
 import { AtActivityIndicator, AtButton } from 'taro-ui';
 import FormCard from '../../component/card/form.card';
 import { FormRowProps } from '../../component/card/form.row';
-import { getPayReceive } from '../../reducers/app.pay';
+import { getPayReceive, PayReducer } from '../../reducers/app.pay';
 import { AppReducer } from '../../reducers';
-import { ProductInterface } from '../../constants';
 import { connect } from '@tarojs/redux';
 import getBaseUrl from '../../common/request/base.url';
 import numeral from 'numeral';
+import invariant from 'invariant';
+import productSdk from '../../common/sdk/product/product.sdk';
+import { ProductCartInterface } from '../../common/sdk/product/product.sdk';
+import { ResponseCode } from '../../constants/index';
 
 const Items = [
   {
@@ -40,26 +43,30 @@ const Items = [
 const cssPrefix = 'pay';
 
 interface Props { 
-  payDetail: Partial<ProductInterface.CashierPay> & {
-    transAmount: number;
-  };
+  payDetail: PayReducer.PayReceive;
 }
 interface State { 
   tab: 'receive' | 'cash';
+  receiveCash: string;
 }
 
 class PayReceive extends Taro.Component<Props, State> {
 
-  static defaultProps = {
+  static defaultProps: Props = {
     payDetail: {
-      codeUrl: '',
-      transAmount: -1
+      transPayload: undefined,
+      transResult: undefined,
     }
   };
   
   readonly state: State = {
     tab: 'receive',
+    receiveCash: '',
   };
+
+  public onChangeCash = (value: string) => {
+    this.setState({receiveCash: value});
+  }
 
   /**
    * @todo [修改当前页面tab]
@@ -88,11 +95,42 @@ class PayReceive extends Taro.Component<Props, State> {
    *
    * @memberof PayReceive
    */
-  public onCashReceive = () => {
-    Taro.showToast({
-      title: '现金收款',
-      icon: 'success'
-    });
+  public onCashReceive = async () => {
+    try {
+      Taro.showLoading();
+      const { payDetail } = this.props;
+      invariant(payDetail.transPayload !== undefined, '参数设置错误');
+      invariant(payDetail.transResult !== undefined, '参数设置错误');
+      if (payDetail.transPayload !== undefined && payDetail.transResult !== undefined) {
+        const payload: ProductCartInterface.ProductPayPayload = {
+          ...payDetail.transPayload,
+          order: {
+            ...payDetail.transPayload.order,
+            payType: 0,
+            orderNo: payDetail.transResult.orderNo
+          },
+          transProp: false
+        };
+        const result = await productSdk.cashierPay(payload);
+        Taro.hideLoading();
+        invariant(result.code === ResponseCode.success, result.msg || ResponseCode.error);
+        Taro.showToast({
+          title: '现金收款',
+          icon: 'success'
+        });
+        setTimeout(() => {
+          Taro.navigateTo({
+            url: `/pages/pay/pay.result`
+          });
+        }, 500);
+      }
+    } catch (error) {
+      Taro.hideLoading();
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
   }
 
   render () {
@@ -142,46 +180,57 @@ class PayReceive extends Taro.Component<Props, State> {
       return (
         <View className={`${cssPrefix}-receive-content`}>
           <View className={`${cssPrefix}-receive-content-code`}>
-            {payDetail.codeUrl ? (
+            {payDetail.transResult !== undefined ? (
               <Image 
                 className={`${cssPrefix}-receive-content-code-image`}
-                src={`${getBaseUrl('').replace('api', '')}${payDetail.codeUrl}`} 
+                src={`${getBaseUrl('').replace('api', '')}${payDetail.transResult.codeUrl}`} 
               />
             ) : (
               <AtActivityIndicator mode='center' />
             )}
           </View>
           <Text className={`${cssPrefix}-receive-content-text`}>请用手机扫一扫二维码，进行付款</Text>
-          <View className={`${cssPrefix}-receive-content-price`}>￥{numeral(payDetail.transAmount).format('0.00')}</View>
+          {payDetail.transPayload !== undefined && (
+            <View className={`${cssPrefix}-receive-content-price`}>￥{numeral(payDetail.transPayload.order.transAmount).format('0.00')}</View>
+          )}
         </View>
       );
     } else if (tab === 'cash') {
-      const cashForm: FormRowProps[] = [
-        {
-          title: '应收金额',
-          extraText: '￥26.00'
-        },
-        {
-          title: '找零金额',
-          extraText: '￥26.00'
-        },
-        {
-          title: '收款',
-          extraText: '￥26.00'
-        }
-      ];
-      return (
-        <View className={`${cssPrefix}-receive-content-cash`}>
-          <FormCard items={cashForm} shadow={false} />
-          <View className={`${cssPrefix}-receive-content-cash-button`}>
-            <AtButton 
-              className="theme-pay-button"
-              onClick={this.onCashReceive}
-            >
-              确定
-            </AtButton>
+      const { receiveCash } = this.state;
+      const { payDetail } = this.props;
+      if (payDetail.transPayload !== undefined) {
+        const cashForm: FormRowProps[] = [
+          {
+            title: '应收金额',
+            extraText: `￥${payDetail.transPayload.order.transAmount}`
+          },
+          {
+            title: '找零金额',
+            extraText: `￥${numeral(numeral(receiveCash).value() - numeral(payDetail.transPayload.order.transAmount).value()).format('0.00')}`
+          },
+          {
+            title: '收款',
+            isInput: true,
+            inputValue: receiveCash,
+            inputOnChange: this.onChangeCash
+          }
+        ];
+        return (
+          <View className={`${cssPrefix}-receive-content-cash`}>
+            <FormCard items={cashForm} shadow={false} />
+            <View className={`${cssPrefix}-receive-content-cash-button`}>
+              <AtButton 
+                className="theme-pay-button"
+                onClick={this.onCashReceive}
+              >
+                确定
+              </AtButton>
+            </View>
           </View>
-        </View>
+        );
+      }
+      return (
+        <View/>
       );
     }
   }

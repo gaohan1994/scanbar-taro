@@ -2,29 +2,32 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-25 14:04:10
+ * @Last Modified time: 2019-11-26 14:30:05
  * 
  * @todo [购物车组件]
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import "./cart.less";
-import { AtFloatLayout, AtButton } from 'taro-ui';
+import "../product/product.less";
+import { AtFloatLayout, AtBadge } from 'taro-ui';
 import classnames from 'classnames';
 import { AppReducer } from '../../reducers';
-import { getProductCartList, getChangeWeigthProduct } from '../../common/sdk/product/product.sdk.reducer';
+import { getProductCartList, getChangeWeigthProduct, getSuspensionCartList, ProductSDKReducer } from '../../common/sdk/product/product.sdk.reducer';
 import { connect } from '@tarojs/redux';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import Modal from '../modal/modal';
 import FormCard from '../card/form.card';
 import { FormRowProps } from '../card/form.row';
 import { ProductInterface } from '../../constants';
+import numeral from 'numeral';
 
 const cssPrefix = 'cart';
 
 interface CartBarProps { 
   productCartList: Array<ProductCartInterface.ProductCartInfo>;
   changeWeightProduct: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo;
+  suspensionCartList: Array<ProductSDKReducer.SuspensionCartBase>;
 }
 
 interface CartBarState { 
@@ -55,7 +58,19 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce, 
     product: ProductCartInterface.ProductCartInfo
   ) => {
+    console.log('product: ', product);
     productSdk.manage({type, product});
+  }
+
+  public onSuspensionCart = () => {
+    const { productCartList } = this.props;
+    if (productCartList.length > 0) {
+      productSdk.suspensionCart();
+    } else {
+      Taro.navigateTo({
+        url: `/pages/product/product.suspension`
+      });
+    }
   }
 
   public onPayHandle = () => {
@@ -72,12 +87,24 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     }
   }
 
+  public emptyCart = () => {
+    const { productCartList } = this.props;
+    if (productCartList.length > 0) {
+      Taro.showModal({
+        title: '提示',
+        content: '确定清空购物车嘛?',
+        success: () => productSdk.manage({type: productSdk.productCartManageType.EMPTY, product: {} as any})
+      });
+    }
+  }
+
   render () {
+    const { productCartList, suspensionCartList } = this.props;
     const buttonClassNames = classnames(
       'cart-right',
       {
-        'cart-right-active': true,
-        'cart-right-disabled': false,
+        'cart-right-active': productCartList.length > 0,
+        'cart-right-disabled': productCartList.length === 0,
       }
     );
 
@@ -88,10 +115,55 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
         <View className="cart">
           <View className="cart-bg">
             <View className="cart-icon" onClick={() => this.onChangeCartListVisible()} >
-              <Image src="//net.huanmusic.com/weapp/icon_cart(1).png" className="cart-icon-image" />
+              {
+                productCartList.length > 0 ? (
+                  <AtBadge 
+                    value={productSdk.getProductNumber()}
+                    className="component-cart-bge"
+                  >
+                    <Image src="//net.huanmusic.com/weapp/icon_cart(1).png" className="cart-icon-image" />
+                  </AtBadge>
+                ) : (
+                  <Image src="//net.huanmusic.com/weapp/icon_cart_unselected.png" className="cart-icon-image" />
+                )
+              }
             </View>
             <View className="cart-left">
-              left
+              <View 
+                className={classnames(`${cssPrefix}-left-price`, {
+                  [`${cssPrefix}-left-price-active`]: productCartList.length > 0,
+                  [`${cssPrefix}-left-price-disabled`]: productCartList.length === 0,
+                })}
+              >
+                ￥{numeral(productSdk.getProductPrice()).format('0.00')}
+              </View>
+                
+              {
+                suspensionCartList.length > 0 ? (
+                  <AtBadge value={suspensionCartList.length}>
+                    <View 
+                      className={classnames(`${cssPrefix}-left-suspension`, {
+                        [`${cssPrefix}-left-suspension-active`]: productCartList.length > 0,
+                        [`${cssPrefix}-left-suspension-disabled`]: productCartList.length === 0,
+                      })}
+                      onClick={() => this.onSuspensionCart()}
+                    >
+                      挂单
+                    </View>
+                  </AtBadge>
+                ) : (
+                  <View 
+                    className={classnames(`${cssPrefix}-left-suspension`, {
+                      [`${cssPrefix}-left-suspension-active`]: productCartList.length > 0,
+                      [`${cssPrefix}-left-suspension-disabled`]: productCartList.length === 0,
+                    })}
+                    onClick={() => this.onSuspensionCart()}
+                  >
+                    挂单
+                  </View>
+                )
+              }
+              
             </View>
             <View 
               className={buttonClassNames}
@@ -114,59 +186,45 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
         onClose={() => this.onChangeCartListVisible(false)}
       >
         <View className="cart-list-header">
-          <View>已选择商品（3）</View>
+          <View>已选择商品（{productSdk.getProductNumber() || 0}）</View>
           <View 
             className="cart-list-header-empty"
-            onClick={() => productSdk.manage({type: productSdk.productCartManageType.EMPTY, product: {} as any})}
+            onClick={() => this.emptyCart()}
           >
             <Image src="//net.huanmusic.com/weapp/icon_empty.png" className="cart-list-header-empty-icon" />
             <Text>清空购物车</Text>
           </View>
         </View>
         {
-          productCartList.length > 0 && productCartList.map((item) => {
+          productCartList.length > 0 && productCartList.map((product) => {
             return (
-              <View key={item.id} >
-                {this.renderProduct(item)}
+              <View key={product.id} >
+                <View className={`${cssPrefix}-product`}>
+                  <View className={`${cssPrefix}-product-container`}>
+                    <Text className={`${cssPrefix}-product-container-name`}>{product.name}</Text>
+                    <Text className={`${cssPrefix}-product-container-normal`}>
+                      <Text className={`${cssPrefix}-product-container-price`}>{product.price}</Text>
+                      / {product.unit}
+                    </Text>
+                    <View className={`${cssPrefix}-product-stepper`}>      
+                      <View 
+                        className={classnames(`component-product-stepper-button`, `component-product-stepper-button-reduce`)}
+                        onClick={() => this.manageProduct(productSdk.productCartManageType.REDUCE, product)}
+                      />
+                      <Text className={`component-product-stepper-text`}>{product.sellNum}</Text>
+                      <View 
+                        className={classnames(`component-product-stepper-button`, `component-product-stepper-button-add`)}
+                        onClick={() => this.manageProduct(productSdk.productCartManageType.ADD, product)}
+                      />  
+                    </View>
+                  </View>
+                </View>
               </View>
             );
           })
         }
       </AtFloatLayout>
     );
-  }
-
-  private renderProduct = (product: ProductCartInterface.ProductCartInfo) => {
-    return (
-      <View className={`${cssPrefix}-product`}>
-        <View className={`${cssPrefix}-product-container`}>
-          <Text className={`${cssPrefix}-product-container-name`}>{product.name}</Text>
-          <Text className={`${cssPrefix}-product-container-normal`}>
-            <Text className={`${cssPrefix}-product-container-price`}>{product.price}</Text>
-            / {product.unit}
-          </Text>
-          <View className={`${cssPrefix}-product-stepper`}>            
-            <AtButton
-              type="secondary"
-              size="small"
-              circle={true}
-              onClick={() => this.manageProduct(productSdk.productCartManageType.REDUCE, product)}
-            >
-              -
-            </AtButton>
-            <Text>{product.sellNum}</Text>
-            <AtButton
-              type="primary"
-              size="small"
-              circle={true}
-              onClick={() => this.manageProduct(productSdk.productCartManageType.ADD, product)}
-            >
-              +
-            </AtButton>
-          </View>
-        </View>
-      </View>
-    ); 
   }
 
   private onWeightProductClose = () => {
@@ -219,6 +277,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
 const select = (state: AppReducer.AppState) => ({
   productCartList: getProductCartList(state),
   changeWeightProduct: getChangeWeigthProduct(state),
+  suspensionCartList: getSuspensionCartList(state),
 });
 
 export default connect(select)(CartBar as any);

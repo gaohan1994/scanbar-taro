@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:28:21 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-12 11:15:51
+ * @Last Modified time: 2019-11-27 16:40:48
  */
 import memberService from "../constants/member/member.service";
 import { ResponseCode, ActionsInterface, MemberInterface, MemberInterfaceMap } from '../constants/index';
@@ -172,6 +172,28 @@ class MemberAction {
     } else {
       return { success: false, result: result.msg }; 
     }
+  }
+
+  public memberPreference = async (params: MemberInterface.MemberInfoDetail) => {
+    const result = await memberService.memberPreference(params);
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: MemberInterfaceMap.reducerInterfaces.RECEIVE_MEMBER_PERFERENCE,
+        payload: {data: result.data}
+      });
+    }
+    return result;
+  }
+
+  public memberOrderInfo = async (params: MemberInterface.MemberInfoDetail) => {
+    const result = await memberService.memberOrderInfo(params);
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: MemberInterfaceMap.reducerInterfaces.RECEIVE_MEMBER_ORDER_INFO,
+        payload: {data: result.data}
+      });
+    }
+    return result;
   }
 
   public memberEdit = async (params: MemberInterface.MemberInfoEditParams) => {

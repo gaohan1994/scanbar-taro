@@ -1,5 +1,7 @@
 @import "../../../styles/theme.less";
 @import "../../../component/cart/cart.less";
+@import "../../member/style/member.less";
+@import "../../home/style/home.less";
 
 @product-prefix: product;
 @product-search-width: 550px;
@@ -160,6 +162,7 @@
           display: flex;
           flex-direction: row;
           flex-wrap: wrap;
+          .margin(50px, b);
         }
       }
     }
@@ -302,6 +305,30 @@
         &-box {
           width: 320px;
           font-size: 26px;
+        }
+      }
+      &-layout {
+        z-index: 1200;
+        &-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        &-card {
+          .margin(150px, t);
+          &-row {
+            .padding(24px);
+            color: #666666;
+            display: flex;
+            font-size: 26px;
+            flex-direction: column;
+            &-text {
+              .margin(24px, b);
+            }
+            &-icons {
+              max-width: 600px !important;
+            }
+          }
         }
       }
     }

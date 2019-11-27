@@ -15,6 +15,7 @@ import classnames from 'classnames';
 import FormRow from '../../component/card/form.row';
 import Modal from '../../component/modal/modal';
 import "../../component/card/form.card.less";
+import numeral from 'numeral';
 
 export function generateModalButtons (confirmCallback: any, cancelCallback: any) {
   return [
@@ -78,6 +79,7 @@ class ProductDetail extends Taro.Component<Props, State> {
         price: -1,
         saleType: -1,
         status: -1,
+        type: -1,
         typeId: -1,
         typeName: '',
         barcode: '',
@@ -92,6 +94,7 @@ class ProductDetail extends Taro.Component<Props, State> {
         createBy: '',
         createTime: '',
         updateTime: '',
+        imgs: [],
       },
       productChangeDetail: {},
       typeModalVisible: true,
@@ -228,6 +231,11 @@ class ProductDetail extends Taro.Component<Props, State> {
     });
   }
 
+  public onScanHandle = () => {
+    console.log('onScanHandle: ');
+
+  }
+
   /**
    * @todo 保存函数
    *
@@ -302,7 +310,7 @@ class ProductDetail extends Taro.Component<Props, State> {
           {
             title: '重新生成',
             type: 'confirm',
-            onPress: () => {}
+            onPress: () => this.onScanHandle()
           }
         ],
       },
@@ -329,24 +337,24 @@ class ProductDetail extends Taro.Component<Props, State> {
     const formNumber: FormRowProps[] = [
       {
         title: '库存',
-        extraText: `${productChangeDetail.number || productDetail.number}`,
+        extraText: `${numeral(productChangeDetail.number || productDetail.number).value()}`,
         onClick: () => this.changeModalVisible('numberModalVisible', true)
       },
     ];
     const formPrice: FormRowProps[] = [
       {
         title: '进价（￥）',
-        extraText: `${productChangeDetail.cost || productDetail.cost}`,
+        extraText: `${numeral(productChangeDetail.cost || productDetail.cost).format('0.00')}`,
         onClick: () => this.changeModalVisible('costModalVisible', true)
       },
       {
         title: '售价（￥）',
-        extraText: `${productChangeDetail.price || productDetail.price}`,
+        extraText: `${numeral(productChangeDetail.price || productDetail.price).format('0.00')}`,
         onClick: () => this.changeModalVisible('priceModalVisible', true)
       },
       {
         title: '会员价（￥）',
-        extraText: `${productChangeDetail.memberPrice || productDetail.memberPrice}`,
+        extraText: `${numeral(productChangeDetail.memberPrice || productDetail.memberPrice).format('0.00')}`,
         onClick: () => this.changeModalVisible('memberPriceModalVisible', true),
         hasBorder: false
       },
@@ -416,14 +424,15 @@ class ProductDetail extends Taro.Component<Props, State> {
       {
         title: '进价调整为',
         isInput: true,
+        inputType: 'number',
         inputValue: `${productChangeDetail.cost || ''}`,
         inputOnChange: this.onCostChange,
       },
       {
         title: '进价差额',
         extraText: `${productChangeDetail.cost !== undefined && String(productChangeDetail.cost) !== '' 
-          ? Number(productChangeDetail.cost) - Number(productDetail.cost) 
-          : '0'}`,
+          ? numeral(productChangeDetail.cost).value() - numeral(productDetail.cost).value() 
+          : ''}`,
         hasBorder: false,
       },
     ];
@@ -431,29 +440,31 @@ class ProductDetail extends Taro.Component<Props, State> {
       {
         title: '售价调整为',
         isInput: true,
+        inputType: 'number',
         inputValue: `${productChangeDetail.price || ''}`,
         inputOnChange: this.onPriceChange,
       },
       {
         title: '售价差额',
         extraText: `${productChangeDetail.price !== undefined && String(productChangeDetail.price) !== '' 
-          ? Number(productChangeDetail.price) - Number(productDetail.price) 
-          : '0'}`,
+          ? numeral(productChangeDetail.price).value() - numeral(productDetail.price).value()
+          : ''}`,
         hasBorder: false,
       },
     ];
     const memberPriceForm: FormRowProps[] = [
       {
-        title: '进价调整为',
+        title: '会员价调整为',
         isInput: true,
+        inputType: 'number',
         inputValue: `${productChangeDetail.memberPrice || ''}`,
         inputOnChange: this.onMemberPriceChange,
       },
       {
-        title: '进价差额',
+        title: '会员价差额',
         extraText: `${productChangeDetail.memberPrice !== undefined && String(productChangeDetail.memberPrice) !== '' 
-          ? Number(productChangeDetail.memberPrice) - Number(productDetail.memberPrice) 
-          : '0'}`,
+          ? numeral(productChangeDetail.memberPrice).value() - numeral(productDetail.memberPrice).value() 
+          : ''}`,
         hasBorder: false,
       },
     ];
@@ -462,14 +473,15 @@ class ProductDetail extends Taro.Component<Props, State> {
       {
         title: '库存调整为',
         isInput: true,
+        inputType: 'number',
         inputValue: `${productChangeDetail.number || ''}`,
         inputOnChange: this.onNumberChange,
       },
       {
         title: '库存差额',
         extraText: `${productChangeDetail.number !== undefined && String(productChangeDetail.number) !== '' 
-          ? Number(productChangeDetail.number) - Number(productDetail.number) 
-          : '0'}`,
+          ? numeral(productChangeDetail.number).value() - numeral(productDetail.number).value() 
+          : ''}`,
         hasBorder: false,
       },
     ];
@@ -522,7 +534,7 @@ class ProductDetail extends Taro.Component<Props, State> {
           buttons={costButtons}
         >
           <View className={`${cssPrefix}-detail-modal`}>
-            <View className={`${cssPrefix}-detail-modal-text`}>系统进价: {productDetail.cost}</View>
+            <View className={`${cssPrefix}-detail-modal-text`}>系统进价: {numeral(productDetail.cost).format('0.00')}</View>
             <FormCard items={costForm} />
           </View>
         </Modal>
@@ -533,7 +545,7 @@ class ProductDetail extends Taro.Component<Props, State> {
           buttons={priceButtons}
         >
           <View className={`${cssPrefix}-detail-modal`}>
-            <View className={`${cssPrefix}-detail-modal-text`}>系统售价: {productDetail.price}</View>
+            <View className={`${cssPrefix}-detail-modal-text`}>系统售价: {numeral(productDetail.price).format('0.00')}</View>
             <FormCard items={priceForm} />
           </View>
         </Modal>
@@ -544,7 +556,7 @@ class ProductDetail extends Taro.Component<Props, State> {
           buttons={memberPriceButtons}
         >
           <View className={`${cssPrefix}-detail-modal`}>
-            <View className={`${cssPrefix}-detail-modal-text`}>系统会员价: {productDetail.memberPrice}</View>
+            <View className={`${cssPrefix}-detail-modal-text`}>系统会员价: {numeral(productDetail.memberPrice).format('0.00')}</View>
             <FormCard items={memberPriceForm} />
           </View>
         </Modal>

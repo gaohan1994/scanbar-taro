@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-12 11:17:10
+ * @Last Modified time: 2019-11-27 16:43:40
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Image } from '@tarojs/components';
@@ -10,18 +10,21 @@ import "./style/member.less";
 import "../home/style/home.less";
 import { Card } from '../../component/common/card/card.common';
 import FormCard from '../../component/card/form.card';
-import { FormRowProps } from '../../component/card/form.row';
+import FormRow, { FormRowProps } from '../../component/card/form.row';
 import { AtButton, AtActivityIndicator } from 'taro-ui';
 import { MemberAction } from '../../actions';
 import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
-import { getMemberDetail } from '../../reducers/app.member';
+import { getMemberDetail, getMemberPerference, getMemberOrderInfo } from '../../reducers/app.member';
 import { MemberInterface } from '../../constants';
+import numeral from 'numeral';
 
 const cssPrefix: string = 'member';
 
 interface MemberMainProps { 
   memberDetail: MemberInterface.MemberInfo;
+  memberPerference: MemberInterface.MemberPerference[];
+  memberOrderInfo: MemberInterface.MemberOrderInfo;
 }
 
 class MemberMain extends Taro.Component<MemberMainProps> {
@@ -58,11 +61,19 @@ class MemberMain extends Taro.Component<MemberMainProps> {
 
   public fetchMemberDetail = (id: string) => {
     MemberAction.memberDetail({id: Number(id)});
+    MemberAction.memberPreference({id: Number(id)});
+    MemberAction.memberPreference({id: Number(id)});
   }
 
   render () {
-    const { memberDetail } = this.props;
+    const { memberDetail, memberPerference, memberOrderInfo } = this.props;
     const form1: FormRowProps[] = [
+      {
+        title: '上次消费时间',
+        extraText: memberDetail.createTime
+      }
+    ];
+    const form2: FormRowProps[] = [
       {
         title: '卡号',
         extraText: memberDetail.cardNo
@@ -76,17 +87,11 @@ class MemberMain extends Taro.Component<MemberMainProps> {
         extraText: memberDetail.birthDate
       },
     ];
-    const form2: FormRowProps[] = [
-      {
-        title: '开发门店',
-        extraText: ''
-      },
+    const form3: FormRowProps[] = [
       {
         title: '开卡时间',
         extraText: memberDetail.createTime
       },
-    ];
-    const form3: FormRowProps[] = [
       {
         title: '会员状态',
         extraText: memberDetail.status === 0 ? '正常' : '注销'
@@ -95,7 +100,7 @@ class MemberMain extends Taro.Component<MemberMainProps> {
     return (
       <ScrollView scrollY={true} className={`container`}>
         <Image src="//net.huanmusic.com/weapp/bg_member.png" className={`${cssPrefix}-bg`} />
-        {Number(this.$router.params.id) !== memberDetail.id
+        {Number(this.$router.params.id) !== Number(memberDetail.id)
         ? (
           <View className={`container ${cssPrefix}-member`}>
             <AtActivityIndicator mode="center" />
@@ -113,16 +118,33 @@ class MemberMain extends Taro.Component<MemberMainProps> {
               </View>
               <View className="home-buttons member-buttons">
                 <View className="member-buttons-button home-buttons-button-border">
-                  <View className="title-text">100000.00</View>
+                  <View className="title-text">{numeral(memberOrderInfo.totalAmount || 0).format('0.00')}</View>
                   <View className="small-text">累计消费</View>
                 </View>
                 <View className="member-buttons-button">
-                  <View className="title-text">100000.00</View>
+                  <View className="title-text">{numeral(memberOrderInfo.totalTimes || 0).value()}</View>
                   <View className="small-text">购买次数</View>
                 </View>
               </View>
             </Card>
-            <FormCard items={form1} />
+            <FormCard items={form1} >
+              <FormRow title="消费偏好">
+                {
+                  memberPerference.length > 0 && (
+                    memberPerference.map((perference) => {
+                      return (
+                        <View 
+                          key={perference.barcode} 
+                          className={`${cssPrefix}-detail-row-icons`}
+                        >
+                          <View  className={`${cssPrefix}-detail-row-icon`}>{perference.productName}</View>
+                        </View>
+                      );
+                    })
+                  )
+                }
+              </FormRow>
+            </FormCard>
             <FormCard items={form2} />
             <FormCard items={form3} />
 
@@ -143,6 +165,8 @@ class MemberMain extends Taro.Component<MemberMainProps> {
 
 const mapState = (state: AppReducer.AppState) => ({
   memberDetail: getMemberDetail(state),
+  memberPerference: getMemberPerference(state),
+  memberOrderInfo: getMemberOrderInfo(state),
 });
 
 export default connect(mapState)(MemberMain);

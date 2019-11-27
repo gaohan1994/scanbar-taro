@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-12 10:27:29
+ * @Last Modified time: 2019-11-26 15:49:35
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Input, Image, Text } from '@tarojs/components';
@@ -11,10 +11,13 @@ import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
 import { MemberInterface } from '../../constants';
 import FormCard from '../../component/card/form.card';
+import '../../component/card/form.card.less';
 import { FormRowProps } from '../../component/card/form.row';
 import './style/member.less';
 import invariant from 'invariant';
 import { AtActivityIndicator } from 'taro-ui';
+import FormRow from '../../component/card/form.row';
+import classnames from 'classnames';
 
 const cssPrefix = 'member';
 
@@ -217,8 +220,9 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
     const { memberListByDate } = this.props;
     return (
       <View className={`container ${cssPrefix}-main`}>
-        <View className={`${cssPrefix}-bg-color`} />
+        
         <View className={`${cssPrefix}-main-header`}>
+          <View className={`${cssPrefix}-bg-color`} />
           <View className={`${cssPrefix}-main-header-search`}>
             <Image src="//net.huanmusic.com/weapp/icon_search.png" className={`${cssPrefix}-main-header-search-icon`} />
             <Input 
@@ -258,9 +262,20 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
                     onClick: () => Taro.navigateTo({url: `/pages/member/member.detail?id=${member.id}`})
                   };
                 });
-                formData.unshift({title: dateList.date});
                 return (
-                  <FormCard items={formData} key={dateList.date} />
+                  <View 
+                    key={dateList.date}
+                    className={classnames('component-form', {
+                      'component-form-shadow': true
+                    })}
+                  >
+                    <View className={`${cssPrefix}-card-header`}>{dateList.date}</View>
+                    {formData.map((item, index) => {
+                      return (
+                        <FormRow key={`${index}`} {...item} />
+                      );
+                    })}
+                  </View>
                 );
               })
             ) : (

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:01:17 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-12 11:12:41
+ * @Last Modified time: 2019-11-27 16:34:25
  * 
  * @todo [会员相关的接口]
  * ```js
@@ -47,6 +47,18 @@ class MemberService {
 
   public memberEdit = async (params: MemberInterface.MemberInfoEditParams): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.post(MemberInterfaceMap.memberInfoEdit, params);
+  }
+
+  public memberDetailByPreciseInfo = async (params: MemberInterface.MemberByPreciseInfo): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.get(MemberInterfaceMap.memberDetailByPreciseInfo(params));
+  }
+
+  public memberPreference = async (params: MemberInterface.MemberInfoDetail): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.get(MemberInterfaceMap.memberPreference(params));
+  }
+
+  public memberOrderInfo = async (params: MemberInterface.MemberInfoDetail): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.get(MemberInterfaceMap.memberOrderInfo(params));
   }
 }
 

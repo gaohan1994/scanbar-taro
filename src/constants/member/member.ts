@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:09:10 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-13 10:15:29
+ * @Last Modified time: 2019-11-27 16:40:44
  */
 import { jsonToQueryString, HTTPInterface } from '../index';
 
@@ -27,6 +27,32 @@ export declare namespace MemberInterface {
     createTime: string;
     id: number;
   }
+
+  /**
+   * @todo [会员消费偏好]
+   *
+   * @author Ghan
+   * @interface MemberPerference
+   */
+  interface MemberPerference {
+    barcode: string;
+    productName: string;
+    purchaseNum: number;
+    purchaseTotalNum: number;
+  }
+
+  /**
+   * @todo [会员消费信息]
+   *
+   * @author Ghan
+   * @interface MemberOrderInfo
+   */
+  interface MemberOrderInfo {
+    lastPayTime: string;
+    totalAmount: number;
+    totalTimes: number;
+  }
+
   /**
    * @todo [添加会员时的参数]
    *
@@ -82,12 +108,20 @@ export declare namespace MemberInterface {
     id: number;
   }
 
+  interface MemberByPreciseInfo {
+    identity: string | number;
+  }
+
   type RECEIVE_MEMBER_LIST = string;
   type RECEIVE_MEMBER_DETAIL = string;
+  type RECEIVE_MEMBER_PERFERENCE = string;
+  type RECEIVE_MEMBER_ORDER_INFO = string;
 
   interface MemberReducerInterface {
     RECEIVE_MEMBER_LIST: RECEIVE_MEMBER_LIST;
     RECEIVE_MEMBER_DETAIL: RECEIVE_MEMBER_DETAIL;
+    RECEIVE_MEMBER_PERFERENCE: RECEIVE_MEMBER_PERFERENCE;
+    RECEIVE_MEMBER_ORDER_INFO: RECEIVE_MEMBER_ORDER_INFO;
   }
   
 }
@@ -95,8 +129,10 @@ interface MemberInterfaceMap {
   reducerInterfaces: MemberInterface.MemberReducerInterface;
   memberInfoAdd: string;
   memberInfoEdit: string;
+  memberPreference(params: MemberInterface.MemberInfoDetail): string;
   memberInfoList(params?: MemberInterface.MemberInfoListFetchFidle): string;
   memberInfoSearch(params?: MemberInterface.MemberInfoSearchFidle): string;
+  memberOrderInfo(params: MemberInterface.MemberInfoDetail): string;
 }
 
 class MemberInterfaceMap {
@@ -108,10 +144,11 @@ class MemberInterfaceMap {
   public reducerInterfaces = {
     RECEIVE_MEMBER_LIST: 'RECEIVE_MEMBER_LIST',
     RECEIVE_MEMBER_DETAIL: 'RECEIVE_MEMBER_DETAIL',
+    RECEIVE_MEMBER_PERFERENCE: 'RECEIVE_MEMBER_PERFERENCE',
+    RECEIVE_MEMBER_ORDER_INFO: 'RECEIVE_MEMBER_ORDER_INFO',
   };
   
   public memberInfoAdd = '/memberInfo/add';
-
   public memberInfoEdit = '/memberInfo/edit';
   /**
    * @todo [请求会员列表]
@@ -123,11 +160,23 @@ class MemberInterfaceMap {
   }
 
   public memberInfoSearch = (params?: MemberInterface.MemberInfoSearchFidle) => {
-    return `/memberInfo/detail/${jsonToQueryString(params)}`;
+    return `/memberInfo/detailByIdentity${jsonToQueryString(params)}`;
   }
 
   public memberInfoDetail = (params: MemberInterface.MemberInfoDetail) => {
     return `/memberInfo/detail/${params.id}`;
+  }
+
+  public memberDetailByPreciseInfo = (params: MemberInterface.MemberByPreciseInfo) => {
+    return `/memberInfo/detailByPreciseInfo/${params.identity}`;
+  }
+
+  public memberPreference = (params: MemberInterface.MemberInfoDetail) => {
+    return `/memberInfo/preference${jsonToQueryString(params)}`;
+  }
+
+  public memberOrderInfo = (params: MemberInterface.MemberInfoDetail) => {
+    return `memberInfo/getMemberOrderInfo/${params.id}`;
   }
 }
 

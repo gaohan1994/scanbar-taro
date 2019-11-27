@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-25 19:31:38
+ * @Last Modified time: 2019-11-26 19:46:50
  * 
  * @todo [商品相关的类型定义]
  */
@@ -43,6 +43,7 @@ export declare namespace ProductInterface {
     price: number;        // 售价
     saleType: number;     // 销售类型（0：按件卖[默认]；1称重）
     status: number;       // 状态(0：启用;1：停用)
+    type: number;         // 品类
     typeId: number;       // 品类id
     typeName: string;     // 品类名称
     barcode: string;      // 条码
@@ -52,6 +53,7 @@ export declare namespace ProductInterface {
     supplier: string;     // 供应商名称
     unit: string;         // 单位
     firstLetter: string;  // 首字母 
+    imgs: string[];       // 商品图片
     name: string;
     updateBy: string;
     createBy: string;
@@ -109,14 +111,32 @@ export declare namespace ProductInterface {
     updateTime: string;
   }
 
+  interface ProductScan {
+    id: number;
+    address: string;
+    barcode?: string;
+    brand: string;
+    createTime: string;
+    goodsType: string;
+    img: string;
+    name: string;
+    price: string;
+    remark: string;
+    standard: string;
+    supplier: string;
+  }
+
   interface ProductInfoAdd extends Partial<ProductInterface.ProductInfo> {
     barcode: string;
     name: string;
-    picStrs?: string[];
   }
 
   interface ProductDetailFetchFidle {
     id: number;
+  }
+
+  interface ProductInfoScanGetFetchFidle {
+    barcode: string;
   }
 
   interface CashierPay {
@@ -154,6 +174,8 @@ interface ProductInterfaceMap {
   productInfoGetList (params?: ProductInterface.ProductInfoGetListFetchFidle): string;
   productInfoList (params?: ProductInterface.ProductInfoListFetchFidle): string;
   productInfoDetail (params: ProductInterface.ProductDetailFetchFidle): string;
+  productInfoScanGet (params: ProductInterface.ProductInfoScanGetFetchFidle): string;
+  productInfoScan (params: ProductInterface.ProductInfoScanGetFetchFidle): string;
 }
 
 class ProductInterfaceMap {
@@ -185,6 +207,14 @@ class ProductInterfaceMap {
 
   public productInfoDetail = (params: ProductInterface.ProductDetailFetchFidle) => {
     return `/product/productInfo/detail/${params.id}`;
+  }
+
+  public productInfoScanGet = (params: ProductInterface.ProductInfoScanGetFetchFidle) => {
+    return `/product/productInfo/scan/get${jsonToQueryString(params)}`;
+  }
+
+  public productInfoScan = (params: ProductInterface.ProductInfoScanGetFetchFidle) => {
+    return `/product/productInfo/scan/${params.barcode}`;
   }
 }
 

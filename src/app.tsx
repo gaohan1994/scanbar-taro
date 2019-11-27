@@ -46,6 +46,7 @@ class App extends Component {
       'pages/product/product.manage',
       'pages/product/product.detail',
       'pages/product/product.add',
+      'pages/product/product.suspension',
 
       /**
        * @todo [sign相关页面]
@@ -92,8 +93,9 @@ class App extends Component {
        * })
        * ```
        */
+      'pages/pay/pay.input',
       'pages/pay/pay.receive',
-
+      'pages/pay/pay.result',
       /**
        * @todo [测试页面]
        */
@@ -125,19 +127,14 @@ class App extends Component {
         text: "首页"
       }, {
         pagePath: "pages/report/report",
-        iconPath: "./assets/tab-bar/icon_nav_home.png",
-        selectedIconPath: "./assets/tab-bar/icon_nav_home_xuan.png",
+        iconPath: "./assets/tab-bar/icon_nav_user.png",
+        selectedIconPath: "./assets/tab-bar/icon_nav_user_xuan.png",
         text: "报表"
       }, {
         pagePath: "pages/user/user",
-        iconPath: "./assets/tab-bar/icon_nav_home.png",
-        selectedIconPath: "./assets/tab-bar/icon_nav_home_xuan.png",
-        text: "我的"
-      }, {
-        pagePath: "pages/test/test",
         iconPath: "./assets/tab-bar/icon_nav_user.png",
         selectedIconPath: "./assets/tab-bar/icon_nav_user_xuan.png",
-        text: "测试"
+        text: "我的"
       }]
     }
   };

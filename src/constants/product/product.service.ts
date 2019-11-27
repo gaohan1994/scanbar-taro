@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:16:32 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-25 19:36:53
+ * @Last Modified time: 2019-11-26 16:13:24
  */
 import requestHttp from "../../common/request/request.http";
 import ProductInterfaceMap, { ProductInterface } from "./product";
@@ -65,6 +65,24 @@ class ProductService {
 
   public cashierPay = async (params: ProductCartInterface.ProductPayPayload): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.post(ProductInterfaceMap.cashierPay, params);
+  }
+
+  /**
+   * @todo 通过条码查看商品是否在我们的库存中存在
+   *
+   * @memberof ProductService
+   */
+  public productInfoScanGet = async (params: ProductInterface.ProductInfoScanGetFetchFidle): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.get(ProductInterfaceMap.productInfoScanGet(params));
+  }
+
+  /**
+   * @todo 通过条码查询商品信息
+   *
+   * @memberof ProductService
+   */
+  public productInfoScan = async (params: ProductInterface.ProductInfoScanGetFetchFidle): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.get(ProductInterfaceMap.productInfoScan(params));
   }
 }
 

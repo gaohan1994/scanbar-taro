@@ -1,10 +1,12 @@
 import { ProductInterface, ProductInterfaceMap } from "../constants";
 import { AppReducer } from '../reducers';
+import { ProductCartInterface } from "src/common/sdk/product/product.sdk";
 
 export declare namespace PayReducer {
 
-  interface PayReceive extends Partial<ProductInterface.CashierPay> {
-    transAmount: number;
+  interface PayReceive {
+    transPayload?: ProductCartInterface.ProductPayPayload;
+    transResult?: ProductInterface.CashierPay;
   }
 
   interface State {
@@ -19,8 +21,8 @@ export declare namespace PayReducer {
 
 const initState: PayReducer.State = {
   payReceive: {
-    codeUrl: '',
-    transAmount: -1,
+    transPayload: undefined,
+    transResult: undefined,
   }
 };
 

@@ -5,8 +5,11 @@
 
 .@{sign-prefix} {
   .background-image('//net.huanmusic.com/weapp/bg.png');
-  .flex(center, center, column);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   &-card {
+    .margin(150px, t);
     width: 720px;
     height: 700px;
     .background-image('//net.huanmusic.com/weapp/bg_login.png');

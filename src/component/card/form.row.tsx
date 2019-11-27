@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 14:41:35 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-25 14:19:14
+ * @Last Modified time: 2019-11-26 13:23:42
  * 
  * @todo [fockedTaroUiListItem,增加以及修改了一些属性]
  */
@@ -88,6 +88,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
       inputValue,
       inputPlaceHolder,
       inputOnChange,
+      children
     } = this.props;
 
     const rootClass = classnames(
@@ -173,6 +174,8 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
               </View>
             )}
 
+            {children}
+            
             {extraThumb && (
               <View className='item-extra__image' onClick={extraThumbClick}>
                 <Image

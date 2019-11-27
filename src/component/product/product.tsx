@@ -7,6 +7,7 @@ import { AppReducer } from '../../reducers';
 import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
 import { AtButton } from 'taro-ui';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
+import classnames from 'classnames';
 
 const cssPrefix = 'component-product';
 interface Props { 
@@ -50,35 +51,23 @@ class ProductComponent extends Taro.Component<Props> {
     return (
       <View className={`${cssPrefix}-stepper`}>
         {productInCart !== undefined ? (
-          <View className={`${cssPrefix}-stepper-container`}>            
-            <AtButton
-              type="secondary"
-              size="small"
-              circle={true}
+          <View className={`${cssPrefix}-stepper-container`}>    
+            <View 
+              className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-reduce`)}
               onClick={() => this.manageProduct(productSdk.productCartManageType.REDUCE)}
-            >
-              -
-            </AtButton>
-            <Text>{productInCart.sellNum}</Text>
-            <AtButton
-              type="primary"
-              size="small"
-              circle={true}
+            />
+            <Text className={`${cssPrefix}-stepper-text`}>{productInCart.sellNum}</Text>
+            <View 
+              className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)}
               onClick={() => this.manageProduct(productSdk.productCartManageType.ADD)}
-            >
-              +
-            </AtButton>
+            />  
           </View>
         ) : (
           <View className={`${cssPrefix}-stepper-container`}>            
-            <AtButton
-              type="primary"
-              size="small"
-              circle={true}
+            <View 
+              className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)}
               onClick={() => this.manageProduct(productSdk.productCartManageType.ADD)}
-            >
-              +
-            </AtButton>
+            />  
           </View>
         )}
         

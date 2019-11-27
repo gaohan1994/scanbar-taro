@@ -34,14 +34,42 @@
     font-size: @cart-button-font;
     &-disabled {
       .background-image('//net.huanmusic.com/weapp/bt_bottom_close_unselected.png');
+      color: #666666;
     }
     &-active {
       .background-image('//net.huanmusic.com/weapp/bt_bottom_close_pitch.png');
     }
   }
   &-left {
-    .flex(center, flex-end);
+    .flex(center, space-between);
     height: 100%;
+    .padding(170px, l);
+    &-price {
+      font-size: 40px;
+      font-weight: bold;
+      .margin(20px, r);
+      &-active {
+        color: #ffffff;
+      }
+      &-disabled {
+        color: #8B8B8B;
+      }
+    }
+    &-suspension {
+      .padding(14px, tb);
+      .padding(45px, lr);
+      border-radius: 20px;
+      &-active {
+        border: 1px solid #A0A0A0;
+        color: #A0A0A0;
+        font-size: 26px;
+      }
+      &-disabled {
+        border: 1px solid #696969;
+        color: #666666;
+        font-size: 26px;
+      }
+    }
   }
   &-icon {
     position: absolute;
