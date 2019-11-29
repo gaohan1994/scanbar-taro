@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-11 10:41:10
+ * @Last Modified time: 2019-11-29 15:59:43
  * 
  * @todo 添加会员页面
  */
@@ -16,7 +16,10 @@ import FormRow from '../../component/card/form.row';
 import Validator from '../../common/util/validator';
 import invariant from 'invariant';
 import { MemberAction } from '../../actions';
-import { MemberInterface } from '../../constants';
+import { MemberInterface, MemberInterfaceMap } from '../../constants';
+import memberService from '../../constants/member/member.service';
+import { ResponseCode } from '../../constants/index';
+import { store } from '../../app';
 
 const cssPrefix: string = 'member';
 
@@ -24,19 +27,23 @@ interface Props { }
 
 interface State { 
   sex: 'male' | 'female'; // 会员性别
+  cardNo: string;         // 会员卡号
   phone: string;          // 会员手机号
   name: string;           // 会员姓名
   birthday: string;       // 会员生日
   memberStatus: boolean;  // 会员状态
+  needCallback: boolean;  // 添加成功之后是否需要回调这个会员数据
 }
 
 class MemberMain extends Taro.Component<Props, State> {
   readonly state: State = {
     sex: 'male',
+    cardNo: '',
     phone: '',
     name: '',
     birthday: '',
     memberStatus: true,
+    needCallback: false,
   };
   /**
    * 指定config的类型声明为: Taro.Config
@@ -49,6 +56,21 @@ class MemberMain extends Taro.Component<Props, State> {
     navigationBarTitleText: '添加会员'
   };
 
+  componentWillMount () {
+    const { params } = this.$router.params;
+
+    if (params) {
+      const payload = JSON.parse(params);
+
+      if (payload.phoneNumber) {
+        this.setState({ phone: payload.phoneNumber });
+      }
+      if (payload.needCallback) {
+        this.setState({ needCallback: payload.needCallback });
+      }
+    }
+  }
+  
   /**
    * @todo [切换会员性别]
    * @todo [如果外部传入性别则改为外部传入的性别否则切换性别]
@@ -65,6 +87,15 @@ class MemberMain extends Taro.Component<Props, State> {
                 : 'male'
       };
     });
+  }
+
+  /**
+   * @todo [卡号]
+   *
+   * @memberof MemberMain
+   */
+  public onChangeCardNo = (value: string) => {
+    this.setState({ cardNo: value });
   }
 
   /**
@@ -109,7 +140,7 @@ class MemberMain extends Taro.Component<Props, State> {
    * @memberof MemberMain
    */
   public validate = (): { success: boolean, result: any } => {
-    const { phone, name } = this.state;
+    const { phone } = this.state;
     const helper = new Validator();
     helper.add(phone, [{
       strategy: 'isNonEmpty',
@@ -119,16 +150,11 @@ class MemberMain extends Taro.Component<Props, State> {
       errorMsg: '请输入正确的手机号码'
     }]);
 
-    helper.add(name, [{
-      strategy: 'isNonEmpty',
-      errorMsg: '请输入会员姓名',
-    }]);
-
     const result = helper.start();
     if (result) {
       return { success: false, result: result.msg };
     }
-    return { success: true, result: { phoneNumber: phone, username: name } };
+    return { success: true, result: { phoneNumber: phone } };
   }
 
   /**
@@ -142,21 +168,45 @@ class MemberMain extends Taro.Component<Props, State> {
       const { success, result } = this.validate();
       invariant(success, result || ' ');
 
-      const params: MemberInterface.MemberInfoAddParams = {
+      const { cardNo, name } = this.state;
+      let params: MemberInterface.MemberInfoAddParams = {
         ...result,
         birthDate: this.state.birthday,
         merchantId: 1,
         sex: this.state.sex === 'male' ? 0 : 1,
         status: this.state.memberStatus === true ? 0 : 1,
       };
+      if (cardNo !== '') {
+        params.cardNo = cardNo;
+      }
+      if (name !== '') {
+        params.username = name;
+      }
+      console.log('params: ', params);
       const addResult = await MemberAction.memberAdd({payload: params});
       invariant(addResult.success, addResult.result || ' ');
+
+      const { needCallback } = this.state;
+
+      if (needCallback === true) {
+        /**
+         * @todo 如果需要添加完会员之后进行回调切需要这个会员数据则存到redux中
+         */
+        const memberDetail = await memberService.memberDetail({id: Number(addResult.result)});
+        if (memberDetail.code === ResponseCode.success) {
+          store.dispatch({
+            type: MemberInterfaceMap.reducerInterfaces.SET_MEMBER_SELECT,
+            payload: { selectMember: memberDetail.data }
+          });
+        }
+      }
+
       Taro.showToast({
         title: '添加会员成功',
         icon: 'success',
         mask: true,
         success: () => {
-          Taro.navigateTo({url: `/pages/member/member`});
+          Taro.navigateBack();
         }
       });
     } catch (error) {
@@ -168,16 +218,15 @@ class MemberMain extends Taro.Component<Props, State> {
   }
 
   render () {
+    const { cardNo } = this.state;
     const memberDetailForm: FormRowProps[] = [
       {
         title: '卡号',
-        buttons: [
-          {
-            title: '保存后自动生成',
-            type: 'cancel',
-            onPress: () => { /** */ }
-          }
-        ]
+        isInput: true,
+        inputType: 'phone',
+        inputValue: cardNo,
+        inputOnChange: this.onChangeCardNo,
+        inputPlaceHolder: '请输入会员卡号',
       },
       {
         title: '手机号',
@@ -212,45 +261,6 @@ class MemberMain extends Taro.Component<Props, State> {
         ]
       }
     ];
-    const memberStoreDetail: FormRowProps[] = [
-      {
-        title: '开卡门店',
-        buttons: [
-          {
-            title: '保存后自动生成',
-            type: 'cancel',
-            onPress: () => { /** */ }
-          }
-        ]
-      },
-      {
-        title: '开卡时间',
-        buttons: [
-          {
-            title: '保存后自动生成',
-            type: 'cancel',
-            onPress: () => { /** */ }
-          }
-        ]
-      },
-    ];
-    const memberStatusForm: FormRowProps[] = [
-      {
-        title: '会员状态',
-        buttons: [
-          {
-            title: '正常',
-            type: this.state.memberStatus === true ? 'confirm' : 'cancel',
-            onPress: () => this.onChangeMemberStatus(true)
-          },
-          {
-            title: '停用',
-            type: this.state.memberStatus !== true ? 'confirm' : 'cancel',
-            onPress: () => this.onChangeMemberStatus(false)
-          }
-        ]
-      },
-    ];
     return (
       <ScrollView scrollY={true} className={`container`}>
         <AtMessage />
@@ -267,8 +277,6 @@ class MemberMain extends Taro.Component<Props, State> {
               />
             </Picker>
           </FormCard>
-          <FormCard items={memberStoreDetail} />
-          <FormCard items={memberStatusForm} />
 
           <View className={`${cssPrefix}-edit`}>
             <AtButton 

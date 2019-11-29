@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-26 19:46:50
+ * @Last Modified time: 2019-11-29 16:35:38
  * 
  * @todo [商品相关的类型定义]
  */
@@ -41,6 +41,7 @@ export declare namespace ProductInterface {
     merchantId: number;   // 商户id
     number: number;       // 库存
     price: number;        // 售价
+    unitPrice?: number;   // 单价 无码商品要穿
     saleType: number;     // 销售类型（0：按件卖[默认]；1称重）
     status: number;       // 状态(0：启用;1：停用)
     type: number;         // 品类
@@ -54,6 +55,7 @@ export declare namespace ProductInterface {
     unit: string;         // 单位
     firstLetter: string;  // 首字母 
     imgs: string[];       // 商品图片
+    remark?: string;      // 商品备注
     name: string;
     updateBy: string;
     createBy: string;
@@ -139,6 +141,10 @@ export declare namespace ProductInterface {
     barcode: string;
   }
 
+  interface ProductCashierQueryStatus {
+    orderNo: string;
+  }
+
   interface CashierPay {
     codeUrl: string;
     orderNo: string;
@@ -151,6 +157,7 @@ export declare namespace ProductInterface {
   type RECEIVE_PRODUCT_SUPPLIER = string;
   type RECEIVE_PRODUCT_DETAIL = string;
   type RECEIVE_PAY_DETAIL = string;
+  type SET_SELECT_PRODUCT = string;
 
   interface ReducerInterface {
     RECEIVE_PRODUCT_LIST: RECEIVE_PRODUCT_LIST;
@@ -160,6 +167,7 @@ export declare namespace ProductInterface {
     RECEIVE_PRODUCT_SUPPLIER: RECEIVE_PRODUCT_SUPPLIER;
     RECEIVE_PRODUCT_DETAIL: RECEIVE_PRODUCT_DETAIL;
     RECEIVE_PAY_DETAIL: RECEIVE_PAY_DETAIL;
+    SET_SELECT_PRODUCT: SET_SELECT_PRODUCT;
   }
 }
 
@@ -171,6 +179,7 @@ interface ProductInterfaceMap {
   productInfoGetBarcode: string;
   productInfoAdd: string;
   cashierPay: string;
+  cashierQueryStatus: string;
   productInfoGetList (params?: ProductInterface.ProductInfoGetListFetchFidle): string;
   productInfoList (params?: ProductInterface.ProductInfoListFetchFidle): string;
   productInfoDetail (params: ProductInterface.ProductDetailFetchFidle): string;
@@ -188,6 +197,7 @@ class ProductInterfaceMap {
     RECEIVE_PRODUCT_SUPPLIER: 'RECEIVE_PRODUCT_SUPPLIER',
     RECEIVE_PRODUCT_DETAIL: 'RECEIVE_PRODUCT_DETAIL',
     RECEIVE_PAY_DETAIL: 'RECEIVE_PAY_DETAIL',
+    SET_SELECT_PRODUCT: 'SET_SELECT_PRODUCT',
   };
 
   public productInfoType = '/product/productInfo/type';
@@ -196,6 +206,7 @@ class ProductInterfaceMap {
   public productInfoGetBarcode = '/product/productInfo/genBarcode';
   public productInfoAdd = '/product/productInfo/add';
   public cashierPay = '/cashier/pay';
+  public cashierQueryStatus = '/cashier/queryStatus';
 
   public productInfoGetList = (params?: ProductInterface.ProductInfoGetListFetchFidle) => {
     return `/product/productInfo/getList${params ? jsonToQueryString(params) : ''}`;

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-15 11:17:25 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-27 17:23:06
+ * @Last Modified time: 2019-11-28 16:36:52
  * 
  * @todo [商品管理页面]
  */
@@ -35,6 +35,7 @@ interface State {
   selectTypeId: number;
   selectSupplierId: number;
   selectStatus: number;
+  searchValue: string;
 }
 
 class ProductManage extends Taro.Component<Props, State> {
@@ -48,6 +49,7 @@ class ProductManage extends Taro.Component<Props, State> {
     selectTypeId: -1,
     selectSupplierId: -1,
     selectStatus: -1,
+    searchValue: '',
   };
 
   componentDidShow () {
@@ -61,6 +63,14 @@ class ProductManage extends Taro.Component<Props, State> {
         selectVisible: typeof visible === 'boolean' ? visible : !prevState.selectVisible
       };
     });
+  }
+
+  public onChangeValue = (e: any) => {
+    const value = e.detail.value;
+    this.setState({ searchValue: value }, () => {
+      this.searchProduct();
+    });
+    return value;
   }
 
   public changeSelectType = (type: ProductInterface.ProductType) => {
@@ -172,6 +182,30 @@ class ProductManage extends Taro.Component<Props, State> {
     }
   }
 
+  public searchProduct = async () => {
+    try {
+      const { searchValue } = this.state; 
+      if (searchValue === '') {
+        /**
+         * @todo [如果搜索是''那么回归查询全部]
+         */
+        const { success, result } = await ProductAction.productInfoList();
+        invariant(success, result || ResponseCode.error);
+        return;
+      }
+      const payload: ProductInterface.ProductInfoListFetchFidle = {
+        name: searchValue
+      };
+      const { success, result } = await ProductAction.productInfoList(payload);
+      invariant(success, result || ResponseCode.error);
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
+
   public onSelectClick = () => {
     this.changeSelectVisible(true);
   }
@@ -181,6 +215,7 @@ class ProductManage extends Taro.Component<Props, State> {
   }
 
   render () {
+    const { searchValue } = this.state;
     const { productIndexList } = this.props;
     return (
       <View className="container">
@@ -188,14 +223,14 @@ class ProductManage extends Taro.Component<Props, State> {
         <View className={`${cssPrefix}-header`}>
           <View className={`${memberPrefix}-main-header-search ${cssPrefix}-header-search`}>
             <Image src="//net.huanmusic.com/weapp/icon_import.png" className={`${memberPrefix}-main-header-search-icon`} />
-            <Input 
+            <Input
               className={`${memberPrefix}-main-header-search-input`} 
               placeholder="请输入商品名称或条码"
+              value={searchValue}
+              onInput={this.onChangeValue}
               placeholderClass={`${memberPrefix}-main-header-search-input-holder`}
             />
-            <View
-              onClick={() => this.onScanProduct()}
-            >
+            <View onClick={() => this.onScanProduct()} >
               <Image src="//net.huanmusic.com/weapp/icon_commodity_scan.png" className={`${memberPrefix}-main-header-search-scan`} />
             </View>
           </View>

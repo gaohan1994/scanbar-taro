@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-12 11:19:04
+ * @Last Modified time: 2019-11-28 18:55:55
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Picker } from '@tarojs/components';
@@ -202,7 +202,7 @@ class MemberMain extends Taro.Component<Props, State> {
         title: '修改成功',
         icon: 'success',
         success: () => {
-          Taro.navigateTo({url: `/pages/member/member.detail?id=${memberDetail.id}`});
+          Taro.redirectTo({url: `/pages/member/member.detail?id=${memberDetail.id}`});
         }
       });
     } catch (error) {

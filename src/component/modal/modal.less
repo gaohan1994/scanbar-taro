@@ -1,6 +1,7 @@
 @import "../../styles/theme.less";
 
 @modal-header-font: 32px;                   // modal 标题字体大小
+@modal-header-max-size: 310px;    
 @modal-button-font: 30px;                   // modal 标题按钮字体大小
 @modal-font-color: #ffffff;               // modal 字体颜色
 @modal-button-height: 60px;                 // modal 按钮高度
@@ -16,6 +17,9 @@
     color: @modal-font-color;
     font-size: @modal-header-font;
     background: linear-gradient(0deg,rgba(42,134,252,1) 2%,rgba(69,150,255,1) 100%);
+    &-text {
+      max-width: @modal-header-max-size;
+    }
   }
   &-buttons {
     flex: 1;

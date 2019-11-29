@@ -2,14 +2,14 @@
  * @Author: Ghan 
  * @Date: 2019-10-31 17:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-11 17:13:41
+ * @Last Modified time: 2019-11-28 15:19:14
  */
 import Taro from '@tarojs/taro';
 import { View, Image } from '@tarojs/components';
 import { AtInput } from 'taro-ui';
 import "./input.less";
 import { AtInputProps } from 'taro-ui/@types/input';
-import merge from 'lodash/merge';
+import merge from 'lodash.merge';
 
 interface Props extends AtInputProps {
   icon?: any;

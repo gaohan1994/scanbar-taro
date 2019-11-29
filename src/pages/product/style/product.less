@@ -193,6 +193,7 @@
       .margin(60px, tb);
     }
     &-modal {
+      position: relative;
       display: flex;
       flex-direction: column;
       flex: 1;
@@ -200,6 +201,30 @@
         font-size: 26px;
         color: @base-font-color;
         .margin(26px, b);
+      }
+      &-close {
+        position: absolute;
+        left: 60px;
+        top: 50px;
+        width: 24px;
+        height: 24px;
+        &-image {
+          width: 100%;
+          height: 100%;
+        }
+      }
+      &-change {
+        position: absolute;
+        right: 47px;
+        top: 50px;
+        &-text {
+          background-color: @theme-color;
+          color: #ffffff;
+          font-size: 28px;
+          .padding(13px, tb);
+          .padding(30px, lr);
+          border-radius: 20px;
+        }
       }
     }
   }
@@ -310,6 +335,7 @@
       &-layout {
         z-index: 1200;
         &-container {
+          position: relative;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -336,6 +362,20 @@
   &-row {
     .padding(24px, tb);
     .padding(40px, lr);
+    &-icon {
+      .margin(16px, lr);
+      .padding(3px, tb);
+      .padding(16px, lr);
+      color: #ffffff;
+      font-size: 20px;
+      border-radius: 10px;
+      &-member {
+        background-color: #CCAE80;
+      }
+    }
+    &-line {
+      text-decoration: line-through;
+    }
     &-border {
       border-bottom: 1PX solid #d6e4ef;
     }
@@ -346,6 +386,7 @@
     &-name {
       font-size: 30px;
       color: #444444;
+      max-width: 400px;
     }
     &-price {
       font-size: 26px;
@@ -356,6 +397,9 @@
       flex-direction: column;
       &-item {
         .flex(center, space-between, row);
+      }
+      &-items {
+        .flex(center, center, row);
       }
       &-top {
         .margin(20px, t);

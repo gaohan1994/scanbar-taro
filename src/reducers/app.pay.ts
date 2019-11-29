@@ -1,6 +1,6 @@
 import { ProductInterface, ProductInterfaceMap } from "../constants";
 import { AppReducer } from '../reducers';
-import { ProductCartInterface } from "src/common/sdk/product/product.sdk";
+import { ProductCartInterface } from "../common/sdk/product/product.sdk";
 
 export declare namespace PayReducer {
 

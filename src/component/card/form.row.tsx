@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 14:41:35 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-26 13:23:42
+ * @Last Modified time: 2019-11-28 18:29:47
  * 
  * @todo [fockedTaroUiListItem,增加以及修改了一些属性]
  */
@@ -39,7 +39,7 @@ export interface FormRowProps {
   inputPlaceHolder?: string;    // 右侧输入框默认值
   inputName?: string;           // 输入框的name
   inputOnChange?: (params: any) => any; // 输入改变函数
-  inputType?: 'text' | 'number' | 'password' | 'phone'; // 输入框类型
+  inputType?: 'text' | 'number' | 'password' | 'phone' | 'digit'; // 输入框类型
 }
 
 interface FormRowState { }

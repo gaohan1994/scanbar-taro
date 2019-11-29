@@ -2,14 +2,14 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 14:06:03 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-01 14:08:52
+ * @Last Modified time: 2019-11-28 15:19:04
  */
 import Taro from '@tarojs/taro';
 import { View } from '@tarojs/components';
 import { ViewProps } from '@tarojs/components/types/View';
 import classnames from 'classnames';
 // import { merge } from 'lodash';
-import merge from 'lodash/merge';
+import merge from 'lodash.merge';
 import './card.less';
 
 interface CardProps extends ViewProps {

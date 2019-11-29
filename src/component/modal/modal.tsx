@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-04 13:49:58 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-11 17:13:50
+ * @Last Modified time: 2019-11-29 15:29:45
  * 
  * @Usage
  * ```jsx
@@ -24,10 +24,10 @@
  */
 import Taro from '@tarojs/taro';
 import { AtModal, AtButton } from 'taro-ui';
-import { View } from '@tarojs/components';
+import { View, Text } from '@tarojs/components';
 import "./modal.less";
 import { AtModalProps } from 'taro-ui/@types/modal';
-import merge from 'lodash/merge';
+import merge from 'lodash.merge';
 import classnames from 'classnames';
 
 const ModalCssPrefix = 'component-modal';
@@ -73,7 +73,7 @@ class Modal extends Taro.Component<Props, State> {
         <AtModal {...ModalProps}>
           {showHeader && (
             <View className={`${ModalCssPrefix}-header`}>
-              {header}
+              <Text className={`${ModalCssPrefix}-header-text`}>{header}</Text>
             </View>
           )}
           {renderHeader && renderHeader()}

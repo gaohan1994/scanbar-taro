@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:16:32 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-26 16:13:24
+ * @Last Modified time: 2019-11-29 16:36:07
  */
 import requestHttp from "../../common/request/request.http";
 import ProductInterfaceMap, { ProductInterface } from "./product";
@@ -83,6 +83,15 @@ class ProductService {
    */
   public productInfoScan = async (params: ProductInterface.ProductInfoScanGetFetchFidle): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.get(ProductInterfaceMap.productInfoScan(params));
+  }
+
+  /**
+   * @todo 查询支付状态
+   *
+   * @memberof ProductService
+   */
+  public cashierQueryStatus = async (params: ProductInterface.ProductCashierQueryStatus) => {
+    return requestHttp.post(ProductInterfaceMap.cashierQueryStatus, params);
   }
 }
 

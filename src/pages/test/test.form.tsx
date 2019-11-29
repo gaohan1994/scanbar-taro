@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 14:13:44 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-05 14:39:56
+ * @Last Modified time: 2019-11-28 14:33:08
  * 
  * @todo [测试表格页面]
  */
@@ -16,12 +16,14 @@ interface Props { }
 interface State { 
   form2Button1Type: boolean;
   form2Button2Type: boolean;
+  inputValue: string;
 }
 
 class TestForm extends Taro.Component<Props, State> {
   readonly state: State = {
     form2Button1Type: false,
     form2Button2Type: false,
+    inputValue: '',
   };
 
   public changeForm2Button = (key: string) => {
@@ -29,6 +31,15 @@ class TestForm extends Taro.Component<Props, State> {
       return {
         ...prevState,
         [`${key}`]: !prevState[key]
+      };
+    });
+  }
+
+  public changeValue = (key: string, value: string) => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        [key]: value
       };
     });
   }
@@ -42,11 +53,13 @@ class TestForm extends Taro.Component<Props, State> {
   }
 
   render () {
+    const { inputValue } = this.state;
     const form1: FormRowProps[] = [
       {
         title: '类别',
-        extraText: '饮料',
-        arrow: 'right'
+        isInput: true,
+        inputValue,
+        inputOnChange: (value) => this.changeValue('inputValue', value)
       },
       {
         title: '规格',

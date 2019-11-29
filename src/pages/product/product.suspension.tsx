@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-26 12:00:48
+ * @Last Modified time: 2019-11-28 15:19:30
  * 
  */
 import Taro from '@tarojs/taro';
@@ -19,7 +19,7 @@ import classnames from 'classnames';
 import ProductComponent from '../../component/product/product';
 import invariant from 'invariant';
 import { ResponseCode } from '../../constants/index';
-import merge from 'lodash/merge';
+import merge from 'lodash.merge';
 import { getSuspensionCartList, ProductSDKReducer } from '../../common/sdk/product/product.sdk.reducer';
 
 const cssPrefix = 'product';

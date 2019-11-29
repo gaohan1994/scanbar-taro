@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:09:10 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-27 16:40:44
+ * @Last Modified time: 2019-11-29 10:37:40
  */
 import { jsonToQueryString, HTTPInterface } from '../index';
 
@@ -116,12 +116,14 @@ export declare namespace MemberInterface {
   type RECEIVE_MEMBER_DETAIL = string;
   type RECEIVE_MEMBER_PERFERENCE = string;
   type RECEIVE_MEMBER_ORDER_INFO = string;
+  type SET_MEMBER_SELECT = string; // 设置添加会员成功之后的回调数据存放处
 
   interface MemberReducerInterface {
     RECEIVE_MEMBER_LIST: RECEIVE_MEMBER_LIST;
     RECEIVE_MEMBER_DETAIL: RECEIVE_MEMBER_DETAIL;
     RECEIVE_MEMBER_PERFERENCE: RECEIVE_MEMBER_PERFERENCE;
     RECEIVE_MEMBER_ORDER_INFO: RECEIVE_MEMBER_ORDER_INFO;
+    SET_MEMBER_SELECT: SET_MEMBER_SELECT;
   }
   
 }
@@ -146,6 +148,7 @@ class MemberInterfaceMap {
     RECEIVE_MEMBER_DETAIL: 'RECEIVE_MEMBER_DETAIL',
     RECEIVE_MEMBER_PERFERENCE: 'RECEIVE_MEMBER_PERFERENCE',
     RECEIVE_MEMBER_ORDER_INFO: 'RECEIVE_MEMBER_ORDER_INFO',
+    SET_MEMBER_SELECT: 'SET_MEMBER_SELECT',
   };
   
   public memberInfoAdd = '/memberInfo/add';

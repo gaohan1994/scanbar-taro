@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-12 14:01:28 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-27 16:25:20
+ * @Last Modified time: 2019-11-29 16:39:24
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
@@ -20,7 +20,8 @@ import numeral from 'numeral';
 import invariant from 'invariant';
 import productSdk from '../../common/sdk/product/product.sdk';
 import { ProductCartInterface } from '../../common/sdk/product/product.sdk';
-import { ResponseCode } from '../../constants/index';
+import { ResponseCode, ProductInterface } from '../../constants/index';
+import { store } from '../../app';
 
 const Items = [
   {
@@ -83,10 +84,100 @@ class PayReceive extends Taro.Component<Props, State> {
    * @memberof PayReceive
    */
   public onTabClick = (tab: any) => {
-    if (tab === 'scan') {
-      Taro.showToast({ title: '调用扫一扫' });
+    try {
+      const { payDetail } = this.props;
+      if (payDetail.transPayload === undefined) {
+        throw new Error('支付参数不正确');
+      } else if (payDetail.transResult === undefined) {
+        throw new Error('支付参数不正确');
+      } else {
+        if (tab === 'scan') {
+          
+          Taro
+          .scanCode()
+          .then(async (barcodeResult) => {
+            Taro.showLoading();
+            const barcode = barcodeResult.result;
+            if (barcode.indexOf('ALIPAY') !== -1) {
+              throw new Error('暂不支持支付宝支付码');
+            }
+            const payload: ProductCartInterface.ProductPayPayload = {
+              ...(payDetail.transPayload as ProductCartInterface.ProductPayPayload),
+              flag: false,
+              order: {
+                ...(payDetail.transPayload as ProductCartInterface.ProductPayPayload).order,
+                authCode: barcode,
+                orderNo: (payDetail.transResult as ProductInterface.CashierPay).orderNo,
+                payType: 4,
+              },
+              transProp: false,
+            };
+            const scanPayResult = await productSdk.cashierPay(payload);
+            Taro.hideLoading();
+            invariant(scanPayResult.code === ResponseCode.success, scanPayResult.msg || ResponseCode.error);
+
+          })
+          .catch(error => {
+            Taro.hideLoading();
+            Taro.showModal({
+              title: '提示',
+              content: error.message,
+              showCancel: false
+            });
+          });
+        } else {
+          this.onChangeTab(tab);
+        }
+      }
+    } catch (error) {
+      Taro.showModal({
+        title: '提示',
+        content: error.message,
+        showCancel: false
+      });
+    }
+  }
+
+  /**
+   * @todo [收款成功之后的处理]
+   * @todo [1.清空购物车]
+   * @todo [2.跳转到收款结果页面]
+   *
+   * @memberof PayReceive
+   */
+  public receiveCallback = (success: boolean) => {
+    if (success === true) {
+      // 清空购物车
+      store.dispatch({
+        type: productSdk.reducerInterface.MANAGE_EMPTY_CART,
+        payload: {}
+      });
+
+      Taro.redirectTo({
+        url: `/pages/pay/pay.result`
+      });
     } else {
-      this.onChangeTab(tab);
+
+      // 收款失败
+      Taro.redirectTo({
+        url: `/pages/pay/pay.result`
+      });
+    }
+  }
+
+  public validate = () => {
+    const { receiveCash } = this.state;
+    const { payDetail } = this.props;
+    if (payDetail.transPayload && payDetail.transResult) {
+      if (receiveCash === '') {
+        return { success: false, result: '请输入收款金额' };
+      } else if (numeral(receiveCash).value() < payDetail.transPayload.order.transAmount) {
+        return { success: false, result: '收款金额应大于支付金额' };
+      } else {
+        return { success: true, result: ' ' };
+      }
+    } else {
+      return { success: false, result: '收款信息丢失' };
     }
   }
 
@@ -97,6 +188,8 @@ class PayReceive extends Taro.Component<Props, State> {
    */
   public onCashReceive = async () => {
     try {
+      const validateResult = this.validate();
+      invariant(validateResult.success, validateResult.result);
       Taro.showLoading();
       const { payDetail } = this.props;
       invariant(payDetail.transPayload !== undefined, '参数设置错误');
@@ -114,15 +207,7 @@ class PayReceive extends Taro.Component<Props, State> {
         const result = await productSdk.cashierPay(payload);
         Taro.hideLoading();
         invariant(result.code === ResponseCode.success, result.msg || ResponseCode.error);
-        Taro.showToast({
-          title: '现金收款',
-          icon: 'success'
-        });
-        setTimeout(() => {
-          Taro.navigateTo({
-            url: `/pages/pay/pay.result`
-          });
-        }, 500);
+        this.receiveCallback(true);
       }
     } catch (error) {
       Taro.hideLoading();
@@ -198,19 +283,26 @@ class PayReceive extends Taro.Component<Props, State> {
     } else if (tab === 'cash') {
       const { receiveCash } = this.state;
       const { payDetail } = this.props;
-      if (payDetail.transPayload !== undefined) {
+      if (payDetail.transPayload) {
         const cashForm: FormRowProps[] = [
           {
             title: '应收金额',
-            extraText: `￥${payDetail.transPayload.order.transAmount}`
+            extraText: `￥${numeral(payDetail.transPayload.order.transAmount).format('0.00')}`
           },
           {
             title: '找零金额',
-            extraText: `￥${numeral(numeral(receiveCash).value() - numeral(payDetail.transPayload.order.transAmount).value()).format('0.00')}`
+            extraText: !!receiveCash 
+              ? `￥${numeral(
+                numeral(receiveCash).value() - numeral(payDetail.transPayload.order.transAmount).value() > 0 
+                ? numeral(receiveCash).value() - numeral(payDetail.transPayload.order.transAmount).value()
+                : 0
+              ).format('0.00')}` 
+              : '',
           },
           {
             title: '收款',
             isInput: true,
+            inputType: 'digit',
             inputValue: receiveCash,
             inputOnChange: this.onChangeCash
           }
@@ -229,9 +321,6 @@ class PayReceive extends Taro.Component<Props, State> {
           </View>
         );
       }
-      return (
-        <View/>
-      );
     }
   }
 }

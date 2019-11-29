@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-26 14:30:05
+ * @Last Modified time: 2019-11-29 17:54:07
  * 
  * @todo [购物车组件]
  */
@@ -13,7 +13,13 @@ import "../product/product.less";
 import { AtFloatLayout, AtBadge } from 'taro-ui';
 import classnames from 'classnames';
 import { AppReducer } from '../../reducers';
-import { getProductCartList, getChangeWeigthProduct, getSuspensionCartList, ProductSDKReducer } from '../../common/sdk/product/product.sdk.reducer';
+import { 
+  getProductCartList, 
+  getChangeWeigthProduct, 
+  getSuspensionCartList, 
+  ProductSDKReducer, 
+  getNonBarcodeProduct,
+} from '../../common/sdk/product/product.sdk.reducer';
 import { connect } from '@tarojs/redux';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import Modal from '../modal/modal';
@@ -21,6 +27,8 @@ import FormCard from '../card/form.card';
 import { FormRowProps } from '../card/form.row';
 import { ProductInterface } from '../../constants';
 import numeral from 'numeral';
+import merge from 'lodash.merge';
+import invariant from 'invariant';
 
 const cssPrefix = 'cart';
 
@@ -28,17 +36,37 @@ interface CartBarProps {
   productCartList: Array<ProductCartInterface.ProductCartInfo>;
   changeWeightProduct: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo;
   suspensionCartList: Array<ProductSDKReducer.SuspensionCartBase>;
+  nonBarcodeProduct: Partial<ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo>;
 }
 
 interface CartBarState { 
-  cartListVisible: boolean; // 是否显示购物车列表
+  cartListVisible: boolean;         // 是否显示购物车列表
+  weightProductSellNum: string;     // 称重商品的重量
+  weightProductChangePrice: string; // 称重商品改价
+  nonBarcodePrice: string;          // 无码商品价格
+  nonBarcodeRemark: string;         // 无码商品备注
 }
 
 class CartBar extends Taro.Component<CartBarProps, CartBarState> {
 
   readonly state: CartBarState = {
-    cartListVisible: false
+    cartListVisible: false,
+    weightProductSellNum: '',
+    weightProductChangePrice: '',
+    nonBarcodePrice: '',
+    nonBarcodeRemark: '',
   };
+
+  componentWillReceiveProps (nextProps: CartBarProps) {
+    /**
+     * @todo 如果是称重商品则把价格提前赋值
+     */
+    if (nextProps.changeWeightProduct && nextProps.changeWeightProduct.id) {
+      this.setState({ 
+        weightProductChangePrice: `${nextProps.changeWeightProduct.price}`,
+      });
+    }
+  }
 
   /**
    * @todo [修改购物车列表显示]
@@ -54,11 +82,19 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     });
   }
 
+  public onChangeValue = (key: string, value: string) => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        [key]: value
+      };
+    });
+  }
+
   public manageProduct = (
     type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce, 
     product: ProductCartInterface.ProductCartInfo
   ) => {
-    console.log('product: ', product);
     productSdk.manage({type, product});
   }
 
@@ -93,7 +129,10 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       Taro.showModal({
         title: '提示',
         content: '确定清空购物车嘛?',
-        success: () => productSdk.manage({type: productSdk.productCartManageType.EMPTY, product: {} as any})
+        success: () => {
+          productSdk.manage({type: productSdk.productCartManageType.EMPTY, product: {} as any});
+          this.onChangeCartListVisible(false);
+        }
       });
     }
   }
@@ -112,6 +151,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       <View>
         {this.renderContent()}
         {this.renderWeightProductModal()}
+        {this.renderNonBarcodeProductModal()}
         <View className="cart">
           <View className="cart-bg">
             <View className="cart-icon" onClick={() => this.onChangeCartListVisible()} >
@@ -138,7 +178,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                 ￥{numeral(productSdk.getProductPrice()).format('0.00')}
               </View>
                 
-              {
+              {/* {
                 suspensionCartList.length > 0 ? (
                   <AtBadge value={suspensionCartList.length}>
                     <View 
@@ -162,8 +202,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                     挂单
                   </View>
                 )
-              }
-              
+              } */}
             </View>
             <View 
               className={buttonClassNames}
@@ -227,22 +266,145 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     );
   }
 
+  private onWeightProductConfirm = () => {
+    try {
+      const { weightProductSellNum, weightProductChangePrice } = this.state;
+      const { changeWeightProduct } = this.props;
+      const weightSellNum = numeral(weightProductSellNum).value();
+      if (weightProductSellNum === '') {
+        throw new Error('请输入商品重量');
+      }
+      if (weightSellNum > 0) {
+        let weightCartProduct: ProductCartInterface.ProductCartInfo = merge({}, changeWeightProduct) as any;
+
+        /**
+         * @todo 如果商品改价格了 则把改的价格存到redux
+         */
+        if (weightProductChangePrice !== '' && numeral(weightProductChangePrice).value() !== weightCartProduct.price) {
+          weightCartProduct.changePrice = numeral(weightProductChangePrice).value();
+        }
+        productSdk.add(weightCartProduct, weightSellNum);
+        console.log('weightCartProduct: ', weightCartProduct);
+        this.setState({
+          weightProductSellNum: '',
+          weightProductChangePrice: ''
+        });
+        this.onWeightProductClose();
+      }
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none',
+      });
+    }
+  }
+
+  private onNonBarcodeConfirm = () => {
+    try {
+      const { nonBarcodePrice, nonBarcodeRemark } = this.state;
+      const { nonBarcodeProduct } = this.props;
+      invariant(nonBarcodePrice !== '', '请输入商品价格');
+      invariant(numeral(nonBarcodePrice).value() > 0, '商品价格必须大于0');
+      let nonBarcodeCartProduct: Partial<ProductCartInterface.ProductCartInfo> = {
+        ...nonBarcodeProduct,
+        name: '无码商品',
+        price: numeral(nonBarcodePrice).value(),
+        memberPrice: numeral(nonBarcodePrice).value(),
+        unitPrice: numeral(nonBarcodePrice).value(),
+        sellNum: 1,
+      };
+      if (nonBarcodeRemark !== '') {
+        nonBarcodeCartProduct.remark = nonBarcodeRemark;
+      }
+      productSdk.add(nonBarcodeCartProduct as any);
+
+      this.setState({
+        nonBarcodePrice: '',
+        nonBarcodeRemark: '',
+      });
+      productSdk.closeNonBarcodeModal();
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
+
+  private onNonBarcodeClose = () => {
+    productSdk.closeNonBarcodeModal();
+  }
+
+  private renderNonBarcodeProductModal = () => {
+    const { nonBarcodePrice, nonBarcodeRemark } = this.state;
+    const { nonBarcodeProduct } = this.props;
+    const nonBarcodeForm: FormRowProps[] = [
+      {
+        title: '价格（￥）',
+        isInput: true,
+        inputType: 'digit',
+        inputValue: nonBarcodePrice,
+        inputOnChange: (value) => this.onChangeValue('nonBarcodePrice', value),
+        inputPlaceHolder: '请输入商品价格'
+      },
+      {
+        title: `备注`,
+        isInput: true,
+        inputValue: nonBarcodeRemark,
+        inputOnChange: (value) => this.onChangeValue('nonBarcodeRemark', value),
+        inputPlaceHolder: '请输入备注信息'
+      }
+    ];
+    const buttons = [
+      {
+        title: '取消',
+        type: 'cancel',
+        onPress: () => this.onNonBarcodeClose()
+      },
+      {
+        title: '确定',
+        type: 'confirm',
+        onPress: () => this.onNonBarcodeConfirm()
+      },
+    ];
+    const isOpen = nonBarcodeProduct !== undefined && typeof nonBarcodeProduct.id === 'string';
+    return (
+      <Modal 
+        isOpened={isOpen}
+        header={'无码商品'}
+        onClose={() => this.onNonBarcodeClose()}
+        buttons={buttons}
+      >
+        <View className="test-modal-form">
+          <FormCard items={nonBarcodeForm} />
+        </View>
+      </Modal>
+    );
+  }
+
   private onWeightProductClose = () => {
     productSdk.closeWeightModal();
   }
 
   private renderWeightProductModal = () => {
+    const { weightProductSellNum, weightProductChangePrice } = this.state;
     const { changeWeightProduct } = this.props;
     const weightForm: FormRowProps[] = [
       {
         title: '重量',
         isInput: true,
+        inputType: 'digit',
+        inputValue: weightProductSellNum,
+        inputOnChange: (value) => this.onChangeValue('weightProductSellNum', value),
         inputPlaceHolder: '请输入重量'
       },
       {
-        title: `原价￥${changeWeightProduct.price}`,
+        title: '价格（￥）',
         isInput: true,
-        inputPlaceHolder: '修改价格'
+        inputValue: weightProductChangePrice,
+        inputType: 'digit',
+        inputOnChange: (value) => this.onChangeValue('weightProductChangePrice', value),
+        hasBorder: false
       }
     ];
     const weightButtons = [
@@ -254,19 +416,18 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       {
         title: '确定',
         type: 'confirm',
-        onPress: () => this.onWeightProductClose()
+        onPress: () => this.onWeightProductConfirm()
       },
     ];
-    const isOpen = typeof changeWeightProduct.id === 'number' && changeWeightProduct.id !== -1;
+    const isOpen = changeWeightProduct && typeof changeWeightProduct.id === 'number' && changeWeightProduct.id !== -1;
     return (
       <Modal 
         isOpened={isOpen}
-        header="库存调整"
+        header={changeWeightProduct.name}
         onClose={() => this.onWeightProductClose()}
         buttons={weightButtons}
       >
         <View className="test-modal-form">
-          <View>上好佳芒果味硬糖</View>
           <FormCard items={weightForm} />
         </View>
       </Modal>
@@ -278,6 +439,7 @@ const select = (state: AppReducer.AppState) => ({
   productCartList: getProductCartList(state),
   changeWeightProduct: getChangeWeigthProduct(state),
   suspensionCartList: getSuspensionCartList(state),
+  nonBarcodeProduct: getNonBarcodeProduct(state),
 });
 
 export default connect(select)(CartBar as any);

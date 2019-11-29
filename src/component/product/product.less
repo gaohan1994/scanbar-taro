@@ -4,6 +4,7 @@
 @product-border-color: #f9f9f9;
 @product-image-size: 150px;
 // @product-image-size: 64PX;
+@product-content-width: 390px;
 @product-content-size: 150px;
 // @product-content-size: 64PX;
 @product-title-font: 32px;
@@ -40,6 +41,7 @@
     &-detail {
       .margin(10px, l);
       display: flex;
+      width: @product-content-width;
       height: @product-content-size;
       flex-direction: column;
       justify-content: space-between;

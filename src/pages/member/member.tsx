@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-26 15:49:35
+ * @Last Modified time: 2019-11-28 18:52:23
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Input, Image, Text } from '@tarojs/components';
@@ -220,9 +220,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
     const { memberListByDate } = this.props;
     return (
       <View className={`container ${cssPrefix}-main`}>
-        
         <View className={`${cssPrefix}-main-header`}>
-          <View className={`${cssPrefix}-bg-color`} />
           <View className={`${cssPrefix}-main-header-search`}>
             <Image src="//net.huanmusic.com/weapp/icon_search.png" className={`${cssPrefix}-main-header-search-icon`} />
             <Input 
@@ -242,10 +240,11 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
             <Text className={`${cssPrefix}-main-header-add-text`}>添加</Text>
           </View>
         </View>
+        
         <View className={`${cssPrefix}-list-container`}>
           <ScrollView 
             scrollY={true}
-            className={`${cssPrefix} ${cssPrefix}-list`}
+            className={`${cssPrefix}-list`}
             onScrollToUpper={this.refresh}
             onScrollToLower={this.loadMore}
           >
@@ -256,25 +255,31 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
             )}
             {memberListByDate && memberListByDate.length > 0 ? (
               memberListByDate.map((dateList) => {
-                const formData: FormRowProps[] = dateList.data.map((member) => {
-                  return {
-                    title: `姓名: ${member.username}`,
-                    onClick: () => Taro.navigateTo({url: `/pages/member/member.detail?id=${member.id}`})
-                  };
-                });
                 return (
                   <View 
                     key={dateList.date}
                     className={classnames('component-form', {
-                      'component-form-shadow': true
+                      'component-form-shadow': true,
+                      [`${cssPrefix}-list-form`]: true
                     })}
                   >
-                    <View className={`${cssPrefix}-card-header`}>{dateList.date}</View>
-                    {formData.map((item, index) => {
-                      return (
-                        <FormRow key={`${index}`} {...item} />
-                      );
-                    })}
+                    <View className={`${cssPrefix}-card-header ${cssPrefix}-card-row-border`}>{dateList.date}</View>
+                    {
+                      dateList.data.map((member, index) => {
+                        return (
+                          <View
+                            key={member.id}
+                            className={classnames(`${cssPrefix}-card-row`, {
+                              [`${cssPrefix}-card-row-border`]: index !== dateList.data.length - 1
+                            })}
+                            onClick={() => {Taro.navigateTo({url: `/pages/member/member.detail?id=${member.id}`})}}
+                          >
+                            <Text>姓名：{member.username}</Text>
+                            <Text className={`${cssPrefix}-card-row-margin`}>手机号：{member.phoneNumber}</Text>
+                          </View>
+                        );
+                      })
+                    }
                   </View>
                 );
               })

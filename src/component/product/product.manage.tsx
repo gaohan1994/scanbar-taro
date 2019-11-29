@@ -26,7 +26,11 @@ class ProductManageComponent extends Taro.Component<Props> {
       >
         <View className={`${cssPrefix}-content`}>
           <View className={`${cssPrefix}-content-cover`}>
-            <Image src={product.pictures} className={`${cssPrefix}-content-cover-image`} />
+            <Image 
+              // src={product.pictures} 
+              src="//net.huanmusic.com/weapp/img_nolist.png"
+              className={`${cssPrefix}-content-cover-image`} 
+            />
           </View>
           <View className={`${cssPrefix}-content-detail`}>
             <Text className={`${cssPrefix}-title`}>{product.name}</Text>

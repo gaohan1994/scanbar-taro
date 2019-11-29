@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-27 11:02:32
+ * @Last Modified time: 2019-11-29 15:47:25
  * 
  * @todo 开单页面
  */
@@ -12,16 +12,17 @@ import "./style/product.less";
 import "../member/style/member.less";
 import CartBar from '../../component/cart/cart';
 import { ProductAction } from '../../actions';
-import { getProductList, getProductSearchList } from '../../reducers/app.product';
+import { getProductList, getProductSearchList, getSelectProduct } from '../../reducers/app.product';
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
-import { ProductInterface, ProductService } from '../../constants';
+import { ProductInterface, ProductService, ProductInterfaceMap } from '../../constants';
 import classnames from 'classnames';
 import ProductComponent from '../../component/product/product';
 import invariant from 'invariant';
 import { ResponseCode } from '../../constants/index';
-import merge from 'lodash/merge';
+import merge from 'lodash.merge';
 import productSdk from '../../common/sdk/product/product.sdk';
+import { store } from '../../app';
 
 let ItemHeight: number = -1;
 let SectionHeight: number = -1;
@@ -46,6 +47,7 @@ interface Props {
   pureProductList: ProductInterface.ProductInfo[];
   productSearchList: ProductInterface.ProductList[];
   pureProductSearchList: ProductInterface.ProductInfo[];
+  selectProduct: ProductInterface.ProductInfo;
 }
 
 interface State {
@@ -96,6 +98,21 @@ class ProductOrder extends Taro.Component<Props, State> {
     try {
       const { success, result } = await ProductAction.productInfoGetList();
       invariant(success, result || ResponseCode.error);
+
+      const { selectProduct } = this.props;
+      if (selectProduct !== undefined) {
+        productSdk.manage({
+          type: productSdk.productCartManageType.ADD,
+          product: selectProduct
+        });
+        setTimeout(() => {
+          store.dispatch({
+            type: ProductInterfaceMap.reducerInterfaces.SET_SELECT_PRODUCT,
+            payload: { selectProduct: undefined }
+          });
+        }, 100);
+      }
+
       const { rows }: { rows: ProductInterface.ProductList[] } = result;
       if (rows.length > 0) {
         const firstType = rows[0];
@@ -125,10 +142,13 @@ class ProductOrder extends Taro.Component<Props, State> {
          */
         ProductAction.productInfoEmptySearchList();
       } else {
+        Taro.showLoading();
         const { success, result } = await ProductAction.productInfoSearchList({words: searchValue});
+        Taro.hideLoading();
         invariant(success, result || ResponseCode.error);
       }
     } catch (error) {
+      Taro.hideLoading();
       Taro.showToast({
         title: error.message,
         icon: 'none'
@@ -142,6 +162,17 @@ class ProductOrder extends Taro.Component<Props, State> {
         ? productList[0].id
         : -1
       : -1;
+  }
+
+  public onNonBarcodeProductClick = () => {
+    const product: any = {
+      id: `${productSdk.nonBarcodeKey}${new Date().getTime()}`
+    };
+    console.log('product: ', product);
+    productSdk.manage({
+      type: productSdk.productCartManageType.ADD,
+      product
+    });
   }
 
   /**
@@ -201,7 +232,6 @@ class ProductOrder extends Taro.Component<Props, State> {
       .then(async (res) => {
         Taro.showLoading();
         const result = await ProductService.productInfoScanGet({barcode: res.result});
-        console.log('result ', result);
         if (result.code === ResponseCode.success) {
           Taro.hideLoading();
           // 找到了商品 显示modal名称
@@ -224,8 +254,12 @@ class ProductOrder extends Taro.Component<Props, State> {
             content: `商品${thirdProductResult.data.barcode}不存在，是否现在建档？`,
             success: ({confirm}) => {
               if (confirm) {
+                const params = {
+                  scanProduct: thirdProductResult.data,
+                  needCallback: true
+                };
                 Taro.navigateTo({
-                  url: `/pages/product/product.add?scanProduct=${JSON.stringify(thirdProductResult.data)}`
+                  url: `/pages/product/product.add?params=${JSON.stringify(params)}`
                 });
               }
             }
@@ -339,7 +373,12 @@ class ProductOrder extends Taro.Component<Props, State> {
               <Image src="//net.huanmusic.com/weapp/icon_commodity_scan.png" className={`${memberPrefix}-main-header-search-scan`} />
             </View>
           </View>
-          <View className={`${cssPrefix}-header-button`}>无码商品</View>
+          <View 
+            className={`${cssPrefix}-header-button`}
+            onClick={() => this.onNonBarcodeProductClick()}
+          >
+            无码商品
+          </View>
         </View>
         
         <View className={`${cssPrefix}-list-container`}>
@@ -488,12 +527,14 @@ const mapState = (state: AppReducer.AppState) => {
       pureProductSearchList.push(item);
     });
   });
+  const selectProduct: any = getSelectProduct(state);
 
   return {
     productList,
     pureProductList,
     productSearchList,
     pureProductSearchList,
+    selectProduct,
   };
 };
 

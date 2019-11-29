@@ -2,9 +2,9 @@
  * @Author: Ghan 
  * @Date: 2019-11-11 10:23:20 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-27 16:42:44
+ * @Last Modified time: 2019-11-29 11:00:00
  */
-import merge from 'lodash/merge';
+import merge from 'lodash.merge';
 import { MemberInterface, MemberInterfaceMap } from '../constants';
 import { AppReducer } from '.';
 
@@ -26,6 +26,7 @@ export declare namespace MemberReducer {
     memberDetail: MemberInterface.MemberInfo;
     memberPerference: MemberInterface.MemberPerference[];
     memberOrderInfo: MemberInterface.MemberOrderInfo;
+    selectMember?: MemberInterface.MemberInfo;
   }
 
   interface MemberAction {
@@ -33,7 +34,8 @@ export declare namespace MemberReducer {
       | MemberInterface.RECEIVE_MEMBER_DETAIL
       | MemberInterface.RECEIVE_MEMBER_LIST
       | MemberInterface.RECEIVE_MEMBER_PERFERENCE
-      | MemberInterface.RECEIVE_MEMBER_ORDER_INFO;
+      | MemberInterface.RECEIVE_MEMBER_ORDER_INFO
+      | MemberInterface.SET_MEMBER_SELECT;
     payload: any;
   }
 }
@@ -58,10 +60,18 @@ const initState: MemberReducer.MemberInitState = {
     totalAmount: 0,
     lastPayTime: ''
   },
+  selectMember: undefined,
 };
 
 export default function memberReducer (state: MemberReducer.MemberInitState = initState, action: MemberReducer.MemberAction): MemberReducer.MemberInitState {
   switch (action.type) {
+    case MemberInterfaceMap.reducerInterfaces.SET_MEMBER_SELECT: {
+      const { payload: { selectMember } } = action;
+      return {
+        ...state,
+        selectMember,
+      };
+    } 
     case MemberInterfaceMap.reducerInterfaces.RECEIVE_MEMBER_ORDER_INFO: {
       const { payload: { data } } = action;
       return {
@@ -107,3 +117,5 @@ export const getMemberDetail = (state: AppReducer.AppState) => state.member.memb
 export const getMemberPerference = (state: AppReducer.AppState) => state.member.memberPerference;
 
 export const getMemberOrderInfo = (state: AppReducer.AppState) => state.member.memberOrderInfo;
+
+export const getSelectMember = (state: AppReducer.AppState) => state.member.selectMember;

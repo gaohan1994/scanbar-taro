@@ -1,14 +1,14 @@
 import productSdk, { ProductCartInterface } from "./product.sdk";
 import { AppReducer } from "../../../reducers";
 import { ProductInterface } from "../../../constants";
-import merge from 'lodash/merge';
-import moment from 'moment';
+import merge from 'lodash.merge';
+import moment from 'dayjs';
 
 /**
  * @Author: Ghan 
  * @Date: 2019-11-22 14:20:31 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-26 11:22:43
+ * @Last Modified time: 2019-11-29 16:37:04
  * @todo productsdk
  */
 export declare namespace ProductSDKReducer {
@@ -22,13 +22,14 @@ export declare namespace ProductSDKReducer {
   interface State {
     productCartList: Array<ProductCartInterface.ProductCartInfo>;
     changeWeightProduct: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo;
+    nonBarcodeProduct?: Partial<ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo>;
     suspensionCartList: Array<SuspensionCartBase>;
   }
 
   interface AddSuspensionCartPayload {
     payload: {
       productCartList: Array<ProductCartInterface.ProductCartInfo>;
-    }
+    };
   }
 
   interface ManageSuspensionCartPayload {
@@ -92,6 +93,7 @@ const initState: ProductSDKReducer.State = {
     price: -1,
     saleType: -1,
     status: -1,
+    typeId: -1,
     type: -1,
     typeName: '',
     barcode: '',
@@ -106,7 +108,9 @@ const initState: ProductSDKReducer.State = {
     createBy: '',
     createTime: '',
     updateTime: '',
-  }
+    imgs: [],
+  },
+  nonBarcodeProduct: {}
 };
 
 export default function productSDKReducer (
@@ -114,6 +118,13 @@ export default function productSDKReducer (
   action: ProductSDKReducer.Action
 ): ProductSDKReducer.State {
   switch (action.type) {
+    case productSdk.reducerInterface.CHANGE_NON_BARCODE_PRODUCT: {
+      const { payload: { nonBarcodeProduct } } = action;
+      return {
+        ...state,
+        nonBarcodeProduct
+      };
+    }
     case productSdk.reducerInterface.EMPTY_SUSPENSION_CART: {
       return {
         ...state,
@@ -129,7 +140,6 @@ export default function productSDKReducer (
         suspension: { date },
         productCartList
       };
-      console.log('suspensionCart ', suspensionCart);
       const newSuspensionList = merge([], state.suspensionCartList);
       newSuspensionList.push(suspensionCart);
       return {
@@ -259,3 +269,5 @@ export const getProductCartList = (state: AppReducer.AppState) => state.productS
 export const getChangeWeigthProduct = (state: AppReducer.AppState) => state.productSDK.changeWeightProduct;
 
 export const getSuspensionCartList = (state: AppReducer.AppState) => state.productSDK.suspensionCartList;
+
+export const getNonBarcodeProduct = (state: AppReducer.AppState) => state.productSDK.nonBarcodeProduct;

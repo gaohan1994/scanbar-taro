@@ -3,14 +3,13 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:28:21 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-27 16:40:48
+ * @Last Modified time: 2019-11-28 15:29:03
  */
 import memberService from "../constants/member/member.service";
 import { ResponseCode, ActionsInterface, MemberInterface, MemberInterfaceMap } from '../constants/index';
 import { store } from '../app';
-import merge from 'lodash/merge';
-import isArray from 'lodash/isArray';
-import moment from 'moment';
+import merge from 'lodash.merge';
+import moment from 'dayjs';
 interface MemberAction {
   /**
    * @interface memberList
@@ -77,7 +76,8 @@ class MemberAction {
 
   public fliterDataByDate = (data: MemberInterface.MemberInfo[], datekey = 'createTime') => {
     // return [];
-    if (isArray(data) === true) {
+
+    if (Array.isArray(data)) {
       /**
        * @param mergeData 深拷贝data
        * @param dateIndexes 存放日期和对应日期数据key的地方

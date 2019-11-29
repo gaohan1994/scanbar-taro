@@ -2,7 +2,7 @@
   "miniprogramRoot": "./dist",
   "projectname": "scanbar",
   "description": "scan bar for centerm company",
-  "appid": "touristappid",
+  "appid": "wxb433be9efd0a2a83",
   "setting": {
     "urlCheck": true,
     "es6": false,

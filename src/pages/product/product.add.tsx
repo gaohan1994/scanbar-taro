@@ -2,27 +2,27 @@
  * @Author: Ghan 
  * @Date: 2019-11-20 13:37:23 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-27 11:44:53
+ * @Last Modified time: 2019-11-29 11:56:37
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Picker } from '@tarojs/components';
 import { ProductAction } from '../../actions';
 import invariant from 'invariant';
-import { ResponseCode, ProductInterface, ProductService, HTTPInterface } from '../../constants/index';
+import { ResponseCode, ProductInterface, ProductService, HTTPInterface, ProductInterfaceMap } from '../../constants/index';
 import './style/product.less';
 import { AppReducer } from '../../reducers';
 import { getProductType } from '../../reducers/app.product';
 import { connect } from '@tarojs/redux';
 import { FormRowProps } from '../../component/card/form.row';
 import FormCard from '../../component/card/form.card';
-import { AtButton, AtActivityIndicator } from 'taro-ui';
-import merge from 'lodash/merge';
+import { AtButton } from 'taro-ui';
 import classnames from 'classnames';
 import FormRow from '../../component/card/form.row';
 import "../../component/card/form.card.less";
 import Validator from '../../common/util/validator';
 import getBaseUrl from '../../common/request/base.url';
 import { LoginManager } from '../../common/sdk';
+import { store } from '../../app';
 
 const cssPrefix = 'product';
 
@@ -47,6 +47,7 @@ interface State {
   barcode: string;      // 商品条码
   name: string;         // 商品名称
   images: string[];     // 图片上传到服务器上之后的数组 
+  needCallback: boolean;// 新增完成之后是否需要数据回调 
 }
 
 class ProductAdd extends Taro.Component<Props, State> {
@@ -68,6 +69,7 @@ class ProductAdd extends Taro.Component<Props, State> {
       saleType: 0,
       status: 0,
       images: [],
+      needCallback: false,
     };
   }
 
@@ -79,22 +81,26 @@ class ProductAdd extends Taro.Component<Props, State> {
       const typeResult = await ProductAction.productInfoType();  
       invariant(typeResult.code === ResponseCode.success, ResponseCode.error);
 
-      const { scanProduct } = this.$router.params;
-      if (scanProduct !== undefined) {
-        Taro.showLoading();
-        console.log('scanProduct: ', JSON.parse(scanProduct));
-        const scan: ProductInterface.ProductScan = JSON.parse(scanProduct);
-        this.setState({
-          barcode: scan.barcode || '',
-          name: scan.name,
-          tempFilePaths: [scan.img],
-          images: [scan.img],
-          price: scan.price,
-          standard: scan.standard,
-          brand: scan.brand,
-        }, () => {
-          Taro.hideLoading();
-        });
+      const { params } = this.$router.params;
+      if (params !== undefined) {
+        const { scanProduct: scan, needCallback } = JSON.parse(params);
+        if (needCallback) {
+          this.setState({ needCallback });
+        }
+        if (scan !== undefined) {
+          Taro.showLoading(); 
+          this.setState({
+            barcode: scan.barcode || '',
+            name: scan.name,
+            tempFilePaths: [scan.img],
+            images: [scan.img],
+            price: scan.price,
+            standard: scan.standard,
+            brand: scan.brand,
+          }, () => {
+            Taro.hideLoading();
+          });
+        }
       }
     } catch (error) {
       Taro.showToast({
@@ -266,7 +272,7 @@ class ProductAdd extends Taro.Component<Props, State> {
   public validate = (): { success: boolean, result: any } => {
     
     const helper = new Validator();
-    const { barcode, name, price, cost, memberPrice, number } = this.state;
+    const { barcode, name } = this.state;
     helper.add(barcode, [{
       strategy: 'isNonEmpty',
       errorMsg: '请设置商品条码',
@@ -274,22 +280,6 @@ class ProductAdd extends Taro.Component<Props, State> {
     helper.add(name, [{
       strategy: 'isNonEmpty',
       errorMsg: '请输入商品名称'
-    }]);
-    helper.add(price, [{
-      strategy: 'isNonEmpty',
-      errorMsg: '请输入商品价格'
-    }]);
-    helper.add(cost, [{
-      strategy: 'isNonEmpty',
-      errorMsg: '请输入商品进价'
-    }]);
-    helper.add(memberPrice, [{
-      strategy: 'isNonEmpty',
-      errorMsg: '请输入商品会员价'
-    }]);
-    helper.add(number, [{
-      strategy: 'isNonEmpty',
-      errorMsg: '请输入商品库存'
     }]);
 
     const result = helper.start();
@@ -388,8 +378,15 @@ class ProductAdd extends Taro.Component<Props, State> {
       invariant(success, result || ' ');
 
       const addResult = await this.addProduct();
+      console.log('addResult: ', addResult);
       invariant(addResult.code === ResponseCode.success, addResult.msg || ResponseCode.error);
-
+      const { needCallback } = this.state;
+      if (needCallback) {
+        store.dispatch({
+          type: ProductInterfaceMap.reducerInterfaces.SET_SELECT_PRODUCT,
+          payload: { selectProduct: addResult.data }
+        });
+      }
       Taro.showToast({
         title: '新增成功',
         icon: 'success',
@@ -437,7 +434,7 @@ class ProductAdd extends Taro.Component<Props, State> {
         title: '进价（￥）',
         isInput: true,
         inputValue: cost,
-        inputType: 'number',
+        inputType: 'digit',
         inputPlaceHolder: '请输入进价',
         inputOnChange: (value) => this.onChangeValue('cost', value)
       },
@@ -445,7 +442,7 @@ class ProductAdd extends Taro.Component<Props, State> {
         title: '售价（￥）',
         isInput: true,
         inputValue: price,
-        inputType: 'number',
+        inputType: 'digit',
         inputPlaceHolder: '请输入售价',
         inputOnChange: (value) => this.onChangeValue('price', value),
       },
@@ -453,7 +450,7 @@ class ProductAdd extends Taro.Component<Props, State> {
         title: '会员价（￥）',
         isInput: true,
         inputValue: memberPrice,
-        inputType: 'number',
+        inputType: 'digit',
         inputPlaceHolder: '请输入会员价',
         inputOnChange: (value) => this.onChangeValue('memberPrice', value),
         hasBorder: false

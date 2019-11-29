@@ -9,6 +9,7 @@ import invariant from 'invariant';
 import { ResponseCode } from '../../constants/index';
 import { store } from '../../app';
 import { ProductInterfaceMap } from '../../constants';
+import { PayReducer } from '../../reducers/app.pay';
 
 const cssPrefix = 'pay';
 
@@ -38,14 +39,13 @@ class PayInput extends Taro.Component<Props, State> {
       const result = await productSdk.cashierPay(payload);
       invariant(result.code === ResponseCode.success, result.msg || ResponseCode.error);
       Taro.hideLoading();
+      const payReceive: PayReducer.PayReceive = {
+        transPayload: payload,
+        transResult: result.data
+      };
       store.dispatch({
         type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PAY_DETAIL,
-        payload: { 
-          payReceive: {
-            ...result.data,
-            transAmount: payload.order.transAmount
-          }
-        }
+        payload: { payReceive }
       });
       Taro.navigateTo({
         url: `/pages/pay/pay.receive`

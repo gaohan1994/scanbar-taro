@@ -40,6 +40,20 @@
       font-size: 24px;
       color: #cccccc;
     }
+    &-row {
+      .padding(23px, tb);
+      .padding(50px, lr);
+      color: #666666;
+      font-size: 26px;
+      display: flex;
+      flex-direction: column;
+      &-margin {
+        .margin(12px, t);
+      }
+      &-border {
+        border-bottom: 1px solid #E3E3E3;
+      }
+    }
   }
   &-buttons {
     .padding(15px, tb);
@@ -89,10 +103,10 @@
     flex-direction: column;
     position: relative;
     &-header {
-      // z-index: @member-search-zindex + 100;
       .padding(20px, tb);
       .padding(30px, lr);
       position: fixed;
+      background-color: @theme-color;
       .flex(center, space-between, row);
       top: 0;
       left: 0;
@@ -142,7 +156,12 @@
     &-container {
       position: absolute;
       top: @member-header-size;
+      bottom: 0px;
       width: 100%;
+    }
+    &-form {
+      .margin(30px, l);
+      width: 690px;
     }
   }
   &-loading {

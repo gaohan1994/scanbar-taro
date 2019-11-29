@@ -3,12 +3,11 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:26:45 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-22 14:21:30
+ * @Last Modified time: 2019-11-29 11:55:18
  */
 
 import { ProductInterface, ProductInterfaceMap } from "../constants";
 import { AppReducer } from './index';
-import isArray from 'lodash/isArray';
 
 export declare namespace ProductReducer {
   interface InitState {
@@ -21,6 +20,7 @@ export declare namespace ProductReducer {
     productType: Array<ProductInterface.ProductType>;
     productSupplier: Array<ProductInterface.ProductSupplier>;
     productDetail: ProductInterface.ProductInfo;
+    selectProduct?: ProductInterface.ProductInfo;
   }
 
   interface Action {
@@ -29,7 +29,8 @@ export declare namespace ProductReducer {
       | ProductInterface.RECEIVE_PRODUCT_SEARCH_LIST
       | ProductInterface.RECEIVE_PRODUCT_TYPE
       | ProductInterface.RECEIVE_PRODUCT_SUPPLIER
-      | ProductInterface.RECEIVE_PRODUCT_DETAIL;
+      | ProductInterface.RECEIVE_PRODUCT_DETAIL
+      | ProductInterface.SET_SELECT_PRODUCT;
     payload: any;
   }
 }
@@ -68,10 +69,18 @@ const initState: ProductReducer.InitState = {
     createTime: '',
     updateTime: '',
   },
+  selectProduct: undefined,
 };
 
 export default function productReducer (state: ProductReducer.InitState = initState, action: ProductReducer.Action): ProductReducer.InitState {
   switch (action.type) {
+    case ProductInterfaceMap.reducerInterfaces.SET_SELECT_PRODUCT: {
+      const { payload: { selectProduct } } = action;
+      return {
+        ...state,
+        selectProduct
+      };
+    }
     case ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_MANAGE_LIST: {
       const { payload: { rows, total } } = action;
       return {
@@ -133,10 +142,6 @@ export default function productReducer (state: ProductReducer.InitState = initSt
 
 export function getProductManageListIndexes (list: ProductInterface.ProductInfo[] = []): ProductInterface.IndexProducList[] {
   const indexesList: ProductInterface.IndexProducList[] = [];
-  if (isArray(list) === false) {
-    return [];
-  }
-
   if (list.length === 0) {
     return [];
   }
@@ -169,3 +174,5 @@ export const getProductType = (state: AppReducer.AppState) => state.product.prod
 export const getProductSupplier = (state: AppReducer.AppState) => state.product.productSupplier;
 
 export const getProductDetail = (state: AppReducer.AppState) => state.product.productDetail;
+
+export const getSelectProduct = (state: AppReducer.AppState) => state.product.selectProduct;
