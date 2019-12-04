@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-29 15:47:25
+ * @Last Modified time: 2019-12-04 10:58:42
  * 
  * @todo 开单页面
  */
@@ -80,7 +80,7 @@ class ProductOrder extends Taro.Component<Props, State> {
     searchValue: ''
   };
 
-  private productScrollList?: Array<ProductInterface.ProductList & { scrollHeight: number }> = undefined;
+  private productScrollList?: Array<ProductInterface.ProductList & { scrollHeight: number, scrollOriginHeight: number }> = undefined;
   
   componentDidShow () {
     this.init();
@@ -168,7 +168,6 @@ class ProductOrder extends Taro.Component<Props, State> {
     const product: any = {
       id: `${productSdk.nonBarcodeKey}${new Date().getTime()}`
     };
-    console.log('product: ', product);
     productSdk.manage({
       type: productSdk.productCartManageType.ADD,
       product
@@ -186,7 +185,7 @@ class ProductOrder extends Taro.Component<Props, State> {
     this.changeScrollProductId(this.getScrollProductId(productList));
     setTimeout(() => {
       this.changeCurrentType(typeInfo);
-    }, 100);
+    }, 200);
   }
 
   public initItemHeight = () => {
@@ -292,24 +291,22 @@ class ProductOrder extends Taro.Component<Props, State> {
     }
   }
 
-  public configItemsHeight = (itemHeight: number): Array<ProductInterface.ProductList & { scrollHeight: number }> => {
+  public configItemsHeight = (itemHeight: number): Array<ProductInterface.ProductList & { scrollHeight: number, scrollOriginHeight: number }> => {
     if (this.productScrollList) {
       return this.productScrollList;
     }
     const productList: ProductInterface.ProductList[] = merge([], this.props.productList);
-    let productScrollList: Array<ProductInterface.ProductList & { scrollHeight: number }> = [];
+    let productScrollList: Array<ProductInterface.ProductList & { scrollHeight: number, scrollOriginHeight: number }> = [];
 
     for (let i = 0; i < productList.length; i++) {
       const list = productList[i];
-      let beforeHeight: number = 0;
-      if (productScrollList.length > 0) {
-        productScrollList.forEach(list => {
-          beforeHeight += list.scrollHeight;
-        });
-      } 
       productScrollList.push({
         ...list,
-        scrollHeight: list.productList.length * itemHeight + beforeHeight + (i * SectionHeight)
+        scrollHeight: 
+          (list.productList.length * itemHeight) 
+          + (i !== 0 ? productScrollList[i - 1].scrollHeight : 0)
+          + (i * SectionHeight),
+        scrollOriginHeight: i !== 0 ? productScrollList[i - 1].scrollHeight + 1 : 0,
       });
     }
     this.productScrollList = productScrollList;
@@ -327,17 +324,10 @@ class ProductOrder extends Taro.Component<Props, State> {
 
     const ProductItemHeight = await this.getItemHeight();
     const productScrollList = this.configItemsHeight(ProductItemHeight);
-
     for (let i = productScrollList.length - 1; i >= 0; i--) {
-      if (i === 0 && scrollTop < productScrollList[i].scrollHeight) {
+      if (scrollTop > productScrollList[i].scrollOriginHeight && scrollTop < productScrollList[i].scrollHeight) {
         if (currentType.name !== productScrollList[i].typeInfo.name) {
           this.changeCurrentType(productScrollList[i].typeInfo);
-          return;
-        }
-      }
-      if (scrollTop > productScrollList[i].scrollHeight) {
-        if (currentType.name !== productScrollList[i + 1].typeInfo.name) {
-          this.changeCurrentType(productScrollList[i + 1].typeInfo);
           return;
         }
       }
@@ -369,9 +359,27 @@ class ProductOrder extends Taro.Component<Props, State> {
               onInput={this.onInput}
               placeholderClass={`${memberPrefix}-main-header-search-input-holder`}
             />
-            <View onClick={() => this.onScanProduct()} >
-              <Image src="//net.huanmusic.com/weapp/icon_commodity_scan.png" className={`${memberPrefix}-main-header-search-scan`} />
-            </View>
+            {searchValue !== '' ? (
+              <View 
+                className={`${memberPrefix}-main-header-search-scan`} 
+                onClick={() => this.onInput({detail: {value: ''}})}  
+              >
+                <Image 
+                  src="//net.huanmusic.com/weapp/icon_del.png" 
+                  className={`${memberPrefix}-main-header-search-del`} 
+                />
+              </View>
+            ) : (
+              <View
+                onClick={() => this.onScanProduct()}
+                className={`${memberPrefix}-main-header-search-scan`} 
+              >
+                <Image
+                  src="//net.huanmusic.com/weapp/icon_commodity_scan.png" 
+                  className={`${memberPrefix}-main-header-search-scan`} 
+                />
+              </View>
+            )}
           </View>
           <View 
             className={`${cssPrefix}-header-button`}

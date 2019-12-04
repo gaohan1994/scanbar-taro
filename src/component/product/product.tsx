@@ -28,10 +28,18 @@ class ProductComponent extends Taro.Component<Props> {
       <View className={`${cssPrefix} ${cssPrefix}-border`}>
         <View className={`${cssPrefix}-content`}>
           <View className={`${cssPrefix}-content-cover`}>
-            <Image src={product.pictures} className={`${cssPrefix}-content-cover-image`} />
+            {product.pictures && product.pictures !== '' ? (
+              <Image src={product.pictures} className={`${cssPrefix}-content-cover-image`} />
+            ) : (
+              <Image src="//net.huanmusic.com/weapp/img_nolist.png" className={`${cssPrefix}-content-cover-image`} />
+            )}
+            
           </View>
           <View className={`${cssPrefix}-content-detail`}>
-            <Text className={`${cssPrefix}-title`}>{product.name}</Text>
+            {/* <View className={`${cssPrefix}-content-title-box`}>
+              
+            </View> */}
+            <View className={`${cssPrefix}-title`}>{product.name}</View>
             <Text className={`${cssPrefix}-normal`}>
               <Text className={`${cssPrefix}-price-bge`}>￥</Text>
               <Text className={`${cssPrefix}-price`}>{product.price}</Text>

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 17:10:29 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-25 17:19:36
+ * @Last Modified time: 2019-12-03 14:12:38
  */
 
 import Taro from '@tarojs/taro';
@@ -165,7 +165,7 @@ class LoginManager {
    * @memberof LoginManager
    */
   public checkUserPermissions = async (permissions: Array<string>): Promise<LoginInterface.CheckPermissionsResult> => {
-    console.log('permissions: ', permissions);
+    // console.log('permissions: ', permissions);
     return { success: true, grantedPermissions: [], declinedPermissions: [] };
   }
 }

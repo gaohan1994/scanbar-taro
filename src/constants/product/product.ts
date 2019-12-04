@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-29 16:35:38
+ * @Last Modified time: 2019-12-03 10:27:01
  * 
  * @todo [商品相关的类型定义]
  */
@@ -51,7 +51,7 @@ export declare namespace ProductInterface {
     brand: string;        // 品牌
     pictures: string;     // 图片
     standard: string;     // 规格
-    supplier: string;     // 供应商名称
+    supplier?: string;     // 供应商名称
     unit: string;         // 单位
     firstLetter: string;  // 首字母 
     imgs: string[];       // 商品图片
@@ -61,6 +61,8 @@ export declare namespace ProductInterface {
     createBy: string;
     createTime: string;
     updateTime: string;
+    supplierId: number;
+    supplierName: string; 
   }
 
   interface ProductTypeInfo {
@@ -179,7 +181,7 @@ interface ProductInterfaceMap {
   productInfoGetBarcode: string;
   productInfoAdd: string;
   cashierPay: string;
-  cashierQueryStatus: string;
+  cashierQueryStatus (params: ProductInterface.ProductCashierQueryStatus): string;
   productInfoGetList (params?: ProductInterface.ProductInfoGetListFetchFidle): string;
   productInfoList (params?: ProductInterface.ProductInfoListFetchFidle): string;
   productInfoDetail (params: ProductInterface.ProductDetailFetchFidle): string;
@@ -206,7 +208,10 @@ class ProductInterfaceMap {
   public productInfoGetBarcode = '/product/productInfo/genBarcode';
   public productInfoAdd = '/product/productInfo/add';
   public cashierPay = '/cashier/pay';
-  public cashierQueryStatus = '/cashier/queryStatus';
+
+  public cashierQueryStatus = (params: ProductInterface.ProductCashierQueryStatus) => {
+    return `/cashier/queryStatus/${params.orderNo}`;
+  }
 
   public productInfoGetList = (params?: ProductInterface.ProductInfoGetListFetchFidle) => {
     return `/product/productInfo/getList${params ? jsonToQueryString(params) : ''}`;

@@ -5,7 +5,7 @@ import invariant from 'invariant';
 import { ResponseCode, ProductInterface, ProductService } from '../../constants/index';
 import './style/product.less';
 import { AppReducer } from '../../reducers';
-import { getProductDetail, getProductType } from '../../reducers/app.product';
+import { getProductDetail, getProductType, getProductSupplier } from '../../reducers/app.product';
 import { connect } from '@tarojs/redux';
 import { FormRowProps } from '../../component/card/form.row';
 import FormCard from '../../component/card/form.card';
@@ -46,6 +46,8 @@ interface Props {
   productDetail: ProductInterface.ProductInfo;
   productType: ProductInterface.ProductType[];
   productTypeSelector: string[];
+  productSupplier: ProductInterface.ProductSupplier[];
+  productSupplierSelector: string[];
 }
 
 interface State {
@@ -64,6 +66,7 @@ interface State {
   memberPriceModalVisible: boolean;
   numberModalVisible: boolean;
   numberLimitModalVisible: boolean;
+  supplierValue: number;
 }
 
 class ProductDetail extends Taro.Component<Props, State> {
@@ -87,7 +90,6 @@ class ProductDetail extends Taro.Component<Props, State> {
         brand: '',
         pictures: '',
         standard: '',
-        supplier: '',
         unit: '',
         firstLetter: '',
         name: '',
@@ -96,10 +98,13 @@ class ProductDetail extends Taro.Component<Props, State> {
         createTime: '',
         updateTime: '',
         imgs: [],
+        supplierId: -1,
+        supplierName: '',
       },
       productChangeDetail: {},
       typeModalVisible: true,
-      typePickerValue: 2,
+      typePickerValue: 0,
+      supplierValue: 0,
       costModalVisible: false,
       priceModalVisible: false,
       memberPriceModalVisible: false,
@@ -130,7 +135,11 @@ class ProductDetail extends Taro.Component<Props, State> {
       let productChangeDetail: Partial<ProductInterface.ProductInfo> = {
         saleType: productDetail.saleType,
         status: productDetail.status,
+        barcode: productDetail.barcode,
       };
+      if (!!productDetail.name) {
+        productChangeDetail.name = productDetail.name;
+      }
       if (!!productDetail.standard) {
         productChangeDetail.standard = productDetail.standard;
       }
@@ -140,8 +149,8 @@ class ProductDetail extends Taro.Component<Props, State> {
       if (!!productDetail.brand) {
         productChangeDetail.brand =  productDetail.brand;
       }
-      if (!!productDetail.supplier) {
-        productChangeDetail.supplier = productDetail.supplier;
+      if (!!productDetail.supplierName) {
+        productChangeDetail.supplierName = productDetail.supplierName;
       }
       this.setState({ 
         productDetail,
@@ -149,13 +158,24 @@ class ProductDetail extends Taro.Component<Props, State> {
       });
 
       /**
-       * @todo 初始化typepicker的位置
-       */
-      const typeResult = await ProductAction.productInfoType();  
-      invariant(typeResult.code === ResponseCode.success, ResponseCode.error);
-      const productType: ProductInterface.ProductType[] = typeResult.data;
+       * @todo 初始化picker的位置
+       */ 
+      let { productType, productSupplier } = this.props;
+      if (productType.length === 0) {
+        const typeResult = await ProductAction.productInfoType();  
+        invariant(typeResult.code === ResponseCode.success, ResponseCode.error);
+        productType = typeResult.data;
+      }
+      
+      if (productSupplier.length === 0) {
+        const supplierResult = await ProductAction.productInfoSupplier();  
+        invariant(supplierResult.code === ResponseCode.success, ResponseCode.error);
+        productSupplier = supplierResult.data;
+      }
+
       this.setState({
-        typePickerValue: productType.findIndex(t => t.id === productDetail.typeId)
+        typePickerValue: productType.findIndex(t => t.id === productDetail.typeId),
+        supplierValue: productSupplier.findIndex(s => s.id === productDetail.supplierId),
       });
     } catch (error) {
       Taro.showToast({
@@ -196,6 +216,31 @@ class ProductDetail extends Taro.Component<Props, State> {
         icon: 'none'
       });
     }
+  }
+
+  public changeProductSupplier = (event: any) => {
+    const { productSupplier } = this.props;
+    const supplierIndex: number = event.detail.value;
+    const supplier = productSupplier[supplierIndex];
+
+    if (!supplier) {
+      Taro.showModal({
+        title: '提示',
+        content: '未找到指定的供应商，请联系客服'
+      });
+      return;
+    }
+
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        productChangeDetail: {
+          ...prevState.productChangeDetail,
+          supplierId: supplier.id,
+          supplierName: supplier.name,
+        }
+      };
+    });
   }
 
   public changeModalVisible = (key: string, visible?: boolean) => {
@@ -278,7 +323,6 @@ class ProductDetail extends Taro.Component<Props, State> {
           // brand ~~
           newProductChangeDetail.brand = scanProduct.brand;
         }
-        console.log('newProductChangeDetail: ', newProductChangeDetail);
         this.setState({productChangeDetail: newProductChangeDetail});
         Taro.hideLoading();
         return;
@@ -393,7 +437,9 @@ class ProductDetail extends Taro.Component<Props, State> {
     const formName: FormRowProps[] = [
       {
         title: '条码',
-        extraText: productChangeDetail.barcode || productDetail.barcode,
+        isInput: true,
+        inputValue: productChangeDetail.barcode,
+        inputOnChange: (value) => this.onValueChange('barcode', value),
         extraThumb: '//net.huanmusic.com/weapp/icon_commodity_scan.png',
         extraThumbClick: this.onScanHandle,
         buttons: [
@@ -406,7 +452,9 @@ class ProductDetail extends Taro.Component<Props, State> {
       },
       {
         title: '名称',
-        extraText: productChangeDetail.name || productDetail.name,
+        isInput: true,
+        inputValue: productChangeDetail.name,
+        inputOnChange: (value) => this.onValueChange('name', value),
         hasBorder: false
       }
     ];
@@ -460,16 +508,6 @@ class ProductDetail extends Taro.Component<Props, State> {
         onClick: () => this.changeModalVisible('memberPriceModalVisible', true),
         hasBorder: false
       },
-    ];
-
-    const formSuppiler: FormRowProps[] = [
-      {
-        title: '供应商',
-        isInput: true,
-        inputValue: productChangeDetail.supplier,
-        inputOnChange: (value) => this.onValueChange('supplier', value), 
-        hasBorder: false,
-      }
     ];
 
     const formStatus: FormRowProps[] = [
@@ -544,7 +582,7 @@ class ProductDetail extends Taro.Component<Props, State> {
                 })
               }
             </View>
-            <FormCard items={formSuppiler} />
+            {this.renderSupplier()}
             <FormCard items={formStatus} />
   
             <View className={`${cssPrefix}-detail-submit`}>
@@ -563,6 +601,34 @@ class ProductDetail extends Taro.Component<Props, State> {
     return (
       <View className="container">
         <AtActivityIndicator mode="center" />
+      </View>
+    );
+  }
+
+  private renderSupplier = () => {
+    const { supplierValue, productChangeDetail } = this.state;
+    const { productSupplierSelector, productSupplier } = this.props;
+
+    return (
+      <View 
+        className={classnames('component-form', {
+          'component-form-shadow': true
+        })}
+      >
+        <Picker 
+          mode="selector"
+          range={productSupplierSelector}
+          onChange={this.changeProductSupplier}
+          value={supplierValue}
+        >
+          <FormRow 
+            title="供应商"
+            // extraText={productSupplier[supplierValue] && productSupplier[supplierValue].name || ''}
+            extraText={productChangeDetail.supplierName}
+            arrow="right"
+            hasBorder={false}
+          />
+        </Picker>
       </View>
     );
   }
@@ -759,10 +825,17 @@ const mapState = (state: AppReducer.AppState) => {
   const productTypeSelector = productType.map((type) => {
     return type.name;
   });
+
+  const productSupplier = getProductSupplier(state);
+  const productSupplierSelector = productSupplier.map((supplier) => {
+    return supplier.name;
+  });
   return {
     productDetail: getProductDetail(state),
     productType,
     productTypeSelector,
+    productSupplier,
+    productSupplierSelector,
   };
 };
 

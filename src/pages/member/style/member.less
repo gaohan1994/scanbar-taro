@@ -4,6 +4,7 @@
 @member-card-width: 690px;
 @member-avator-size: 150px;
 @member-search-icon-size: 28px;
+@member-search-del-size: 22px;
 @member-scan-icon-size: 40px;
 @member-search-add-icon-size: 40px;
 @member-search-input-font-size: 26px;
@@ -14,6 +15,10 @@
 
 .@{member-prefix} {
   .padding(30px, lr);
+  &-add {
+    background-color: #f6f6f6;
+    .padding(20px, t);
+  }
   position: relative;
   &-pos {
     margin-top: -150px;
@@ -53,6 +58,10 @@
       &-border {
         border-bottom: 1px solid #E3E3E3;
       }
+    }
+    &-text {
+      font-size: 26px;
+      color: #666666;
     }
   }
   &-buttons {
@@ -103,6 +112,7 @@
     flex-direction: column;
     position: relative;
     &-header {
+      z-index: 100;
       .padding(20px, tb);
       .padding(30px, lr);
       position: fixed;
@@ -135,6 +145,10 @@
           width: @member-search-icon-size;
           height: @member-search-icon-size;
           .margin(15px, r);
+        }
+        &-del {
+          width: @member-search-del-size;
+          height: @member-search-del-size;
         }
         &-scan {
           width: @member-scan-icon-size;

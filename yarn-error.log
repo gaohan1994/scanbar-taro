@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/bin/node /Users/Gao/.yarn/bin/yarn.js add src/constants/member/member.service --silent --no-progress
+  /usr/local/bin/node /Users/Gao/.yarn/bin/yarn.js add taro-ui/dist/style/index.sass --silent --no-progress
 
 PATH: 
   /usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/Gao/Desktop/macdesktop/scanbar/node_modules/.bin:/usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/Gao/Desktop/macdesktop/scanbar/node_modules/.bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bind:/usr/local/mongodb/bind:/usr/local/mongodb/bin:/Users/Gao/.yarn/bin:/Users/Gao/.config/yarn/global/node_modules/.bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Tomcat/bin:/Users/Gao/Library/Android/sdk/tools:/Users/Gao/Library/Android/sdk/platform-tools:
@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.npmjs.org/src%2fconstants/member/member.service: Request "https://registry.npmjs.org/src%2fconstants/member/member.service" returned a 405
+  Error: https://registry.npmjs.org/taro-ui%2fdist/style/index.sass: Request "https://registry.npmjs.org/taro-ui%2fdist/style/index.sass" returned a 405
       at Request.params.callback [as _callback] (/Users/Gao/.yarn/lib/cli.js:66067:18)
       at Request.self.callback (/Users/Gao/.yarn/lib/cli.js:129541:22)
       at Request.emit (events.js:200:13)

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-12 14:01:28 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-29 16:39:24
+ * @Last Modified time: 2019-12-04 14:34:31
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
@@ -20,7 +20,7 @@ import numeral from 'numeral';
 import invariant from 'invariant';
 import productSdk from '../../common/sdk/product/product.sdk';
 import { ProductCartInterface } from '../../common/sdk/product/product.sdk';
-import { ResponseCode, ProductInterface } from '../../constants/index';
+import { ResponseCode, ProductInterface, ProductService } from '../../constants/index';
 import { store } from '../../app';
 
 const Items = [
@@ -31,7 +31,7 @@ const Items = [
   },
   {
     title: '收款码',
-    image: '//net.huanmusic.com/weapp/cash.png',
+    image: '//net.huanmusic.com/weapp/icon_sao.png',
     tab: 'scan',
   },
   {
@@ -64,6 +64,28 @@ class PayReceive extends Taro.Component<Props, State> {
     tab: 'receive',
     receiveCash: '',
   };
+
+  componentDidMount() {
+    this.queryStatus();
+  }
+  
+  public queryStatus = async () => {
+    try {
+      const { payDetail } = this.props;
+      invariant(payDetail.transPayload !== undefined, '支付参数设置错误');
+      invariant(payDetail.transResult !== undefined, '支付参数设置错误');
+      const result = await ProductService.cashierQueryStatus({orderNo: (payDetail.transResult as ProductInterface.CashierPay).orderNo});
+      invariant(result.code === ResponseCode.success, result.msg || ResponseCode.error);
+      
+      const { data } = result;
+      this.receiveCallback(data.status);
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
 
   public onChangeCash = (value: string) => {
     this.setState({receiveCash: value});
@@ -115,7 +137,7 @@ class PayReceive extends Taro.Component<Props, State> {
             const scanPayResult = await productSdk.cashierPay(payload);
             Taro.hideLoading();
             invariant(scanPayResult.code === ResponseCode.success, scanPayResult.msg || ResponseCode.error);
-
+            this.receiveCallback(scanPayResult.data.status);
           })
           .catch(error => {
             Taro.hideLoading();
@@ -146,22 +168,20 @@ class PayReceive extends Taro.Component<Props, State> {
    * @memberof PayReceive
    */
   public receiveCallback = (success: boolean) => {
+    const params = { status: success };
     if (success === true) {
       // 清空购物车
       store.dispatch({
         type: productSdk.reducerInterface.MANAGE_EMPTY_CART,
         payload: {}
       });
-
-      Taro.redirectTo({
-        url: `/pages/pay/pay.result`
-      });
+      
+      Taro.showToast({ title: `收款成功` });
+      Taro.redirectTo({ url: `/pages/pay/pay.result?params=${JSON.stringify(params)}` });
     } else {
-
       // 收款失败
-      Taro.redirectTo({
-        url: `/pages/pay/pay.result`
-      });
+      Taro.showToast({ title: `收款失败` });
+      // Taro.redirectTo({ url: `/pages/pay/pay.result?params=${JSON.stringify(params)}` });
     }
   }
 
@@ -268,7 +288,8 @@ class PayReceive extends Taro.Component<Props, State> {
             {payDetail.transResult !== undefined ? (
               <Image 
                 className={`${cssPrefix}-receive-content-code-image`}
-                src={`${getBaseUrl('').replace('api', '')}${payDetail.transResult.codeUrl}`} 
+                // src={`${getBaseUrl('').replace('inventory-app/api', '')}${payDetail.transResult.codeUrl}`} 
+                src={`http://inventory.51cpay.com${payDetail.transResult.codeUrl}`}
               />
             ) : (
               <AtActivityIndicator mode='center' />

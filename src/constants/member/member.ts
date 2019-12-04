@@ -179,7 +179,7 @@ class MemberInterfaceMap {
   }
 
   public memberOrderInfo = (params: MemberInterface.MemberInfoDetail) => {
-    return `memberInfo/getMemberOrderInfo/${params.id}`;
+    return `/memberInfo/getMemberOrderInfo/${params.id}`;
   }
 }
 

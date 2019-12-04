@@ -167,6 +167,7 @@
 .component-list-row-extra {
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
 .component-list-row-input {
@@ -179,4 +180,8 @@
   height: 40rpx !important;
   margin-right: 0px !important;
   margin-left: 20rpx !important;
+}
+
+.at-input__input {
+  padding-right: 0px !important;
 }

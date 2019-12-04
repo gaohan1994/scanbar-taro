@@ -12,7 +12,7 @@ import "./styles/reset.less";
 //   require('nerv-devtools')
 // }
 
-export const store = configStore();
+export const store = configStore() || {};
 
 class App extends Component {
 

@@ -32,8 +32,8 @@ class ProductManageComponent extends Taro.Component<Props> {
               className={`${cssPrefix}-content-cover-image`} 
             />
           </View>
-          <View className={`${cssPrefix}-content-detail`}>
-            <Text className={`${cssPrefix}-title`}>{product.name}</Text>
+          <View className={`${cssPrefix}-content-manage`}>
+            <Text className={`${cssPrefix}-title ${cssPrefix}-title-manage`}>{product.name}</Text>
             <View className={`${cssPrefix}-manage-detail`}>
               <Text className={`${cssPrefix}-manage-font`}>进价: ￥{product.cost}</Text>
               <Text className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 14:41:35 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-28 18:29:47
+ * @Last Modified time: 2019-12-04 13:45:22
  * 
  * @todo [fockedTaroUiListItem,增加以及修改了一些属性]
  */
@@ -25,7 +25,6 @@ export interface FormRowProps {
   thumb?: string;               // 图片
   title?: string;               // 左边标题
   extraText?: string;           // 右边文字
-  extraTextStyle?: string;      // 右边文字颜色
   iconInfo?: any;               // Icon相关信息
   disabled?: boolean;           // 是否禁用
   hasBorder?: boolean;          // 是否有底部border
@@ -40,6 +39,7 @@ export interface FormRowProps {
   inputName?: string;           // 输入框的name
   inputOnChange?: (params: any) => any; // 输入改变函数
   inputType?: 'text' | 'number' | 'password' | 'phone' | 'digit'; // 输入框类型
+  extraTextStyle?: 'price' | 'black' | 'gray';      // 右边文字颜色
 }
 
 interface FormRowState { }
@@ -54,7 +54,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
     hasBorder: true,
     extraText: '',
     extraThumb: '',
-    extraTextStyle: undefined,
+    extraTextStyle: 'black',
     iconInfo: {},
     onClick: () => {/** */},
     extraThumbClick: () => {/** */},
@@ -128,11 +128,28 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
             {extraText && (
               <View 
                 className={classnames({
-                  'item-extra__info': extraTextStyle !== 'price',
-                  'component-form-price': extraTextStyle === 'price'
+                  // 'item-extra__info': extraTextStyle !== 'price',
+                  'component-form-price': extraTextStyle === 'price',
+                  'component-form-black': extraTextStyle === 'black',
+                  'component-form-gray': extraTextStyle === 'gray',
                 })} 
               >
                 {extraText}
+              </View>
+            )}
+
+            {isInput === true && (
+              <View className="component-form-input">
+                <AtInput 
+                  className={classnames('component-list-row-input')}
+                  name={inputName || 'form.row.name'}
+                  value={inputValue} 
+                  onChange={inputOnChange}
+                  type={inputType}
+                  placeholder={inputPlaceHolder}
+                  border={false}
+                  placeholderClass="component-list-placeholder"
+                />
               </View>
             )}
 
@@ -159,21 +176,6 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
               </View>
             )}
 
-            {isInput === true && (
-              <View className="component-form-input">
-                <AtInput 
-                  className={classnames('component-list-row-input')}
-                  name={inputName || 'form.row.name'}
-                  value={inputValue} 
-                  onChange={inputOnChange}
-                  type={inputType}
-                  placeholder={inputPlaceHolder}
-                  border={false}
-                  placeholderStyle="component-list-row-input-placeholder"
-                />
-              </View>
-            )}
-
             {children}
             
             {extraThumb && (
@@ -187,11 +189,15 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
             )}
 
             {arrow ? (
-              <View className='item-extra__icon'>
-                <Text
-                  className={`at-icon item-extra__icon-arrow at-icon-chevron-${arrow}`}
-                />
-              </View>
+              <Image 
+                src="//net.huanmusic.com/weapp/icon_commodity_into.png" 
+                className={`component-form-arrow`}
+              />
+              // <View className='item-extra__icon'>
+              //   <Text
+              //     className={`at-icon item-extra__icon-arrow at-icon-chevron-${arrow}`}
+              //   />
+              // </View>
             ) : null}
           </View>
         </View>

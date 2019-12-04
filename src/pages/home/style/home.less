@@ -47,12 +47,21 @@
     .padding(24px, lr);
     &-button {
       flex: 1;
-      .flex(flex-start, cneter, column);
+      .flex(flex-start, center, column);
       &-border {
         border-right: 1px solid #e3e3e3;
       }
       &-end {
         align-items: flex-end;
+      }
+      &-box {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
+      &-icon {
+        width: 46px;
+        height: 46px;
       }
     }
   }

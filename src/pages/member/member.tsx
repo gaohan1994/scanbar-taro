@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-28 18:52:23
+ * @Last Modified time: 2019-12-03 14:10:24
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Input, Image, Text } from '@tarojs/components';
@@ -10,14 +10,12 @@ import MemberAction from '../../actions/member.action';
 import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
 import { MemberInterface } from '../../constants';
-import FormCard from '../../component/card/form.card';
 import '../../component/card/form.card.less';
-import { FormRowProps } from '../../component/card/form.row';
 import './style/member.less';
 import invariant from 'invariant';
 import { AtActivityIndicator } from 'taro-ui';
-import FormRow from '../../component/card/form.row';
 import classnames from 'classnames';
+import "../product/style/product.less";
 
 const cssPrefix = 'member';
 
@@ -241,10 +239,10 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
           </View>
         </View>
         
-        <View className={`${cssPrefix}-list-container`}>
+        <View className={`product-manage-list`}>
           <ScrollView 
             scrollY={true}
-            className={`${cssPrefix}-list`}
+            className={`product-manage-list-container`}
             onScrollToUpper={this.refresh}
             onScrollToLower={this.loadMore}
           >
@@ -274,8 +272,8 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
                             })}
                             onClick={() => {Taro.navigateTo({url: `/pages/member/member.detail?id=${member.id}`})}}
                           >
-                            <Text>姓名：{member.username}</Text>
-                            <Text className={`${cssPrefix}-card-row-margin`}>手机号：{member.phoneNumber}</Text>
+                            <Text className={`${cssPrefix}-card-text`}>姓名：{member.username}</Text>
+                            <Text className={`${cssPrefix}-card-row-margin ${cssPrefix}-card-text`}>手机号：{member.phoneNumber}</Text>
                           </View>
                         );
                       })
@@ -293,6 +291,9 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
             )}
           </ScrollView>
         </View>
+        {/* <View className={`${cssPrefix}-list-container`}>
+          
+        </View> */}
       </View>
     );
   }

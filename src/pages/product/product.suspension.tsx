@@ -2,28 +2,21 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-28 15:19:30
+ * @Last Modified time: 2019-12-03 14:34:51
  * 
  */
 import Taro from '@tarojs/taro';
-import { View, Image, Input, ScrollView, Text } from '@tarojs/components';
+import { View, ScrollView } from '@tarojs/components';
 import "./style/product.less";
 import "../member/style/member.less";
 import CartBar from '../../component/cart/cart';
-import { ProductAction } from '../../actions';
-import { getProductList, getProductSearchList } from '../../reducers/app.product';
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
-import { ProductInterface } from '../../constants';
 import classnames from 'classnames';
 import ProductComponent from '../../component/product/product';
-import invariant from 'invariant';
-import { ResponseCode } from '../../constants/index';
-import merge from 'lodash.merge';
 import { getSuspensionCartList, ProductSDKReducer } from '../../common/sdk/product/product.sdk.reducer';
 
 const cssPrefix = 'product';
-const memberPrefix = 'member';
 
 interface Props {
   suspensionCartList: ProductSDKReducer.SuspensionCartBase[];

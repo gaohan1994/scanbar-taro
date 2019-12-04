@@ -284,7 +284,7 @@ class MemberMain extends Taro.Component<Props, State> {
     return (
       <ScrollView scrollY={true} className={`container`}>
         <AtMessage />
-        <View className={`container ${cssPrefix}`}>
+        <View className={`container ${cssPrefix} ${cssPrefix}-add`}>
           <FormCard items={memberDetailForm}>
             <Picker 
               mode='date'

@@ -86,6 +86,27 @@ export declare namespace ProductCartInterface {
     transProp: boolean;   // true=正常支付流程,false=订单再次支付],直接收款=true
   }
 
+  interface QueryStatusListItem extends Partial<ProductInterface.ProductInfo> {
+    costAmount: number;
+    discountAmount: number;
+    discountType: number;
+    merchantId: number;
+    num: number;
+    profit: number;
+    totalAmount: number;
+    transAmount: number;
+    type: number;
+  }
+
+  interface QueryStatus {
+    orderNo: string;
+    status: boolean;
+    printInfo?: {
+      order: ProductOrderPayload;
+      orderDetailList: QueryStatusListItem[];
+    };
+  }
+
   type MANAGE_CART_PRODUCT = string;
   type MANAGE_CART_WEIGHT_PRODUCT = string;
   type CHANGE_WEIGHT_PRODUCT_MODAL = string;
@@ -365,7 +386,7 @@ class ProductSDK {
       }),
       transProp: true
     };
-    console.log('payload: ', payload);
+    // console.log('payload: ', payload);
     return payload;
   }
 

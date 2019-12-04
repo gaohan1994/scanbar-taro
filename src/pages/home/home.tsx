@@ -113,12 +113,24 @@ class Home extends Component {
           <Card card-class="home-card">
             <View className="home-buttons">
               <View className="home-buttons-button home-buttons-button-border">
-                <View className="normal-text">今日销售额 ></View>
+                <View className={`normal-text ${cssPrefix}-buttons-button-box`}>
+                  <View>今日销售额</View>
+                  <Image
+                    src="//net.huanmusic.com/weapp/icon_home_into.png" 
+                    className={`${cssPrefix}-buttons-button-icon`}
+                  />  
+                </View>
                 <View className="home-money">100000.00</View>
               </View>
               <View className="home-buttons-button home-buttons-button-end">
-                <View className="normal-text">今日销售额 ></View>
-                <View className="home-money">100000.00</View>
+                <View className={`normal-text ${cssPrefix}-buttons-button-box`}>
+                  <View>销售笔数</View>
+                  <Image
+                    src="//net.huanmusic.com/weapp/icon_home_into.png" 
+                    className={`${cssPrefix}-buttons-button-icon`}
+                  />  
+                </View>
+                <View className="home-money">200</View>
               </View>
             </View>
           </Card>

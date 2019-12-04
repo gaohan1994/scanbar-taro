@@ -132,10 +132,6 @@ class ProductPay extends Taro.Component<Props, State> {
     this.changeModalVisible('memberModal', true);
   }
 
-  public addMemberCallback = (member: SelectMember) => {
-    console.log('member: ', member);
-  }
-
   public onSearchMember = async () => {
     try {
       const { memberValue } = this.state;
@@ -216,7 +212,6 @@ class ProductPay extends Taro.Component<Props, State> {
         transPayload: payload,
         transResult: result.data
       };
-      console.log('payReceive: ', payReceive);
       store.dispatch({
         type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PAY_DETAIL,
         payload: { payReceive }
@@ -275,7 +270,7 @@ class ProductPay extends Taro.Component<Props, State> {
           <View className={`product-pay-member-layout-container`}>
             <View 
               className={`product-detail-modal-close`}
-              onClick={() => this.changeModalVisible('memberModal', false)}
+              onClick={() => this.changeModalVisible('memberLayout', false)}
             >
               <Image 
                 className={`product-detail-modal-close-image`}

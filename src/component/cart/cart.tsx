@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-29 17:54:07
+ * @Last Modified time: 2019-12-04 11:26:44
  * 
  * @todo [购物车组件]
  */
@@ -10,7 +10,7 @@ import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import "./cart.less";
 import "../product/product.less";
-import { AtFloatLayout, AtBadge } from 'taro-ui';
+import { AtBadge } from 'taro-ui';
 import classnames from 'classnames';
 import { AppReducer } from '../../reducers';
 import { 
@@ -29,6 +29,7 @@ import { ProductInterface } from '../../constants';
 import numeral from 'numeral';
 import merge from 'lodash.merge';
 import invariant from 'invariant';
+import CartLayout from './cart.layout';
 
 const cssPrefix = 'cart';
 
@@ -95,6 +96,10 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce, 
     product: ProductCartInterface.ProductCartInfo
   ) => {
+    if (type === productSdk.productCartManageType.ADD && productSdk.isNonBarcodeProduct(product)) {
+      productSdk.add(product);
+      return;
+    }
     productSdk.manage({type, product});
   }
 
@@ -121,6 +126,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
         icon: 'none'
       });
     }
+    this.onChangeCartListVisible(false);
   }
 
   public emptyCart = () => {
@@ -128,7 +134,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     if (productCartList.length > 0) {
       Taro.showModal({
         title: '提示',
-        content: '确定清空购物车嘛?',
+        content: '确定清空购物车吗?',
         success: () => {
           productSdk.manage({type: productSdk.productCartManageType.EMPTY, product: {} as any});
           this.onChangeCartListVisible(false);
@@ -220,27 +226,23 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     const { cartListVisible } = this.state;
     const { productCartList } = this.props;
     return (
-      <AtFloatLayout
+      <CartLayout
         isOpened={cartListVisible}
+        title={`已选择商品（${productSdk.getProductNumber() || 0}）`}
+        titleRight={'清空购物车'}
+        titleRightIcon="//net.huanmusic.com/weapp/icon_empty.png"
+        titleRightClick={() => this.emptyCart()}
         onClose={() => this.onChangeCartListVisible(false)}
       >
-        <View className="cart-list-header">
-          <View>已选择商品（{productSdk.getProductNumber() || 0}）</View>
-          <View 
-            className="cart-list-header-empty"
-            onClick={() => this.emptyCart()}
-          >
-            <Image src="//net.huanmusic.com/weapp/icon_empty.png" className="cart-list-header-empty-icon" />
-            <Text>清空购物车</Text>
-          </View>
-        </View>
         {
           productCartList.length > 0 && productCartList.map((product) => {
             return (
               <View key={product.id} >
                 <View className={`${cssPrefix}-product`}>
                   <View className={`${cssPrefix}-product-container`}>
-                    <Text className={`${cssPrefix}-product-container-name`}>{product.name}</Text>
+                    <Text className={`${cssPrefix}-product-container-name`}>
+                      {product.name}{product.remark && `（${product.remark}）`}
+                    </Text>
                     <Text className={`${cssPrefix}-product-container-normal`}>
                       <Text className={`${cssPrefix}-product-container-price`}>{product.price}</Text>
                       / {product.unit}
@@ -262,7 +264,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
             );
           })
         }
-      </AtFloatLayout>
+      </CartLayout>
     );
   }
 
@@ -284,7 +286,6 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
           weightCartProduct.changePrice = numeral(weightProductChangePrice).value();
         }
         productSdk.add(weightCartProduct, weightSellNum);
-        console.log('weightCartProduct: ', weightCartProduct);
         this.setState({
           weightProductSellNum: '',
           weightProductChangePrice: ''
@@ -442,4 +443,8 @@ const select = (state: AppReducer.AppState) => ({
   nonBarcodeProduct: getNonBarcodeProduct(state),
 });
 
-export default connect(select)(CartBar as any);
+const selectDispatch = dispatch => ({
+  dispatch,
+});
+
+export default connect(select, selectDispatch)(CartBar as any);

@@ -62,7 +62,7 @@ class MemberMain extends Taro.Component<MemberMainProps> {
   public fetchMemberDetail = (id: string) => {
     MemberAction.memberDetail({id: Number(id)});
     MemberAction.memberPreference({id: Number(id)});
-    MemberAction.memberPreference({id: Number(id)});
+    MemberAction.memberOrderInfo({id: Number(id)});
   }
 
   render () {
@@ -118,7 +118,7 @@ class MemberMain extends Taro.Component<MemberMainProps> {
               </View>
               <View className="home-buttons member-buttons">
                 <View className="member-buttons-button home-buttons-button-border">
-                  <View className="title-text">{numeral(memberOrderInfo.totalAmount || 0).format('0.00')}</View>
+                  <View className="title-text">￥ {numeral(memberOrderInfo.totalAmount || 0).format('0.00')}</View>
                   <View className="small-text">累计消费</View>
                 </View>
                 <View className="member-buttons-button">
@@ -150,7 +150,7 @@ class MemberMain extends Taro.Component<MemberMainProps> {
 
             <View className={`${cssPrefix}-edit`}>
               <AtButton 
-                className="theme-button "
+                className="theme-button"
                 onClick={this.onEditClick}
               >
                 编辑

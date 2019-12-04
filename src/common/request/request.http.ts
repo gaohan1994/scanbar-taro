@@ -24,7 +24,7 @@ class HttpRequest {
     if (result !== '') {
       option.header.Authorization = result;
     }
-    console.log('option: ', option);
+    // console.log('option: ', option);
     return Taro.request(option);
   }
 

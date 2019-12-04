@@ -8,7 +8,7 @@ import moment from 'dayjs';
  * @Author: Ghan 
  * @Date: 2019-11-22 14:20:31 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-29 16:37:04
+ * @Last Modified time: 2019-12-03 13:56:19
  * @todo productsdk
  */
 export declare namespace ProductSDKReducer {
@@ -109,6 +109,8 @@ const initState: ProductSDKReducer.State = {
     createTime: '',
     updateTime: '',
     imgs: [],
+    supplierId: -1,
+    supplierName: '',
   },
   nonBarcodeProduct: {}
 };

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-15 11:17:25 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-28 16:36:52
+ * @Last Modified time: 2019-12-03 14:06:06
  * 
  * @todo [商品管理页面]
  */
@@ -230,22 +230,28 @@ class ProductManage extends Taro.Component<Props, State> {
               onInput={this.onChangeValue}
               placeholderClass={`${memberPrefix}-main-header-search-input-holder`}
             />
-            <View onClick={() => this.onScanProduct()} >
-              <Image src="//net.huanmusic.com/weapp/icon_commodity_scan.png" className={`${memberPrefix}-main-header-search-scan`} />
+            <View
+              onClick={() => this.onScanProduct()}
+              className={`${memberPrefix}-main-header-search-scan`} 
+            >
+              <Image
+                src="//net.huanmusic.com/weapp/icon_commodity_scan.png" 
+                className={`${memberPrefix}-main-header-search-scan`} 
+              />
             </View>
           </View>
           <View 
             className={`${cssPrefix}-header-item`} 
             onClick={() => this.onSelectClick()}
           >
-            <Image src="//net.huanmusic.com/weapp/icon_import.png" className={`${cssPrefix}-header-item-icon`} />
+            <Image src="//net.huanmusic.com/weapp/icon_shaixuan.png" className={`${cssPrefix}-header-item-icon`} />
             <Text className={`${cssPrefix}-header-item-text`}>筛选</Text>
           </View>
           <View
             className={`${cssPrefix}-header-item`}
             onClick={() => this.onAddClick()}
           >
-            <Image src="//net.huanmusic.com/weapp/icon_import.png" className={`${cssPrefix}-header-item-icon`} />
+            <Image src="//net.huanmusic.com/weapp/icon_tianjia.png" className={`${cssPrefix}-header-item-icon`} />
             <Text className={`${cssPrefix}-header-item-text`}>添加</Text>
           </View>
         </View>

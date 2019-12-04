@@ -7,7 +7,6 @@ const customInterceptor = (chain) => {
   const requestParams = chain.requestParams;
 
   return chain.proceed(requestParams).then(res => {
-    console.log('res: ', res);
     if (res.statusCode === HTTP_STATUS.NOT_FOUND) {
       return Promise.reject("请求资源不存在");
 

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:16:32 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-29 16:36:07
+ * @Last Modified time: 2019-12-02 15:09:32
  */
 import requestHttp from "../../common/request/request.http";
 import ProductInterfaceMap, { ProductInterface } from "./product";
@@ -90,8 +90,9 @@ class ProductService {
    *
    * @memberof ProductService
    */
-  public cashierQueryStatus = async (params: ProductInterface.ProductCashierQueryStatus) => {
-    return requestHttp.post(ProductInterfaceMap.cashierQueryStatus, params);
+  public cashierQueryStatus = async (params: ProductInterface.ProductCashierQueryStatus): 
+    Promise<HTTPInterface.ResponseResultBase<ProductCartInterface.QueryStatus>> => {
+    return requestHttp.post(ProductInterfaceMap.cashierQueryStatus(params), '');
   }
 }
 

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-29 15:59:43
+ * @Last Modified time: 2019-12-03 14:12:41
  * 
  * @todo 添加会员页面
  */
@@ -182,7 +182,6 @@ class MemberMain extends Taro.Component<Props, State> {
       if (name !== '') {
         params.username = name;
       }
-      console.log('params: ', params);
       const addResult = await MemberAction.memberAdd({payload: params});
       invariant(addResult.success, addResult.result || ' ');
 
@@ -264,7 +263,7 @@ class MemberMain extends Taro.Component<Props, State> {
     return (
       <ScrollView scrollY={true} className={`container`}>
         <AtMessage />
-        <View className={`container ${cssPrefix}`}>
+        <View className={`container ${cssPrefix} ${cssPrefix}-add`}>
           <FormCard items={memberDetailForm}>
             <Picker 
               mode='date'
