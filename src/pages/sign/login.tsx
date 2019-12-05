@@ -2,16 +2,17 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 10:07:05 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-25 16:29:20
+ * @Last Modified time: 2019-12-05 14:46:22
  */
 import Taro from '@tarojs/taro';
-import { View, Image, Text } from '@tarojs/components';
+import { View, Image, Text, Input } from '@tarojs/components';
 import './style/login.less';
 import classnames from 'classnames';
-import CTInput from '../../component/sign/input/input';
 import { AtButton } from 'taro-ui';
 import { LoginManager } from '../../common/sdk';
 import invariant from 'invariant';
+
+const cssPrefix = 'sign';
 
 type Props = {};
 
@@ -79,14 +80,37 @@ class Login extends Taro.Component<Props, State> {
       });
     }
   }
+  public onChangeValue = (key: string, value: string) => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        [key]: value
+      };
+    });
+    return value;
+  }
 
   render () {
+    const { username } = this.state;
     return (
       <View className={classnames(['container', 'sign'])} >
         <View className="sign-card">
           <View className="sign-card-title">欢迎使用进销存产品</View>
           <View className="sign-card-input">
-            <CTInput
+            <View 
+              className={`${cssPrefix}-input-box`}
+            >
+              <Image src="http://net.huanmusic.com/weapp/icon_login_user.png" className={`${cssPrefix}-input-box-icon`} />
+              <Input
+                className={`${cssPrefix}-input-box-input-input`} 
+                value={username}
+                onInput={({detail: {value}}) => this.onChangeValue('username', value)}
+                placeholder="请输入账号"
+                placeholderStyle="fontSize: 26px; color: #333333"
+                type="number"
+              />
+            </View>
+            {/* <CTInput
               name="username"
               icon="http://net.huanmusic.com/weapp/icon_login_user.png"
               onChange={this.changeUsername}
@@ -94,10 +118,10 @@ class Login extends Taro.Component<Props, State> {
               border={false}
               placeholder="请输入账号"
               autoFocus={true}
-            />
+            /> */}
           </View>
           <View className="sign-card-input">
-            <CTInput
+            {/* <CTInput
               name="username"
               icon="http://net.huanmusic.com/weapp/icon_login_password.png"
               onChange={this.changePassword}
@@ -105,7 +129,7 @@ class Login extends Taro.Component<Props, State> {
               border={false}
               placeholder="请输入密码"
               type="password"
-            />
+            /> */}
           </View>
           <View className={classnames(['sign-card-check'])}>
             {

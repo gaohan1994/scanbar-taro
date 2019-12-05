@@ -2,6 +2,7 @@
 
 @sign-prefix: sign;
 @check-icon-size: 24px;
+@sign-input-box-size: 590px;
 
 .@{sign-prefix} {
   .background-image('//net.huanmusic.com/weapp/bg.png');
@@ -38,6 +39,22 @@
       &-uncheck {
         border-radius: @check-icon-size / 2;
         border: 1px solid #A0A0A0;
+      }
+    }
+  }
+  &-input {
+    &-box {
+      width: @sign-input-box-size;
+      border-radius: 10px;
+      border: 1px solid #EDEDED;
+      .padding(26px, tb);
+      .padding(24px, lr);
+      flex-direction: row;
+      align-items: center;
+      &-icon {
+        width: 43px;
+        height: 43px;
+        .margin(60px, r);
       }
     }
   }
