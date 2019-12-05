@@ -99,15 +99,23 @@ class App extends Component {
       /**
        * @todo [测试页面]
        */
-      'pages/test/test',
-      'pages/test/test.date.picker',
-      'pages/test/test.notice',
-      'pages/test/test.accordion',
-      'pages/test/test.control',
-      'pages/test/test.listview',
-      'pages/test/test.cart',
-      'pages/test/test.modal',
-      'pages/test/test.form',
+    ],
+    subPackages: [
+      {
+        root: 'pages/test/',
+        pages: [
+          'test',
+          'test.date.picker',
+          'test.notice',
+          'test.accordion',
+          'test.control',
+          'test.listview',
+          'test.cart',
+          'test.modal',
+          'test.form',
+          'test.echarts',
+        ],
+      }
     ],
     window: {
       backgroundTextStyle: 'light',
