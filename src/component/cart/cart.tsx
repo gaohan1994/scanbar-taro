@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-04 11:26:44
+ * @Last Modified time: 2019-12-04 15:53:09
  * 
  * @todo [购物车组件]
  */
@@ -135,9 +135,11 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       Taro.showModal({
         title: '提示',
         content: '确定清空购物车吗?',
-        success: () => {
-          productSdk.manage({type: productSdk.productCartManageType.EMPTY, product: {} as any});
-          this.onChangeCartListVisible(false);
+        success: (res) => {
+          if (res.confirm) {
+            productSdk.manage({type: productSdk.productCartManageType.EMPTY, product: {} as any});
+            this.onChangeCartListVisible(false);
+          }
         }
       });
     }
