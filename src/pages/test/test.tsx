@@ -11,6 +11,7 @@ class TestMain extends Taro.Component<Props, any> {
     return (
       <View className={classnames("container")}>
         <AtList>
+          <AtListItem title='Echarts' note="图表" onClick={() => Taro.navigateTo({url: '/pages/test/test.echarts'})} />
           <AtListItem title='Result' note="Result" onClick={() => Taro.navigateTo({url: '/pages/pay/pay.result'})} />
           <AtListItem title='TestCart' note="购物车" onClick={() => Taro.navigateTo({url: '/pages/test/test.cart'})} />
           <AtListItem title='Login' note="跳转到登录" onClick={() => Taro.navigateTo({url: '/pages/sign/login'})} />

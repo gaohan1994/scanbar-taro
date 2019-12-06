@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-03 14:10:24
+ * @Last Modified time: 2019-12-06 14:41:44
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Input, Image, Text } from '@tarojs/components';
@@ -11,11 +11,12 @@ import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
 import { MemberInterface } from '../../constants';
 import '../../component/card/form.card.less';
-import './style/member.less';
+import '../style/member.less';
 import invariant from 'invariant';
 import { AtActivityIndicator } from 'taro-ui';
 import classnames from 'classnames';
-import "../product/style/product.less";
+import "../style/product.less";
+import { getMemberList } from '../../reducers/app.member';
 
 const cssPrefix = 'member';
 
@@ -23,7 +24,8 @@ let pageNum: number = 1;
 const pageSize: number = 20;
 
 interface MemberMainProps { 
-  memberListByDate: MemberInterface.MemberListByDate[];
+  // memberListByDate: MemberInterface.MemberListByDate[];
+  memberList: MemberInterface.MemberInfo[];
 }
 
 interface State {
@@ -215,13 +217,14 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
 
   render () {
     const { loading, refreshing } = this.state;
-    const { memberListByDate } = this.props;
+    const { memberList } = this.props;
     return (
       <View className={`container ${cssPrefix}-main`}>
         <View className={`${cssPrefix}-main-header`}>
           <View className={`${cssPrefix}-main-header-search`}>
             <Image src="//net.huanmusic.com/weapp/icon_search.png" className={`${cssPrefix}-main-header-search-icon`} />
             <Input 
+              cursorSpacing={300}
               className={`${cssPrefix}-main-header-search-input`} 
               placeholder="请输入手机号/姓名"
               placeholderClass={`${cssPrefix}-main-header-search-input-holder`}
@@ -251,36 +254,28 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
                 <AtActivityIndicator mode='center' />
               </View>
             )}
-            {memberListByDate && memberListByDate.length > 0 ? (
-              memberListByDate.map((dateList) => {
-                return (
-                  <View 
-                    key={dateList.date}
-                    className={classnames('component-form', {
-                      'component-form-shadow': true,
-                      [`${cssPrefix}-list-form`]: true
-                    })}
-                  >
-                    <View className={`${cssPrefix}-card-header ${cssPrefix}-card-row-border`}>{dateList.date}</View>
-                    {
-                      dateList.data.map((member, index) => {
-                        return (
-                          <View
-                            key={member.id}
-                            className={classnames(`${cssPrefix}-card-row`, {
-                              [`${cssPrefix}-card-row-border`]: index !== dateList.data.length - 1
-                            })}
-                            onClick={() => {Taro.navigateTo({url: `/pages/member/member.detail?id=${member.id}`})}}
-                          >
-                            <Text className={`${cssPrefix}-card-text`}>姓名：{member.username}</Text>
-                            <Text className={`${cssPrefix}-card-row-margin ${cssPrefix}-card-text`}>手机号：{member.phoneNumber}</Text>
-                          </View>
-                        );
-                      })
-                    }
-                  </View>
-                );
-              })
+            {memberList.length > 0 ? (
+              <View 
+                className={classnames('component-form', {
+                  'component-form-shadow': true,
+                  [`${cssPrefix}-list-form`]: true
+                })}
+              >
+                {memberList.map((member, index) => {
+                  return (
+                    <View
+                      key={member.id}
+                      className={classnames(`${cssPrefix}-card-row`, {
+                        [`${cssPrefix}-card-row-border`]: index !== memberList.length - 1
+                      })}
+                      onClick={() => {Taro.navigateTo({url: `/pages/member/member.detail?id=${member.id}`})}}
+                    >
+                      <Text className={`${cssPrefix}-card-text`}>姓名：{member.username}</Text>
+                      <Text className={`${cssPrefix}-card-row-margin ${cssPrefix}-card-text`}>手机号：{member.phoneNumber}</Text>
+                    </View>
+                  );
+                })}
+              </View>
             ) : (
               <View>暂无数据</View>
             )}
@@ -291,9 +286,6 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
             )}
           </ScrollView>
         </View>
-        {/* <View className={`${cssPrefix}-list-container`}>
-          
-        </View> */}
       </View>
     );
   }
@@ -301,10 +293,11 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
 
 const mapState = (state: AppReducer.AppState) => {
   return {
-    memberListByDate: 
-      state.member.memberList && state.member.memberList.data 
-      ? MemberAction.fliterDataByDate(state.member.memberList.data) 
-      : []
+    // memberListByDate: 
+    //   state.member.memberList && state.member.memberList.data 
+    //   ? MemberAction.fliterDataByDate(state.member.memberList.data) 
+    //   : []
+    memberList: getMemberList(state).data || [],
   };
 };
 

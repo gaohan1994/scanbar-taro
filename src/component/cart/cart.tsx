@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-04 15:53:09
+ * @Last Modified time: 2019-12-06 15:22:12
  * 
  * @todo [购物车组件]
  */
@@ -10,7 +10,6 @@ import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import "./cart.less";
 import "../product/product.less";
-import { AtBadge } from 'taro-ui';
 import classnames from 'classnames';
 import { AppReducer } from '../../reducers';
 import { 
@@ -30,6 +29,7 @@ import numeral from 'numeral';
 import merge from 'lodash.merge';
 import invariant from 'invariant';
 import CartLayout from './cart.layout';
+import Badge from '../badge/badge';
 
 const cssPrefix = 'cart';
 
@@ -165,12 +165,12 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
             <View className="cart-icon" onClick={() => this.onChangeCartListVisible()} >
               {
                 productCartList.length > 0 ? (
-                  <AtBadge 
+                  <Badge 
                     value={productSdk.getProductNumber()}
                     className="component-cart-bge"
                   >
                     <Image src="//net.huanmusic.com/weapp/icon_cart(1).png" className="cart-icon-image" />
-                  </AtBadge>
+                  </Badge>
                 ) : (
                   <Image src="//net.huanmusic.com/weapp/icon_cart_unselected.png" className="cart-icon-image" />
                 )
@@ -186,9 +186,9 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                 ￥{numeral(productSdk.getProductPrice()).format('0.00')}
               </View>
                 
-              {/* {
+              {
                 suspensionCartList.length > 0 ? (
-                  <AtBadge value={suspensionCartList.length}>
+                  <Badge value={suspensionCartList.length}>
                     <View 
                       className={classnames(`${cssPrefix}-left-suspension`, {
                         [`${cssPrefix}-left-suspension-active`]: productCartList.length > 0,
@@ -198,19 +198,19 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                     >
                       挂单
                     </View>
-                  </AtBadge>
+                  </Badge>
                 ) : (
                   <View 
                     className={classnames(`${cssPrefix}-left-suspension`, {
                       [`${cssPrefix}-left-suspension-active`]: productCartList.length > 0,
                       [`${cssPrefix}-left-suspension-disabled`]: productCartList.length === 0,
                     })}
-                    onClick={() => this.onSuspensionCart()}
+                    // onClick={() => this.onSuspensionCart()}
                   >
                     挂单
                   </View>
                 )
-              } */}
+              }
             </View>
             <View 
               className={buttonClassNames}
@@ -240,13 +240,13 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
           productCartList.length > 0 && productCartList.map((product) => {
             return (
               <View key={product.id} >
-                <View className={`${cssPrefix}-product`}>
-                  <View className={`${cssPrefix}-product-container`}>
+                <View className={`${cssPrefix}-product ${cssPrefix}-product-border`}>
+                  <View className={`${cssPrefix}-product-container `}>
                     <Text className={`${cssPrefix}-product-container-name`}>
                       {product.name}{product.remark && `（${product.remark}）`}
                     </Text>
                     <Text className={`${cssPrefix}-product-container-normal`}>
-                      <Text className={`${cssPrefix}-product-container-price`}>{product.price}</Text>
+                      <Text className={`${cssPrefix}-product-container-price`}>{`￥ ${product.price}`}</Text>
                       / {product.unit}
                     </Text>
                     <View className={`${cssPrefix}-product-stepper`}>      
@@ -344,6 +344,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     const nonBarcodeForm: FormRowProps[] = [
       {
         title: '价格（￥）',
+        main: true,
         isInput: true,
         inputType: 'digit',
         inputValue: nonBarcodePrice,
@@ -353,6 +354,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       {
         title: `备注`,
         isInput: true,
+        hasBorder: false,
         inputValue: nonBarcodeRemark,
         inputOnChange: (value) => this.onChangeValue('nonBarcodeRemark', value),
         inputPlaceHolder: '请输入备注信息'
@@ -367,7 +369,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       {
         title: '确定',
         type: 'confirm',
-        onPress: () => this.onNonBarcodeConfirm()
+        onPress: () => this.onNonBarcodeConfirm(),
       },
     ];
     const isOpen = nonBarcodeProduct !== undefined && typeof nonBarcodeProduct.id === 'string';

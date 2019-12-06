@@ -3,7 +3,7 @@ import { View, Image, Picker } from '@tarojs/components';
 import { ProductAction } from '../../actions';
 import invariant from 'invariant';
 import { ResponseCode, ProductInterface, ProductService } from '../../constants/index';
-import './style/product.less';
+import '../style/product.less';
 import { AppReducer } from '../../reducers';
 import { getProductDetail, getProductType, getProductSupplier } from '../../reducers/app.product';
 import { connect } from '@tarojs/redux';
@@ -437,6 +437,7 @@ class ProductDetail extends Taro.Component<Props, State> {
     const formName: FormRowProps[] = [
       {
         title: '条码',
+        main: true,
         isInput: true,
         inputValue: productChangeDetail.barcode,
         inputOnChange: (value) => this.onValueChange('barcode', value),
@@ -452,6 +453,7 @@ class ProductDetail extends Taro.Component<Props, State> {
       },
       {
         title: '名称',
+        main: true,
         isInput: true,
         inputValue: productChangeDetail.name,
         inputOnChange: (value) => this.onValueChange('name', value),
@@ -488,7 +490,8 @@ class ProductDetail extends Taro.Component<Props, State> {
       {
         title: '库存下限预警',
         extraText: `${numeral(productChangeDetail.limitNum || productDetail.limitNum).value()}`,
-        onClick: () => this.changeModalVisible('numberLimitModalVisible', true)
+        onClick: () => this.changeModalVisible('numberLimitModalVisible', true),
+        hasBorder: false,
       },
     ];
     const formPrice: FormRowProps[] = [

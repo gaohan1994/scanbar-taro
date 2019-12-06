@@ -29,86 +29,82 @@ class App extends Component {
        * @todo [首页相关页面]
        */
       'pages/home/home',
-
-      /**
-       * @todo [开单页面]
-       * @todo [商品管理页面]
-       * 
-       * @todo [商品详情]
-       * ```js
-       * Taro.navigateTo({
-       *  url: `/pages/product/product.detail?id=${product.id}`
-       * });
-       * ```
-       */
-      'pages/product/product.order',
-      'pages/product/product.pay',
-      'pages/product/product.manage',
-      'pages/product/product.detail',
-      'pages/product/product.add',
-      'pages/product/product.suspension',
-
-      /**
-       * @todo [sign相关页面]
-       */
-      'pages/sign/login',
-
-      /**
-       * @todo [报表相关页面]
-       */
-      'pages/report/report',
-
-      /**
-       * @todo [我的相关页面]
-       */
-      'pages/user/user',
-
-      /**
-       * @todo [会员相关]
-       */
-      'pages/member/member',
-      'pages/member/member.add',
-      /**
-       * @param {id} number
-       * 
-       * ```js
-       * Taro.navigateTo({url: 'pages/member/member.detail?id=1',});
-       * ```
-       */
-      'pages/member/member.detail',
-      /**
-       * @param {id} number
-       * 
-       * ```js
-       * Taro.navigateTo({url: 'pages/member/member.edit?id=1',});
-       * ```
-       */
-      'pages/member/member.edit',
-
-      /**
-       * @todo [支付相关]
-       * ```js
-       * Taro.navigateTo({
-       *  url: `/pages/pay/pay.receive`
-       * })
-       * ```
-       */
-      'pages/pay/pay.input',
-      'pages/pay/pay.receive',
-      'pages/pay/pay.result',
-      /**
-       * @todo [测试页面]
-       */
-      'pages/test/test',
-      'pages/test/test.date.picker',
-      'pages/test/test.notice',
-      'pages/test/test.accordion',
-      'pages/test/test.control',
-      'pages/test/test.listview',
-      'pages/test/test.cart',
-      'pages/test/test.modal',
-      'pages/test/test.form',
+      "pages/report/report",
+      "pages/user/user",
     ],
+    subPackages: [
+      {
+        root: 'pages/pay',
+        pages: [
+          'pay.input',
+          'pay.receive',
+          'pay.result',
+        ],
+      },
+      {
+        /**
+         * @param {id} number
+         * 
+         * ```js
+         * Taro.navigateTo({url: 'pages/member/member.detail?id=1',});
+         * Taro.navigateTo({url: 'pages/member/member.edit?id=1',});
+         * ```
+         */
+        root: 'pages/member',
+        pages: [
+          'member',
+          'member.add',
+          'member.detail',
+          'member.edit',
+        ],
+      },
+      {
+        root: 'pages/sign',
+        pages: [
+          'login'
+        ]
+      },
+      {
+        /**
+         * @todo [商品详情]
+         * 
+         * @todo [开单页面]
+         * @todo [商品管理页面]
+         * ```js
+         * Taro.navigateTo({
+         *    url: `/pages/product/product.detail?id=${product.id}`
+         * });
+         * ```
+         */
+        root: 'pages/product',
+        pages: [
+          'product.order',
+          'product.pay',
+          'product.manage',
+          'product.detail',
+          'product.add',
+          'product.suspension',
+        ],
+      },
+      {
+        /**
+         * @todo [测试页面]
+         */
+        root: 'pages/test/',
+        pages: [
+          'test',
+          'test.date.picker',
+          'test.notice',
+          'test.accordion',
+          'test.control',
+          'test.listview',
+          'test.cart',
+          'test.modal',
+          'test.form',
+          'test.echarts',
+        ],
+      }
+    ], 
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#2a86fc',

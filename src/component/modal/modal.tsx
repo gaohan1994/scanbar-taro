@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-04 13:49:58 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-29 15:29:45
+ * @Last Modified time: 2019-12-06 14:15:41
  * 
  * @Usage
  * ```jsx
@@ -94,7 +94,7 @@ class Modal extends Taro.Component<Props, State> {
                         'component-modal-cancel-button': button.type === 'cancel' ? true : false,
                       })}
                     >
-                      {button.title}
+                      <Text className="component-modal-confirm-button-text">{button.title}</Text>
                     </AtButton>
                   );
                 })

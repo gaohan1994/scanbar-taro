@@ -5,7 +5,8 @@ import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer
 import { connect } from '@tarojs/redux';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import "../../component/card/form.card.less";
-import './style/product.less';
+import '../style/product.less';
+import '../../styles/theme.less';
 import classnames from 'classnames';
 import FormCard from '../../component/card/form.card';
 import { FormRowProps } from '../../component/card/form.row';
@@ -237,13 +238,8 @@ class ProductPay extends Taro.Component<Props, State> {
     return (
       <View className='container'>
         <View className={`${cssPrefix}-pay-container ${cssPrefix}-pay`} >
-          {/* <ScrollView 
-            scrollY={true}
-            className={`${cssPrefix}-pay-list`}
-          > */}
-            {this.renderListProductCard()}
-            {this.renderListDetail()}
-          {/* </ScrollView> */}
+          {this.renderListDetail()}
+          {this.renderListProductCard()}
         </View>
         {this.renderFooter()}
         {this.renderEraseModal()}
@@ -370,8 +366,10 @@ class ProductPay extends Taro.Component<Props, State> {
               'component-form-shadow': true
             })}
           >
+            <View>{`金额：￥${numeral(productSdk.getProductPrice() - productSdk.getProductMemberPrice()).format('0.00')}`}</View>
             <View className={`${cssPrefix}-pay-member-input`}>
               <Input 
+                cursorSpacing={300}
                 className={`${cssPrefix}-pay-member-input-box`}
                 placeholder="请输入卡号、手机号"
                 value={memberValue}
@@ -586,7 +584,7 @@ class ProductPay extends Taro.Component<Props, State> {
               className={`${cssPrefix}-pay-footer-left-item`}
               onClick={() => this.changeModalVisible('eraseModal', true)}
             >
-              <Image src='//net.huanmusic.com/weapp/icon_molin.png' className={`${cssPrefix}-pay-footer-left-item-icon`} />
+              <Image src='//net.huanmusic.com/weapp/icon_molin.png' className={`${cssPrefix}-pay-footer-left-item-erase`} />
               <Text className={`${cssPrefix}-pay-footer-left-item-font`}>{eraseValue === '' ? '抹零' : '已抹零'}</Text>
             </View>
           </View>

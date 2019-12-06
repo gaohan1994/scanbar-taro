@@ -5,7 +5,6 @@ import { ProductInterface } from '../../constants';
 import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
 import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
-import { AtButton } from 'taro-ui';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import classnames from 'classnames';
 
@@ -33,12 +32,8 @@ class ProductComponent extends Taro.Component<Props> {
             ) : (
               <Image src="//net.huanmusic.com/weapp/img_nolist.png" className={`${cssPrefix}-content-cover-image`} />
             )}
-            
           </View>
           <View className={`${cssPrefix}-content-detail`}>
-            {/* <View className={`${cssPrefix}-content-title-box`}>
-              
-            </View> */}
             <View className={`${cssPrefix}-title`}>{product.name}</View>
             <Text className={`${cssPrefix}-normal`}>
               <Text className={`${cssPrefix}-price-bge`}>￥</Text>
@@ -46,7 +41,6 @@ class ProductComponent extends Taro.Component<Props> {
               /{product.unit}
             </Text>
           </View>
-
           {this.renderStepper()}
         </View>
       </View>

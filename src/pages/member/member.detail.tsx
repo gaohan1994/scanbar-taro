@@ -2,12 +2,12 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-27 16:43:40
+ * @Last Modified time: 2019-12-06 14:31:30
  */
 import Taro from '@tarojs/taro';
-import { View, ScrollView, Image } from '@tarojs/components';
-import "./style/member.less";
-import "../home/style/home.less";
+import { View, ScrollView, Image, Text } from '@tarojs/components';
+import "../style/member.less";
+import "../style/home.less";
 import { Card } from '../../component/common/card/card.common';
 import FormCard from '../../component/card/form.card';
 import FormRow, { FormRowProps } from '../../component/card/form.row';
@@ -73,6 +73,21 @@ class MemberMain extends Taro.Component<MemberMainProps> {
         extraText: memberDetail.createTime
       }
     ];
+    const form4: FormRowProps[] = [
+      {
+        title: '积分',
+        extraText: ''
+      },
+      {
+        title: '储值余额',
+        extraText: '',
+      },
+      {
+        title: '优惠券',
+        extraText: '',
+        hasBorder: false
+      },
+    ];
     const form2: FormRowProps[] = [
       {
         title: '卡号',
@@ -84,7 +99,8 @@ class MemberMain extends Taro.Component<MemberMainProps> {
       },
       {
         title: '生日',
-        extraText: memberDetail.birthDate
+        extraText: memberDetail.birthDate,
+        hasBorder: false
       },
     ];
     const form3: FormRowProps[] = [
@@ -94,7 +110,8 @@ class MemberMain extends Taro.Component<MemberMainProps> {
       },
       {
         title: '会员状态',
-        extraText: memberDetail.status === 0 ? '正常' : '注销'
+        extraText: memberDetail.status === 0 ? '正常' : '注销',
+        hasBorder: false
       },
     ];
     return (
@@ -128,7 +145,7 @@ class MemberMain extends Taro.Component<MemberMainProps> {
               </View>
             </Card>
             <FormCard items={form1} >
-              <FormRow title="消费偏好">
+              <FormRow title="消费偏好" hasBorder={false}>
                 {
                   memberPerference.length > 0 && (
                     memberPerference.map((perference) => {
@@ -145,6 +162,7 @@ class MemberMain extends Taro.Component<MemberMainProps> {
                 }
               </FormRow>
             </FormCard>
+            <FormCard items={form4} />
             <FormCard items={form2} />
             <FormCard items={form3} />
 
@@ -153,8 +171,17 @@ class MemberMain extends Taro.Component<MemberMainProps> {
                 className="theme-button"
                 onClick={this.onEditClick}
               >
-                编辑
+                <Text className="theme-button-text">编辑</Text>
               </AtButton>
+
+              <View className={`${cssPrefix}-edit-button-view`} />
+              <AtButton 
+                className="theme-button"
+                onClick={() => {}}
+              >
+                <Text className="theme-button-text">会员充值</Text>
+              </AtButton>
+              <View className={`${cssPrefix}-edit-button-view`} />
             </View>
           </View>
         )}

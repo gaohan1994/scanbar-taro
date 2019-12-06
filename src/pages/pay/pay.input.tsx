@@ -2,7 +2,7 @@ import Taro from '@tarojs/taro';
 import { View, Input } from '@tarojs/components';
 import '../../component/card/form.card.less';
 import classnames from 'classnames';
-import "./style/pay.less";
+import "../style/pay.less";
 import productSdk from '../../common/sdk/product/product.sdk';
 import numeral from 'numeral';
 import invariant from 'invariant';
@@ -74,6 +74,7 @@ class PayInput extends Taro.Component<Props, State> {
             <View className={`${cssPrefix}-input-box-input`}>
               <View className={`${cssPrefix}-input-box-input-money`}>￥</View>
               <Input 
+                cursorSpacing={300}
                 className={`${cssPrefix}-input-box-input-input`} 
                 value={inputValue}
                 onInput={({detail: {value}}) => this.onChangeValue(value)}

@@ -64,6 +64,8 @@
   &-title {
     width: @product-content-width;
     font-size: @product-title-font;
+    line-height: @product-title-font;
+    height: @product-title-font * 2;
     color: @product-title-color;
     font-weight: bold;
     display: -webkit-box;
@@ -81,6 +83,7 @@
     font-size: @product-price-font + 14px;
     color: @product-price-color;
     font-weight: bold;
+    .margin(6px, r);
     &-bge {
       font-size: @product-price-font;
       color: @product-price-color;

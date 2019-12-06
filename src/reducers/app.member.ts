@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-11 10:23:20 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-29 11:00:00
+ * @Last Modified time: 2019-12-06 14:38:06
  */
 import merge from 'lodash.merge';
 import { MemberInterface, MemberInterfaceMap } from '../constants';
@@ -119,3 +119,5 @@ export const getMemberPerference = (state: AppReducer.AppState) => state.member.
 export const getMemberOrderInfo = (state: AppReducer.AppState) => state.member.memberOrderInfo;
 
 export const getSelectMember = (state: AppReducer.AppState) => state.member.selectMember;
+
+export const getMemberList = (state: AppReducer.AppState) => state.member.memberList;

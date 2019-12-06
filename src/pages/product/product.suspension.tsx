@@ -2,13 +2,13 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-03 14:34:51
+ * @Last Modified time: 2019-12-06 11:58:59
  * 
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView } from '@tarojs/components';
-import "./style/product.less";
-import "../member/style/member.less";
+import "../style/product.less";
+import "../style/member.less";
 import CartBar from '../../component/cart/cart';
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';

@@ -28,6 +28,10 @@ const config = {
   },
   copy: {
     patterns: [
+      {
+          from: 'ecahrts.js',
+          to: `dist/npm/echarts12/dist/${process.env.TARO_ENV}/components/echart/echarts.js`,
+      }
     ],
     options: {
     }

@@ -1,4 +1,4 @@
-@import "../../../styles/theme.less";
+@import "../../styles/theme.less";
 
 @pay-prefix: pay;
 @pay-receive-image-size: 58px;
@@ -32,7 +32,7 @@
           color: #ffffff;
         }
         &-active {
-          border-bottom: 3px solid #ffffff;
+          border-bottom: 4px solid #ffffff;
         }
       }
     }
@@ -49,6 +49,11 @@
         .margin(50px, t);
         &-button {
           .margin(34px, t);
+        }
+        &-box {
+          .margin(18px, t);
+          border-radius: 20px;
+          background-color: #ffffff;
         }
       }
       &-code {
@@ -109,7 +114,7 @@
         }
         &-input {
           width: 100%;
-          font-size: 40px;
+          font-size: 50px;
           color: #444444;
           font-weight: bold;
           &-placeholder {

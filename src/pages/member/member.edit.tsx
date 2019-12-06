@@ -2,11 +2,11 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-28 18:55:55
+ * @Last Modified time: 2019-12-06 14:32:54
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Picker } from '@tarojs/components';
-import "./style/member.less";
+import "../style/member.less";
 import FormCard from '../../component/card/form.card';
 import { FormRowProps } from '../../component/card/form.row';
 import { AtButton, AtMessage } from 'taro-ui';
@@ -240,6 +240,7 @@ class MemberMain extends Taro.Component<Props, State> {
       },
       {
         title: '性别',
+        hasBorder: false,
         buttons: [
           {
             title: '先生',
@@ -261,7 +262,8 @@ class MemberMain extends Taro.Component<Props, State> {
       },
       {
         title: '开卡时间',
-        extraText: this.state.createTime
+        extraText: this.state.createTime,
+        hasBorder: false
       },
     ];
     const memberStatusForm: FormRowProps[] = [
@@ -278,7 +280,8 @@ class MemberMain extends Taro.Component<Props, State> {
             type: this.state.memberStatus !== true ? 'confirm' : 'cancel',
             onPress: () => this.onChangeMemberStatus(false)
           }
-        ]
+        ],
+        hasBorder: false
       },
     ];
     return (
@@ -297,7 +300,6 @@ class MemberMain extends Taro.Component<Props, State> {
               />
             </Picker>
           </FormCard>
-          <FormCard items={memberStoreDetail} />
           <FormCard items={memberStatusForm} />
 
           <View className={`${cssPrefix}-edit`}>

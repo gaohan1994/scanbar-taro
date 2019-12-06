@@ -2,14 +2,14 @@
  * @Author: Ghan 
  * @Date: 2019-11-15 11:17:25 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-03 14:06:06
+ * @Last Modified time: 2019-12-06 11:59:32
  * 
  * @todo [商品管理页面]
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Input, ScrollView, Text } from '@tarojs/components';
-import "./style/product.less";
-import "../member/style/member.less";
+import "../style/product.less";
+import "../style/member.less";
 import { ProductAction } from '../../actions';
 import { ResponseCode, ProductInterface, ProductService } from '../../constants/index';
 import invariant from 'invariant';
@@ -224,6 +224,7 @@ class ProductManage extends Taro.Component<Props, State> {
           <View className={`${memberPrefix}-main-header-search ${cssPrefix}-header-search`}>
             <Image src="//net.huanmusic.com/weapp/icon_import.png" className={`${memberPrefix}-main-header-search-icon`} />
             <Input
+              cursorSpacing={300}
               className={`${memberPrefix}-main-header-search-input`} 
               placeholder="请输入商品名称或条码"
               value={searchValue}
@@ -244,8 +245,8 @@ class ProductManage extends Taro.Component<Props, State> {
             className={`${cssPrefix}-header-item`} 
             onClick={() => this.onSelectClick()}
           >
-            <Image src="//net.huanmusic.com/weapp/icon_shaixuan.png" className={`${cssPrefix}-header-item-icon`} />
-            <Text className={`${cssPrefix}-header-item-text`}>筛选</Text>
+            <Image src="//net.huanmusic.com/weapp/icon_shaixuan.png" className={`${cssPrefix}-header-item-icon-select`} />
+            <Text className={`${cssPrefix}-header-item-text ${cssPrefix}-header-item-text-select`}>筛选</Text>
           </View>
           <View
             className={`${cssPrefix}-header-item`}
@@ -348,7 +349,14 @@ class ProductManage extends Taro.Component<Props, State> {
                         }
                       )}
                     >
-                      {supplier.name}
+                      <Text
+                        className={classnames({
+                          'product-manage-select-modal-button-confirm-text': selectSupplierId === supplier.id,
+                          'product-manage-select-modal-button-cancel-text': selectSupplierId !== supplier.id,
+                        })}
+                      >
+                        {supplier.name}
+                      </Text>
                     </AtButton>
                   );
                 })
@@ -369,7 +377,14 @@ class ProductManage extends Taro.Component<Props, State> {
                   }
                 )}
               >
-                启用
+                <Text 
+                  className={classnames({
+                    'product-manage-select-modal-button-confirm-text': selectStatus === 0,
+                    'product-manage-select-modal-button-cancel-text': selectStatus !== 0,
+                  })}
+                >
+                  启用
+                </Text>
               </AtButton>
               <AtButton
                 type="primary"
@@ -382,7 +397,14 @@ class ProductManage extends Taro.Component<Props, State> {
                   }
                 )}
               >
-                停用
+                <Text
+                  className={classnames({
+                    'product-manage-select-modal-button-confirm-text': selectStatus === 1,
+                    'product-manage-select-modal-button-cancel-text': selectStatus !== 1
+                  })}
+                >
+                  停用
+                </Text>
               </AtButton>
             </View>
           </View>
@@ -393,14 +415,14 @@ class ProductManage extends Taro.Component<Props, State> {
               onClick={() => this.reset()}
               className={`product-manage-select-modal-button-reset`}
             >
-              重置
+              <Text className={`product-manage-select-modal-button-reset-text`}>重置</Text>
             </AtButton>
             <AtButton
               type="primary"
               onClick={() => this.submit()}
               className={`product-manage-select-modal-button-submit`}
             >
-              确定
+              <Text className={`product-manage-select-modal-button-submit-text`}>确定</Text>
             </AtButton>
           </View>
         </View>

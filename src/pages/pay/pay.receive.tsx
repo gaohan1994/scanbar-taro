@@ -2,12 +2,12 @@
  * @Author: Ghan 
  * @Date: 2019-11-12 14:01:28 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-04 14:34:31
+ * @Last Modified time: 2019-12-06 15:40:28
  */
 import Taro from '@tarojs/taro';
-import { View, Image, Text } from '@tarojs/components';
-import "./style/pay.less";
-import '../product/style/product.less';
+import { View, Image, Text, Input } from '@tarojs/components';
+import "../style/pay.less";
+import '../style/product.less';
 import classnames from 'classnames';
 import { AtActivityIndicator, AtButton } from 'taro-ui';
 import FormCard from '../../component/card/form.card';
@@ -26,11 +26,11 @@ import { store } from '../../app';
 const Items = [
   {
     title: '收款码',
-    image: '//net.huanmusic.com/weapp/cash.png',
+    image: '//net.huanmusic.com/weapp/icon_receipt.png',
     tab: 'receive',
   },
   {
-    title: '收款码',
+    title: '扫一扫',
     image: '//net.huanmusic.com/weapp/icon_sao.png',
     tab: 'scan',
   },
@@ -60,7 +60,7 @@ class PayReceive extends Taro.Component<Props, State> {
     }
   };
   
-  readonly state: State = {
+  state: State = {
     tab: 'receive',
     receiveCash: '',
   };
@@ -278,7 +278,7 @@ class PayReceive extends Taro.Component<Props, State> {
    * @memberof PayReceive
    */
   private renderContent = () => {
-    const { tab } = this.state;
+    const { tab, receiveCash } = this.state;
     const { payDetail } = this.props;
 
     if (tab === 'receive') {
@@ -302,8 +302,6 @@ class PayReceive extends Taro.Component<Props, State> {
         </View>
       );
     } else if (tab === 'cash') {
-      const { receiveCash } = this.state;
-      const { payDetail } = this.props;
       if (payDetail.transPayload) {
         const cashForm: FormRowProps[] = [
           {
@@ -312,6 +310,8 @@ class PayReceive extends Taro.Component<Props, State> {
           },
           {
             title: '找零金额',
+            hasBorder: false,
+            extraTextStyle: 'price',
             extraText: !!receiveCash 
               ? `￥${numeral(
                 numeral(receiveCash).value() - numeral(payDetail.transPayload.order.transAmount).value() > 0 
@@ -320,17 +320,48 @@ class PayReceive extends Taro.Component<Props, State> {
               ).format('0.00')}` 
               : '',
           },
-          {
-            title: '收款',
-            isInput: true,
-            inputType: 'digit',
-            inputValue: receiveCash,
-            inputOnChange: this.onChangeCash
-          }
+          // {
+          //   title: '收款',
+          //   isInput: true,
+          //   inputType: 'digit',
+          //   inputValue: receiveCash,
+          //   inputOnChange: this.onChangeCash
+          // }
         ];
         return (
           <View className={`${cssPrefix}-receive-content-cash`}>
             <FormCard items={cashForm} shadow={false} />
+
+            {/* <View className={`${cssPrefix}-receive-content-cash-box`}>
+              <View className={`${cssPrefix}-receive-content-cash-box-title`}>收款金额</View>
+              <View className={`${cssPrefix}-receive-content-cash-box-container`}>
+                <View>￥</View>
+                <Input 
+                  cursorSpacing={300}
+                  type="digit"
+                  value={receiveCash}
+                  onInput={({detail: {value}}) => this.onChangeCash(value)}
+                  className={`${cssPrefix}-receive-content-cash-box-container-input`}
+                  placeholderClass={`${cssPrefix}-receive-content-cash-box-container-input-place`}
+                />
+              </View>
+            </View> */}
+            <View className={`${cssPrefix}-input-box ${cssPrefix}-receive-content-cash-box`}>
+              <View className={`${cssPrefix}-input-box-title`}>收款金额</View>
+              <View className={`${cssPrefix}-input-box-input`}>
+                <View className={`${cssPrefix}-input-box-input-money`}>￥</View>
+                <Input 
+                  cursorSpacing={300}
+                  className={`${cssPrefix}-input-box-input-input`} 
+                  value={receiveCash}
+                  onInput={({detail: {value}}) => this.onChangeCash(value)}
+                  placeholder="请输入收款金额"
+                  placeholderClass={`${cssPrefix}-input-box-input-input-placeholder`}
+                  type="number"
+                />
+              </View>
+            </View>
+
             <View className={`${cssPrefix}-receive-content-cash-button`}>
               <AtButton 
                 className="theme-pay-button"

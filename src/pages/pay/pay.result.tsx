@@ -1,6 +1,6 @@
 import Taro from '@tarojs/taro';
 import { View, Image } from '@tarojs/components';
-import "./style/pay.less";
+import "../style/pay.less";
 import { AtButton, AtActivityIndicator } from 'taro-ui';
 import { connect } from '@tarojs/redux';
 import { getPayReceive } from '../../reducers/app.pay';

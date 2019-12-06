@@ -1,11 +1,11 @@
-@import "../../../styles/theme.less";
-@import "../../../component/cart/cart.less";
-@import "../../member/style/member.less";
-@import "../../home/style/home.less";
+@import "../../styles/theme.less";
+@import "../../component/cart/cart.less";
+@import "./member.less";
+@import "./home.less";
 
 @product-prefix: product;
 @product-search-width: 550px;
-@product-header-height: 20px + 20px + 60px;
+@product-header-height: 20px + 20px + 60px + 6px;
 @product-header-zindex: 100;
 @product-list-left-bg-color: #f6f6f6;
 @product-list-type-height: 94px;
@@ -31,8 +31,8 @@
       color: @theme-color;
       background-color: #ffffff;
       height: 60px;
-      .padding(18px, lr);
-      .flex(center, center);
+      width: 147px;
+      .flex(center, center, row);
       border-radius: 30px;
       font-size: @normal-text-fontsize;
     }
@@ -44,10 +44,18 @@
       &-icon {
         width: 34px;
         height: 34px;
+        &-select {
+          .margin(2px, t);
+          width: 40px;
+          height: 26px;
+        }
       }
       &-text {
         font-size: 24px;
         color: #ffffff;
+        &-select {
+          .margin(6px, t);
+        }
       }
     }
   }
@@ -76,7 +84,7 @@
           &-bge {
             position: absolute;
             height: @product-list-type-height;
-            width: 2px;
+            width: 6px;
             left: 0;
             top: 0;
             bottom: 0;
@@ -90,13 +98,14 @@
       flex-direction: column;
       flex: 1;
       &-header {
+        border-bottom: 1px solid #f9f9f9;
         .padding(20px);
         display: flex;
         flex-direction: row;
         align-items: center;
         &-bge {
           background-color: @theme-color;
-          width: 2px;
+          width: 6px;
           height: 28px;
           .margin(10px, r);
         }
@@ -109,12 +118,12 @@
     }
     &-section {
       background-color: @product-section-color;
-      .padding(20px, tb);
+      .padding(16px, tb);
       .padding(25px, lr);
       .flex(center, flex-start, row);
       &-icon {
         height: 28px;
-        width: 4px;
+        width: 6px;
         background-color: @theme-color;
         .margin(12px, r);
       }
@@ -167,7 +176,7 @@
       }
     }
     &-border {
-      border-bottom: 1px solid #f9f9f9;;
+      border-bottom: 1px solid #f9f9f9;
     }
     &-form {
       .flex(center, space-around, row);
@@ -229,6 +238,7 @@
     }
   }
   &-add {
+    background-color: #f6f6f6;
     &-buttons {
       .margin(60px, tb);
       .flex(center, space-between, row);
@@ -251,6 +261,8 @@
   }
   
   &-pay {
+    height: 100%;
+    background-color: #f9f9f9;
     .padding(20px);
     &-card {
       .margin(20px, t);
@@ -284,6 +296,7 @@
         .background-image('//net.huanmusic.com/weapp/bmg_bottom_close.png');
       }
       &-right {
+        font-weight: bold;
         position: absolute;
         right: 0;
         bottom: 0;
@@ -305,8 +318,12 @@
         &-item {
           .flex(center, center, column);
           &-icon {
-            width: 35px;
-            height: 35px;
+            width: 37px;
+            height: 32px;
+          }
+          &-erase {
+            width: 32px;
+            height: 34px;
           }
           &-font {
             font-size: 26px;
@@ -365,11 +382,12 @@
     .padding(40px, lr);
     &-icon {
       .margin(16px, lr);
-      .padding(3px, tb);
-      .padding(16px, lr);
+      .padding(17px, lr);
+      height: 28px;
+      .flex(center, center);
       color: #ffffff;
       font-size: 20px;
-      border-radius: 10px;
+      border-radius: 14px;
       &-member {
         background-color: #CCAE80;
       }
@@ -388,6 +406,7 @@
       font-size: 30px;
       color: #444444;
       max-width: 400px;
+      font-weight: bold;
     }
     &-price {
       font-size: 26px;

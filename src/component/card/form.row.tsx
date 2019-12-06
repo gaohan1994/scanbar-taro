@@ -2,14 +2,15 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 14:41:35 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-04 13:45:22
+ * @Last Modified time: 2019-12-06 14:11:13
  * 
  * @todo [fockedTaroUiListItem,增加以及修改了一些属性]
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import classnames from 'classnames';
-import '../../styles/index.css';
+// import '../../styles/index.css';
+import './style.sass';
 import './form.card.less';
 import { AtButton, AtInput } from 'taro-ui';
 
@@ -20,6 +21,7 @@ interface ListRowButton {
 }
 
 export interface FormRowProps { 
+  main?: boolean;               // 左边角标
   note?: string;                // 左边小文字
   arrow?: string;               // 箭头方向
   thumb?: string;               // 图片
@@ -47,6 +49,7 @@ interface FormRowState { }
 class FormRow extends Taro.Component<FormRowProps, FormRowState> {
 
   static defaultProps = {
+    main: false,
     note: '',
     disabled: false,
     title: '',
@@ -69,6 +72,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
 
   render () {
     let {
+      main,
       extraText,
       title,
       note,
@@ -119,6 +123,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
 
           <View className='at-list__item-content item-content'>
             <View className='item-content__info'>
+              {main && <View className="item-content__info-icon">*</View>}
               <View className='item-content__info-title'>{title}</View>
               {note && <View className='item-content__info-note'>{note}</View>}
             </View>
@@ -148,6 +153,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
                   type={inputType}
                   placeholder={inputPlaceHolder}
                   border={false}
+                  cursorSpacing={300}
                   placeholderClass="component-list-placeholder"
                 />
               </View>
@@ -169,7 +175,9 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
                         }
                       )}
                     >
-                      {button.title}
+                      <Text className={`component-list-row-confirm-button-text`}>
+                        {button.title}
+                      </Text>
                     </AtButton>
                   );
                 })}
@@ -193,11 +201,6 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
                 src="//net.huanmusic.com/weapp/icon_commodity_into.png" 
                 className={`component-form-arrow`}
               />
-              // <View className='item-extra__icon'>
-              //   <Text
-              //     className={`at-icon item-extra__icon-arrow at-icon-chevron-${arrow}`}
-              //   />
-              // </View>
             ) : null}
           </View>
         </View>

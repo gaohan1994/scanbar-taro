@@ -1,4 +1,4 @@
-@import "../../../styles/theme.less";
+@import "../../styles/theme.less";
 
 @home-prefix: home;
 @icon-size: 75px;
@@ -32,6 +32,9 @@
   }
   &-card {
     width: 690px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    .theme-shadow;
     .margin(15px, t);
     &-icon {
       .margin(16px, b);
@@ -43,16 +46,19 @@
   }
   &-buttons {
     .flex(center, center);
-    .padding(34px, tb);
-    .padding(24px, lr);
+    .padding(45px, tb);
     &-button {
-      flex: 1;
+      box-sizing: border-box;
+      width: 345px;
       .flex(flex-start, center, column);
       &-border {
         border-right: 1px solid #e3e3e3;
       }
       &-end {
-        align-items: flex-end;
+        .padding(124px, l);
+      }
+      &-start {
+        .padding(64px, l);
       }
       &-box {
         display: flex;
@@ -68,6 +74,7 @@
   &-money {
     font-size: 45px;
     color: #333333;
+    font-weight: bold;
   }
   &-order {
     width: 690px;

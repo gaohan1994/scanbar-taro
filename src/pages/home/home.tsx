@@ -1,7 +1,7 @@
 import { ComponentClass } from 'react';
 import Taro, { Component, Config } from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
-import './style/home.less';
+import '../style/home.less';
 import classnames from 'classnames';
 import { Card } from '../../component/common/card/card.common';
 import { LoginManager } from '../../common/sdk';
@@ -76,9 +76,7 @@ class Home extends Component {
 
   async componentDidMount () {
     try {
-      // LoginManager.logout();
       const userinfo = await LoginManager.getUserInfo();
-      // const result = await LoginManager.login({phoneNumber: '15659995443', password: '111111'});
       invariant(userinfo.success, userinfo.msg || ' ');
     } catch (error) {
       Taro.showToast({
@@ -110,9 +108,9 @@ class Home extends Component {
             <Image src="//net.huanmusic.com/weapp/icon_shop.png" className={classnames(['home-name-icon', 'home-icon'])} />
             <Text className="home-name-text">可乐便利店</Text>
           </View>
-          <Card card-class="home-card">
+          <View className="home-card">
             <View className="home-buttons">
-              <View className="home-buttons-button home-buttons-button-border">
+              <View className={`home-buttons-button home-buttons-button-border ${cssPrefix}-buttons-button-start`}>
                 <View className={`normal-text ${cssPrefix}-buttons-button-box`}>
                   <View>今日销售额</View>
                   <Image
@@ -133,7 +131,7 @@ class Home extends Component {
                 <View className="home-money">200</View>
               </View>
             </View>
-          </Card>
+          </View>
           <View onClick={() => Taro.navigateTo({url: '/pages/product/product.order'})}>
             <Card card-class="home-order">
               <Image src="//net.huanmusic.com/weapp/icon_home_bill.png" className="home-order-icon" />

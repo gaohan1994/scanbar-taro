@@ -2,14 +2,14 @@
  * @Author: Ghan 
  * @Date: 2019-11-20 13:37:23 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-03 14:12:50
+ * @Last Modified time: 2019-12-06 14:12:41
  */
 import Taro from '@tarojs/taro';
-import { View, Image, Picker } from '@tarojs/components';
+import { View, Image, Picker, Text } from '@tarojs/components';
 import { ProductAction } from '../../actions';
 import invariant from 'invariant';
 import { ResponseCode, ProductInterface, ProductService, HTTPInterface, ProductInterfaceMap } from '../../constants/index';
-import './style/product.less';
+import '../style/product.less';
 import { AppReducer } from '../../reducers';
 import { getProductType, getProductSupplier } from '../../reducers/app.product';
 import { connect } from '@tarojs/redux';
@@ -442,6 +442,7 @@ class ProductAdd extends Taro.Component<Props, State> {
     const formName: FormRowProps[] = [
       {
         title: '条码',
+        main: true,
         extraText: barcode,
         extraThumb: '//net.huanmusic.com/weapp/icon_commodity_scan.png',
         extraThumbClick: this.onScan,
@@ -455,6 +456,7 @@ class ProductAdd extends Taro.Component<Props, State> {
       },
       {
         title: '名称',
+        main: true,
         isInput: true,
         inputValue: name,
         inputOnChange: (value) => this.onChangeValue('name', value),
@@ -490,7 +492,7 @@ class ProductAdd extends Taro.Component<Props, State> {
       },
     ];
     return (
-      <View className="container">
+      <View className="container product-add">
         {this.renderImage()}
         <View className={`${cssPrefix}-detail-list`}>
           <FormCard items={formName} />
@@ -676,7 +678,7 @@ class ProductAdd extends Taro.Component<Props, State> {
             className="theme-button "
             onClick={this.onSave}
           >
-            保存并新增
+            <Text className="theme-button-text" >保存并新增</Text>
           </AtButton>
         </View>
         <View className={`${cssPrefix}-add-buttons-button`}>
@@ -684,7 +686,7 @@ class ProductAdd extends Taro.Component<Props, State> {
             className="theme-button "
             onClick={this.onAdd}
           >
-            保存
+            <Text className="theme-button-text" >保存</Text>
           </AtButton>
         </View>
       </View>

@@ -2,13 +2,13 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-03 14:12:41
+ * @Last Modified time: 2019-12-06 12:00:59
  * 
  * @todo 添加会员页面
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Picker } from '@tarojs/components';
-import "./style/member.less";
+import "../style/member.less";
 import FormCard from '../../component/card/form.card';
 import { FormRowProps } from '../../component/card/form.row';
 import { AtButton, AtMessage } from 'taro-ui';

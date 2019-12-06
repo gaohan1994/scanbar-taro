@@ -2,14 +2,14 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-04 10:58:42
+ * @Last Modified time: 2019-12-06 11:59:24
  * 
  * @todo 开单页面
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Input, ScrollView, Text } from '@tarojs/components';
-import "./style/product.less";
-import "../member/style/member.less";
+import "../style/product.less";
+import "../style/member.less";
 import CartBar from '../../component/cart/cart';
 import { ProductAction } from '../../actions';
 import { getProductList, getProductSearchList, getSelectProduct } from '../../reducers/app.product';

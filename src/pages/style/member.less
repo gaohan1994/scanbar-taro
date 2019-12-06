@@ -1,8 +1,8 @@
-@import "../../../styles/theme.less";
+@import "../../styles/theme.less";
 
 @member-prefix: member;
 @member-card-width: 690px;
-@member-avator-size: 150px;
+@member-avator-size: 126px;
 @member-search-icon-size: 28px;
 @member-search-del-size: 22px;
 @member-scan-icon-size: 40px;
@@ -73,17 +73,17 @@
   }
   &-detail {
     .flex(center, center, column);
-    .padding((@member-avator-size / 3) + 20px, t);
+    .padding((40px + 15px), t);
     &-img {
       position: absolute;
       left: (@member-card-width - @member-avator-size) / 2;
-      top: -(@member-avator-size / 2);
+      top: -(@member-avator-size - 40px);
       .theme-shadow();
       border-radius: @member-avator-size / 2;
     }
     &-avator {
-      width: 150px;
-      height: 150px;
+      width: @member-avator-size;
+      height: @member-avator-size;
     }
     &-row {
       &-icons {
@@ -106,6 +106,12 @@
   }
   &-edit {
     .margin(80px, t);
+    &-button {
+      &-view {
+        height: 50px;
+        width: 100%;
+      }
+    }
   }
   &-main {
     display: flex;
@@ -145,6 +151,7 @@
           width: @member-search-icon-size;
           height: @member-search-icon-size;
           .margin(15px, r);
+          .margin(4px, l);
         }
         &-del {
           width: @member-search-del-size;
@@ -153,6 +160,7 @@
         &-scan {
           width: @member-scan-icon-size;
           height: @member-scan-icon-size;
+          .flex(center, center);
         }
         &-input {
           font-size: @member-search-input-font-size;

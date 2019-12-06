@@ -2,11 +2,11 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 10:07:05 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-05 14:46:22
+ * @Last Modified time: 2019-12-06 11:58:40
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text, Input } from '@tarojs/components';
-import './style/login.less';
+import '../style/login.less';
 import classnames from 'classnames';
 import { AtButton } from 'taro-ui';
 import { LoginManager } from '../../common/sdk';
@@ -91,45 +91,42 @@ class Login extends Taro.Component<Props, State> {
   }
 
   render () {
-    const { username } = this.state;
+    const { username, password } = this.state;
     return (
       <View className={classnames(['container', 'sign'])} >
         <View className="sign-card">
           <View className="sign-card-title">欢迎使用进销存产品</View>
           <View className="sign-card-input">
-            <View 
-              className={`${cssPrefix}-input-box`}
-            >
+            <View className={`${cssPrefix}-input-box`} >
               <Image src="http://net.huanmusic.com/weapp/icon_login_user.png" className={`${cssPrefix}-input-box-icon`} />
-              <Input
-                className={`${cssPrefix}-input-box-input-input`} 
-                value={username}
-                onInput={({detail: {value}}) => this.onChangeValue('username', value)}
-                placeholder="请输入账号"
-                placeholderStyle="fontSize: 26px; color: #333333"
-                type="number"
-              />
+              <View className={`${cssPrefix}-input-container`}>
+                <Input
+                  cursorSpacing={300}
+                  className={`${cssPrefix}-input-box-input`} 
+                  value={username}
+                  onInput={({detail: {value}}) => this.onChangeValue('username', value)}
+                  placeholder="请输入账号"
+                  placeholderStyle="fontSize: 26px; color: #cccccc"
+                  type="number"
+                  autoFocus={true}
+                />
+              </View>
             </View>
-            {/* <CTInput
-              name="username"
-              icon="http://net.huanmusic.com/weapp/icon_login_user.png"
-              onChange={this.changeUsername}
-              value={this.state.username}  
-              border={false}
-              placeholder="请输入账号"
-              autoFocus={true}
-            /> */}
           </View>
           <View className="sign-card-input">
-            {/* <CTInput
-              name="username"
-              icon="http://net.huanmusic.com/weapp/icon_login_password.png"
-              onChange={this.changePassword}
-              value={this.state.password}
-              border={false}
-              placeholder="请输入密码"
-              type="password"
-            /> */}
+            <View className={`${cssPrefix}-input-box`} >
+              <Image src="http://net.huanmusic.com/weapp/icon_login_password.png" className={`${cssPrefix}-input-box-icon`} />
+              <View className={`${cssPrefix}-input-container`}>
+                <Input
+                  cursorSpacing={300}
+                  className={`${cssPrefix}-input-box-input`} 
+                  value={password}
+                  onInput={({detail: {value}}) => this.changePassword(value)}
+                  placeholder="请输入密码"
+                  placeholderStyle="fontSize: 26px; color: #cccccc"
+                />
+              </View>
+            </View>
           </View>
           <View className={classnames(['sign-card-check'])}>
             {

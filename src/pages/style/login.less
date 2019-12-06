@@ -1,4 +1,4 @@
-@import "../../../styles/theme.less";
+@import "../../styles/theme.less";
 
 @sign-prefix: sign;
 @check-icon-size: 24px;
@@ -49,6 +49,7 @@
       border: 1px solid #EDEDED;
       .padding(26px, tb);
       .padding(24px, lr);
+      display: flex;
       flex-direction: row;
       align-items: center;
       &-icon {
@@ -56,6 +57,15 @@
         height: 43px;
         .margin(60px, r);
       }
+      &-input {
+        width: 100%;
+        font-size: 26px;
+        color: #666666;
+      }
+    }
+    &-container {
+      display: flex;
+      flex: 1;
     }
   }
 }

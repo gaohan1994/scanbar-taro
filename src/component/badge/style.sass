@@ -1,0 +1,44 @@
+@import '~taro-ui/dist/style/variables/default.scss';
+@import '~taro-ui/dist/style/mixins/index.scss';
+
+$at-badge-border-radius: $at-badge-font-size * 0.7;
+$at-badge-box-shadow: 0 4px 8px 0 rgba($color: $at-badge-bg-color, $alpha: 0.2);
+
+.at-badge {
+  position: relative;
+  display: inline-block;
+  font-size: 0;
+  vertical-align: middle;
+
+  /* elements */
+  &__dot {
+    position: absolute;
+    right: -6px;
+    top: -6px;
+    width: $at-badge-dot-size;
+    height: $at-badge-dot-size;
+    border-radius: 50%;
+    overflow: hidden;
+    background: $at-badge-bg;
+    box-shadow: $at-badge-box-shadow;
+  }
+
+  &__num {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: -$at-badge-border-radius;
+    right: -6PX;
+    color: $at-badge-color;
+    font-size: 26px;
+    border-radius: 25px;
+    background: $at-badge-bg;
+    box-shadow: $at-badge-box-shadow;
+    // transform: translate(50%, 0);
+    overflow: hidden;
+    z-index: 1;
+  }
+}
