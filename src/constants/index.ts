@@ -13,6 +13,9 @@ export { MemberInterface, default as MemberInterfaceMap } from './member/member'
 export { default as ProductService } from './product/product.service';
 export { ProductInterface, default as ProductInterfaceMap } from './product/product';
 
+export { default as OrderService } from './order/order.service';
+export { OrderInterface, default as OrderInterfaceMap } from './order/order';
+
 export const ResponseCode = {
   success: 'response.success',
   error: '服务器开了个小差',

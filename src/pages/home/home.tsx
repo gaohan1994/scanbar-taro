@@ -38,7 +38,7 @@ const NavItems = [
     image: '//net.huanmusic.com/weapp/icon_menu_order.png',
     value: '采购下单',
     subTitle: 'Purchasing order',
-    url: '/pages/',
+    url: '/pages/order/order.main',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_more.png',

@@ -34,6 +34,13 @@ class App extends Component {
     ],
     subPackages: [
       {
+        // 订单模块分包
+        root: 'pages/order',
+        pages: [
+          'order.main',
+        ],
+      },
+      {
         root: 'pages/pay',
         pages: [
           'pay.input',
