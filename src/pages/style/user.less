@@ -1,0 +1,67 @@
+@import "../../styles/theme.less";
+
+@user-prefix: user;
+@user-bg-size: 390px;
+
+.@{user-prefix} {
+  background-color: #f9f9f9;
+  &-bg {
+    height: @user-bg-size;
+    width: 100%;
+    .background-image('//net.huanmusic.com/weapp/bg_mine.png');
+  }
+  &-container {
+    .flex(center, flex-start, column);
+    .padding(30px, lr);
+    height: 100%;
+    width: 100%;
+  }
+  &-user {
+    .flex(center, center, column);
+    .margin(-(@user-bg-size - 24px), t);
+    width: 100%;
+    &-image {
+      width: 140px;
+      height: 140px;
+    }
+    &-name {
+      .title-text(#ffffff);
+      .margin(26px, t);
+    }
+    &-text {
+      font-size: 28px;
+      color: #ffffff;
+      .margin(17px, t);
+    }
+  }
+  &-rows {
+    width: 100%;
+  }
+  &-row {
+    .flex(center, space-between, row);
+    .padding(27px, tb);
+    .padding(29px, lr);
+    .margin(16px, b);
+    &-left {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      &-icon {
+        width: 39px;
+        height: 36px;
+        .margin(20px, r);
+      }
+      &-text {
+        font-size: 28px;
+        color: #666666;
+      }
+    }
+    &-right {
+      &-icon {
+        width: 14px;
+        height: 24px;
+        .background-image('//net.huanmusic.com/weapp/icon_into.png');
+      }
+    }
+  }
+}

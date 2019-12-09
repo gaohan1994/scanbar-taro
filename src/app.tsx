@@ -123,8 +123,8 @@ class App extends Component {
         text: "首页"
       }, {
         pagePath: "pages/report/report",
-        iconPath: "./assets/tab-bar/icon_nav_user.png",
-        selectedIconPath: "./assets/tab-bar/icon_nav_user_xuan.png",
+        iconPath: "./assets/tab-bar/icon_reportforms.png",
+        selectedIconPath: "./assets/tab-bar/icon_reportforms_xuan.png",
         text: "报表"
       }, {
         pagePath: "pages/user/user",

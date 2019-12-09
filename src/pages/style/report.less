@@ -1,0 +1,57 @@
+@import "../../styles/theme.less";
+
+.report {
+  position: relative;
+  &-bg {
+    height: 230px;
+    width: 100%;
+    background-color: @theme-color;
+  }
+  &-row-extra-icon {
+    width: 24px;
+    height: 14px;
+    .background-image('//net.huanmusic.com/weapp/icon_expand_gray.png');
+  }
+  &-container {
+    .flex(center, flex-start, column);
+    .padding(30px, lr);
+    height: 100%;
+    width: 100%;
+  }
+  &-card {
+    .margin(-140px, t);
+  }
+  &-detail {
+    .flex(center, center, column);
+    &-title {
+      font-size: 28px;
+      color: #999999;
+    }
+    &-price {
+      font-size: 56px;
+      color: #333333;
+      font-weight: bold;
+      .margin(17px, t);
+    }
+  }
+  &-tabs {
+    .flex(center, space-between, row);
+    position: absolute;
+    top: 20px;
+    width: 100%;
+  }
+  &-tab {
+    .flex(center, center, row);
+    flex: 1;
+    &-text {
+      font-size: 30px;
+      color: #ffffff;
+    }
+    &-icon {
+      .margin(16px, l);
+      width: 16px;
+      height: 8px;
+      .background-image('//net.huanmusic.com/weapp/icon_expand_white.png');
+    }
+  }
+}

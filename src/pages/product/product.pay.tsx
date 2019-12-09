@@ -361,12 +361,14 @@ class ProductPay extends Taro.Component<Props, State> {
         header="选择会员"
       >
         <View className={`product-detail-modal`}>
+          <View className={`product-detail-modal-tip`}>
+            {`金额：￥${numeral(productSdk.getProductPrice() - productSdk.getProductMemberPrice()).format('0.00')}`}
+          </View>
           <View 
             className={classnames('component-form', {
               'component-form-shadow': true
             })}
-          >
-            <View>{`金额：￥${numeral(productSdk.getProductPrice() - productSdk.getProductMemberPrice()).format('0.00')}`}</View>
+          > 
             <View className={`${cssPrefix}-pay-member-input`}>
               <Input 
                 cursorSpacing={300}
