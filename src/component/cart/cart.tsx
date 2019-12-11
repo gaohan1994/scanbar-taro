@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-06 15:22:12
+ * @Last Modified time: 2019-12-09 15:00:18
  * 
  * @todo [购物车组件]
  */
@@ -205,7 +205,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                       [`${cssPrefix}-left-suspension-active`]: productCartList.length > 0,
                       [`${cssPrefix}-left-suspension-disabled`]: productCartList.length === 0,
                     })}
-                    // onClick={() => this.onSuspensionCart()}
+                    onClick={() => this.onSuspensionCart()}
                   >
                     挂单
                   </View>
@@ -447,8 +447,4 @@ const select = (state: AppReducer.AppState) => ({
   nonBarcodeProduct: getNonBarcodeProduct(state),
 });
 
-const selectDispatch = dispatch => ({
-  dispatch,
-});
-
-export default connect(select, selectDispatch)(CartBar as any);
+export default connect(select)(CartBar as any);

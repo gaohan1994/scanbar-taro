@@ -2,20 +2,19 @@ import productSdk, { ProductCartInterface } from "./product.sdk";
 import { AppReducer } from "../../../reducers";
 import { ProductInterface } from "../../../constants";
 import merge from 'lodash.merge';
-import moment from 'dayjs';
 
 /**
  * @Author: Ghan 
  * @Date: 2019-11-22 14:20:31 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-03 13:56:19
+ * @Last Modified time: 2019-12-11 11:37:46
  * @todo productsdk
  */
 export declare namespace ProductSDKReducer {
 
   interface SuspensionCartBase {
     suspension: {
-      date: string;
+      date: number;
     };
     productCartList: Array<ProductCartInterface.ProductCartInfo>;
   }
@@ -47,7 +46,25 @@ export declare namespace ProductSDKReducer {
     payload: {
       product: ProductInterface.ProductInfo;
       type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce;
+      suspension?: number;
     };
+  }
+
+  namespace Reducers {
+    interface EmptySuspensionAction {
+      type: ProductCartInterface.EMPTY_SUSPENSION_CART;
+      payload: any;
+    }
+
+    interface DeleteSuspensionAction {
+      type: ProductCartInterface.DELETE_SUSPENSION_CART;
+      payload: { suspension: number };
+    }
+
+    interface ManageCartList {
+      type: ProductCartInterface.MANAGE_CART;
+      payload: { productCartList: ProductCartInterface.ProductCartInfo[] };
+    }
   }
 
   /**
@@ -59,6 +76,7 @@ export declare namespace ProductSDKReducer {
   interface ProductManageWeightCartPayload {
     product: ProductCartInterface.ProductCartInfo;
     type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce;
+    suspension?: number;
   }
   interface ProductManageWeightCart {
     type: ProductCartInterface.MANAGE_CART_WEIGHT_PRODUCT;
@@ -71,6 +89,9 @@ export declare namespace ProductSDKReducer {
   type Action = 
     ProductManageCart 
     | ProductManageWeightCart
+    | Reducers.DeleteSuspensionAction
+    | Reducers.EmptySuspensionAction
+    | Reducers.ManageCartList
     | {
       type: 
         ProductCartInterface.ADD_SUSPENSION_CART 
@@ -120,6 +141,46 @@ export default function productSDKReducer (
   action: ProductSDKReducer.Action
 ): ProductSDKReducer.State {
   switch (action.type) {
+
+    case productSdk.reducerInterface.DELETE_SUSPENSION_CART: {
+      const { payload } = action as ProductSDKReducer.Reducers.DeleteSuspensionAction;
+      const { suspension } = payload;
+
+      /**
+       * @todo 如果没找到则直接返回state
+       */
+      const currentSuspensionIndex = state.suspensionCartList.findIndex(s => s.suspension.date === suspension);
+      if (currentSuspensionIndex === -1) {
+        return { ...state };
+      }
+
+      /**
+       * @todo 把对应的suspension挂单删除
+       */
+      let nextSuspensionList: ProductSDKReducer.SuspensionCartBase[] = merge([], state.suspensionCartList);
+      nextSuspensionList.splice(currentSuspensionIndex, 1);
+      return {
+        ...state,
+        suspensionCartList: nextSuspensionList
+      };
+    }
+
+    case productSdk.reducerInterface.EMPTY_SUSPENSION_CART: {
+      return {
+        ...state,
+        suspensionCartList: []
+      };
+    }
+
+    case productSdk.reducerInterface.MANAGE_CART: {
+      const { payload } = action as ProductSDKReducer.Reducers.ManageCartList;
+      const { productCartList } = payload;
+      return {
+        ...state,
+        productCartList
+      };
+    }
+
     case productSdk.reducerInterface.CHANGE_NON_BARCODE_PRODUCT: {
       const { payload: { nonBarcodeProduct } } = action;
       return {
@@ -137,7 +198,7 @@ export default function productSDKReducer (
     case productSdk.reducerInterface.ADD_SUSPENSION_CART: {
       const { payload } = action as ProductSDKReducer.AddSuspensionCartPayload;
       const { productCartList } = payload;
-      const date = moment().format('MM-DD HH:mm');
+      const date: number = Number(new Date());
       const suspensionCart: ProductSDKReducer.SuspensionCartBase = {
         suspension: { date },
         productCartList
@@ -162,7 +223,39 @@ export default function productSDKReducer (
       };
     }
     case productSdk.reducerInterface.MANAGE_CART_PRODUCT: {
-      const { payload: { product, type } } = action;
+      const { payload } = action as ProductSDKReducer.ProductManageCart;
+      const { product, type, suspension } = payload;
+
+      if (!!suspension) {
+        // 如果是挂单的话修改挂单中的商品,首先找到这个挂单list没找到直接返回
+        const currentSuspensionIndex = state.suspensionCartList.findIndex(s => s.suspension.date === suspension);
+        if (currentSuspensionIndex === -1) {
+          return { ...state };
+        }
+
+        let nextSuspensionList: ProductSDKReducer.SuspensionCartBase[] = merge([], state.suspensionCartList);
+        // 找到这个商品的位置, 挂单购物车中一定有这个商品否则直接返回
+        const currentProductIndex = nextSuspensionList[currentSuspensionIndex].productCartList.findIndex(p => p.id === product.id);
+        if (currentProductIndex === -1) {
+          return { ...state };
+        }
+        
+        if (type === productSdk.productCartManageType.ADD) {
+          // 将该商品数量+1
+          nextSuspensionList[currentSuspensionIndex].productCartList[currentProductIndex].sellNum += 1;
+        } else {
+          // 商品数量-1 如果只有一个则删除该商品
+          const currentProduct = nextSuspensionList[currentSuspensionIndex].productCartList[currentProductIndex];
+          currentProduct.sellNum === 1
+            ? nextSuspensionList[currentSuspensionIndex].productCartList.splice(currentProductIndex, 1)
+            : nextSuspensionList[currentSuspensionIndex].productCartList[currentProductIndex].sellNum -= 1;
+        }
+        return {
+          ...state,
+          suspensionCartList: nextSuspensionList
+        };
+      }
+
       const productCartList: Array<ProductCartInterface.ProductCartInfo> = merge([], state.productCartList);
       const index = productCartList.findIndex(p => p.id === product.id);
       if (type === productSdk.productCartManageType.ADD) {
@@ -211,8 +304,35 @@ export default function productSDKReducer (
       }
     }
     case productSdk.reducerInterface.MANAGE_CART_WEIGHT_PRODUCT: {
-      const { payload }: { payload: any } = action;
-      const { product, type }: ProductSDKReducer.ProductManageWeightCartPayload = payload;
+      const { payload } = action as ProductSDKReducer.ProductManageWeightCart;
+      const { product, type, suspension } = payload;
+
+      if (!!suspension) {
+        // 挂单称重商品不存在+ 只有-
+        if (type === productSdk.productCartManageType.ADD) {
+          return { ...state };
+        }
+
+        // 如果是挂单的话修改挂单中的商品,首先找到这个挂单list没找到直接返回
+        const currentSuspensionIndex = state.suspensionCartList.findIndex(s => s.suspension.date === suspension);
+        if (currentSuspensionIndex === -1) {
+          return { ...state };
+        }
+
+        const nextSuspensionList: ProductSDKReducer.SuspensionCartBase[] = merge([], state.suspensionCartList);
+        // 找到这个商品的位置, 挂单购物车中一定有这个商品否则直接返回
+        const currentProductIndex = nextSuspensionList[currentSuspensionIndex].productCartList.findIndex(p => p.id === product.id);
+        if (currentProductIndex === -1) {
+          return { ...state };
+        }
+
+        nextSuspensionList[currentSuspensionIndex].productCartList.splice(currentProductIndex, 1);
+        return { 
+          ...state,
+          suspensionCartList: nextSuspensionList
+        }; 
+      }
+
       const productCartList: Array<ProductCartInterface.ProductCartInfo> = merge([], state.productCartList);
       const index = productCartList.findIndex(p => p.id === product.id);
       if (type === productSdk.productCartManageType.ADD) {

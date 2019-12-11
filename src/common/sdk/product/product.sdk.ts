@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-29 18:04:42
+ * @Last Modified time: 2019-12-11 11:30:36
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -20,7 +20,7 @@
 import Taro from '@tarojs/taro';
 import { ProductInterface, ProductService, MemberInterface, HTTPInterface } from '../../../constants';
 import { store } from '../../../app';
-import { ProductSDKReducer } from './product.sdk.reducer';
+import { ProductSDKReducer, getSuspensionCartList } from './product.sdk.reducer';
 import numeral from 'numeral';
 import merge from 'lodash.merge';
 import productService from '../../../constants/product/product.service';
@@ -107,6 +107,7 @@ export declare namespace ProductCartInterface {
     };
   }
 
+  type MANAGE_CART = string;
   type MANAGE_CART_PRODUCT = string;
   type MANAGE_CART_WEIGHT_PRODUCT = string;
   type CHANGE_WEIGHT_PRODUCT_MODAL = string;
@@ -117,6 +118,7 @@ export declare namespace ProductCartInterface {
   type CHANGE_NON_BARCODE_PRODUCT = string;
 
   type ReducerInterface = {
+    MANAGE_CART: MANAGE_CART;
     MANAGE_EMPTY_CART: MANAGE_EMPTY_CART;
     MANAGE_CART_PRODUCT: MANAGE_CART_PRODUCT;
     MANAGE_CART_WEIGHT_PRODUCT: MANAGE_CART_WEIGHT_PRODUCT;
@@ -139,6 +141,7 @@ export declare namespace ProductCartInterface {
   interface ProductSDKManageInterface {
     type: ProductCartAdd | ProductCartReduce | ProductCartEmpty;
     product: ProductInterface.ProductInfo | ProductCartInfo;
+    suspension?: number;
   }
 }
 
@@ -153,6 +156,7 @@ class ProductSDK {
   };
 
   public reducerInterface: ProductCartInterface.ReducerInterface = {
+    MANAGE_CART: 'MANAGE_CART',
     MANAGE_EMPTY_CART: 'MANAGE_EMPTY_CART',
     MANAGE_CART_PRODUCT: 'MANAGE_CART_PRODUCT',
     MANAGE_CART_WEIGHT_PRODUCT: 'MANAGE_CART_WEIGHT_PRODUCT',
@@ -430,7 +434,7 @@ class ProductSDK {
    *
    * @memberof ProductSDK
    */
-  public add = (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, sellNum?: number) => {
+  public add = (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, sellNum?: number, suspension?: number) => {
     Taro.showToast({
       title: '加入购物车'
     });
@@ -442,7 +446,8 @@ class ProductSDK {
           product: {
             ...product,
             sellNum: sellNum || 1
-          }
+          },
+          suspension,
         }
       };
       store.dispatch(reducer);
@@ -451,7 +456,8 @@ class ProductSDK {
         type: this.reducerInterface.MANAGE_CART_PRODUCT,
         payload: {
           type: this.productCartManageType.ADD,
-          product
+          product,
+          suspension,
         }
       };
       store.dispatch(reducer);
@@ -464,7 +470,7 @@ class ProductSDK {
    *
    * @memberof ProductSDK
    */
-  public reduce = (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, sellNum?: number) => {
+  public reduce = (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, sellNum?: number, suspension?: number) => {
     if (this.isWeighProduct(product)) {
       const reducer: ProductSDKReducer.ProductManageWeightCart = {
         type: this.reducerInterface.MANAGE_CART_WEIGHT_PRODUCT,
@@ -473,7 +479,8 @@ class ProductSDK {
           product: {
             ...product,
             sellNum: sellNum || 1
-          }
+          },
+          suspension
         }
       };
       store.dispatch(reducer);
@@ -482,7 +489,8 @@ class ProductSDK {
         type: this.reducerInterface.MANAGE_CART_PRODUCT,
         payload: {
           type: this.productCartManageType.REDUCE,
-          product
+          product,
+          suspension
         }
       };
       store.dispatch(reducer);
@@ -497,7 +505,7 @@ class ProductSDK {
   }
 
   public manage = (params: ProductCartInterface.ProductSDKManageInterface) => {
-    const { product, type } = params;
+    const { product, type, suspension } = params;
     if (type === this.productCartManageType.EMPTY) {
       this.empty();
       return;
@@ -510,7 +518,7 @@ class ProductSDK {
           payload: { product }
         });
       } else {
-        this.reduce(product);
+        this.reduce(product, undefined, suspension);
       }
     } else if (this.isNonBarcodeProduct(product)) {
       // 如果是无码商品
@@ -525,11 +533,19 @@ class ProductSDK {
     } else {
       // 如果是其他商品
       if (type === this.productCartManageType.ADD) {
-        this.add(product);
+        this.add(product, undefined, suspension);
       } else {
-        this.reduce(product);
+        this.reduce(product, undefined, suspension);
       }
     }
+  }
+
+  public manageCart = (productCartList: ProductCartInterface.ProductCartInfo[]) => {
+    const reducer: ProductSDKReducer.Reducers.ManageCartList = {
+      type: this.reducerInterface.MANAGE_CART,
+      payload: { productCartList }
+    };
+    return store.dispatch(reducer);
   }
 
   public closeNonBarcodeModal = () => {
@@ -585,6 +601,43 @@ class ProductSDK {
       })
       .catch(error => resolve(error));
     });
+  }
+
+  public suspensionOrder = async (suspension: number): Promise<{success: boolean}> => {
+    const state = await store.getState();
+    const suspensionCartList = getSuspensionCartList(state);
+    const currentSuspension = suspensionCartList.find(s => s.suspension.date === suspension);
+    if (currentSuspension && currentSuspension.productCartList.length > 0) {
+      const orderSuspensionList = merge([], currentSuspension.productCartList);
+      await this.manageCart(orderSuspensionList);
+      await this.deleteSuspension(suspension);
+      return { success: true };
+    }
+    return { success: false };
+  }
+
+  /**
+   * @todo [删除挂单如果传入suspension则删除该suspension，如果不传全部删除]
+   *
+   * @memberof ProductSDK
+   */
+  public deleteSuspension = (suspension?: number) => {
+
+    if (suspension) {
+      const reducer: ProductSDKReducer.Reducers.DeleteSuspensionAction = {
+        type: this.reducerInterface.DELETE_SUSPENSION_CART,
+        payload: { suspension }
+      };
+      store.dispatch(reducer);
+      return;
+    }
+
+    const reducer: ProductSDKReducer.Reducers.EmptySuspensionAction = {
+      type: this.reducerInterface.EMPTY_SUSPENSION_CART,
+      payload: {}
+    };
+    store.dispatch(reducer);
+    return;
   }
 }
 

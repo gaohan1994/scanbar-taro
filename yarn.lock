@@ -9048,6 +9048,11 @@ xtend@^4.0.0, xtend@^4.0.1, xtend@~4.0.1:
   resolved "https://registry.npmjs.org/xtend/-/xtend-4.0.2.tgz#bb72779f5fa465186b1f438f674fa347fdb5db54"
   integrity sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==
 
+xxx@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.npmjs.org/xxx/-/xxx-0.0.1.tgz#9d8b8a55dbab7901e72c2174bacd13e82fbc1340"
+  integrity sha1-nYuKVdureQHnLCF0us0T6C+8E0A=
+
 y18n@^3.2.1:
   version "3.2.1"
   resolved "https://registry.npmjs.org/y18n/-/y18n-3.2.1.tgz#6d15fba884c08679c0d77e88e7759e811e07fa41"

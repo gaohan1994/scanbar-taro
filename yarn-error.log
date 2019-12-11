@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/bin/node /Users/Gao/.yarn/bin/yarn.js add taro-ui/dist/style/index.sass --silent --no-progress
+  /usr/local/bin/node /Users/Gao/.yarn/bin/yarn.js add src/common/sdk/product/product.sdk --silent --no-progress
 
 PATH: 
   /usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/Gao/Desktop/macdesktop/scanbar/node_modules/.bin:/usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/Gao/Desktop/macdesktop/scanbar/node_modules/.bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bind:/usr/local/mongodb/bind:/usr/local/mongodb/bin:/Users/Gao/.yarn/bin:/Users/Gao/.config/yarn/global/node_modules/.bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Tomcat/bin:/Users/Gao/Library/Android/sdk/tools:/Users/Gao/Library/Android/sdk/platform-tools:
@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.npmjs.org/taro-ui%2fdist/style/index.sass: Request "https://registry.npmjs.org/taro-ui%2fdist/style/index.sass" returned a 405
+  Error: https://registry.npmjs.org/src%2fcommon/sdk/product/product.sdk: Request "https://registry.npmjs.org/src%2fcommon/sdk/product/product.sdk" returned a 405
       at Request.params.callback [as _callback] (/Users/Gao/.yarn/lib/cli.js:66067:18)
       at Request.self.callback (/Users/Gao/.yarn/lib/cli.js:129541:22)
       at Request.emit (events.js:200:13)
@@ -68,6 +68,7 @@ npm manifest:
       "blueimp-md5": "^2.12.0",
       "classnames": "^2.2.6",
       "dayjs": "^1.8.17",
+      "echarts12": "^1.1.5-alpha.0",
       "invariant": "^2.2.4",
       "lodash.merge": "^4.6.2",
       "nerv-devtools": "^1.4.0",
@@ -76,13 +77,15 @@ npm manifest:
       "redux": "^4.0.0",
       "redux-logger": "^3.0.6",
       "redux-thunk": "^2.3.0",
-      "taro-ui": "^2.2.4"
+      "taro-ui": "^2.2.4",
+      "xxx": "^0.0.1"
     },
     "devDependencies": {
       "@tarojs/plugin-babel": "1.3.17",
       "@tarojs/plugin-csso": "1.3.17",
       "@tarojs/plugin-less": "1.3.17",
       "@tarojs/plugin-sass": "^1.3.22",
+      "@tarojs/plugin-stylus": "^1.3.27",
       "@tarojs/plugin-uglifyjs": "1.3.17",
       "@tarojs/webpack-runner": "1.3.17",
       "@types/classnames": "^2.2.9",
@@ -282,6 +285,13 @@ Lockfile:
     dependencies:
       node-sass "^4.12.0"
       scss-bundle "^2.5.1"
+  
+  "@tarojs/plugin-stylus@^1.3.27":
+    version "1.3.27"
+    resolved "https://registry.npmjs.org/@tarojs/plugin-stylus/-/plugin-stylus-1.3.27.tgz#41851696b08f2fc1a33a9fa597c71564c490859c"
+    integrity sha512-gFV+M9FGscVpzeg6CSDsP99WZl9zXzvbfqZdbiy9TrfxLsXVhkP3068YySwPm8JFlvAKh96dSJXRtaj/wlZHIg==
+    dependencies:
+      stylus "^0.54.5"
   
   "@tarojs/plugin-uglifyjs@1.3.17":
     version "1.3.17"
@@ -2601,6 +2611,13 @@ Lockfile:
     resolved "https://registry.npmjs.org/css-parse/-/css-parse-1.7.0.tgz#321f6cf73782a6ff751111390fc05e2c657d8c9b"
     integrity sha1-Mh9s9zeCpv91ERE5D8BeLGV9jJs=
   
+  css-parse@~2.0.0:
+    version "2.0.0"
+    resolved "https://registry.npmjs.org/css-parse/-/css-parse-2.0.0.tgz#a468ee667c16d81ccf05c58c38d2a97c780dbfd4"
+    integrity sha1-pGjuZnwW2BzPBcWMONKpfHgNv9Q=
+    dependencies:
+      css "^2.0.0"
+  
   css-select@^1.1.0:
     version "1.2.0"
     resolved "https://registry.npmjs.org/css-select/-/css-select-1.2.0.tgz#2b3a110539c5355f1cd8d314623e870b121ec858"
@@ -2739,6 +2756,13 @@ Lockfile:
     integrity sha512-mel+jf7nrtEl5Pn1Qx46zARXKDpBbvzezse7p7LqINmdoIk8PYP5SySaxEmYv6TZ0JyEKA1hsCId6DIhgITtWQ==
     dependencies:
       ms "^2.1.1"
+  
+  debug@~3.1.0:
+    version "3.1.0"
+    resolved "https://registry.npmjs.org/debug/-/debug-3.1.0.tgz#5bb5a0672628b64149566ba16819e61518c67261"
+    integrity sha512-OX8XqP7/1a9cqkxYw2yXss15f26NKWBpDXQd0/uK/KPqdQhxbPa994hnzjcE2VqQpDslf55723cKPUOGSmMY3g==
+    dependencies:
+      ms "2.0.0"
   
   decamelize-keys@^1.0.0:
     version "1.1.0"
@@ -3048,6 +3072,11 @@ Lockfile:
     dependencies:
       jsbn "~0.1.0"
       safer-buffer "^2.1.0"
+  
+  echarts12@^1.1.5-alpha.0:
+    version "1.1.5-alpha.0"
+    resolved "https://registry.npmjs.org/echarts12/-/echarts12-1.1.5-alpha.0.tgz#ade3fbd239a9e1498095b5f28ded1844b07854db"
+    integrity sha512-cHj5riUOF8zbGnyjjcOuyeS6WJhrf4uL1rkzQcCBatJYvTwUy2mUbcDiFJatozPKQCX+avrhQhhC0NKsJwsMUQ==
   
   ee-first@1.1.1:
     version "1.1.1"
@@ -5740,7 +5769,7 @@ Lockfile:
       for-in "^0.1.3"
       is-extendable "^0.1.1"
   
-  mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0:
+  mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkdirp@~0.5.x:
     version "0.5.1"
     resolved "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
     integrity sha1-MAV0OOrGz3+MR2fzhkjWaX11yQM=
@@ -7516,7 +7545,7 @@ Lockfile:
     dependencies:
       ret "~0.1.10"
   
-  "safer-buffer@>= 2.1.2 < 3", safer-buffer@^2.0.2, safer-buffer@^2.1.0, safer-buffer@~2.1.0:
+  "safer-buffer@>= 2.1.2 < 3", safer-buffer@^2.0.2, safer-buffer@^2.1.0, safer-buffer@^2.1.2, safer-buffer@~2.1.0:
     version "2.1.2"
     resolved "https://registry.npmjs.org/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
     integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
@@ -7548,7 +7577,7 @@ Lockfile:
     resolved "https://registry.npmjs.org/sax/-/sax-0.5.8.tgz#d472db228eb331c2506b0e8c15524adb939d12c1"
     integrity sha1-1HLbIo6zMcJQaw6MFVJK25OdEsE=
   
-  sax@^1.2.4:
+  sax@^1.2.4, sax@~1.2.4:
     version "1.2.4"
     resolved "https://registry.npmjs.org/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
     integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
@@ -7616,6 +7645,11 @@ Lockfile:
     version "5.5.0"
     resolved "https://registry.npmjs.org/semver/-/semver-5.5.0.tgz#dc4bbc7a6ca9d916dee5d43516f0092b58f7b8ab"
     integrity sha512-4SJ3dm0WAwWy/NVeioZh5AntkdJoWKxHxcmyP622fOkgHa4z3R0TdBJICINyaSDE6uNwVc8gZr+ZinwZAH4xIA==
+  
+  semver@^6.0.0:
+    version "6.3.0"
+    resolved "https://registry.npmjs.org/semver/-/semver-6.3.0.tgz#ee0a64c8af5e8ceea67687b133761e1becbd1d3d"
+    integrity sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
   
   semver@~5.3.0:
     version "5.3.0"
@@ -7868,6 +7902,11 @@ Lockfile:
     version "0.6.1"
     resolved "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
     integrity sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
+  
+  source-map@^0.7.3:
+    version "0.7.3"
+    resolved "https://registry.npmjs.org/source-map/-/source-map-0.7.3.tgz#5302f8169031735226544092e64981f751750383"
+    integrity sha512-CkCj6giN3S+n9qrYiBTX5gystlENnRW5jZeNLHpe6aue+SrHcG5VYwujhW9s4dY31mEGsxBDrHR6oI69fTXsaQ==
   
   spdx-correct@^3.0.0:
     version "3.1.0"
@@ -8241,6 +8280,20 @@ Lockfile:
       mkdirp "0.5.x"
       sax "0.5.x"
       source-map "0.1.x"
+  
+  stylus@^0.54.5:
+    version "0.54.7"
+    resolved "https://registry.npmjs.org/stylus/-/stylus-0.54.7.tgz#c6ce4793965ee538bcebe50f31537bfc04d88cd2"
+    integrity sha512-Yw3WMTzVwevT6ZTrLCYNHAFmanMxdylelL3hkWNgPMeTCpMwpV3nXjpOHuBXtFv7aiO2xRuQS6OoAdgkNcSNug==
+    dependencies:
+      css-parse "~2.0.0"
+      debug "~3.1.0"
+      glob "^7.1.3"
+      mkdirp "~0.5.x"
+      safer-buffer "^2.1.2"
+      sax "~1.2.4"
+      semver "^6.0.0"
+      source-map "^0.7.3"
   
   sugarss@^1.0.0:
     version "1.0.1"
@@ -9115,6 +9168,11 @@ Lockfile:
     version "4.0.2"
     resolved "https://registry.npmjs.org/xtend/-/xtend-4.0.2.tgz#bb72779f5fa465186b1f438f674fa347fdb5db54"
     integrity sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==
+  
+  xxx@^0.0.1:
+    version "0.0.1"
+    resolved "https://registry.npmjs.org/xxx/-/xxx-0.0.1.tgz#9d8b8a55dbab7901e72c2174bacd13e82fbc1340"
+    integrity sha1-nYuKVdureQHnLCF0us0T6C+8E0A=
   
   y18n@^3.2.1:
     version "3.2.1"

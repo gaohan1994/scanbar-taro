@@ -22,6 +22,9 @@
     width: 750px;
     height: @cart-height;
     .background-image('//net.huanmusic.com/weapp/bmg_bottom_close.png');
+    &-suspension {
+      .padding(414px, r);
+    }
   }
   &-right {
     position: absolute;
@@ -32,12 +35,52 @@
     .flex(center, center, column);
     color: #ffffff;
     font-size: @cart-button-font;
+    &-suspension {
+      width: 414px;
+      flex-direction: row;
+      &-icon {
+        width: 36px;
+        height: 36px;
+        .margin(13px, r);
+      }
+      &-disabled {
+        .background-image('//net.huanmusic.com/weapp/bt_put_bottom_close_und.png');
+        color: #7C7C7C;
+      }
+      &-active {
+        .background-image('//net.huanmusic.com/weapp/bt_put_bottom_close_pitch.png');
+      }
+    }
     &-disabled {
       .background-image('//net.huanmusic.com/weapp/bt_bottom_close_unselected.png');
       color: #666666;
     }
     &-active {
       .background-image('//net.huanmusic.com/weapp/bt_bottom_close_pitch.png');
+    }
+  }
+  &-suspension {
+    &-left {
+      .flex(center, space-between, row);
+      .padding(60px, lr);
+      height: 100%;
+      &-item {
+        .flex(center, center, column);
+        flex: 1;
+        &-text {
+          font-size: 26px;
+          color: #ffffff;
+          .margin(5px, t);
+        }
+        &-empty {
+          width: 39px;
+          height: 36px;
+        }
+        &-delete {
+          width: 32px;
+          height: 35px;
+        }
+      }
     }
   }
   &-left {
