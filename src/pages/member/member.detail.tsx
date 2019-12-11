@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-06 14:31:30
+ * @Last Modified time: 2019-12-11 11:50:58
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Image, Text } from '@tarojs/components';
@@ -131,7 +131,7 @@ class MemberMain extends Taro.Component<MemberMainProps> {
               </View>
               <View className={`${cssPrefix}-detail`}>
                 <View className="title-text">{memberDetail.username || ''}</View>
-                <View className="small-text">{memberDetail.phoneNumber || ''}</View>
+                <View className="normal-text">{memberDetail.phoneNumber || ''}</View>
               </View>
               <View className="home-buttons member-buttons">
                 <View className="member-buttons-button home-buttons-button-border">

@@ -2,14 +2,13 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 14:41:35 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-06 14:11:13
+ * @Last Modified time: 2019-12-11 11:45:32
  * 
  * @todo [fockedTaroUiListItem,增加以及修改了一些属性]
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import classnames from 'classnames';
-// import '../../styles/index.css';
 import './style.sass';
 import './form.card.less';
 import { AtButton, AtInput } from 'taro-ui';

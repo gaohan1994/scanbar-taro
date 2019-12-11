@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-06 14:41:44
+ * @Last Modified time: 2019-12-11 11:52:41
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Input, Image, Text } from '@tarojs/components';
@@ -293,10 +293,6 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
 
 const mapState = (state: AppReducer.AppState) => {
   return {
-    // memberListByDate: 
-    //   state.member.memberList && state.member.memberList.data 
-    //   ? MemberAction.fliterDataByDate(state.member.memberList.data) 
-    //   : []
     memberList: getMemberList(state).data || [],
   };
 };
