@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:16:32 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-02 15:09:32
+ * @Last Modified time: 2019-12-23 10:44:25
  */
 import requestHttp from "../../common/request/request.http";
 import ProductInterfaceMap, { ProductInterface } from "./product";
@@ -29,7 +29,7 @@ class ProductService {
     return requestHttp.get(ProductInterfaceMap.productInfoList(params));
   }
 
-  public productInfoType = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
+  public productInfoType = async (): Promise<HTTPInterface.ResponseResultBase<ProductInterface.ProductTypeInfo[]>> => {
     return requestHttp.get(ProductInterfaceMap.productInfoType);
   }
 

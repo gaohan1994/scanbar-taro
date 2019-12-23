@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:26:45 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-29 11:55:18
+ * @Last Modified time: 2019-12-23 10:51:43
  */
 
 import { ProductInterface, ProductInterfaceMap } from "../constants";
@@ -11,7 +11,7 @@ import { AppReducer } from './index';
 
 export declare namespace ProductReducer {
   interface InitState {
-    productList: Array<ProductInterface.ProductList>;
+    productList: Array<ProductInterface.ProductInfo>;
     productSearchList: Array<ProductInterface.ProductList>;
     productManageList: {
       total: number;
@@ -44,31 +44,7 @@ const initState: ProductReducer.InitState = {
   },
   productType: [],
   productSupplier: [],
-  productDetail: {
-    id: -1,
-    cost: -1,
-    limitNum: -1,
-    memberPrice: -1,
-    merchantId: -1,
-    number: -1,
-    price: -1,
-    saleType: -1,
-    status: -1,
-    type: -1,
-    typeName: '',
-    barcode: '',
-    brand: '',
-    pictures: '',
-    standard: '',
-    supplier: '',
-    unit: '',
-    firstLetter: '',
-    name: '',
-    updateBy: '',
-    createBy: '',
-    createTime: '',
-    updateTime: '',
-  },
+  productDetail: {} as any,
   selectProduct: undefined,
 };
 

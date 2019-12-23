@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-06 11:59:24
+ * @Last Modified time: 2019-12-23 11:05:08
  * 
  * @todo 开单页面
  */
@@ -12,7 +12,7 @@ import "../style/product.less";
 import "../style/member.less";
 import CartBar from '../../component/cart/cart';
 import { ProductAction } from '../../actions';
-import { getProductList, getProductSearchList, getSelectProduct } from '../../reducers/app.product';
+import { getProductSearchList, getSelectProduct, getProductType, getProductList } from '../../reducers/app.product';
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
 import { ProductInterface, ProductInterfaceMap } from '../../constants';
@@ -20,14 +20,13 @@ import classnames from 'classnames';
 import ProductComponent from '../../component/product/product';
 import invariant from 'invariant';
 import { ResponseCode } from '../../constants/index';
-import merge from 'lodash.merge';
 import productSdk from '../../common/sdk/product/product.sdk';
 import { store } from '../../app';
 import { getProductCartList, getSuspensionCartList, ProductSDKReducer } from '../../common/sdk/product/product.sdk.reducer';
 import { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import Badge from '../../component/badge/badge';
+import { AtActivityIndicator } from 'taro-ui';
 
-let ItemHeight: number = -1;
 let SectionHeight: number = -1;
 
 const memberPrefix = 'member';
@@ -40,17 +39,11 @@ interface Props {
    * @type {ProductInterface.ProductList[]}
    * @memberof Props
    */
-  productList: ProductInterface.ProductList[];
-  /**
-   * @param {pureProductList} 所有商品去掉分类之后合成的数组
-   *
-   * @type {ProductInterface.ProductInfo[]}
-   * @memberof Props
-   */
-  pureProductList: ProductInterface.ProductInfo[];
+  productList: ProductInterface.ProductInfo[];
   productSearchList: ProductInterface.ProductList[];
   pureProductSearchList: ProductInterface.ProductInfo[];
   selectProduct: ProductInterface.ProductInfo;
+  productTypeList: ProductInterface.ProductTypeInfo[];
   /**
    * @param {productCartList}  
    * @param {suspensionList} 
@@ -70,14 +63,8 @@ interface State {
    * @memberof State
    */
   currentType: ProductInterface.ProductTypeInfo;
-  /**
-   * @param {scrollProductId} 右边滑动的id
-   *
-   * @type {number}
-   * @memberof State
-   */
-  scrollProductId: number;
-  searchValue: string;                            
+  searchValue: string;              
+  loading: boolean;              
 }
 
 class ProductOrder extends Taro.Component<Props, State> {
@@ -88,28 +75,30 @@ class ProductOrder extends Taro.Component<Props, State> {
       id: 0,
       createTime: ''
     },
-    scrollProductId: -1,
-    searchValue: ''
+    searchValue: '',
+    loading: false,
   };
-
-  private productScrollList?: Array<ProductInterface.ProductList & { scrollHeight: number, scrollOriginHeight: number }> = undefined;
   
   componentDidShow () {
     this.init();
   }
 
-  public changeCurrentType = (typeInfo: ProductInterface.ProductTypeInfo) => {
-    this.setState({ currentType: typeInfo });
-  }
-
-  public changeScrollProductId = (id: number) => {
-    this.setState({ scrollProductId: id });
+  public changeCurrentType = (typeInfo: ProductInterface.ProductTypeInfo, fetchProduct: boolean = true) => {
+    this.setState({ currentType: typeInfo }, async () => {
+      if (fetchProduct) {
+        this.fetchData(typeInfo);
+      }
+    });
   }
 
   public init = async (): Promise<void> => {
     try {
-      const { success, result } = await ProductAction.productInfoGetList();
-      invariant(success, result || ResponseCode.error);
+      const productTypeResult = await ProductAction.productInfoType();
+      console.log('productTypeResult: ', productTypeResult);
+      invariant(productTypeResult.code === ResponseCode.success, productTypeResult.msg || ' ');
+      const { data } = productTypeResult;
+      const firstType = data[0] || {};
+      this.changeCurrentType(firstType);
 
       const { selectProduct } = this.props;
       if (selectProduct !== undefined) {
@@ -124,15 +113,6 @@ class ProductOrder extends Taro.Component<Props, State> {
           });
         }, 100);
       }
-
-      const { rows }: { rows: ProductInterface.ProductList[] } = result;
-      if (rows.length > 0) {
-        const firstType = rows[0];
-        this.changeCurrentType(firstType.typeInfo);
-      }
-      setTimeout(() => {
-        this.initItemHeight();
-      }, 100);
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -141,8 +121,11 @@ class ProductOrder extends Taro.Component<Props, State> {
     }
   }
 
-  public fetchData = () => {
-    ProductAction.productInfoGetList();
+  public fetchData = async (type: ProductInterface.ProductTypeInfo) => {
+    this.setState({ loading: true });
+    const result = await ProductAction.productOrderInfoList({type: type.id, status: 0});
+    this.setState({ loading: false });
+    return result;
   }
 
   public searchData = async () => {
@@ -168,14 +151,6 @@ class ProductOrder extends Taro.Component<Props, State> {
     }
   }
 
-  public getScrollProductId = (productList: ProductInterface.ProductInfo[]) => {
-    return productList.length > 0 
-      ? productList[0]
-        ? productList[0].id
-        : -1
-      : -1;
-  }
-
   public onNonBarcodeProductClick = () => {
     const product: any = {
       id: `${productSdk.nonBarcodeKey}${new Date().getTime()}`
@@ -191,44 +166,11 @@ class ProductOrder extends Taro.Component<Props, State> {
    *
    * @memberof ProductOrder
    */
-  public onTypeClick = (params: ProductInterface.ProductList) => {
-    const { typeInfo, productList } = params;
+  public onTypeClick = (params: ProductInterface.ProductTypeInfo) => {
     this.onInput({detail: {value: ''}});
-    this.changeScrollProductId(this.getScrollProductId(productList));
     setTimeout(() => {
-      this.changeCurrentType(typeInfo);
+      this.changeCurrentType(params);
     }, 200);
-  }
-
-  public initItemHeight = () => {
-    if (ItemHeight === -1) {
-      const query = Taro.createSelectorQuery().in(this.$scope);
-      query
-        .select('.product-component-base1')
-        .boundingClientRect((rect: any) => {
-          ItemHeight = rect.height;
-        })
-        .exec();
-    }
-  }
-  
-  public getItemHeight = async (): Promise<number> => {
-    if (ItemHeight !== -1) {
-      return new Promise((resolve) => {
-        resolve(ItemHeight);
-      });
-    } else {
-      return new Promise((resolve) => {
-        const query = Taro.createSelectorQuery().in(this.$scope);
-        query
-          .select('.product-component-base1')
-          .boundingClientRect((rect: any) => {
-            ItemHeight = rect.height;
-            resolve(rect.height);
-          })
-          .exec();
-      });
-    }
   }
 
   public onSuspensionHandle = () => {
@@ -251,49 +193,6 @@ class ProductOrder extends Taro.Component<Props, State> {
           SectionHeight = rect.height;
         })
         .exec();
-    }
-  }
-
-  public configItemsHeight = (itemHeight: number): Array<ProductInterface.ProductList & { scrollHeight: number, scrollOriginHeight: number }> => {
-    if (this.productScrollList) {
-      return this.productScrollList;
-    }
-    const productList: ProductInterface.ProductList[] = merge([], this.props.productList);
-    let productScrollList: Array<ProductInterface.ProductList & { scrollHeight: number, scrollOriginHeight: number }> = [];
-
-    for (let i = 0; i < productList.length; i++) {
-      const list = productList[i];
-      productScrollList.push({
-        ...list,
-        scrollHeight: 
-          (list.productList.length * itemHeight) 
-          + (i !== 0 ? productScrollList[i - 1].scrollHeight : 0)
-          + (i * SectionHeight),
-        scrollOriginHeight: i !== 0 ? productScrollList[i - 1].scrollHeight + 1 : 0,
-      });
-    }
-    this.productScrollList = productScrollList;
-    return productScrollList;
-  }
-
-  /**
-   * @todo [监听滚动并设置跳转事件]
-   *
-   * @memberof ProductOrder
-   */
-  public onScroll = async (event: any) => {
-    const { target: { scrollTop } } = event;
-    const { currentType } = this.state;
-
-    const ProductItemHeight = await this.getItemHeight();
-    const productScrollList = this.configItemsHeight(ProductItemHeight);
-    for (let i = productScrollList.length - 1; i >= 0; i--) {
-      if (scrollTop > productScrollList[i].scrollOriginHeight && scrollTop < productScrollList[i].scrollHeight) {
-        if (currentType.name !== productScrollList[i].typeInfo.name) {
-          this.changeCurrentType(productScrollList[i].typeInfo);
-          return;
-        }
-      }
     }
   }
 
@@ -373,7 +272,7 @@ class ProductOrder extends Taro.Component<Props, State> {
    */
   private renderLeft = () => {
     const { currentType, searchValue } = this.state; 
-    const { productList, pureProductSearchList } = this.props;
+    const { productTypeList, pureProductSearchList } = this.props;
     return (
       <ScrollView 
         scrollY={true}
@@ -386,21 +285,21 @@ class ProductOrder extends Taro.Component<Props, State> {
           无码商品
         </View>
         {
-          productList && productList.length > 0
-            ? productList.map((list) => {
+          productTypeList && productTypeList.length > 0
+            ? productTypeList.map((type) => {
               
               return (
                 <View 
-                  key={list.typeInfo.id}
+                  key={type.id}
                   className={classnames(`${cssPrefix}-list-left-item`, {
-                    [`${cssPrefix}-list-left-item-active`]: searchValue === '' && pureProductSearchList.length === 0 && list.typeInfo.id === currentType.id
+                    [`${cssPrefix}-list-left-item-active`]: searchValue === '' && pureProductSearchList.length === 0 && type.id === currentType.id
                   })}
-                  onClick={() => this.onTypeClick(list)}
+                  onClick={() => this.onTypeClick(type)}
                 >
-                  {searchValue === '' && pureProductSearchList.length === 0 && list.typeInfo.id === currentType.id && (
+                  {searchValue === '' && pureProductSearchList.length === 0 && type.id === currentType.id && (
                     <View className={`${cssPrefix}-list-left-item-active-bge`} />
                   )}
-                  {list.typeInfo.name}
+                  {type.name}
                 </View>
               );
             })
@@ -412,8 +311,7 @@ class ProductOrder extends Taro.Component<Props, State> {
 
   private renderRight = () => {
     const { productList, pureProductSearchList } = this.props;
-    const { currentType, scrollProductId, searchValue } = this.state;
-
+    const { currentType, searchValue, loading } = this.state;
     if (pureProductSearchList.length === 0 && searchValue === '') {
       return (
         <View className={`${cssPrefix}-list-right`}>
@@ -424,42 +322,28 @@ class ProductOrder extends Taro.Component<Props, State> {
           <ScrollView 
             scrollY={true}
             className={`${cssPrefix}-list-right ${cssPrefix}-list-right-container`}
-            scrollIntoView={`product${scrollProductId}`}
-            onScroll={this.onScroll}
           >
             {
-              productList && productList.length > 0
-                ? productList.map((list, index) => {
-                  const { typeInfo } = list;
+              !loading 
+              ? productList && productList.length > 0
+                ? productList.map((product) => {
                   return (
-                    <View key={typeInfo.id}>
-                      {
-                        index !== 0 && (
-                          <View className={`${cssPrefix}-list-right-header `}>
-                            <View className={`${cssPrefix}-list-right-header-bge`}/>
-                            <Text className={`${cssPrefix}-list-right-header-text`}>{typeInfo.name}</Text>
-                          </View>
-                        )
-                      }
-                      {
-                        list.productList.map((product) => {
-                          return (
-                            <View    
-                              id={`product${product.id}`}
-                              className="product-component-base1"
-                              key={product.id}
-                            >
-                              <ProductComponent
-                                product={product}
-                              />  
-                            </View>
-                          );
-                        })
-                      }
+                    <View    
+                      id={`product${product.id}`}
+                      key={product.id}
+                    >
+                      <ProductComponent
+                        product={product}
+                      />  
                     </View>
                   );
                 })
                 : <View />
+              : (
+                <View className="container">
+                  <AtActivityIndicator mode='center' />
+                </View>
+              )
             }
           </ScrollView>  
         </View>
@@ -476,7 +360,6 @@ class ProductOrder extends Taro.Component<Props, State> {
               return (
                 <View    
                   id={`product${product.id}`}
-                  className="product-component-base1"
                   key={product.id}
                 >
                   <ProductComponent
@@ -494,12 +377,6 @@ class ProductOrder extends Taro.Component<Props, State> {
 
 const mapState = (state: AppReducer.AppState) => {
   const productList = getProductList(state) || [];
-  const pureProductList: ProductInterface.ProductInfo[] = [];
-  productList.forEach((list) => {
-    list.productList.forEach((item) => {
-      pureProductList.push(item);
-    });
-  });
 
   const productSearchList = getProductSearchList(state) || [];
   const pureProductSearchList: any[] = [];
@@ -512,10 +389,10 @@ const mapState = (state: AppReducer.AppState) => {
 
   return {
     productList,
-    pureProductList,
     productSearchList,
     pureProductSearchList,
     selectProduct,
+    productTypeList: getProductType(state),
     productCartList: getProductCartList(state),
     suspensionList: getSuspensionCartList(state)
   };

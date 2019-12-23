@@ -16,6 +16,17 @@ class ProductAction {
     }
   }
 
+  public productOrderInfoList = async (params?: ProductInterface.ProductInfoListFetchFidle) => {
+    const result = await ProductService.productInfoList(params);
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_LIST,
+        payload: result.data
+      });
+    }
+    return result;
+  }
+
   public productInfoGetList = async (params?: any) => {
     const result = await ProductService.productInfoGetList();
     if (result.code === ResponseCode.success) {
