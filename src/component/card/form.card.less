@@ -4,7 +4,7 @@
 @form-input-width: 300px;
 
 .@{form-prefix} {
-  .margin(10px, t);
+  .margin(14px, t);
   .theme-card;
   &-buttons {
     .flex(center, center);
@@ -12,6 +12,33 @@
   &-shadow {
     box-sizing: border-box;
     .theme-shadow;
+  }
+  &-info {
+    &-333333 {
+      color: #333333 !important;
+    }
+    &-666666 {
+      color: #666666 !important;
+    }
+  }
+  &-color {
+    &-333333 {
+      color: #333333 !important;
+    }
+    &-666666 {
+      color: #666666 !important;
+    }
+    &-4d4d4d {
+      color: #4d4d4d !important;
+    }
+  }
+  &-size {
+    &-36 {
+      font-size: 36px !important;
+    }
+    &-34 {
+      font-size: 34px !important;
+    }
   }
   &-input {
     width: @form-input-width;
@@ -23,7 +50,11 @@
   }
   &-black {
     font-size: 30px;
-    color: #666666;
+    color: #4d4d4d;
+  }
+  &-title {
+    font-size: 36px;
+    color: #4d4d4d;
   }
   &-gray {
     font-size: 30px;
@@ -37,5 +68,27 @@
     width: 13px;
     height: 24px;
     margin-left: 16px;
+  }
+  &-bold {
+    font-weight: bold;
+  }
+  &-button {
+    min-width: 120px;
+    .padding(10px, tb);
+    .padding(18px, lr);
+    .flex(center, center, row);
+    border: 2px solid;
+    .margin(15px, l);
+    font-size: 26px;
+    border-radius: 22px;
+    line-height: 26px;
+    &-confirm {
+      border-color: @theme-color;
+      color: @theme-color;
+    }
+    &-cancel {
+      border-color: #E6E6E6;
+      color: #E6E6E6;
+    }
   }
 }

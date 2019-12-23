@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-04 13:49:58 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-06 14:15:41
+ * @Last Modified time: 2019-12-20 11:50:02
  * 
  * @Usage
  * ```jsx
@@ -24,13 +24,19 @@
  */
 import Taro from '@tarojs/taro';
 import { AtModal, AtButton } from 'taro-ui';
-import { View, Text } from '@tarojs/components';
+import { View, Text, Input } from '@tarojs/components';
 import "./modal.less";
 import { AtModalProps } from 'taro-ui/@types/modal';
 import merge from 'lodash.merge';
 import classnames from 'classnames';
+import { InputProps } from '@tarojs/components/types/Input';
 
 const ModalCssPrefix = 'component-modal';
+
+export type ModalInput = {
+  title: string;
+  main?: boolean;
+} & Partial<InputProps>;
 
 interface ModalButton {
   onPress: () => void;
@@ -43,6 +49,8 @@ interface Props extends AtModalProps {
   buttons?: ModalButton[];  // modal 的按钮
   renderHeader?: () => any; // 自定义渲染 modal 标题
   renderFooter?: () => any; // 自定义渲染 modal 底部
+  tip?: string;
+  inputs?: ModalInput[];
 }
 
 interface State { }
@@ -54,10 +62,12 @@ class Modal extends Taro.Component<Props, State> {
     buttons: [],
     renderHeader: undefined,
     renderFooter: undefined,
+    tip: undefined,
+    inputs: undefined,
   };
 
   render () {
-    const { header, buttons, renderHeader, renderFooter } = this.props;
+    const { header, buttons, renderHeader, renderFooter, tip, inputs } = this.props;
     const showHeader = header && header.length > 0;
 
     /**
@@ -78,6 +88,38 @@ class Modal extends Taro.Component<Props, State> {
           )}
           {renderHeader && renderHeader()}
           <View className={`${ModalCssPrefix}-content`}>
+            {tip && (
+              <View className={`${ModalCssPrefix}-content-tip`}>{tip}</View>
+            )}
+            {inputs && (
+              <View>
+                {inputs.map((item) => {
+                  const { title, main } = item;
+                  return (
+                    <View 
+                      key={title}
+                      className={`${ModalCssPrefix}-content-item`}
+                    >
+                      <View className={`${ModalCssPrefix}-content-item-title`}>
+                        {main && (
+                          <View className={`${ModalCssPrefix}-content-item-title-main`}>*</View>
+                        )}
+                        {title}
+                      </View>
+                      <Input 
+                        value={item.value} 
+                        onInput={item.onInput}
+                        type={item.type}
+                        disabled={item.disabled}
+                        placeholder={item.placeholder}
+                        className={`${ModalCssPrefix}-content-item-input`}
+                        placeholderClass={`${ModalCssPrefix}-content-item-input-place`}
+                      />
+                    </View>
+                  );
+                })}
+              </View>
+            )}
             {this.props.children}
           </View>
           {buttons && buttons.length > 0 && (

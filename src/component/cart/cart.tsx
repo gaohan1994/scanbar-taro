@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-09 15:00:18
+ * @Last Modified time: 2019-12-20 13:34:46
  * 
  * @todo [购物车组件]
  */
@@ -15,8 +15,6 @@ import { AppReducer } from '../../reducers';
 import { 
   getProductCartList, 
   getChangeWeigthProduct, 
-  getSuspensionCartList, 
-  ProductSDKReducer, 
   getNonBarcodeProduct,
 } from '../../common/sdk/product/product.sdk.reducer';
 import { connect } from '@tarojs/redux';
@@ -24,19 +22,20 @@ import productSdk, { ProductCartInterface } from '../../common/sdk/product/produ
 import Modal from '../modal/modal';
 import FormCard from '../card/form.card';
 import { FormRowProps } from '../card/form.row';
-import { ProductInterface } from '../../constants';
+import { ProductInterface, ProductService } from '../../constants';
 import numeral from 'numeral';
 import merge from 'lodash.merge';
 import invariant from 'invariant';
 import CartLayout from './cart.layout';
 import Badge from '../badge/badge';
+import { ResponseCode } from '../../constants/index';
+import { ModalInput } from '../modal/modal';
 
 const cssPrefix = 'cart';
 
 interface CartBarProps { 
   productCartList: Array<ProductCartInterface.ProductCartInfo>;
   changeWeightProduct: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo;
-  suspensionCartList: Array<ProductSDKReducer.SuspensionCartBase>;
   nonBarcodeProduct: Partial<ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo>;
 }
 
@@ -103,17 +102,6 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     productSdk.manage({type, product});
   }
 
-  public onSuspensionCart = () => {
-    const { productCartList } = this.props;
-    if (productCartList.length > 0) {
-      productSdk.suspensionCart();
-    } else {
-      Taro.navigateTo({
-        url: `/pages/product/product.suspension`
-      });
-    }
-  }
-
   public onPayHandle = () => {
     const { productCartList } = this.props;
     if (productCartList.length > 0) {
@@ -145,8 +133,68 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     }
   }
 
+  public onScanProduct = () => {
+    try {
+      /**
+       * @todo [先去自己的库里查询商品看是否存在，如果存在则加入购物车]
+       * @todo [如果不存在，则去第三方库里查询商品，如果存在则提示是否建档]
+       * @todo [如果第三方库里也不存在则提示没有找到该商品]
+       */
+      Taro
+      .scanCode()
+      .then(async (res) => {
+        Taro.showLoading();
+        const result = await ProductService.productInfoScanGet({barcode: res.result});
+        if (result.code === ResponseCode.success) {
+          Taro.hideLoading();
+          // 找到了商品 显示modal名称
+          Taro.showToast({
+            title: `${result.data.name}`,
+            icon: 'none',
+          });
+          productSdk.manage({
+            type: productSdk.productCartManageType.ADD,
+            product: result.data
+          });
+          return;
+        }
+        // 说明没找到
+        const thirdProductResult = await ProductService.productInfoScan({barcode: res.result});
+        Taro.hideLoading();
+        if (thirdProductResult.code === ResponseCode.success) {
+          Taro.showModal({
+            title: '提示',
+            content: `商品${thirdProductResult.data.barcode}不存在，是否现在建档？`,
+            success: ({confirm}) => {
+              if (confirm) {
+                const params = {
+                  scanProduct: thirdProductResult.data,
+                  needCallback: true
+                };
+                Taro.navigateTo({
+                  url: `/pages/product/product.add?params=${JSON.stringify(params)}`
+                });
+              }
+            }
+          });
+          return;
+        }
+        throw new Error(thirdProductResult.msg || '没有找到该商品');
+      })
+      .catch(error => {
+        Taro.showToast({title: error.message, icon: 'none'});
+      });
+    } catch (error) {
+      Taro.hideLoading();
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
+
   render () {
-    const { productCartList, suspensionCartList } = this.props;
+    const { productCartList } = this.props;
     const buttonClassNames = classnames(
       'cart-right',
       {
@@ -162,6 +210,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
         {this.renderNonBarcodeProductModal()}
         <View className="cart">
           <View className="cart-bg">
+            {this.renderScan()}
             <View className="cart-icon" onClick={() => this.onChangeCartListVisible()} >
               {
                 productCartList.length > 0 ? (
@@ -185,32 +234,6 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
               >
                 ￥{numeral(productSdk.getProductPrice()).format('0.00')}
               </View>
-                
-              {
-                suspensionCartList.length > 0 ? (
-                  <Badge value={suspensionCartList.length}>
-                    <View 
-                      className={classnames(`${cssPrefix}-left-suspension`, {
-                        [`${cssPrefix}-left-suspension-active`]: productCartList.length > 0,
-                        [`${cssPrefix}-left-suspension-disabled`]: productCartList.length === 0,
-                      })}
-                      onClick={() => this.onSuspensionCart()}
-                    >
-                      挂单
-                    </View>
-                  </Badge>
-                ) : (
-                  <View 
-                    className={classnames(`${cssPrefix}-left-suspension`, {
-                      [`${cssPrefix}-left-suspension-active`]: productCartList.length > 0,
-                      [`${cssPrefix}-left-suspension-disabled`]: productCartList.length === 0,
-                    })}
-                    onClick={() => this.onSuspensionCart()}
-                  >
-                    挂单
-                  </View>
-                )
-              }
             </View>
             <View 
               className={buttonClassNames}
@@ -220,6 +243,17 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
             </View>
           </View>
         </View>
+      </View>
+    );
+  }
+
+  private renderScan = () => {
+    return (
+      <View 
+        className={`${cssPrefix}-scan`}
+        onClick={() => this.onScanProduct()}
+      >
+        <Image src="//net.huanmusic.com/weapp/icon_scan.png" className={`${cssPrefix}-scan-image`} />
       </View>
     );
   }
@@ -341,24 +375,20 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
   private renderNonBarcodeProductModal = () => {
     const { nonBarcodePrice, nonBarcodeRemark } = this.state;
     const { nonBarcodeProduct } = this.props;
-    const nonBarcodeForm: FormRowProps[] = [
+    const nonBarcodeInputs: ModalInput[] = [
       {
-        title: '价格（￥）',
+        title: '价格',
         main: true,
-        isInput: true,
-        inputType: 'digit',
-        inputValue: nonBarcodePrice,
-        inputOnChange: (value) => this.onChangeValue('nonBarcodePrice', value),
-        inputPlaceHolder: '请输入商品价格'
+        value: nonBarcodePrice,
+        onInput: ({detail: {value}}) => this.onChangeValue('nonBarcodePrice', value),
+        placeholder: '请输入商品价格',
       },
       {
-        title: `备注`,
-        isInput: true,
-        hasBorder: false,
-        inputValue: nonBarcodeRemark,
-        inputOnChange: (value) => this.onChangeValue('nonBarcodeRemark', value),
-        inputPlaceHolder: '请输入备注信息'
-      }
+        title: '备注',
+        value: nonBarcodeRemark,
+        onInput: ({detail: {value}}) => this.onChangeValue('nonBarcodeRemark', value),
+        placeholder: '请输入备注信息',
+      },
     ];
     const buttons = [
       {
@@ -379,11 +409,8 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
         header={'无码商品'}
         onClose={() => this.onNonBarcodeClose()}
         buttons={buttons}
-      >
-        <View className="test-modal-form">
-          <FormCard items={nonBarcodeForm} />
-        </View>
-      </Modal>
+        inputs={nonBarcodeInputs}
+      />
     );
   }
 
@@ -394,23 +421,22 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
   private renderWeightProductModal = () => {
     const { weightProductSellNum, weightProductChangePrice } = this.state;
     const { changeWeightProduct } = this.props;
-    const weightForm: FormRowProps[] = [
+    const weightInputs: ModalInput[] = [
       {
         title: '重量',
-        isInput: true,
-        inputType: 'digit',
-        inputValue: weightProductSellNum,
-        inputOnChange: (value) => this.onChangeValue('weightProductSellNum', value),
-        inputPlaceHolder: '请输入重量'
+        type: 'digit',
+        main: true,
+        value: weightProductSellNum,
+        onInput: ({detail: {value}}) => this.onChangeValue('weightProductSellNum', value),
+        placeholder: '请输入重量',
       },
       {
-        title: '价格（￥）',
-        isInput: true,
-        inputValue: weightProductChangePrice,
-        inputType: 'digit',
-        inputOnChange: (value) => this.onChangeValue('weightProductChangePrice', value),
-        hasBorder: false
-      }
+        title: '价格',
+        main: true,
+        value: weightProductChangePrice,
+        onInput: ({detail: {value}}) => this.onChangeValue('weightProductChangePrice', value),
+        placeholder: '请输入商品价格',
+      },
     ];
     const weightButtons = [
       {
@@ -430,12 +456,9 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
         isOpened={isOpen}
         header={changeWeightProduct.name}
         onClose={() => this.onWeightProductClose()}
+        inputs={weightInputs}
         buttons={weightButtons}
-      >
-        <View className="test-modal-form">
-          <FormCard items={weightForm} />
-        </View>
-      </Modal>
+      />
     );
   }
 }
@@ -443,7 +466,6 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
 const select = (state: AppReducer.AppState) => ({
   productCartList: getProductCartList(state),
   changeWeightProduct: getChangeWeigthProduct(state),
-  suspensionCartList: getSuspensionCartList(state),
   nonBarcodeProduct: getNonBarcodeProduct(state),
 });
 

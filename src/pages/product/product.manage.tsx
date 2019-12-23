@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-15 11:17:25 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-06 11:59:32
+ * @Last Modified time: 2019-12-17 11:37:08
  * 
  * @todo [商品管理页面]
  */
@@ -224,7 +224,7 @@ class ProductManage extends Taro.Component<Props, State> {
           <View className={`${memberPrefix}-main-header-search ${cssPrefix}-header-search`}>
             <Image src="//net.huanmusic.com/weapp/icon_import.png" className={`${memberPrefix}-main-header-search-icon`} />
             <Input
-              cursorSpacing={300}
+              // cursorSpacing={300}
               className={`${memberPrefix}-main-header-search-input`} 
               placeholder="请输入商品名称或条码"
               value={searchValue}

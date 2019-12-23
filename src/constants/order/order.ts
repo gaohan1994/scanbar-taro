@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-09 14:02:01
+ * @Last Modified time: 2019-12-18 10:58:52
  * 
  * @todo [商品相关的类型定义]
  */
@@ -79,10 +79,12 @@ export declare namespace OrderInterface {
     orderNo: string;
   }
 
+  type RECEIVE_ORDER_DETAIL = string;
   type RECEIVE_ORDER_LIST = string;
 
   type ReducerInterface = {
     RECEIVE_ORDER_LIST: RECEIVE_ORDER_LIST;
+    RECEIVE_ORDER_DETAIL: RECEIVE_ORDER_DETAIL;
   };
 
   interface OrderInterfaceMapImp {
@@ -96,6 +98,7 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
 
   public reducerInterfaces = {
     RECEIVE_ORDER_LIST: 'RECEIVE_ORDER_LIST',
+    RECEIVE_ORDER_DETAIL: 'RECEIVE_ORDER_DETAIL',
   };
 
   public orderList = (params?: OrderInterface.OrderListFetchFidle) => {

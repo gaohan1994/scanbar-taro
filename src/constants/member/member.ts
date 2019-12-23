@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:09:10 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-29 10:37:40
+ * @Last Modified time: 2019-12-18 17:10:23
  */
 import { jsonToQueryString, HTTPInterface } from '../index';
 
@@ -69,6 +69,7 @@ export declare namespace MemberInterface {
     sex: string;
     status: number;
     username: string;
+    levelId?: number;
   }
 
   interface MemberInfoEditParams extends MemberInfoAddParams { }
@@ -87,6 +88,7 @@ export declare namespace MemberInterface {
     phoneNumber?: string;
     sex?: string;
     username?: string;
+    identity?: string;
   }
 
   /**
@@ -131,6 +133,7 @@ interface MemberInterfaceMap {
   reducerInterfaces: MemberInterface.MemberReducerInterface;
   memberInfoAdd: string;
   memberInfoEdit: string;
+  getRandomCaroNo: string;
   memberPreference(params: MemberInterface.MemberInfoDetail): string;
   memberInfoList(params?: MemberInterface.MemberInfoListFetchFidle): string;
   memberInfoSearch(params?: MemberInterface.MemberInfoSearchFidle): string;
@@ -153,6 +156,7 @@ class MemberInterfaceMap {
   
   public memberInfoAdd = '/memberInfo/add';
   public memberInfoEdit = '/memberInfo/edit';
+  public getRandomCaroNo = '/memberInfo/getRandomCaroNo';
   /**
    * @todo [请求会员列表]
    *

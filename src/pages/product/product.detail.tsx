@@ -1,5 +1,5 @@
 import Taro from '@tarojs/taro';
-import { View, Image, Picker } from '@tarojs/components';
+import { View, Image, Picker, Textarea } from '@tarojs/components';
 import { ProductAction } from '../../actions';
 import invariant from 'invariant';
 import { ResponseCode, ProductInterface, ProductService } from '../../constants/index';
@@ -16,6 +16,7 @@ import FormRow from '../../component/card/form.row';
 import Modal from '../../component/modal/modal';
 import "../../component/card/form.card.less";
 import numeral from 'numeral';
+import { ModalInput } from '../../component/modal/modal';
 
 export function generateModalButtons (confirmCallback: any, cancelCallback: any) {
   return [
@@ -553,13 +554,24 @@ class ProductDetail extends Taro.Component<Props, State> {
         <View className="container">
           <View className={`${cssPrefix}-detail-cover`}>
             <Image 
-              // src={productDetail.pictures} 
               src="//net.huanmusic.com/weapp/img_nolist.png"
               className={`${cssPrefix}-detail-cover-image`} 
             />
           </View>
-          <View className={`${cssPrefix}-detail-list`}>
-            <FormCard items={formName} />
+          <View className={`${cssPrefix}-detail-list  product-detail`}>
+            <FormCard items={formName}>
+              {/* <FormRow
+                title={'名称'}
+                main={true}
+              >
+                <Textarea
+                  value={productChangeDetail.name || ''}
+                  autoHeight={true}
+                  className={`${cssPrefix}-detail-textarea`}
+                  onInput={({detail: {value}}) => this.onValueChange('name', value)}
+                />
+              </FormRow> */}
+            </FormCard>
             <FormCard items={formPrice} />
             <FormCard items={formNumber} />
             <View 
@@ -647,86 +659,85 @@ class ProductDetail extends Taro.Component<Props, State> {
       productChangeDetail
     } = this.state;
 
-    const costForm: FormRowProps[] = [
+    const costInputs: ModalInput[] = [
       {
-        title: '进价调整为',
-        isInput: true,
-        inputType: 'digit',
-        inputValue: `${productChangeDetail.cost || ''}`,
-        inputOnChange: (value) => this.onNumberValueChange('cost', value),
+        title: '进价',
+        type: 'digit',
+        value: `${productChangeDetail.cost || ''}`,
+        placeholder: `${productDetail.cost}`,
+        onInput: ({detail: {value}}) => this.onNumberValueChange('cost', value),
       },
       {
         title: '进价差额',
-        extraText: `${productChangeDetail.cost !== undefined && String(productChangeDetail.cost) !== '' 
-          ? numeral(productChangeDetail.cost).value() - numeral(productDetail.cost).value() 
-          : ''}`,
-        hasBorder: false,
-      },
+        value: `${productChangeDetail.cost !== undefined && String(productChangeDetail.cost) !== '' 
+        ? numeral(numeral(productChangeDetail.cost).value() - numeral(productDetail.cost).value() ).format('0.00')
+        : ''}`,
+        disabled: true,
+      }
     ];
-    const priceForm: FormRowProps[] = [
+    const priceInputs: ModalInput[] = [
       {
-        title: '售价调整为',
-        isInput: true,
-        inputType: 'digit',
-        inputValue: `${productChangeDetail.price || ''}`,
-        inputOnChange: (value) => this.onNumberValueChange('price', value)
+        title: '售价',
+        type: 'digit',
+        value: `${productChangeDetail.price || ''}`,
+        placeholder: `${productDetail.price}`,
+        onInput: ({detail: {value}}) => this.onNumberValueChange('price', value),
       },
       {
         title: '售价差额',
-        extraText: `${productChangeDetail.price !== undefined && String(productChangeDetail.price) !== '' 
-          ? numeral(productChangeDetail.price).value() - numeral(productDetail.price).value()
-          : ''}`,
-        hasBorder: false,
-      },
+        value: `${productChangeDetail.price !== undefined && String(productChangeDetail.price) !== '' 
+        ? numeral(numeral(productChangeDetail.price).value() - numeral(productDetail.price).value()).format('0.00')
+        : ''}`,
+        disabled: true,
+      }
     ];
-    const memberPriceForm: FormRowProps[] = [
+    const memberPriceInputs: ModalInput[] = [
       {
-        title: '会员价调整为',
-        isInput: true,
-        inputType: 'digit',
-        inputValue: `${productChangeDetail.memberPrice || ''}`,
-        inputOnChange: (value) => this.onNumberValueChange('memberPrice', value),
+        title: '会员价',
+        type: 'digit',
+        placeholder: `${productDetail.memberPrice}`,
+        value: `${productChangeDetail.memberPrice || ''}`,
+        onInput: ({detail: {value}}) => this.onNumberValueChange('memberPrice', value),
       },
       {
-        title: '会员价差额',
-        extraText: `${productChangeDetail.memberPrice !== undefined && String(productChangeDetail.memberPrice) !== '' 
-          ? numeral(productChangeDetail.memberPrice).value() - numeral(productDetail.memberPrice).value() 
-          : ''}`,
-        hasBorder: false,
-      },
+        title: '价格差额',
+        value: `${productChangeDetail.memberPrice !== undefined && String(productChangeDetail.memberPrice) !== '' 
+        ? numeral(numeral(productChangeDetail.memberPrice).value() - numeral(productDetail.memberPrice).value()).format('0.00')
+        : ''}`,
+        disabled: true,
+      }
     ];
 
-    const numberForm: FormRowProps[] = [
+    const numberInputs: ModalInput[] = [
       {
-        title: '库存调整为',
-        isInput: true,
-        inputType: 'digit',
-        inputValue: `${productChangeDetail.number || ''}`,
-        inputOnChange: (value) => this.onNumberValueChange('number', value)
+        title: '现有库存',
+        value: `${productChangeDetail.number || ''}`,
+        placeholder: '请输入现有库存',
+        onInput: ({detail: {value}}) => this.onNumberValueChange('number', value),
       },
       {
         title: '库存差额',
-        extraText: `${productChangeDetail.number !== undefined && String(productChangeDetail.number) !== '' 
-          ? numeral(productChangeDetail.number).value() - numeral(productDetail.number).value() 
-          : ''}`,
-      },
+        value: `${productChangeDetail.number !== undefined && String(productChangeDetail.number) !== '' 
+        ? numeral(numeral(productChangeDetail.number).value() - numeral(productDetail.number).value()).format('0.00') 
+        : ''}`,
+        disabled: true,
+      }
     ];
 
-    const numberLimitForm: FormRowProps[] = [
+    const numberLimitInputs: ModalInput[] = [
       {
-        title: '库存预警调整为',
-        isInput: true,
-        inputType: 'number',
-        inputValue: `${productChangeDetail.limitNum || ''}`,
-        inputOnChange: (value) => this.onNumberValueChange('limitNum', value),
+        title: '库存预警',
+        value: `${productChangeDetail.limitNum || ''}`,
+        placeholder: '请输入现有库存预警',
+        onInput: ({detail: {value}}) => this.onNumberValueChange('limitNum', value),
       },
       {
-        title: '库存预警差额',
-        extraText: `${productChangeDetail.limitNum !== undefined && String(productChangeDetail.limitNum) !== '' 
-          ? numeral(productChangeDetail.limitNum).value() - numeral(productDetail.limitNum).value() 
-          : ''}`,
-        hasBorder: false,
-      },
+        title: '预警差额',
+        value: `${productChangeDetail.limitNum !== undefined && String(productChangeDetail.limitNum) !== '' 
+        ? numeral(numeral(productChangeDetail.limitNum).value() - numeral(productDetail.limitNum).value()).format('0.00') 
+        : ''}`,
+        disabled: true,
+      }
     ];
 
     const costButtons = generateModalButtons(
@@ -766,58 +777,43 @@ class ProductDetail extends Taro.Component<Props, State> {
         <Modal 
           isOpened={numberModalVisible}
           header="库存调整"
+          tip={`系统库存：${productDetail.number}`}
           onClose={() => this.changeModalVisible('numberModalVisible', false)}
+          inputs={numberInputs}
           buttons={numberButtons}
-        >
-          <View className={`${cssPrefix}-detail-modal`}>
-            <View className={`${cssPrefix}-detail-modal-text`}>系统库存: {productDetail.number}</View>
-            <FormCard items={numberForm} />
-          </View>
-        </Modal>
+        />
         <Modal 
           isOpened={numberLimitModalVisible}
-          header="库存下限调整"
+          header="库存预警调整"
+          tip={`系统库存预警：${productDetail.limitNum}`}
           onClose={() => this.changeModalVisible('numberModalVisible', false)}
           buttons={numberLimitButtons}
-        >
-          <View className={`${cssPrefix}-detail-modal`}>
-            <View className={`${cssPrefix}-detail-modal-text`}>库存下限预警: {productDetail.limitNum}</View>
-            <FormCard items={numberLimitForm} />
-          </View>
-        </Modal>
+          inputs={numberLimitInputs}
+        />
         <Modal 
           isOpened={costModalVisible}
           header="进价调整"
+          tip={`系统进价：${productDetail.cost}`}
           onClose={() => this.changeModalVisible('costModalVisible', false)}
           buttons={costButtons}
-        >
-          <View className={`${cssPrefix}-detail-modal`}>
-            <View className={`${cssPrefix}-detail-modal-text`}>系统进价: {numeral(productDetail.cost).format('0.00')}</View>
-            <FormCard items={costForm} />
-          </View>
-        </Modal>
+          inputs={costInputs}
+        />
         <Modal 
           isOpened={priceModalVisible}
           header="售价调整"
+          tip={`系统售价：${productDetail.price}`}
           onClose={() => this.changeModalVisible('priceModalVisible', false)}
           buttons={priceButtons}
-        >
-          <View className={`${cssPrefix}-detail-modal`}>
-            <View className={`${cssPrefix}-detail-modal-text`}>系统售价: {numeral(productDetail.price).format('0.00')}</View>
-            <FormCard items={priceForm} />
-          </View>
-        </Modal>
+          inputs={priceInputs}
+        />
         <Modal 
           isOpened={memberPriceModalVisible}
           header="会员价调整"
+          tip={`系统会员价：${productDetail.memberPrice}`}
           onClose={() => this.changeModalVisible('memberPriceModalVisible', false)}
           buttons={memberPriceButtons}
-        >
-          <View className={`${cssPrefix}-detail-modal`}>
-            <View className={`${cssPrefix}-detail-modal-text`}>系统会员价: {numeral(productDetail.memberPrice).format('0.00')}</View>
-            <FormCard items={memberPriceForm} />
-          </View>
-        </Modal>
+          inputs={memberPriceInputs}
+        />
       </View>
     );
   }

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-12 14:01:28 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-06 15:40:28
+ * @Last Modified time: 2019-12-18 17:26:50
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text, Input } from '@tarojs/components';
@@ -75,10 +75,14 @@ class PayReceive extends Taro.Component<Props, State> {
       invariant(payDetail.transPayload !== undefined, '支付参数设置错误');
       invariant(payDetail.transResult !== undefined, '支付参数设置错误');
       const result = await ProductService.cashierQueryStatus({orderNo: (payDetail.transResult as ProductInterface.CashierPay).orderNo});
-      invariant(result.code === ResponseCode.success, result.msg || ResponseCode.error);
+
+      // 取消支付失败的toast
+      // invariant(result.code === ResponseCode.success, result.msg || ResponseCode.error);
       
-      const { data } = result;
-      this.receiveCallback(data.status);
+      if (result.code === ResponseCode.success) {
+        const { data } = result;
+        this.receiveCallback(data.status);
+      }
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -319,39 +323,17 @@ class PayReceive extends Taro.Component<Props, State> {
                 : 0
               ).format('0.00')}` 
               : '',
-          },
-          // {
-          //   title: '收款',
-          //   isInput: true,
-          //   inputType: 'digit',
-          //   inputValue: receiveCash,
-          //   inputOnChange: this.onChangeCash
-          // }
+          }
         ];
         return (
           <View className={`${cssPrefix}-receive-content-cash`}>
             <FormCard items={cashForm} shadow={false} />
-
-            {/* <View className={`${cssPrefix}-receive-content-cash-box`}>
-              <View className={`${cssPrefix}-receive-content-cash-box-title`}>收款金额</View>
-              <View className={`${cssPrefix}-receive-content-cash-box-container`}>
-                <View>￥</View>
-                <Input 
-                  cursorSpacing={300}
-                  type="digit"
-                  value={receiveCash}
-                  onInput={({detail: {value}}) => this.onChangeCash(value)}
-                  className={`${cssPrefix}-receive-content-cash-box-container-input`}
-                  placeholderClass={`${cssPrefix}-receive-content-cash-box-container-input-place`}
-                />
-              </View>
-            </View> */}
             <View className={`${cssPrefix}-input-box ${cssPrefix}-receive-content-cash-box`}>
               <View className={`${cssPrefix}-input-box-title`}>收款金额</View>
               <View className={`${cssPrefix}-input-box-input`}>
                 <View className={`${cssPrefix}-input-box-input-money`}>￥</View>
                 <Input 
-                  cursorSpacing={300}
+                  // cursorSpacing={300}
                   className={`${cssPrefix}-input-box-input-input`} 
                   value={receiveCash}
                   onInput={({detail: {value}}) => this.onChangeCash(value)}

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-11 11:52:41
+ * @Last Modified time: 2019-12-20 15:48:56
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Input, Image, Text } from '@tarojs/components';
@@ -12,6 +12,7 @@ import { AppReducer } from '../../reducers';
 import { MemberInterface } from '../../constants';
 import '../../component/card/form.card.less';
 import '../style/member.less';
+import '../style/home.less';
 import invariant from 'invariant';
 import { AtActivityIndicator } from 'taro-ui';
 import classnames from 'classnames';
@@ -172,10 +173,9 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
         }
       }
       const params: MemberInterface.MemberInfoSearchFidle = {
-        pageNum: currentPage,
         pageSize,
-        cardNo: value,
-        phoneNumber: value,
+        pageNum: currentPage,
+        identity: value,
       };
       const result = await MemberAction.memberSearch(params);
       invariant(result.success === true, result.result || '服务器开了个小差');
@@ -216,15 +216,12 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
   }
 
   render () {
-    const { loading, refreshing } = this.state;
-    const { memberList } = this.props;
     return (
-      <View className={`container ${cssPrefix}-main`}>
-        <View className={`${cssPrefix}-main-header`}>
+      <View className={`container ${cssPrefix}-main container-color`}>
+        <View className={`${cssPrefix}-main-header ${cssPrefix}-main-bg`}>
           <View className={`${cssPrefix}-main-header-search`}>
             <Image src="//net.huanmusic.com/weapp/icon_search.png" className={`${cssPrefix}-main-header-search-icon`} />
-            <Input 
-              cursorSpacing={300}
+            <Input
               className={`${cssPrefix}-main-header-search-input`} 
               placeholder="请输入手机号/姓名"
               placeholderClass={`${cssPrefix}-main-header-search-input-holder`}
@@ -243,49 +240,75 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
         </View>
         
         <View className={`product-manage-list`}>
-          <ScrollView 
-            scrollY={true}
-            className={`product-manage-list-container`}
-            onScrollToUpper={this.refresh}
-            onScrollToLower={this.loadMore}
-          >
-            {refreshing === true && (
-              <View className={`${cssPrefix}-loading`}>
-                <AtActivityIndicator mode='center' />
+          <View className={`${cssPrefix}-main-card`}>
+            <View className="home-card">
+              <View className="home-buttons">
+                <View className={`home-buttons-button home-buttons-button-border ${cssPrefix}-main-button`}>
+                  <View className="home-money">2000</View>
+                  <View className={`normal-text home-buttons-button-box`}>会员总数</View>
+                </View>
+                <View className={`home-buttons-button  ${cssPrefix}-main-button`}>
+                  <View className="home-money">200</View>
+                  <View className={`normal-text home-buttons-button-box`}>今日新增</View>
+                </View>
               </View>
-            )}
-            {memberList.length > 0 ? (
-              <View 
-                className={classnames('component-form', {
-                  'component-form-shadow': true,
-                  [`${cssPrefix}-list-form`]: true
-                })}
-              >
-                {memberList.map((member, index) => {
-                  return (
-                    <View
-                      key={member.id}
-                      className={classnames(`${cssPrefix}-card-row`, {
-                        [`${cssPrefix}-card-row-border`]: index !== memberList.length - 1
-                      })}
-                      onClick={() => {Taro.navigateTo({url: `/pages/member/member.detail?id=${member.id}`})}}
-                    >
-                      <Text className={`${cssPrefix}-card-text`}>姓名：{member.username}</Text>
-                      <Text className={`${cssPrefix}-card-row-margin ${cssPrefix}-card-text`}>手机号：{member.phoneNumber}</Text>
-                    </View>
-                  );
-                })}
-              </View>
-            ) : (
-              <View>暂无数据</View>
-            )}
-            {loading === true && (
-              <View className={`${cssPrefix}-loading`}>
-                <AtActivityIndicator mode='center' />
-              </View>
-            )}
-          </ScrollView>
+            </View>
+          </View>
+
+          {this.renderTabs()}
         </View>
+      </View>
+    );
+  }
+
+  private renderTabs = () => {
+    const { loading, refreshing } = this.state;
+    const { memberList } = this.props;
+    return (
+      <View>
+
+        <ScrollView 
+          scrollY={true}
+          className={`product-manage-list-container`}
+          onScrollToUpper={this.refresh}
+          onScrollToLower={this.loadMore}
+        >
+          {refreshing === true && (
+            <View className={`${cssPrefix}-loading`}>
+              <AtActivityIndicator mode='center' />
+            </View>
+          )}
+          {memberList.length > 0 ? (
+            <View 
+              className={classnames('component-form', {
+                'component-form-shadow': true,
+                [`${cssPrefix}-list-form`]: true
+              })}
+            >
+              {memberList.map((member, index) => {
+                return (
+                  <View
+                    key={member.id}
+                    className={classnames(`${cssPrefix}-card-row`, {
+                      [`${cssPrefix}-card-row-border`]: index !== memberList.length - 1
+                    })}
+                    onClick={() => {Taro.navigateTo({url: `/pages/member/member.detail?id=${member.id}`})}}
+                  >
+                    <Text className={`${cssPrefix}-card-text`}>姓名：{member.username}</Text>
+                    <Text className={`${cssPrefix}-card-row-margin ${cssPrefix}-card-text`}>手机号：{member.phoneNumber}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          ) : (
+            <View>暂无数据</View>
+          )}
+          {loading === true && (
+            <View className={`${cssPrefix}-loading`}>
+              <AtActivityIndicator mode='center' />
+            </View>
+          )}
+        </ScrollView>
       </View>
     );
   }

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 14:06:03 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-28 15:19:04
+ * @Last Modified time: 2019-12-20 14:37:47
  */
 import Taro from '@tarojs/taro';
 import { View } from '@tarojs/components';
@@ -35,7 +35,7 @@ export class Card extends Taro.Component<CardProps> {
         className={classnames({
           'theme-card': true, 
           'common-card': true,
-          'theme-shadow': shadow,
+          // 'theme-shadow': shadow,
           'card-class': true,
         })} 
       >

@@ -4,6 +4,7 @@ import { Provider } from '@tarojs/redux';
 import Home from './pages/home/home';
 import configStore from './store';
 import 'taro-ui/dist/style/index.scss';
+// import './styles/style/index.sass';
 import "./styles/reset.less";
 
 // 如果需要在 h5 环境中开启 React Devtools
@@ -34,10 +35,17 @@ class App extends Component {
     ],
     subPackages: [
       {
-        // 订单模块分包
+        /**
+         * @todo 订单模块
+         * 
+         * ```ts
+         * Taro.navigateTo({url: 'pages/order/order.detail?id=1'});
+         * ```
+         */
         root: 'pages/order',
         pages: [
           'order.main',
+          'order.detail',
         ],
       },
       {
@@ -114,7 +122,7 @@ class App extends Component {
     ], 
     window: {
       backgroundTextStyle: 'light',
-      navigationBarBackgroundColor: '#2a86fc',
+      navigationBarBackgroundColor: '#2181fd',
       navigationBarTitleText: 'WeChat',
       navigationBarTextStyle: 'white',
     },

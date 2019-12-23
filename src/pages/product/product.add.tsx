@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-20 13:37:23 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-06 14:12:41
+ * @Last Modified time: 2019-12-20 16:37:10
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Picker, Text } from '@tarojs/components';
@@ -52,6 +52,7 @@ interface State {
   needCallback: boolean;  // 新增完成之后是否需要数据回调 
   supplier: string;       // 供应商
   supplierValue: number;  // 供应商pickerValue
+  showMore: boolean;      // 是否显示更多
 }
 
 class ProductAdd extends Taro.Component<Props, State> {
@@ -76,10 +77,11 @@ class ProductAdd extends Taro.Component<Props, State> {
       needCallback: false,
       supplier: '',
       supplierValue: 0,
+      showMore: false,
     };
   }
 
-  async componentDidMount () {
+  async componentWillMount () {
     try {
       /**
        * @todo 初始化typepicker的位置
@@ -122,6 +124,15 @@ class ProductAdd extends Taro.Component<Props, State> {
         icon: 'none'
       });
     }
+  }
+
+  public onChangeShowMore = (show?: boolean) => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        showMore: typeof show === 'boolean' ? show : !prevState.showMore
+      };
+    });
   }
 
   public onScan = () => {
@@ -438,7 +449,7 @@ class ProductAdd extends Taro.Component<Props, State> {
   }
 
   render () {
-    const { cost, price, memberPrice, barcode, name } = this.state;
+    const { cost, price, barcode, name } = this.state;
     const formName: FormRowProps[] = [
       {
         title: '条码',
@@ -480,30 +491,60 @@ class ProductAdd extends Taro.Component<Props, State> {
         inputType: 'digit',
         inputPlaceHolder: '请输入售价',
         inputOnChange: (value) => this.onChangeValue('price', value),
-      },
-      {
-        title: '会员价（￥）',
-        isInput: true,
-        inputValue: memberPrice,
-        inputType: 'digit',
-        inputPlaceHolder: '请输入会员价',
-        inputOnChange: (value) => this.onChangeValue('memberPrice', value),
-        hasBorder: false
-      },
+      }
     ];
     return (
-      <View className="container product-add">
+      <View className="container product-add container-color">
         {this.renderImage()}
-        <View className={`${cssPrefix}-detail-list`}>
+        <View className={`${cssPrefix}-detail-list container-color`}>
           <FormCard items={formName} />
           <FormCard items={formPrice} />
-          {this.renderType()}
-          {this.renderNumber()}
-          {this.renderSupplier()}
-          {this.renderStatus()}
+          {this.renderMore()}
           {this.renderButtons()}
         </View>
       </View>
+    );
+  }
+
+  private renderMore = () => {
+    const { showMore } = this.state;
+    return (
+      <View>
+        <View 
+          onClick={() => this.onChangeShowMore()}
+          className={`${cssPrefix}-add-more`}
+        >
+          更多信息 
+          {showMore 
+            ? <Image src="//net.huanmusic.com/weapp/icon_packup_gray.png" className={`${cssPrefix}-add-more-image`} /> 
+            : <Image src="//net.huanmusic.com/weapp/icon_expand_gray.png" className={`${cssPrefix}-add-more-image`} />}
+        </View>
+        {showMore && (
+          <View>
+            {this.renderMemberPrice()}
+            {this.renderNumber()}
+            {this.renderType()}
+            {this.renderSupplier()}
+            {this.renderStatus()}
+          </View>
+        )}
+      </View>
+    );
+  }
+
+  private renderMemberPrice = () => {
+    const { memberPrice } = this.state;
+    const memberForm: FormRowProps[] = [{
+      title: '会员价（￥）',
+      isInput: true,
+      inputValue: memberPrice,
+      inputType: 'digit',
+      inputPlaceHolder: '请输入会员价',
+      inputOnChange: (value) => this.onChangeValue('memberPrice', value),
+      hasBorder: false
+    }];
+    return (
+      <FormCard items={memberForm} />
     );
   }
 
@@ -515,8 +556,17 @@ class ProductAdd extends Taro.Component<Props, State> {
         onClick={() => this.onChoiceImage()}
       >
         {
-          tempFilePaths && tempFilePaths[0] && (
-            <Image src={tempFilePaths[0]} className={`${cssPrefix}-detail-cover-image`} />
+          tempFilePaths && tempFilePaths[0] ? (
+            <View 
+              // src={tempFilePaths[0]} 
+              className={`${cssPrefix}-detail-cover-image ${cssPrefix}-detail-cover-image-background`} 
+              style={`background-image: url(${tempFilePaths[0]})`}
+            />
+          ) : (
+            <Image
+              src="//net.huanmusic.com/weapp/img_nolist.png"
+              className={`${cssPrefix}-detail-cover-image`} 
+            />
           )
         }
       </View>
@@ -592,7 +642,7 @@ class ProductAdd extends Taro.Component<Props, State> {
         title: '库存下限预警',
         isInput: true,
         inputValue: `${limitNum}`,
-        inputPlaceHolder: '请输入库存下限预警',
+        inputPlaceHolder: '请输入库存预警',
         inputType: 'number',
         inputOnChange: (value) => this.onChangeValue('limitNum', value),
         hasBorder: false,

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-11 11:38:10
+ * @Last Modified time: 2019-12-20 16:55:27
  * 
  */
 import Taro from '@tarojs/taro';
@@ -68,7 +68,8 @@ class ProductSuspension extends Taro.Component<Props, State> {
       const { success } = await productSdk.suspensionOrder(currentSuspension);
       invariant(success, '下单失败');
       Taro.hideLoading();
-      Taro.redirectTo({url: `/pages/product/product.pay`});
+      // Taro.redirectTo({url: `/pages/product/product.order`});
+      Taro.navigateBack();
     } catch (error) {
       Taro.hideLoading();
       Taro.showToast({title: error.message, icon: 'none'});
@@ -264,7 +265,7 @@ class ProductSuspension extends Taro.Component<Props, State> {
                 src="//net.huanmusic.com/weapp/icon_xiadan.png" 
                 className="cart-right-suspension-icon"
               />
-              <Text>下单</Text>
+              <Text className={`cart-right-suspension-text`}>下单</Text>
             </View>
           </View>
         </View>

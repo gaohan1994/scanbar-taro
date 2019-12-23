@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-06 12:00:59
+ * @Last Modified time: 2019-12-18 17:12:21
  * 
  * @todo 添加会员页面
  */
@@ -16,7 +16,7 @@ import FormRow from '../../component/card/form.row';
 import Validator from '../../common/util/validator';
 import invariant from 'invariant';
 import { MemberAction } from '../../actions';
-import { MemberInterface, MemberInterfaceMap } from '../../constants';
+import { MemberInterface, MemberInterfaceMap, MemberService } from '../../constants';
 import memberService from '../../constants/member/member.service';
 import { ResponseCode } from '../../constants/index';
 import { store } from '../../app';
@@ -68,6 +68,21 @@ class MemberMain extends Taro.Component<Props, State> {
       if (payload.needCallback) {
         this.setState({ needCallback: payload.needCallback });
       }
+    }
+
+    this.init();
+  }
+  
+  public init = async () => {
+    try {
+      const result = await MemberService.getRandomCaroNo();  
+      invariant(result.code === ResponseCode.success, result.msg || ' ');
+      this.setState({ cardNo: result.data });
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
     }
   }
   

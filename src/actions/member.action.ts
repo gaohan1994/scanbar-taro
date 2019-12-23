@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:28:21 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-28 15:29:03
+ * @Last Modified time: 2019-12-18 17:12:07
  */
 import memberService from "../constants/member/member.service";
 import { ResponseCode, ActionsInterface, MemberInterface, MemberInterfaceMap } from '../constants/index';
@@ -204,6 +204,7 @@ class MemberAction {
       return { success: false, result: result.msg }; 
     }
   }
+
 }
 
 export default new MemberAction();

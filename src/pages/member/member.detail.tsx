@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-11 11:50:58
+ * @Last Modified time: 2019-12-20 17:57:48
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Image, Text } from '@tarojs/components';
@@ -76,15 +76,15 @@ class MemberMain extends Taro.Component<MemberMainProps> {
     const form4: FormRowProps[] = [
       {
         title: '积分',
-        extraText: ''
+        extraText: '接口未返回'
       },
       {
         title: '储值余额',
-        extraText: '',
+        extraText: '接口未返回',
       },
       {
         title: '优惠券',
-        extraText: '',
+        extraText: '接口未返回',
         hasBorder: false
       },
     ];
@@ -115,7 +115,7 @@ class MemberMain extends Taro.Component<MemberMainProps> {
       },
     ];
     return (
-      <ScrollView scrollY={true} className={`container`}>
+      <View className={`container`}>
         <Image src="//net.huanmusic.com/weapp/bg_member.png" className={`${cssPrefix}-bg`} />
         {Number(this.$router.params.id) !== Number(memberDetail.id)
         ? (
@@ -124,26 +124,36 @@ class MemberMain extends Taro.Component<MemberMainProps> {
           </View>
         )
         : (
-          <View className={`container ${cssPrefix} ${cssPrefix}-pos`}>
-            <Card card-class="home-card member-card">
-              <View className={`${cssPrefix}-detail-img`}>
-                <Image className={`${cssPrefix}-detail-avator`} src="//net.huanmusic.com/weapp/icon_user.png" />
-              </View>
-              <View className={`${cssPrefix}-detail`}>
-                <View className="title-text">{memberDetail.username || ''}</View>
-                <View className="normal-text">{memberDetail.phoneNumber || ''}</View>
-              </View>
-              <View className="home-buttons member-buttons">
-                <View className="member-buttons-button home-buttons-button-border">
-                  <View className="title-text">￥ {numeral(memberOrderInfo.totalAmount || 0).format('0.00')}</View>
-                  <View className="small-text">累计消费</View>
+          <View className={`container ${cssPrefix} ${cssPrefix}-pos container-color`}>
+            <View className={`${cssPrefix}-detail-zindex`}>
+              <Card card-class="home-card member-card">
+                <View className={`${cssPrefix}-detail-img`}>
+                  <Image className={`${cssPrefix}-detail-avator`} src="//net.huanmusic.com/weapp/icon_user.png" />
                 </View>
-                <View className="member-buttons-button">
-                  <View className="title-text">{numeral(memberOrderInfo.totalTimes || 0).value()}</View>
-                  <View className="small-text">购买次数</View>
+                <View className={`${cssPrefix}-detail`}>
+                  <View className={`title-text ${cssPrefix}-detail-name`}>
+                    {memberDetail.username || ''}
+                    {memberDetail.levelId && (
+                      <View className={`${cssPrefix}-detail-name-level`}>
+                        {this.setLevel(memberDetail.levelId)}
+                      </View>
+                    )}
+                  </View>
+                  <View className="normal-text">{memberDetail.phoneNumber || ''}</View>
                 </View>
-              </View>
-            </Card>
+                <View className="home-buttons member-buttons">
+                  <View className="member-buttons-button home-buttons-button-border">
+                    <View className="title-text">￥ {numeral(memberOrderInfo.totalAmount || 0).format('0.00')}</View>
+                    <View className="small-text">累计消费</View>
+                  </View>
+                  <View className="member-buttons-button">
+                    <View className="title-text">{numeral(memberOrderInfo.totalTimes || 0).value()}</View>
+                    <View className="small-text">购买次数</View>
+                  </View>
+                </View>
+              </Card>
+            </View>
+           
             <FormCard items={form1} >
               <FormRow title="消费偏好" hasBorder={false}>
                 {
@@ -185,8 +195,15 @@ class MemberMain extends Taro.Component<MemberMainProps> {
             </View>
           </View>
         )}
-      </ScrollView>
+      </View>
     );
+  }
+
+  private setLevel = (id: number): string => {
+    if (id === 1) {
+      return '普通会员';
+    }
+    return '普通会员';
   }
 }
 

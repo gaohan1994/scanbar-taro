@@ -15,7 +15,7 @@ import { ProductAction } from '../../actions';
 import { getProductList, getProductSearchList, getSelectProduct } from '../../reducers/app.product';
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
-import { ProductInterface, ProductService, ProductInterfaceMap } from '../../constants';
+import { ProductInterface, ProductInterfaceMap } from '../../constants';
 import classnames from 'classnames';
 import ProductComponent from '../../component/product/product';
 import invariant from 'invariant';
@@ -23,6 +23,9 @@ import { ResponseCode } from '../../constants/index';
 import merge from 'lodash.merge';
 import productSdk from '../../common/sdk/product/product.sdk';
 import { store } from '../../app';
+import { getProductCartList, getSuspensionCartList, ProductSDKReducer } from '../../common/sdk/product/product.sdk.reducer';
+import { ProductCartInterface } from '../../common/sdk/product/product.sdk';
+import Badge from '../../component/badge/badge';
 
 let ItemHeight: number = -1;
 let SectionHeight: number = -1;
@@ -48,6 +51,15 @@ interface Props {
   productSearchList: ProductInterface.ProductList[];
   pureProductSearchList: ProductInterface.ProductInfo[];
   selectProduct: ProductInterface.ProductInfo;
+  /**
+   * @param {productCartList}  
+   * @param {suspensionList} 
+   *
+   * @type {ProductCartInterface.ProductCartInfo[]}
+   * @memberof Props
+   */
+  productCartList: ProductCartInterface.ProductCartInfo[];
+  suspensionList: ProductSDKReducer.SuspensionCartBase[];
 }
 
 interface State {
@@ -219,62 +231,13 @@ class ProductOrder extends Taro.Component<Props, State> {
     }
   }
 
-  public onScanProduct = async () => {
-    try {
-      /**
-       * @todo [先去自己的库里查询商品看是否存在，如果存在则加入购物车]
-       * @todo [如果不存在，则去第三方库里查询商品，如果存在则提示是否建档]
-       * @todo [如果第三方库里也不存在则提示没有找到该商品]
-       */
-      Taro
-      .scanCode()
-      .then(async (res) => {
-        Taro.showLoading();
-        const result = await ProductService.productInfoScanGet({barcode: res.result});
-        if (result.code === ResponseCode.success) {
-          Taro.hideLoading();
-          // 找到了商品 显示modal名称
-          Taro.showToast({
-            title: `${result.data.name}`,
-            icon: 'none',
-          });
-          productSdk.manage({
-            type: productSdk.productCartManageType.ADD,
-            product: result.data
-          });
-          return;
-        }
-        // 说明没找到
-        const thirdProductResult = await ProductService.productInfoScan({barcode: res.result});
-        Taro.hideLoading();
-        if (thirdProductResult.code === ResponseCode.success) {
-          Taro.showModal({
-            title: '提示',
-            content: `商品${thirdProductResult.data.barcode}不存在，是否现在建档？`,
-            success: ({confirm}) => {
-              if (confirm) {
-                const params = {
-                  scanProduct: thirdProductResult.data,
-                  needCallback: true
-                };
-                Taro.navigateTo({
-                  url: `/pages/product/product.add?params=${JSON.stringify(params)}`
-                });
-              }
-            }
-          });
-          return;
-        }
-        throw new Error(thirdProductResult.msg || '没有找到该商品');
-      })
-      .catch(error => {
-        Taro.showToast({title: error.message, icon: 'none'});
-      });
-    } catch (error) {
-      Taro.hideLoading();
-      Taro.showToast({
-        title: error.message,
-        icon: 'none'
+  public onSuspensionHandle = () => {
+    const { productCartList } = this.props;
+    if (productCartList.length > 0) {
+      productSdk.suspensionCart();
+    } else {
+      Taro.navigateTo({
+        url: `/pages/product/product.suspension`
       });
     }
   }
@@ -347,6 +310,7 @@ class ProductOrder extends Taro.Component<Props, State> {
 
   render () {
     const { searchValue } = this.state;
+    const { suspensionList } = this.props;
     return (
       <View className={`container ${cssPrefix}`}>
         <View className={`${cssPrefix}-header`}>
@@ -359,7 +323,7 @@ class ProductOrder extends Taro.Component<Props, State> {
               onInput={this.onInput}
               placeholderClass={`${memberPrefix}-main-header-search-input-holder`}
             />
-            {searchValue !== '' ? (
+            {searchValue !== '' && (
               <View 
                 className={`${memberPrefix}-main-header-search-scan`} 
                 onClick={() => this.onInput({detail: {value: ''}})}  
@@ -369,24 +333,27 @@ class ProductOrder extends Taro.Component<Props, State> {
                   className={`${memberPrefix}-main-header-search-del`} 
                 />
               </View>
-            ) : (
-              <View
-                onClick={() => this.onScanProduct()}
-                className={`${memberPrefix}-main-header-search-scan`} 
-              >
-                <Image
-                  src="//net.huanmusic.com/weapp/icon_commodity_scan.png" 
-                  className={`${memberPrefix}-main-header-search-scan`} 
-                />
-              </View>
             )}
           </View>
-          <View 
-            className={`${cssPrefix}-header-button`}
-            onClick={() => this.onNonBarcodeProductClick()}
-          >
-            无码商品
-          </View>
+          {
+            suspensionList.length > 0 ? (
+              <Badge value={suspensionList.length}>
+                <View 
+                  className={`${cssPrefix}-header-button`}
+                  onClick={() => this.onSuspensionHandle()}
+                >
+                  挂单
+                </View>
+              </Badge>
+            ) : (
+              <View 
+                className={`${cssPrefix}-header-button`}
+                onClick={() => this.onSuspensionHandle()}
+              >
+                挂单
+              </View>
+            )
+          }
         </View>
         
         <View className={`${cssPrefix}-list-container`}>
@@ -412,6 +379,12 @@ class ProductOrder extends Taro.Component<Props, State> {
         scrollY={true}
         className={`${cssPrefix}-list-left`}
       >
+        <View 
+          className={classnames(`${cssPrefix}-list-left-item`)}
+          onClick={() => this.onNonBarcodeProductClick()}
+        >
+          无码商品
+        </View>
         {
           productList && productList.length > 0
             ? productList.map((list) => {
@@ -543,6 +516,8 @@ const mapState = (state: AppReducer.AppState) => {
     productSearchList,
     pureProductSearchList,
     selectProduct,
+    productCartList: getProductCartList(state),
+    suspensionList: getSuspensionCartList(state)
   };
 };
 

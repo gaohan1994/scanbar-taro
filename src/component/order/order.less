@@ -1,0 +1,38 @@
+
+@import "../../styles/theme.less";
+
+@orderItemPrefix: component-order-item;
+
+@order-item-width: 690px;
+@order-item-icon: 50px;
+
+.@{orderItemPrefix} {
+  background-color: #ffffff;
+  width: @order-item-width;
+  .padding(30px, lr);
+  .padding(33px, tb);
+  .flex(center, space-between, row);
+  border-bottom: 1px solid #e3e3e3;
+  &-left {
+    flex-direction: row;
+    &-icon {
+      width: @order-item-icon;
+      height: @order-item-icon;
+      .margin(14px, r);
+    }
+    &-detail {
+      flex-direction: column;
+      &-margin {
+        .margin(9px, t);
+      }
+    }
+    &-text {
+      font-size: 24px;
+      color: #666666;
+    }
+  }
+  &-right {
+    .flex(center, flex-end, column);
+    font-size: 30px;
+  }
+}

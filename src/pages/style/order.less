@@ -1,0 +1,102 @@
+@import "../../styles/theme.less";
+
+@order-prefix: order;
+@order-time-pos: 200px;
+@order-status-icon: 111px;
+
+.@{order-prefix} {
+  background-color: #F2F2F2;
+  &-area {
+    height: 50px;
+    width: 750px;
+  }
+  &-bg {
+    height: 306px;
+    width: 100%;
+    background-color: @theme-color;
+  }
+  &-container {
+    flex-direction: column;
+    width: 100%;
+  }
+  &-time {
+    .flex(center, center, row);
+    .margin(-@order-time-pos, t);
+    &-date {
+      .margin(40px, lr);
+      min-width: 160px;
+      color: #ffffff;
+      font-size: 30px;
+    }
+    &-text {
+      color: #ffffff;
+      font-size: 30px;
+    }
+  }
+  &-list {
+    position: absolute;
+    top: @order-time-pos;
+    bottom: 0px;
+    &-item {
+      width: 690px;
+      .margin(30px, l);
+      overflow: hidden;
+    }
+    &-top {
+      border-radius: 20px 20px 0 0;
+    }
+    &-bottom {
+      border-radius: 0 0 20px 20px;
+      .margin(30px, b);
+    }
+  }
+
+  &-detail {
+    &-bg {
+      .background-image('//net.huanmusic.com/weapp/bg_home.png');
+      width: 100%;
+      height: 260px;
+    }
+    &-container {
+      .margin(-220px, t);
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    &-status {
+      .flex(center, flex-start, row);
+      .padding(30px, b);
+      .margin(30px, l);
+      &-icon {
+        width: @order-status-icon;
+        height: @order-status-icon;
+        .margin(20px, r);
+      }
+      &-copy {
+        width: 22px;
+        height: 23px;
+        .margin(11px, l);
+      }
+      &-detail {
+        display: flex;
+        flex-direction: column;
+        color: #ffffff;
+        &-box {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+        }
+      }
+      &-result {
+        font-size: 34px;
+      }
+      &-time {
+        font-size: 26px;
+      }
+    }
+    &-cards {
+      .margin(30px, l);
+      width: 690px;
+    }
+  }
+}

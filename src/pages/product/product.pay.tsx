@@ -356,14 +356,12 @@ class ProductPay extends Taro.Component<Props, State> {
     ];
     return (
       <Modal
+        onClose={() => this.changeModalVisible('memberModal', false)}
         isOpened={memberModal}
         buttons={buttons}
         header="选择会员"
       >
         <View className={`product-detail-modal`}>
-          <View className={`product-detail-modal-tip`}>
-            {`金额：￥${numeral(productSdk.getProductPrice() - productSdk.getProductMemberPrice()).format('0.00')}`}
-          </View>
           <View 
             className={classnames('component-form', {
               'component-form-shadow': true
@@ -371,7 +369,7 @@ class ProductPay extends Taro.Component<Props, State> {
           > 
             <View className={`${cssPrefix}-pay-member-input`}>
               <Input 
-                cursorSpacing={300}
+                // cursorSpacing={300}
                 className={`${cssPrefix}-pay-member-input-box`}
                 placeholder="请输入卡号、手机号"
                 value={memberValue}
@@ -413,7 +411,7 @@ class ProductPay extends Taro.Component<Props, State> {
     ];
     const eraseForm: FormRowProps[] = [
       {
-        title: '抹零金额（￥）',
+        title: '改价金额（￥）',
         isInput: true,
         inputValue: eraseValue,
         inputType: 'digit',
@@ -426,13 +424,35 @@ class ProductPay extends Taro.Component<Props, State> {
       },
     ];
     return (
-      <Modal
+      // <Modal
+      //   onClose={() => this.changeModalVisible('eraseModal', false)}
+      //   isOpened={eraseModal}
+      //   buttons={eraseButtons}
+      //   header="抹零"
+      // >
+      //   <View className={`product-detail-modal`}>
+      //     <View>asd</View>
+      //     <FormCard items={eraseForm} />
+      //   </View>
+      // </Modal>
+      <Modal 
+        onClose={() => this.changeModalVisible('eraseModal', false)}
         isOpened={eraseModal}
         buttons={eraseButtons}
-        header="抹零"
+        header="改价"
       >
-        <View className={`product-detail-modal`}>
-          <FormCard items={eraseForm} />
+        <View className="product-detail-modal">
+          <View 
+            className={classnames('component-form', {
+              'component-form-shadow': true
+            })}
+          > 
+            {
+              eraseForm.map((item) => {
+                return <FormRow key={item.title} {...item} />;
+              })
+            }
+          </View>
         </View>
       </Modal>
     );
@@ -526,6 +546,18 @@ class ProductPay extends Taro.Component<Props, State> {
 
   private renderListDetail = () => {
     const { selectMember, eraseValue } = this.state;
+
+    const priceForm: FormRowProps[] = [
+      {
+        title: '应收金额',
+        extraText: `￥${numeral(productSdk.getProductTransPrice()).format('0.00')}`,
+        extraTextColor: '#333333',
+        extraTextBold: 'bold',
+        extraTextSize: '36',
+        hasBorder: false,
+      }
+    ];
+
     const formCard: FormRowProps[] = [
       {
         title: '商品数量',
@@ -536,27 +568,27 @@ class ProductPay extends Taro.Component<Props, State> {
         extraText: `￥${numeral(productSdk.getProductPrice()).format('0.00')}`
       },
       {
-        title: '优惠金额',
+        title: '商品优惠',
         extraText: `${selectMember !== undefined
           ? `- ￥${numeral(productSdk.getProductPrice() - productSdk.getProductMemberPrice()).format('0.00')}`
           : '￥0'}`,
         extraTextStyle: 'price'
       },
       {
-        title: '抹零金额',
+        title: '整单改价',
         extraText: `${eraseValue !== ''
           ? `- ￥${numeral(eraseValue).format('0.00')}`
           : '￥0'}`,
-        extraTextStyle: 'price'
+        extraTextStyle: 'price',
+        hasBorder: false,
       },
-      {
-        title: '应收金额',
-        extraText: `￥${numeral(productSdk.getProductTransPrice()).format('0.00')}`,
-        hasBorder: false
-      },
+     
     ];
     return (
-      <FormCard items={formCard} />
+      <View>
+        <FormCard items={priceForm} />
+        <FormCard items={formCard} />
+      </View>
     );
   }
 
@@ -587,7 +619,7 @@ class ProductPay extends Taro.Component<Props, State> {
               onClick={() => this.changeModalVisible('eraseModal', true)}
             >
               <Image src='//net.huanmusic.com/weapp/icon_molin.png' className={`${cssPrefix}-pay-footer-left-item-erase`} />
-              <Text className={`${cssPrefix}-pay-footer-left-item-font`}>{eraseValue === '' ? '抹零' : '已抹零'}</Text>
+              <Text className={`${cssPrefix}-pay-footer-left-item-font`}>{eraseValue === '' ? '改价' : '已改价'}</Text>
             </View>
           </View>
           <View

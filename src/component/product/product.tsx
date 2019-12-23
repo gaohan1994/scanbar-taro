@@ -7,6 +7,9 @@ import { AppReducer } from '../../reducers';
 import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import classnames from 'classnames';
+import Modal from '../modal/modal';
+import { FormRowProps } from '../card/form.row';
+import FormCard from '../card/form.card';
 
 const cssPrefix = 'component-product';
 interface Props { 
@@ -14,7 +17,24 @@ interface Props {
   productInCart?: ProductCartInterface.ProductCartInfo;
 }
 
-class ProductComponent extends Taro.Component<Props> {
+interface State {
+  priceModal: boolean;
+}
+
+class ProductComponent extends Taro.Component<Props, State> {
+
+  /**
+   * @todo [新增商品点击改价]
+   *
+   * @memberof ProductComponent
+   */
+  public onProductPress = () => {
+    this.changePriceModal(true);
+  }
+
+  public changePriceModal = (visible: boolean) => {
+    this.setState({priceModal: visible});
+  }
 
   public manageProduct = (type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce) => {
     const { product } = this.props;
@@ -25,10 +45,13 @@ class ProductComponent extends Taro.Component<Props> {
     const { product } = this.props;
     return (
       <View className={`${cssPrefix} ${cssPrefix}-border`}>
-        <View className={`${cssPrefix}-content`}>
+        <View 
+          className={`${cssPrefix}-content`}
+          // onClick={() => this.onProductPress()}
+        >
           <View className={`${cssPrefix}-content-cover`}>
             {product.pictures && product.pictures !== '' ? (
-              <Image src={product.pictures} className={`${cssPrefix}-content-cover-image`} />
+              <Image src={product.pictures[0]} className={`${cssPrefix}-content-cover-image`} />
             ) : (
               <Image src="//net.huanmusic.com/weapp/img_nolist.png" className={`${cssPrefix}-content-cover-image`} />
             )}
@@ -43,7 +66,28 @@ class ProductComponent extends Taro.Component<Props> {
           </View>
           {this.renderStepper()}
         </View>
+        {this.renderModal()}
       </View>
+    );
+  }
+
+  private renderModal = () => {
+    const { priceModal } = this.state;
+    // const { product, productInCart } = this.props;
+    const priceForm: FormRowProps[] = [
+      {
+        title: '数量',
+        isInput: true,
+        // inputValue: 
+      },
+    ];
+    return (
+      <Modal
+        isOpened={priceModal}
+        onClose={() => this.changePriceModal(false)}
+      >
+        <FormCard items={priceForm} />
+      </Modal>
     );
   }
 

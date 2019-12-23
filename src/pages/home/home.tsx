@@ -30,14 +30,20 @@ const NavItems = [
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_procurement.png',
-    value: '采购收货',
+    value: '采购',
     subTitle: 'Procurement',
     url: '/pages/',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_order.png',
-    value: '采购下单',
-    subTitle: 'Purchasing order',
+    value: '盘点',
+    subTitle: 'inventory',
+    url: '/pages/',
+  },
+  {
+    image: '//net.huanmusic.com/weapp/icon_menu_details.png',
+    value: '交易明细',
+    subTitle: 'Transcation details',
     url: '/pages/order/order.main',
   },
   {
@@ -95,8 +101,19 @@ class Home extends Component {
    *
    * @memberof Home
    */
-  public onNavHandle = ({url}: {url: string}) => {
-    Taro.navigateTo({url});
+  public onNavHandle = (item: any) => {
+    if (
+      item.value === '采购' ||
+      item.value === '盘点' ||
+      item.value === '更多'
+    ) {
+      Taro.showToast({
+        icon: 'none',
+        title: '正在开发中'
+      });
+      return;
+    }
+    Taro.navigateTo({url: item.url});
   }
 
   render () {
@@ -112,21 +129,17 @@ class Home extends Component {
             <View className="home-buttons">
               <View className={`home-buttons-button home-buttons-button-border ${cssPrefix}-buttons-button-start`}>
                 <View className={`normal-text ${cssPrefix}-buttons-button-box`}>
-                  <View>今日销售额</View>
-                  <Image
+                  <View>{`今日销售额 >`}</View>
+                  {/* <Image
                     src="//net.huanmusic.com/weapp/icon_home_into.png" 
                     className={`${cssPrefix}-buttons-button-icon`}
-                  />  
+                  />   */}
                 </View>
                 <View className="home-money">100000.00</View>
               </View>
               <View className="home-buttons-button home-buttons-button-end">
                 <View className={`normal-text ${cssPrefix}-buttons-button-box`}>
-                  <View>销售笔数</View>
-                  <Image
-                    src="//net.huanmusic.com/weapp/icon_home_into.png" 
-                    className={`${cssPrefix}-buttons-button-icon`}
-                  />  
+                  <View>{`销售笔数 >`}</View>
                 </View>
                 <View className="home-money">200</View>
               </View>

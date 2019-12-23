@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 14:41:35 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-11 11:45:32
+ * @Last Modified time: 2019-12-20 16:38:36
  * 
  * @todo [fockedTaroUiListItem,增加以及修改了一些属性]
  */
@@ -39,8 +39,13 @@ export interface FormRowProps {
   inputPlaceHolder?: string;    // 右侧输入框默认值
   inputName?: string;           // 输入框的name
   inputOnChange?: (params: any) => any; // 输入改变函数
+  infoColor?: '333333' | '666666';
   inputType?: 'text' | 'number' | 'password' | 'phone' | 'digit'; // 输入框类型
-  extraTextStyle?: 'price' | 'black' | 'gray';      // 右边文字颜色
+  extraTextStyle?: 'price' | 'black' | 'gray' | 'title';      // 右边文字颜色
+  extraTextColor?: string;      // 右边字体颜色
+  extraTextSize?: string;       // 右边字体大小
+  extraTextBold?: 'bold';       // 是否加粗
+  inputCursorSpacing?: number;  // cursorSpacing
 }
 
 interface FormRowState { }
@@ -57,6 +62,8 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
     extraText: '',
     extraThumb: '',
     extraTextStyle: 'black',
+    infoColor: '333333',
+    extraTextBold: '',
     iconInfo: {},
     onClick: () => {/** */},
     extraThumbClick: () => {/** */},
@@ -65,6 +72,8 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
     inputValue: '',
     inputName: 'form.row.name',
     inputPlaceHolder: '',
+    extraTextColor: undefined,
+    extraTextSize: undefined,
     inputType: 'text',
     inputOnChange: () => { /** */ },
   };
@@ -81,17 +90,21 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
       arrow,
       extraThumb,
       extraTextStyle,
+      extraTextBold,
       extraThumbClick,
       buttons,
       onClick,
-
+      infoColor,
       isInput,
       inputType,
       inputName,
       inputValue,
       inputPlaceHolder,
       inputOnChange,
-      children
+      extraTextColor,
+      inputCursorSpacing,
+      extraTextSize,
+      children,
     } = this.props;
 
     const rootClass = classnames(
@@ -123,7 +136,11 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
           <View className='at-list__item-content item-content'>
             <View className='item-content__info'>
               {main && <View className="item-content__info-icon">*</View>}
-              <View className='item-content__info-title'>{title}</View>
+              <View 
+                className={classnames('item-content__info-title', `component-form-info-${infoColor}`)}
+              >
+                {title}
+              </View>
               {note && <View className='item-content__info-note'>{note}</View>}
             </View>
           </View>
@@ -131,12 +148,12 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
           <View className='at-list__item-extra item-extra component-list-row-extra'>
             {extraText && (
               <View 
-                className={classnames({
-                  // 'item-extra__info': extraTextStyle !== 'price',
-                  'component-form-price': extraTextStyle === 'price',
-                  'component-form-black': extraTextStyle === 'black',
-                  'component-form-gray': extraTextStyle === 'gray',
-                })} 
+                className={classnames(
+                  `component-form-${extraTextStyle}`, {
+                  'component-form-bold': extraTextBold === 'bold',
+                  [`component-form-size-${extraTextSize}`]: !!extraTextSize,
+                })}
+                style={`${!!extraTextColor ? `color: ${extraTextColor};` : ''}`}
               >
                 {extraText}
               </View>
@@ -152,7 +169,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
                   type={inputType}
                   placeholder={inputPlaceHolder}
                   border={false}
-                  cursorSpacing={300}
+                  cursorSpacing={inputCursorSpacing}
                   placeholderClass="component-list-placeholder"
                 />
               </View>
@@ -162,22 +179,19 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
               <View className="component-form-buttons">
                 {buttons.map((button) => {
                   return (
-                    <AtButton
+                    <View
                       key={button.title}
                       onClick={button.onPress}
-                      type="primary"
                       className={classnames(
-                        'component-list-row-button', 
+                        'component-form-button', 
                         {
-                          'component-list-row-confirm-button': button.type !== 'cancel' ? true : false,
-                          'component-list-row-cancel-button': button.type === 'cancel' ? true : false,
+                          'component-form-button-confirm': button.type !== 'cancel' ? true : false,
+                          'component-form-button-cancel': button.type === 'cancel' ? true : false,
                         }
                       )}
                     >
-                      <Text className={`component-list-row-confirm-button-text`}>
-                        {button.title}
-                      </Text>
-                    </AtButton>
+                      {button.title}
+                    </View>
                   );
                 })}
               </View>

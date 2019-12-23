@@ -23,6 +23,15 @@ class PayInput extends Taro.Component<Props, State> {
     inputValue: ''
   };
 
+  /**
+   * @todo 刚进页面的时候清空输入值
+   *
+   * @memberof PayInput
+   */
+  public componentDidShow = () => {
+    this.onChangeValue('');
+  }
+
   public onChangeValue = (value: string) => {
     this.setState({ inputValue: value });
   }
@@ -74,13 +83,14 @@ class PayInput extends Taro.Component<Props, State> {
             <View className={`${cssPrefix}-input-box-input`}>
               <View className={`${cssPrefix}-input-box-input-money`}>￥</View>
               <Input 
-                cursorSpacing={300}
+                // cursorSpacing={300}
                 className={`${cssPrefix}-input-box-input-input`} 
                 value={inputValue}
                 onInput={({detail: {value}}) => this.onChangeValue(value)}
                 placeholder="请输入收款金额"
                 placeholderClass={`${cssPrefix}-input-box-input-input-placeholder`}
-                type="number"
+                type='digit'
+                focus={true}
               />
             </View>
 

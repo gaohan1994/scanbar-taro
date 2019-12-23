@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 10:07:05 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-06 11:58:40
+ * @Last Modified time: 2019-12-17 11:37:19
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text, Input } from '@tarojs/components';
@@ -101,7 +101,7 @@ class Login extends Taro.Component<Props, State> {
               <Image src="http://net.huanmusic.com/weapp/icon_login_user.png" className={`${cssPrefix}-input-box-icon`} />
               <View className={`${cssPrefix}-input-container`}>
                 <Input
-                  cursorSpacing={300}
+                  // cursorSpacing={300}
                   className={`${cssPrefix}-input-box-input`} 
                   value={username}
                   onInput={({detail: {value}}) => this.onChangeValue('username', value)}
@@ -118,7 +118,7 @@ class Login extends Taro.Component<Props, State> {
               <Image src="http://net.huanmusic.com/weapp/icon_login_password.png" className={`${cssPrefix}-input-box-icon`} />
               <View className={`${cssPrefix}-input-container`}>
                 <Input
-                  cursorSpacing={300}
+                  // cursorSpacing={300}
                   className={`${cssPrefix}-input-box-input`} 
                   value={password}
                   onInput={({detail: {value}}) => this.changePassword(value)}

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-11 11:30:36
+ * @Last Modified time: 2019-12-18 15:56:54
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -610,7 +610,12 @@ class ProductSDK {
     if (currentSuspension && currentSuspension.productCartList.length > 0) {
       const orderSuspensionList = merge([], currentSuspension.productCartList);
       await this.manageCart(orderSuspensionList);
-      await this.deleteSuspension(suspension);
+      setTimeout(() => {
+        /**
+         * 延后删除挂单防止空页面
+         */
+        this.deleteSuspension(suspension);
+      }, 500);
       return { success: true };
     }
     return { success: false };

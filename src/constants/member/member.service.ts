@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:01:17 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-27 16:34:25
+ * @Last Modified time: 2019-12-18 17:12:06
  * 
  * @todo [会员相关的接口]
  * ```js
@@ -59,6 +59,10 @@ class MemberService {
 
   public memberOrderInfo = async (params: MemberInterface.MemberInfoDetail): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.get(MemberInterfaceMap.memberOrderInfo(params));
+  }
+
+  public getRandomCaroNo = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.get(MemberInterfaceMap.getRandomCaroNo);
   }
 }
 
