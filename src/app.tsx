@@ -140,7 +140,7 @@ class App extends Component {
         pagePath: "pages/report/report",
         iconPath: "./assets/tab-bar/icon_reportforms.png",
         selectedIconPath: "./assets/tab-bar/icon_reportforms_xuan.png",
-        text: "报表"
+        text: "数据"
       }, {
         pagePath: "pages/user/user",
         iconPath: "./assets/tab-bar/icon_nav_user.png",

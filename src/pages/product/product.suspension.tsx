@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-20 16:55:27
+ * @Last Modified time: 2019-12-23 14:47:39
  * 
  */
 import Taro from '@tarojs/taro';
@@ -240,7 +240,7 @@ class ProductSuspension extends Taro.Component<Props, State> {
                   src="//net.huanmusic.com/weapp/icon_orders_empty.png" 
                   className="cart-suspension-left-item-empty"
                 />
-                <Text className="cart-suspension-left-item-text">清空全部</Text>
+                <Text className="cart-suspension-left-item-text">清空</Text>
               </View>
               <View 
                 className="cart-suspension-left-item"

@@ -17,14 +17,18 @@ interface Props {
 interface State { 
   status: boolean; // 支付成功还是失败
   loading: boolean;
+  time: number;
 }
 
 class PayResult extends Taro.Component<Props, State> {
-
+  
   readonly state: State = {
     status: false,
-    loading: true
+    loading: true,
+    time: 5000,
   };
+
+  private timer: any;
 
   async componentDidShow () {
     const { params } = this.$router.params;
@@ -34,6 +38,27 @@ class PayResult extends Taro.Component<Props, State> {
         status,
         loading: false,
       });
+      if (status === true) {
+        // 成功设置计时器
+        this.timer = setInterval(() => {
+          this.setWaitTimer(this.state.time - 1000);
+        }, 1000);
+      }
+    }
+  }
+
+  public setWaitTimer = (time: number) => {
+    if (time < 0) {
+      clearInterval(this.timer);
+      this.onNavHandle();
+    } else {
+      this.setState({ time });
+    }
+  }
+
+  componentWillUnmount () {
+    if (this.timer) {
+      clearTimeout(this.timer);
     }
   }
 
@@ -54,7 +79,7 @@ class PayResult extends Taro.Component<Props, State> {
   }
 
   render () {
-    const { loading, status } = this.state;
+    const { loading, status, time } = this.state;
     const { isOrder, payDetail } = this.props;
     return (
       <View className="container">
@@ -68,7 +93,9 @@ class PayResult extends Taro.Component<Props, State> {
                   src="//net.huanmusic.com/weapp/img_payment_success.png"
                   className={`${cssPrefix}-result-container-image`} 
                 />
-                <View className={`${cssPrefix}-result-container-title`}>微信收款成功</View>
+                <View className={`${cssPrefix}-result-container-title`}>
+                  {payDetail && payDetail.transPayload && payDetail.transPayload.order.payType === 0 ? '现金' : '微信'}收款成功
+                </View>
                 <View className={`${cssPrefix}-result-container-title`}>
                   {`￥ ${(payDetail.transPayload as ProductCartInterface.ProductPayPayload).order.transAmount}`}
                 </View>
@@ -77,9 +104,7 @@ class PayResult extends Taro.Component<Props, State> {
                     className="theme-button"
                     onClick={() => this.onNavHandle()}
                   >
-                    {
-                      isOrder === true ? '继续开单' : '继续收款'
-                    }
+                    {isOrder === true ? `继续开单（${time / 1000}秒）` : `继续收款（${time / 1000}秒）`}
                   </AtButton>
                 </View>
               </View>
@@ -90,7 +115,9 @@ class PayResult extends Taro.Component<Props, State> {
                   className={`${cssPrefix}-result-container-image`} 
                 />
                 <View className={`${cssPrefix}-result-container-title`}>Sorry ~</View>
-                <View className={`${cssPrefix}-result-container-title`}>微信收款失败</View>
+                <View className={`${cssPrefix}-result-container-title`}>
+                  {payDetail && payDetail.transPayload && payDetail.transPayload.order.payType === 0 ? '现金' : '微信'}收款失败
+                </View>
                 <View className={`${cssPrefix}-result-container-button`}>
                   <AtButton
                     className="theme-button"

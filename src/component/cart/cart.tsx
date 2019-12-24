@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-20 13:34:46
+ * @Last Modified time: 2019-12-23 13:51:18
  * 
  * @todo [购物车组件]
  */
@@ -211,20 +211,29 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
         <View className="cart">
           <View className="cart-bg">
             {this.renderScan()}
-            <View className="cart-icon" onClick={() => this.onChangeCartListVisible()} >
-              {
-                productCartList.length > 0 ? (
+            {
+              productCartList.length > 0 
+              ? (
+                <View 
+                  className="cart-icon"
+                  onClick={() => this.onChangeCartListVisible()}
+                >
                   <Badge 
                     value={productSdk.getProductNumber()}
                     className="component-cart-bge"
                   >
                     <Image src="//net.huanmusic.com/weapp/icon_cart(1).png" className="cart-icon-image" />
                   </Badge>
-                ) : (
-                  <Image src="//net.huanmusic.com/weapp/icon_cart_unselected.png" className="cart-icon-image" />
-                )
-              }
-            </View>
+                </View>
+              )
+              : (
+                <Image 
+                  src="//net.huanmusic.com/weapp/icon_cart_unselected.png" 
+                  className="cart-icon-image cart-icon" 
+                  onClick={() => this.onChangeCartListVisible()}
+                />
+              )
+            }
             <View className="cart-left">
               <View 
                 className={classnames(`${cssPrefix}-left-price`, {

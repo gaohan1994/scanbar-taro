@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-23 11:05:08
+ * @Last Modified time: 2019-12-23 17:00:26
  * 
  * @todo 开单页面
  */
@@ -168,9 +168,7 @@ class ProductOrder extends Taro.Component<Props, State> {
    */
   public onTypeClick = (params: ProductInterface.ProductTypeInfo) => {
     this.onInput({detail: {value: ''}});
-    setTimeout(() => {
-      this.changeCurrentType(params);
-    }, 200);
+    this.changeCurrentType(params);
   }
 
   public onSuspensionHandle = () => {
@@ -234,25 +232,15 @@ class ProductOrder extends Taro.Component<Props, State> {
               </View>
             )}
           </View>
-          {
-            suspensionList.length > 0 ? (
-              <Badge value={suspensionList.length}>
-                <View 
-                  className={`${cssPrefix}-header-button`}
-                  onClick={() => this.onSuspensionHandle()}
-                >
-                  挂单
-                </View>
-              </Badge>
-            ) : (
-              <View 
-                className={`${cssPrefix}-header-button`}
-                onClick={() => this.onSuspensionHandle()}
-              >
-                挂单
-              </View>
-            )
-          }
+          <View 
+            className={`${cssPrefix}-header-button`}
+            onClick={() => this.onSuspensionHandle()}
+          >
+            {suspensionList.length > 0 && (
+              <View className={`${cssPrefix}-header-suspension`}>{suspensionList.length}</View>
+            )}
+            挂单
+          </View>
         </View>
         
         <View className={`${cssPrefix}-list-container`}>

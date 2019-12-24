@@ -552,26 +552,21 @@ class ProductDetail extends Taro.Component<Props, State> {
     if (productDetail.id !== -1) {
       return (
         <View className="container">
-          <View className={`${cssPrefix}-detail-cover`}>
-            <Image 
-              src="//net.huanmusic.com/weapp/img_nolist.png"
-              className={`${cssPrefix}-detail-cover-image`} 
-            />
+          <View 
+            className={`${cssPrefix}-detail-cover`}
+          >
+            {productDetail.pictures && productDetail.pictures.length > 0
+            ? (
+              <View
+                className={`${cssPrefix}-detail-cover-image ${cssPrefix}-detail-cover-image-background`} 
+                style={`background-image: url(${productDetail.pictures[0]})`}
+              />
+            )
+            : <Image className={`${cssPrefix}-detail-cover-empty`} src="//net.huanmusic.com/weapp/pic_default.png"/>
+            }
           </View>
-          <View className={`${cssPrefix}-detail-list  product-detail`}>
-            <FormCard items={formName}>
-              {/* <FormRow
-                title={'名称'}
-                main={true}
-              >
-                <Textarea
-                  value={productChangeDetail.name || ''}
-                  autoHeight={true}
-                  className={`${cssPrefix}-detail-textarea`}
-                  onInput={({detail: {value}}) => this.onValueChange('name', value)}
-                />
-              </FormRow> */}
-            </FormCard>
+          <View className={`${cssPrefix}-detail-list  product-detail product-add`}>
+            <FormCard items={formName} />
             <FormCard items={formPrice} />
             <FormCard items={formNumber} />
             <View 
@@ -599,7 +594,8 @@ class ProductDetail extends Taro.Component<Props, State> {
             </View>
             {this.renderSupplier()}
             <FormCard items={formStatus} />
-  
+          </View>
+          <View className={`${cssPrefix}-add-buttons`}>
             <View className={`${cssPrefix}-detail-submit`}>
               <AtButton
                 className={`theme-button`}

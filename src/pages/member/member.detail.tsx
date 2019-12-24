@@ -2,11 +2,12 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-20 17:57:48
+ * @Last Modified time: 2019-12-23 19:55:39
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Image, Text } from '@tarojs/components';
 import "../style/member.less";
+import "../style/product.less";
 import "../style/home.less";
 import { Card } from '../../component/common/card/card.common';
 import FormCard from '../../component/card/form.card';
@@ -153,48 +154,50 @@ class MemberMain extends Taro.Component<MemberMainProps> {
                 </View>
               </Card>
             </View>
-           
-            <FormCard items={form1} >
-              <FormRow title="消费偏好" hasBorder={false}>
-                {
-                  memberPerference.length > 0 && (
-                    memberPerference.map((perference) => {
-                      return (
-                        <View 
-                          key={perference.barcode} 
-                          className={`${cssPrefix}-detail-row-icons`}
-                        >
-                          <View  className={`${cssPrefix}-detail-row-icon`}>{perference.productName}</View>
-                        </View>
-                      );
-                    })
-                  )
-                }
-              </FormRow>
-            </FormCard>
-            <FormCard items={form4} />
-            <FormCard items={form2} />
-            <FormCard items={form3} />
 
-            <View className={`${cssPrefix}-edit`}>
-              <AtButton 
-                className="theme-button"
-                onClick={this.onEditClick}
-              >
-                <Text className="theme-button-text">编辑</Text>
-              </AtButton>
-
-              <View className={`${cssPrefix}-edit-button-view`} />
-              <AtButton 
-                className="theme-button"
-                onClick={() => {}}
-              >
-                <Text className="theme-button-text">会员充值</Text>
-              </AtButton>
-              <View className={`${cssPrefix}-edit-button-view`} />
+            <View className="product-add">
+              <FormCard items={form1} >
+                <FormRow title="消费偏好" hasBorder={false}>
+                  {
+                    memberPerference.length > 0 && (
+                      memberPerference.map((perference) => {
+                        return (
+                          <View 
+                            key={perference.barcode} 
+                            className={`${cssPrefix}-detail-row-icons`}
+                          >
+                            <View  className={`${cssPrefix}-detail-row-icon`}>{perference.productName}</View>
+                          </View>
+                        );
+                      })
+                    )
+                  }
+                </FormRow>
+              </FormCard>
+              <FormCard items={form4} />
+              <FormCard items={form2} />
+              <FormCard items={form3} />
             </View>
           </View>
         )}
+        <View className={`product-add-buttons`}>
+          <View className={`product-add-buttons-button`}>
+            <AtButton 
+              className="theme-button "
+              onClick={this.onEditClick}
+            >
+              <Text className="theme-button-text" >编辑</Text>
+            </AtButton>
+          </View>
+          <View className={`product-add-buttons-button`}>
+            <AtButton 
+              className="theme-button"
+              onClick={() => {}}
+            >
+              <Text className="theme-button-text" >会员充值</Text>
+            </AtButton>
+          </View>
+        </View>
       </View>
     );
   }

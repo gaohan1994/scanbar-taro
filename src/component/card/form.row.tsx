@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 14:41:35 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-20 16:38:36
+ * @Last Modified time: 2019-12-23 16:14:05
  * 
  * @todo [fockedTaroUiListItem,增加以及修改了一些属性]
  */
@@ -160,7 +160,11 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
             )}
 
             {isInput === true && (
-              <View className="component-form-input">
+              <View 
+                className={classnames({
+                  ["component-form-input"]: buttons && buttons.length > 0
+                })}
+              >
                 <AtInput 
                   className={classnames('component-list-row-input')}
                   name={inputName || 'form.row.name'}
@@ -171,6 +175,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
                   border={false}
                   cursorSpacing={inputCursorSpacing}
                   placeholderClass="component-list-placeholder"
+                  placeholderStyle="color: #cccccc;"
                 />
               </View>
             )}

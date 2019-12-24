@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-12 14:01:28 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-18 17:26:50
+ * @Last Modified time: 2019-12-23 16:35:08
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text, Input } from '@tarojs/components';
@@ -15,7 +15,6 @@ import { FormRowProps } from '../../component/card/form.row';
 import { getPayReceive, PayReducer } from '../../reducers/app.pay';
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
-import getBaseUrl from '../../common/request/base.url';
 import numeral from 'numeral';
 import invariant from 'invariant';
 import productSdk from '../../common/sdk/product/product.sdk';
@@ -86,7 +85,7 @@ class PayReceive extends Taro.Component<Props, State> {
     } catch (error) {
       Taro.showToast({
         title: error.message,
-        icon: 'none'
+        icon: 'none',
       });
     }
   }
@@ -180,11 +179,10 @@ class PayReceive extends Taro.Component<Props, State> {
         payload: {}
       });
       
-      Taro.showToast({ title: `收款成功` });
       Taro.redirectTo({ url: `/pages/pay/pay.result?params=${JSON.stringify(params)}` });
     } else {
       // 收款失败
-      Taro.showToast({ title: `收款失败` });
+      // Taro.showToast({ title: `收款失败` });
       // Taro.redirectTo({ url: `/pages/pay/pay.result?params=${JSON.stringify(params)}` });
     }
   }
@@ -251,12 +249,10 @@ class PayReceive extends Taro.Component<Props, State> {
               return (
                 <View 
                   key={item.title} 
-                  className={classnames(
-                    `${cssPrefix}-receive-header-item`,
-                    {
-                      [`${cssPrefix}-receive-header-item-active`]: this.state.tab === item.tab
-                    }
-                  )} 
+                  className={classnames(`${cssPrefix}-receive-header-item`, {
+                    [`${cssPrefix}-receive-header-item-active`]: this.state.tab === item.tab,
+                    [`${cssPrefix}-receive-header-item-disabled`]: this.state.tab !== item.tab
+                  })} 
                   onClick={() => this.onTabClick(item.tab)}
                 >
                   <Image src={item.image} className={`${cssPrefix}-receive-header-item-image`} />
@@ -334,6 +330,7 @@ class PayReceive extends Taro.Component<Props, State> {
                 <View className={`${cssPrefix}-input-box-input-money`}>￥</View>
                 <Input 
                   // cursorSpacing={300}
+                  focus={true}
                   className={`${cssPrefix}-input-box-input-input`} 
                   value={receiveCash}
                   onInput={({detail: {value}}) => this.onChangeCash(value)}

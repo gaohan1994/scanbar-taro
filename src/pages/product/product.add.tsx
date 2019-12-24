@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-20 13:37:23 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-20 16:37:10
+ * @Last Modified time: 2019-12-23 21:04:23
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Picker, Text } from '@tarojs/components';
@@ -477,31 +477,32 @@ class ProductAdd extends Taro.Component<Props, State> {
     ];
     const formPrice: FormRowProps[] = [
       {
-        title: '进价（￥）',
-        isInput: true,
-        inputValue: cost,
-        inputType: 'digit',
-        inputPlaceHolder: '请输入进价',
-        inputOnChange: (value) => this.onChangeValue('cost', value)
-      },
-      {
         title: '售价（￥）',
         isInput: true,
         inputValue: price,
         inputType: 'digit',
         inputPlaceHolder: '请输入售价',
         inputOnChange: (value) => this.onChangeValue('price', value),
-      }
+      },
+      {
+        title: '进价（￥）',
+        isInput: true,
+        hasBorder: false,
+        inputValue: cost,
+        inputType: 'digit',
+        inputPlaceHolder: '请输入进价',
+        inputOnChange: (value) => this.onChangeValue('cost', value)
+      },
     ];
     return (
-      <View className="container product-add container-color">
+      <View className="container container-color">
         {this.renderImage()}
-        <View className={`${cssPrefix}-detail-list container-color`}>
+        <View className={`${cssPrefix}-detail-list product-add container-color`}>
           <FormCard items={formName} />
           <FormCard items={formPrice} />
           {this.renderMore()}
-          {this.renderButtons()}
         </View>
+        {this.renderButtons()}
       </View>
     );
   }
@@ -557,16 +558,14 @@ class ProductAdd extends Taro.Component<Props, State> {
       >
         {
           tempFilePaths && tempFilePaths[0] ? (
-            <View 
-              // src={tempFilePaths[0]} 
+            <View
               className={`${cssPrefix}-detail-cover-image ${cssPrefix}-detail-cover-image-background`} 
               style={`background-image: url(${tempFilePaths[0]})`}
             />
           ) : (
-            <Image
-              src="//net.huanmusic.com/weapp/img_nolist.png"
-              className={`${cssPrefix}-detail-cover-image`} 
-            />
+            <View className={`${cssPrefix}-detail-cover`}  >
+              <Image className={`${cssPrefix}-detail-cover-empty`} src="//net.huanmusic.com/weapp/pic_default.png"/>
+            </View>
           )
         }
       </View>
@@ -725,7 +724,7 @@ class ProductAdd extends Taro.Component<Props, State> {
       <View className={`${cssPrefix}-add-buttons`}>
         <View className={`${cssPrefix}-add-buttons-button`}>
           <AtButton 
-            className="theme-button "
+            className="theme-button"
             onClick={this.onSave}
           >
             <Text className="theme-button-text" >保存并新增</Text>
@@ -733,7 +732,7 @@ class ProductAdd extends Taro.Component<Props, State> {
         </View>
         <View className={`${cssPrefix}-add-buttons-button`}>
           <AtButton 
-            className="theme-button "
+            className="theme-button"
             onClick={this.onAdd}
           >
             <Text className="theme-button-text" >保存</Text>

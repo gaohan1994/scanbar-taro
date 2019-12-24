@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-04 13:49:58 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-20 11:50:02
+ * @Last Modified time: 2019-12-23 13:44:53
  * 
  * @Usage
  * ```jsx
@@ -100,7 +100,9 @@ class Modal extends Taro.Component<Props, State> {
                       key={title}
                       className={`${ModalCssPrefix}-content-item`}
                     >
-                      <View className={`${ModalCssPrefix}-content-item-title`}>
+                      <View 
+                        className={classnames(`${ModalCssPrefix}-content-item-title`)}
+                      >
                         {main && (
                           <View className={`${ModalCssPrefix}-content-item-title-main`}>*</View>
                         )}

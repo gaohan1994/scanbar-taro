@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:09:10 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-18 17:10:23
+ * @Last Modified time: 2019-12-23 20:06:14
  */
 import { jsonToQueryString, HTTPInterface } from '../index';
 
@@ -26,6 +26,9 @@ export declare namespace MemberInterface {
   interface MemberInfo extends MemberInfoAddParams {
     createTime: string;
     id: number;
+    lastPayTime: string;
+    totalAmount: number;
+    totalTimes: number;
   }
 
   /**

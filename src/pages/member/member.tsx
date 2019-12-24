@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-20 15:48:56
+ * @Last Modified time: 2019-12-23 20:07:52
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Input, Image, Text } from '@tarojs/components';
@@ -18,6 +18,7 @@ import { AtActivityIndicator } from 'taro-ui';
 import classnames from 'classnames';
 import "../style/product.less";
 import { getMemberList } from '../../reducers/app.member';
+import numeral from 'numeral';
 
 const cssPrefix = 'member';
 
@@ -29,11 +30,17 @@ interface MemberMainProps {
   memberList: MemberInterface.MemberInfo[];
 }
 
+type MemberQuery = 'total_amount' | 'last_pay_time' | 'create_time';
+type MemberSelect = 'desc' | 'asc';
+
 interface State {
   searchValue: string;
   refreshing: boolean;
   loading: boolean;
   lastIsSearch: boolean;
+  memberQuery: MemberQuery;
+  memberSelect: MemberSelect;
+
 }
 class MemberMain extends Taro.Component<MemberMainProps, State> {
   /**
@@ -53,12 +60,47 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
     loading: false,
     lastFetch: '',
     lastIsSearch: false,
+    memberQuery: 'total_amount' as MemberQuery,
+    memberSelect: 'desc' as MemberSelect,
   };
   
   componentDidShow () {
     if (this.state.lastIsSearch === false && this.state.searchValue === '') {
       this.fetchMember(1);
     }
+  }
+
+  public changeValue = (key: string, value: string) => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        [key]: value
+      };
+    });
+  }
+
+  public onTabClick = (type: MemberQuery) => {
+    const { memberQuery } = this.state;
+    if (memberQuery === type) {
+      
+      this.setState(prevState => {
+        return {
+          ...prevState,
+          memberSelect: prevState.memberSelect === 'desc' ? 'asc' : 'desc'
+        };
+      }, () => {
+        this.fetchMember(1);
+      });
+      return;
+    }
+
+    // 说明不是
+    this.setState({
+      memberQuery: type,
+      memberSelect: 'desc'
+    }, () => {
+      this.fetchMember(1);
+    });
   }
 
   /**
@@ -118,8 +160,13 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
           this.changeLoading(true);
         }
       }
-      
-      const result = await MemberAction.memberList({pageNum: currentPage, pageSize});
+      const { memberQuery, memberSelect } = this.state;
+      const payload: MemberInterface.MemberInfoListFetchFidle = {
+        pageNum: currentPage,
+        pageSize,
+        orderByColumn: `${memberQuery} ${memberSelect}`
+      };
+      const result = await MemberAction.memberList(payload);
       invariant(result.success, result.result || '服务器开了个小差');
       /**
        * @todo [请求结束之后如果外部传入的page那么赋值给全局，如果没传那么默认+1]
@@ -218,7 +265,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
   render () {
     return (
       <View className={`container ${cssPrefix}-main container-color`}>
-        <View className={`${cssPrefix}-main-header ${cssPrefix}-main-bg`}>
+        <View className={`${cssPrefix}-main-header`}>
           <View className={`${cssPrefix}-main-header-search`}>
             <Image src="//net.huanmusic.com/weapp/icon_search.png" className={`${cssPrefix}-main-header-search-icon`} />
             <Input
@@ -242,7 +289,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
         <View className={`product-manage-list`}>
           <View className={`${cssPrefix}-main-card`}>
             <View className="home-card">
-              <View className="home-buttons">
+              <View className="home-buttons member-card-buttons">
                 <View className={`home-buttons-button home-buttons-button-border ${cssPrefix}-main-button`}>
                   <View className="home-money">2000</View>
                   <View className={`normal-text home-buttons-button-box`}>会员总数</View>
@@ -254,22 +301,63 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
               </View>
             </View>
           </View>
-
-          {this.renderTabs()}
         </View>
+
+        {this.renderTabs()}
+      </View>
+    );
+  }
+
+  private renderTabsHeader = () => {
+    const { memberQuery, memberSelect } = this.state;
+
+    const tabs: {key: MemberQuery, value: string}[] = [
+      {key: 'total_amount', value: '累计消费'},
+      {key: 'last_pay_time', value: '上次消费时间'},
+      {key: 'create_time', value: '注册时间'},
+    ];
+    return (
+      <View className={`${cssPrefix}-tabs-header`}>
+        {
+          tabs.map((tab) => {
+            return (
+              <View 
+                key={tab.key}
+                className={classnames(`${cssPrefix}-tabs-header-item`, {
+                  [`${cssPrefix}-tabs-header-item-active`]: memberQuery === tab.key
+                })}
+                onClick={() => this.onTabClick(tab.key)}
+              >
+                {tab.value}
+                {memberQuery === tab.key && memberSelect === 'desc' && (
+                  <Image src="//net.huanmusic.com/weapp/icon_sort.png" className={`${cssPrefix}-tabs-header-item-icon`} />
+                )}
+                {memberQuery === tab.key && memberSelect === 'asc' && (
+                  <Image 
+                    src="//net.huanmusic.com/weapp/icon_sort.png" 
+                    className={`${cssPrefix}-tabs-header-item-icon ${cssPrefix}-tabs-header-item-icon-asc`} 
+                  />
+                )}
+                {memberQuery === tab.key && (
+                  <View className={`${cssPrefix}-tabs-header-item-border`} />
+                )}
+              </View>
+            );
+          })
+        }
       </View>
     );
   }
 
   private renderTabs = () => {
-    const { loading, refreshing } = this.state;
+    const { loading, refreshing, memberQuery } = this.state;
     const { memberList } = this.props;
     return (
-      <View>
-
+      <View className={`${cssPrefix}-tabs`}>
+        {this.renderTabsHeader()}
         <ScrollView 
           scrollY={true}
-          className={`product-manage-list-container`}
+          className={`${cssPrefix}-tabs-list`}
           onScrollToUpper={this.refresh}
           onScrollToLower={this.loadMore}
         >
@@ -282,20 +370,34 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
             <View 
               className={classnames('component-form', {
                 'component-form-shadow': true,
-                [`${cssPrefix}-list-form`]: true
+                [`${cssPrefix}-list-pos`]: true
               })}
             >
-              {memberList.map((member, index) => {
+              {memberList.map((member) => {
                 return (
                   <View
                     key={member.id}
                     className={classnames(`${cssPrefix}-card-row`, {
-                      [`${cssPrefix}-card-row-border`]: index !== memberList.length - 1
+                      [`${cssPrefix}-card-row-border`]: true
                     })}
                     onClick={() => {Taro.navigateTo({url: `/pages/member/member.detail?id=${member.id}`})}}
                   >
-                    <Text className={`${cssPrefix}-card-text`}>姓名：{member.username}</Text>
-                    <Text className={`${cssPrefix}-card-row-margin ${cssPrefix}-card-text`}>手机号：{member.phoneNumber}</Text>
+                    <View className={`${cssPrefix}-card-row-detail`}>
+                      <View className={`${cssPrefix}-card-row-detail-name`}>
+                        <Text className={`${cssPrefix}-card-text`}>{member.username}</Text>
+                        <View className={`${cssPrefix}-card-row-detail-icon`}>普通会员</View>
+                      </View>
+                      <Text className={`${cssPrefix}-card-row-margin ${cssPrefix}-card-text`}>{member.phoneNumber}</Text>
+                    </View>
+                    {memberQuery === 'total_amount' && (
+                      <Text>{`￥${numeral(member.totalAmount).format('0.00')}`}</Text>
+                    )}
+                    {memberQuery === 'create_time' && (
+                      <Text>{member.createTime}</Text>
+                    )}
+                    {memberQuery === 'last_pay_time' && (
+                      <Text>{member.lastPayTime}</Text>
+                    )}
                   </View>
                 );
               })}
@@ -303,11 +405,12 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
           ) : (
             <View>暂无数据</View>
           )}
-          {loading === true && (
+          {loading && (
             <View className={`${cssPrefix}-loading`}>
               <AtActivityIndicator mode='center' />
             </View>
           )}
+          
         </ScrollView>
       </View>
     );

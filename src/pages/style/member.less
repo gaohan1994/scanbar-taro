@@ -23,6 +23,50 @@
   &-pos {
     margin-top: -150px;
   }
+  &-tabs {
+    background-color: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    position: absolute;
+    top: 20px + 140px + 24px + 60px + 20px + 60px;
+    bottom: 50px;
+    width: 690px;
+    .margin(30px, l);
+    &-list {
+      height: 100%;
+    }
+    &-header {
+      .flex(center, center, row);
+      border-bottom: 1px solid #e3e3e3;
+      &-item {
+        flex: 1;
+        .padding(30px, tb);
+        .flex(center, center, row);
+        font-size: 30px;
+        color: #999999;
+        position: relative;
+        &-icon {
+          width: 10px;
+          height: 30px;
+          .margin(10px, l);
+          &-asc {
+            transform: rotate(180deg);
+          }
+        }
+        &-active {
+          color: @theme-color;
+        }
+        &-border {
+          position: absolute;
+          bottom: 0;
+          width: 120px;
+          height: 4px;
+          background-color: @theme-color;
+          left: ((690px / 3) - 120px) / 2;
+        }
+      }
+    }
+  }
   &-bg {
     position: relative;
     z-index: 100;
@@ -41,6 +85,9 @@
   &-card {
     position: relative;
     background-color: #ffffff;
+    &-buttons {
+      .padding(40px, tb) !important;
+    }
     &-header {
       .flex(center, center, row);
       .padding(25px, tb);
@@ -49,11 +96,29 @@
     }
     &-row {
       .padding(23px, tb);
-      .padding(50px, lr);
+      .padding(30px, lr);
       color: #666666;
       font-size: 26px;
-      display: flex;
-      flex-direction: column;
+      .flex(center, space-between, row);
+      &-detail {
+        display: flex;
+        flex-direction: column;
+        &-name {
+          display: flex;
+          flex-direction: row;
+        }
+        &-icon {
+          font-size: 18px;
+          color: #D8AE6D;
+          border: 1px solid #D8AE6D;
+          .padding(6px, tb);
+          .padding(13px, lr);
+          line-height: 18px;
+          .flex(center, center);
+          .margin(20px, l);
+          border-radius: 10px;
+        }
+      }
       &-margin {
         .margin(12px, t);
       }
@@ -218,6 +283,9 @@
     &-form {
       .margin(30px, l);
       width: 690px;
+    }
+    &-pos {
+      width: 100%;
     }
   }
   &-loading {

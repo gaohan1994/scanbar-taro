@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-15 11:17:25 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-17 11:37:08
+ * @Last Modified time: 2019-12-23 18:51:53
  * 
  * @todo [商品管理页面]
  */
@@ -10,6 +10,7 @@ import Taro from '@tarojs/taro';
 import { View, Image, Input, ScrollView, Text } from '@tarojs/components';
 import "../style/product.less";
 import "../style/member.less";
+import "../../component/card/form.card.less";
 import { ProductAction } from '../../actions';
 import { ResponseCode, ProductInterface, ProductService } from '../../constants/index';
 import invariant from 'invariant';
@@ -20,6 +21,7 @@ import ProductManageComponent from '../../component/product/product.manage';
 import { AtFloatLayout, AtButton } from 'taro-ui';
 import classnames from 'classnames';
 import productSdk from '../../common/sdk/product/product.sdk';
+import merge from 'lodash.merge';
 
 const memberPrefix = 'member';
 const cssPrefix = 'product';
@@ -32,8 +34,8 @@ interface Props {
 
 interface State {
   selectVisible: boolean;
-  selectTypeId: number;
-  selectSupplierId: number;
+  selectTypeId: number[];
+  selectSupplierId: number[];
   selectStatus: number;
   searchValue: string;
 }
@@ -46,8 +48,8 @@ class ProductManage extends Taro.Component<Props, State> {
 
   readonly state: State = {
     selectVisible: false,
-    selectTypeId: -1,
-    selectSupplierId: -1,
+    selectTypeId: [],
+    selectSupplierId: [],
     selectStatus: -1,
     searchValue: '',
   };
@@ -73,12 +75,55 @@ class ProductManage extends Taro.Component<Props, State> {
     return value;
   }
 
+  public changeAll = (key: string) => {
+    const { productType, productSupplier } = this.props;
+    this.setState(prevState => {
+      const prevData = merge([], prevState[key]);
+      let nextData: any[] = [];
+      if (prevData.length === 0) {
+        if (key === 'selectTypeId') {
+          nextData = productType.map((t) => t.id);
+        } else if (key === 'selectSupplierId') {
+          nextData = productSupplier.map((s) => s.id);
+        }
+      }
+      return {
+        ...prevState,
+        [key]: nextData
+      };
+    });
+  }
+
   public changeSelectType = (type: ProductInterface.ProductType) => {
-    this.setState({selectTypeId: type.id});
+    this.setState(prevState => {
+      const prevIds = merge([], prevState.selectTypeId);
+      const index = prevIds.findIndex(p => p === type.id);
+      if (index === -1) {
+        prevIds.push(type.id);
+      } else {
+        prevIds.splice(index, 1);
+      }
+      return {
+        ...prevState,
+        selectTypeId: prevIds
+      };
+    });
   }
 
   public changeSelectSupplier = (supplier: ProductInterface.ProductSupplier) => {
-    this.setState({selectSupplierId: supplier.id});
+    this.setState(prevState => {
+      const prevIds = merge([], prevState.selectSupplierId);
+      const index = prevIds.findIndex(p => p === supplier.id);
+      if (index === -1) {
+        prevIds.push(supplier.id);
+      } else {
+        prevIds.splice(index, 1);
+      }
+      return {
+        ...prevState,
+        selectSupplierId: prevIds
+      };
+    });
   }
 
   public changeSelectStatus = (status: number) => {
@@ -87,8 +132,8 @@ class ProductManage extends Taro.Component<Props, State> {
 
   public reset = () => {
     this.setState({
-      selectTypeId: -1,
-      selectSupplierId: -1,
+      selectTypeId: [],
+      selectSupplierId: [],
       selectStatus: -1
     });
   }
@@ -142,10 +187,10 @@ class ProductManage extends Taro.Component<Props, State> {
       if (selectStatus !== -1) {
         payload.status = selectStatus;
       }
-      if (selectSupplierId !== -1) {
+      if (selectSupplierId.length > 0) {
         payload.supplierId = selectSupplierId;
       }
-      if (selectTypeId !== -1) {
+      if (selectTypeId.length > 0) {
         payload.type = selectTypeId;
       }
       const { success, result } = await ProductAction.productInfoList(payload);
@@ -306,58 +351,80 @@ class ProductManage extends Taro.Component<Props, State> {
           筛选
         </View>
         <View className={`${cssPrefix}-select-content`}>
-          <View className={`${cssPrefix}-select-content-item ${cssPrefix}-select-border`}>
-            <View className={`${cssPrefix}-select-content-item-title`}>品类</View>
-            <View className={`${cssPrefix}-select-content-item-buttons`}>
-              {
-                productType.map((type) => {
-                  return (
-                    <AtButton
-                      key={type.id}
-                      type="primary"
-                      onClick={() => this.changeSelectType(type)}
-                      className={classnames(
-                        'product-manage-select-modal-button', 
-                        {
-                          'product-manage-select-modal-button-confirm': selectTypeId === type.id,
-                          'product-manage-select-modal-button-cancel': selectTypeId !== type.id,
-                        }
-                      )}
-                    >
-                      {type.name}
-                    </AtButton>
-                  );
-                })
-              }
+          {productType.length > 0 && (
+            <View className={`${cssPrefix}-select-content-item ${cssPrefix}-select-border`}>
+              <View className={`${cssPrefix}-select-content-item-title`}>品类</View>
+              <View className={`${cssPrefix}-select-content-item-buttons`}>
+                <View
+                  onClick={() => this.changeAll('selectTypeId')}
+                  className={classnames(
+                    'component-form-button', 
+                    {
+                      [`${cssPrefix}-select-content-button`]: true,
+                      'component-form-button-confirm': selectTypeId.length === productType.length,
+                      'component-form-button-cancel': selectTypeId.length !== productType.length
+                    }
+                  )}
+                >
+                  全部
+                </View>
+                {
+                  productType.map((type) => {
+                    return (
+                      <View
+                        key={type.id}
+                        onClick={() => this.changeSelectType(type)}
+                        className={classnames(
+                          'component-form-button', 
+                          {
+                            [`${cssPrefix}-select-content-button`]: true,
+                            'component-form-button-confirm': selectTypeId.some((t) => t === type.id),
+                            'component-form-button-cancel': !(selectTypeId.some((t) => t === type.id)),
+                          }
+                        )}
+                      >
+                        {type.name}
+                      </View>
+                    );
+                  })
+                }
+              </View>
             </View>
-          </View>
+          )}
+          
           <View className={`${cssPrefix}-select-content-item ${cssPrefix}-select-border`}>
             <View className={`${cssPrefix}-select-content-item-title`}>供应商</View>
             <View className={`${cssPrefix}-select-content-item-buttons`}>
+              <View
+                onClick={() => this.changeAll('selectSupplierId')}
+                className={classnames(
+                  'component-form-button', 
+                  {
+                    [`${cssPrefix}-select-content-button`]: true,
+                    'component-form-button-confirm': selectSupplierId.length === productSupplier.length,
+                    'component-form-button-cancel': selectSupplierId.length !== productSupplier.length,
+                  }
+                )}
+              >
+                全部
+              </View>
               {
                 productSupplier.map((supplier) => {
                   return (
-                    <AtButton
+                    <View
                       key={supplier.id}
-                      type="primary"
                       onClick={() => this.changeSelectSupplier(supplier)}
                       className={classnames(
-                        'product-manage-select-modal-button', 
+                        'component-form-button', 
                         {
-                          'product-manage-select-modal-button-confirm': selectSupplierId === supplier.id,
-                          'product-manage-select-modal-button-cancel': selectSupplierId !== supplier.id,
+                          [`${cssPrefix}-select-content-button`]: true,
+                          'component-form-button-confirm': selectSupplierId.some((t) => t === supplier.id),
+                          'component-form-button-cancel': !(selectSupplierId.some((t) => t === supplier.id)),
                         }
                       )}
                     >
-                      <Text
-                        className={classnames({
-                          'product-manage-select-modal-button-confirm-text': selectSupplierId === supplier.id,
-                          'product-manage-select-modal-button-cancel-text': selectSupplierId !== supplier.id,
-                        })}
-                      >
-                        {supplier.name}
-                      </Text>
-                    </AtButton>
+                      {supplier.name}
+                    </View>
                   );
                 })
               }
@@ -366,65 +433,50 @@ class ProductManage extends Taro.Component<Props, State> {
           <View className={`${cssPrefix}-select-content-item ${cssPrefix}-select-border`}>
             <View className={`${cssPrefix}-select-content-item-title`}>商品状态</View>
             <View className={`${cssPrefix}-select-content-item-buttons`}>
-              <AtButton
-                type="primary"
+              <View
                 onClick={() => this.changeSelectStatus(0)}
                 className={classnames(
-                  'product-manage-select-modal-button', 
+                  'component-form-button', 
                   {
-                    'product-manage-select-modal-button-confirm': selectStatus === 0,
-                    'product-manage-select-modal-button-cancel': selectStatus !== 0,
+                    [`${cssPrefix}-select-content-button`]: true,
+                    'component-form-button-confirm': selectStatus === 0,
+                    'component-form-button-cancel': selectStatus !== 0,
                   }
                 )}
               >
-                <Text 
-                  className={classnames({
-                    'product-manage-select-modal-button-confirm-text': selectStatus === 0,
-                    'product-manage-select-modal-button-cancel-text': selectStatus !== 0,
-                  })}
-                >
-                  启用
-                </Text>
-              </AtButton>
-              <AtButton
-                type="primary"
+                启用
+              </View>
+              <View
                 onClick={() => this.changeSelectStatus(1)}
                 className={classnames(
-                  'product-manage-select-modal-button', 
+                  'component-form-button', 
                   {
-                    'product-manage-select-modal-button-confirm': selectStatus === 1,
-                    'product-manage-select-modal-button-cancel': selectStatus !== 1
+                    [`${cssPrefix}-select-content-button`]: true,
+                    'component-form-button-confirm': selectStatus === 1,
+                    'component-form-button-cancel': selectStatus !== 1
                   }
                 )}
               >
-                <Text
-                  className={classnames({
-                    'product-manage-select-modal-button-confirm-text': selectStatus === 1,
-                    'product-manage-select-modal-button-cancel-text': selectStatus !== 1
-                  })}
-                >
-                  停用
-                </Text>
-              </AtButton>
+                停用
+              </View>
             </View>
           </View>
-          
-          <View className={`${cssPrefix}-select-content-item-buttons ${cssPrefix}-select-form`}>
-            <AtButton
-              type="primary"
-              onClick={() => this.reset()}
-              className={`product-manage-select-modal-button-reset`}
-            >
-              <Text className={`product-manage-select-modal-button-reset-text`}>重置</Text>
-            </AtButton>
-            <AtButton
-              type="primary"
-              onClick={() => this.submit()}
-              className={`product-manage-select-modal-button-submit`}
-            >
-              <Text className={`product-manage-select-modal-button-submit-text`}>确定</Text>
-            </AtButton>
-          </View>
+        </View>
+        <View className={`${cssPrefix}-select-content-item-pos`}>
+          <AtButton
+            type="primary"
+            onClick={() => this.reset()}
+            className={`product-manage-select-modal-button-reset`}
+          >
+            <Text className={`product-manage-select-modal-button-reset-text`}>重置</Text>
+          </AtButton>
+          <AtButton
+            type="primary"
+            onClick={() => this.submit()}
+            className={`product-manage-select-modal-button-submit`}
+          >
+            <Text className={`product-manage-select-modal-button-submit-text`}>确定</Text>
+          </AtButton>
         </View>
       </AtFloatLayout>
     );

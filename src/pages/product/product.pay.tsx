@@ -109,25 +109,6 @@ class ProductPay extends Taro.Component<Props, State> {
     return productSdk.getProductTransPrice();
   }
 
-  public onScanMember = () => {
-    try {
-      Taro
-      .scanCode()
-      .then(res => {
-        Taro.showLoading();
-        this.setState({
-          memberValue: res.result
-        });
-        Taro.hideLoading();
-      });
-    } catch (error) {
-      Taro.showToast({
-        title: error.message,
-        icon: 'none'
-      });
-    }
-  }
-
   public changeMember = () => {
     this.changeModalVisible('memberLayout', false);
     this.changeModalVisible('memberModal', true);
@@ -362,30 +343,15 @@ class ProductPay extends Taro.Component<Props, State> {
         header="选择会员"
       >
         <View className={`product-detail-modal`}>
-          <View 
-            className={classnames('component-form', {
-              'component-form-shadow': true
-            })}
-          > 
-            <View className={`${cssPrefix}-pay-member-input`}>
-              <Input 
-                // cursorSpacing={300}
-                className={`${cssPrefix}-pay-member-input-box`}
-                placeholder="请输入卡号、手机号"
-                value={memberValue}
-                type="number"
-                onInput={({detail: { value }}) => this.onChangeValue('memberValue', value)}
-              />
-              <View
-                className={`${cssPrefix}-pay-member-input-icon`} 
-                onClick={() => this.onScanMember()}
-              >
-                <Image 
-                  src="//net.huanmusic.com/weapp/icon_close_scan.png"
-                  className={`${cssPrefix}-pay-member-input-icon-img`} 
-                />
-              </View>
-            </View>
+          <View className={`${cssPrefix}-pay-member-input`}>
+            <Input
+              className={`${cssPrefix}-pay-member-input-box`}
+              placeholder="请输入会员卡号、手机号"
+              value={memberValue}
+              type="number"
+              placeholderClass={`${cssPrefix}-pay-member-input-place`}
+              onInput={({detail: { value }}) => this.onChangeValue('memberValue', value)}
+            />
           </View>
         </View>
       </Modal>

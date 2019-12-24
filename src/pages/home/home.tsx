@@ -29,20 +29,20 @@ const NavItems = [
     url: '/pages/pay/pay.input',
   },
   {
-    image: '//net.huanmusic.com/weapp/icon_menu_procurement.png',
+    image: '//net.huanmusic.com/weapp/icon_menu_procurement1.png',
     value: '采购',
     subTitle: 'Procurement',
     url: '/pages/',
   },
   {
-    image: '//net.huanmusic.com/weapp/icon_menu_order.png',
+    image: '//net.huanmusic.com/weapp/icon_menu_inventory1.png',
     value: '盘点',
     subTitle: 'inventory',
     url: '/pages/',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_details.png',
-    value: '交易明细',
+    value: '订单',
     subTitle: 'Transcation details',
     url: '/pages/order/order.main',
   },
@@ -130,10 +130,6 @@ class Home extends Component {
               <View className={`home-buttons-button home-buttons-button-border ${cssPrefix}-buttons-button-start`}>
                 <View className={`normal-text ${cssPrefix}-buttons-button-box`}>
                   <View>{`今日销售额 >`}</View>
-                  {/* <Image
-                    src="//net.huanmusic.com/weapp/icon_home_into.png" 
-                    className={`${cssPrefix}-buttons-button-icon`}
-                  />   */}
                 </View>
                 <View className="home-money">100000.00</View>
               </View>

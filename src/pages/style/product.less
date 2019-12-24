@@ -5,7 +5,7 @@
 
 @product-prefix: product;
 @product-search-width: 550px;
-@product-header-height: 20px + 20px + 60px + 6px;
+@product-header-height: 20px + 20px + 60px;
 @product-header-zindex: 100;
 @product-list-left-bg-color: #f6f6f6;
 @product-list-type-height: 94px;
@@ -34,7 +34,20 @@
       width: 147px;
       .flex(center, center, row);
       border-radius: 30px;
+      position: relative;
       font-size: @normal-text-fontsize;
+    }
+    &-suspension {
+      position: absolute;
+      right: 10px;
+      border-radius: 50%;
+      background-color: #FC4E44;
+      font-size: 22px;
+      .flex(center, center);
+      height: 37px;
+      min-width: 37px;
+      color: #ffffff;
+      top: -18px;
     }
     &-search {
       width: @product-search-width !important;
@@ -79,7 +92,7 @@
     &-container {
       position: absolute;
       top: @product-header-height;
-      bottom: @cart-height + 10px;
+      bottom: @cart-height;
       width: 100%;
       display: flex;
       flex-direction: row;
@@ -179,21 +192,38 @@
     &-content {
       display: flex;
       flex-direction: column;
-      .padding(35px, lr);
+      .padding(34px, lr);
+      .padding(120px, b);
+      &-button {
+        .margin(0px, l) !important;
+        .margin(18px, r) !important;
+        .margin(18px, t);
+        .padding(18px, tb) !important;
+        .padding(40px, lr) !important;
+      }
       &-item {
         display: flex;
         flex-direction: column;
-        .padding(40px, tb);
+        .padding(25px, tb);
         &-title {
           font-size: @product-select-title-font;
-          color: @base-font-color;
+          color: #4d4d4d;
           font-weight: bold;
         }
         &-buttons {
           display: flex;
           flex-direction: row;
           flex-wrap: wrap;
-          .margin(50px, b);
+        }
+        &-pos {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          .flex(center, space-between, row);
+          .padding(40px, tb);
+          .padding(34px, lr);
+          background-color: #ffffff;
         }
       }
     }
@@ -210,7 +240,13 @@
     background-color: #f2f2f2;
     &-cover {
       width: 100%;
-      height: 380px;
+      height: 388px;
+      background-color: #ffffff;
+      .flex(center, center);
+      &-empty {
+        width: 200px;
+        height: 200px;
+      }
       &-image {
         width: 100%;
         height: 100%;
@@ -224,13 +260,13 @@
     &-list {
       width: 100%;
       .padding(30px, lr);
-      .padding(20px, t);
+      .padding(6rpx, t);
     }
     &-textarea {
       width: 450rpx;
     }
     &-submit {
-      .margin(60px, tb);
+      width: 100%;
     }
     &-modal {
       position: relative;
@@ -275,9 +311,17 @@
     }
   }
   &-add {
-    background-color: #f6f6f6;
+    .padding(200px, b);
     &-buttons {
-      .margin(60px, tb);
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background-color: #f2f2f2;
+      .padding(40px, t);
+      .padding(50px, b);
+      .padding(30px, lr);
       .flex(center, space-between, row);
       &-button {
         width: 320px;
@@ -315,6 +359,7 @@
     height: 100%;
     background-color: #f2f2f2;
     .padding(20px);
+    .padding(6px, t);
     &-card {
       .margin(20px, t);
     }
@@ -364,10 +409,13 @@
         }
       }
       &-left {
-        .flex(center, space-around);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
         height: 100%;
         &-item {
           .flex(center, center, column);
+          flex: 1;
           &-icon {
             width: 37px;
             height: 32px;
@@ -388,6 +436,8 @@
       &-input {
         .padding(30px);
         .flex(center, space-between, row);
+        background-color: #F8F8FA;
+        border-radius: 20px;
         &-icon {
           width: 40px;
           height: 40px;
@@ -396,9 +446,13 @@
             height: 100%;
           }
         }
+        &-place {
+          font-size: 30px;
+          color: #cccccc;
+        }
         &-box {
-          width: 320px;
-          font-size: 26px;
+          width: 100%;
+          font-size: 30px;
         }
       }
       &-layout {
