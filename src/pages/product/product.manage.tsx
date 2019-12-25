@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-15 11:17:25 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-23 18:51:53
+ * @Last Modified time: 2019-12-25 15:46:16
  * 
  * @todo [商品管理页面]
  */
@@ -188,10 +188,10 @@ class ProductManage extends Taro.Component<Props, State> {
         payload.status = selectStatus;
       }
       if (selectSupplierId.length > 0) {
-        payload.supplierId = selectSupplierId;
+        payload.supplierId = selectSupplierId.join(',');
       }
       if (selectTypeId.length > 0) {
-        payload.type = selectTypeId;
+        payload.type = selectTypeId.join(',');
       }
       const { success, result } = await ProductAction.productInfoList(payload);
       Taro.hideLoading();
@@ -239,7 +239,7 @@ class ProductManage extends Taro.Component<Props, State> {
         return;
       }
       const payload: ProductInterface.ProductInfoListFetchFidle = {
-        name: searchValue
+        words: searchValue
       };
       const { success, result } = await ProductAction.productInfoList(payload);
       invariant(success, result || ResponseCode.error);
@@ -278,7 +278,7 @@ class ProductManage extends Taro.Component<Props, State> {
             />
             <View
               onClick={() => this.onScanProduct()}
-              className={`${memberPrefix}-main-header-search-scan`} 
+              className={`${memberPrefix}-main-header-search-scan ${memberPrefix}-main-header-search-mar`} 
             >
               <Image
                 src="//net.huanmusic.com/weapp/icon_commodity_scan.png" 
@@ -333,153 +333,156 @@ class ProductManage extends Taro.Component<Props, State> {
   private renderSelectModal = () => {
     const { selectTypeId, selectSupplierId, selectStatus, selectVisible } = this.state;
     const { productSupplier, productType } = this.props;
-    return (
-      <AtFloatLayout
-        isOpened={selectVisible}
-        onClose={() => this.changeSelectVisible(false)}
-      >
-        <View className={`${cssPrefix}-select-header`}>
+    if (selectVisible) {
+      return (
+        <View className={`product-pay-member-layout-mask`} >
           <View 
-            className={`${cssPrefix}-select-header-close`}
-            onClick={() => this.changeSelectVisible(false)}
+            className={`product-pay-member-layout-box product-pay-member-layout-container`}
+            style="background-color: #ffffff;"
           >
-            <Image 
-              className={`${cssPrefix}-select-header-close-image`} 
-              src="//net.huanmusic.com/weapp/icon_del.png" 
-            />
-          </View>
-          筛选
-        </View>
-        <View className={`${cssPrefix}-select-content`}>
-          {productType.length > 0 && (
-            <View className={`${cssPrefix}-select-content-item ${cssPrefix}-select-border`}>
-              <View className={`${cssPrefix}-select-content-item-title`}>品类</View>
-              <View className={`${cssPrefix}-select-content-item-buttons`}>
-                <View
-                  onClick={() => this.changeAll('selectTypeId')}
-                  className={classnames(
-                    'component-form-button', 
-                    {
-                      [`${cssPrefix}-select-content-button`]: true,
-                      'component-form-button-confirm': selectTypeId.length === productType.length,
-                      'component-form-button-cancel': selectTypeId.length !== productType.length
-                    }
-                  )}
-                >
-                  全部
-                </View>
-                {
-                  productType.map((type) => {
-                    return (
-                      <View
-                        key={type.id}
-                        onClick={() => this.changeSelectType(type)}
-                        className={classnames(
-                          'component-form-button', 
-                          {
-                            [`${cssPrefix}-select-content-button`]: true,
-                            'component-form-button-confirm': selectTypeId.some((t) => t === type.id),
-                            'component-form-button-cancel': !(selectTypeId.some((t) => t === type.id)),
-                          }
-                        )}
-                      >
-                        {type.name}
-                      </View>
-                    );
-                  })
-                }
-              </View>
+            <View 
+              className={`${cssPrefix}-select-header-close`}
+              onClick={() => this.changeSelectVisible(false)}
+            >
+              <Image 
+                className={`${cssPrefix}-select-header-close-image`} 
+                src="//net.huanmusic.com/weapp/icon_del.png" 
+              />
             </View>
-          )}
-          
-          <View className={`${cssPrefix}-select-content-item ${cssPrefix}-select-border`}>
-            <View className={`${cssPrefix}-select-content-item-title`}>供应商</View>
-            <View className={`${cssPrefix}-select-content-item-buttons`}>
-              <View
-                onClick={() => this.changeAll('selectSupplierId')}
-                className={classnames(
-                  'component-form-button', 
-                  {
-                    [`${cssPrefix}-select-content-button`]: true,
-                    'component-form-button-confirm': selectSupplierId.length === productSupplier.length,
-                    'component-form-button-cancel': selectSupplierId.length !== productSupplier.length,
-                  }
-                )}
-              >
-                全部
-              </View>
-              {
-                productSupplier.map((supplier) => {
-                  return (
+            <View className={`${cssPrefix}-select-header`}>筛选</View>
+            <View className={`${cssPrefix}-select-content`}>
+              {productType.length > 0 && (
+                <View className={`${cssPrefix}-select-content-item ${cssPrefix}-select-border`}>
+                  <View className={`${cssPrefix}-select-content-item-title`}>品类</View>
+                  <View className={`${cssPrefix}-select-content-item-buttons`}>
                     <View
-                      key={supplier.id}
-                      onClick={() => this.changeSelectSupplier(supplier)}
+                      onClick={() => this.changeAll('selectTypeId')}
                       className={classnames(
                         'component-form-button', 
                         {
                           [`${cssPrefix}-select-content-button`]: true,
-                          'component-form-button-confirm': selectSupplierId.some((t) => t === supplier.id),
-                          'component-form-button-cancel': !(selectSupplierId.some((t) => t === supplier.id)),
+                          'component-form-button-confirm': selectTypeId.length === productType.length,
+                          'component-form-button-cancel': selectTypeId.length !== productType.length
                         }
                       )}
                     >
-                      {supplier.name}
+                      全部
                     </View>
-                  );
-                })
-              }
+                    {
+                      productType.map((type) => {
+                        return (
+                          <View
+                            key={type.id}
+                            onClick={() => this.changeSelectType(type)}
+                            className={classnames(
+                              'component-form-button', 
+                              {
+                                [`${cssPrefix}-select-content-button`]: true,
+                                'component-form-button-confirm': selectTypeId.some((t) => t === type.id),
+                                'component-form-button-cancel': !(selectTypeId.some((t) => t === type.id)),
+                              }
+                            )}
+                          >
+                            {type.name}
+                          </View>
+                        );
+                      })
+                    }
+                  </View>
+                </View>
+              )}
+              
+              <View className={`${cssPrefix}-select-content-item ${cssPrefix}-select-border`}>
+                <View className={`${cssPrefix}-select-content-item-title`}>供应商</View>
+                <View className={`${cssPrefix}-select-content-item-buttons`}>
+                  <View
+                    onClick={() => this.changeAll('selectSupplierId')}
+                    className={classnames(
+                      'component-form-button', 
+                      {
+                        [`${cssPrefix}-select-content-button`]: true,
+                        'component-form-button-confirm': selectSupplierId.length === productSupplier.length,
+                        'component-form-button-cancel': selectSupplierId.length !== productSupplier.length,
+                      }
+                    )}
+                  >
+                    全部
+                  </View>
+                  {
+                    productSupplier.map((supplier) => {
+                      return (
+                        <View
+                          key={supplier.id}
+                          onClick={() => this.changeSelectSupplier(supplier)}
+                          className={classnames(
+                            'component-form-button', 
+                            {
+                              [`${cssPrefix}-select-content-button`]: true,
+                              'component-form-button-confirm': selectSupplierId.some((t) => t === supplier.id),
+                              'component-form-button-cancel': !(selectSupplierId.some((t) => t === supplier.id)),
+                            }
+                          )}
+                        >
+                          {supplier.name}
+                        </View>
+                      );
+                    })
+                  }
+                </View>
+              </View>
+              <View className={`${cssPrefix}-select-content-item ${cssPrefix}-select-border`}>
+                <View className={`${cssPrefix}-select-content-item-title`}>商品状态</View>
+                <View className={`${cssPrefix}-select-content-item-buttons`}>
+                  <View
+                    onClick={() => this.changeSelectStatus(0)}
+                    className={classnames(
+                      'component-form-button', 
+                      {
+                        [`${cssPrefix}-select-content-button`]: true,
+                        'component-form-button-confirm': selectStatus === 0,
+                        'component-form-button-cancel': selectStatus !== 0,
+                      }
+                    )}
+                  >
+                    启用
+                  </View>
+                  <View
+                    onClick={() => this.changeSelectStatus(1)}
+                    className={classnames(
+                      'component-form-button', 
+                      {
+                        [`${cssPrefix}-select-content-button`]: true,
+                        'component-form-button-confirm': selectStatus === 1,
+                        'component-form-button-cancel': selectStatus !== 1
+                      }
+                    )}
+                  >
+                    停用
+                  </View>
+                </View>
+              </View>
             </View>
+            <View className={`${cssPrefix}-select-content-item-pos`}>
+            <AtButton
+              type="primary"
+              onClick={() => this.reset()}
+              className={`product-manage-select-modal-button-reset`}
+            >
+              <Text className={`product-manage-select-modal-button-reset-text`}>重置</Text>
+            </AtButton>
+            <AtButton
+              type="primary"
+              onClick={() => this.submit()}
+              className={`product-manage-select-modal-button-submit`}
+            >
+              <Text className={`product-manage-select-modal-button-submit-text`}>确定</Text>
+            </AtButton>
           </View>
-          <View className={`${cssPrefix}-select-content-item ${cssPrefix}-select-border`}>
-            <View className={`${cssPrefix}-select-content-item-title`}>商品状态</View>
-            <View className={`${cssPrefix}-select-content-item-buttons`}>
-              <View
-                onClick={() => this.changeSelectStatus(0)}
-                className={classnames(
-                  'component-form-button', 
-                  {
-                    [`${cssPrefix}-select-content-button`]: true,
-                    'component-form-button-confirm': selectStatus === 0,
-                    'component-form-button-cancel': selectStatus !== 0,
-                  }
-                )}
-              >
-                启用
-              </View>
-              <View
-                onClick={() => this.changeSelectStatus(1)}
-                className={classnames(
-                  'component-form-button', 
-                  {
-                    [`${cssPrefix}-select-content-button`]: true,
-                    'component-form-button-confirm': selectStatus === 1,
-                    'component-form-button-cancel': selectStatus !== 1
-                  }
-                )}
-              >
-                停用
-              </View>
-            </View>
           </View>
         </View>
-        <View className={`${cssPrefix}-select-content-item-pos`}>
-          <AtButton
-            type="primary"
-            onClick={() => this.reset()}
-            className={`product-manage-select-modal-button-reset`}
-          >
-            <Text className={`product-manage-select-modal-button-reset-text`}>重置</Text>
-          </AtButton>
-          <AtButton
-            type="primary"
-            onClick={() => this.submit()}
-            className={`product-manage-select-modal-button-submit`}
-          >
-            <Text className={`product-manage-select-modal-button-submit-text`}>确定</Text>
-          </AtButton>
-        </View>
-      </AtFloatLayout>
-    );
+      );
+    }
+    return <View />;
   }
 
   private renderSectionHeader = (section: ProductInterface.IndexProducList) => {

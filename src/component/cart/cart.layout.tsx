@@ -3,6 +3,7 @@ import { View, Text, ScrollView, Image } from '@tarojs/components';
 import classNames from 'classnames';
 import "./layout.sass";
 import "./cart.less";
+import "../../pages/style/product.less";
 
 const ENV = Taro.getEnv();
 let scrollTop = 0;
@@ -31,6 +32,7 @@ interface Props {
   isOpened: boolean;
   onClose: () => void;
   className?: any;
+  gray?: boolean;
   title?: any;
   scrollY?: any;
   scrollX?: any;
@@ -46,6 +48,7 @@ interface Props {
   titleRight?: any;
   titleRightClick?: any;
   titleRightIcon?: any;
+  buttons: any[];
 }
 
 interface State {
@@ -59,6 +62,7 @@ export default class AtFloatLayout extends Taro.Component<Props, State> {
     isOpened: false,
     scrollY: true,
     scrollX: false,
+    gray: false,
     scrollWithAnimation: false,
     onClose: () => { /**/ },
     onScroll: () => { /**/ },
@@ -67,6 +71,7 @@ export default class AtFloatLayout extends Taro.Component<Props, State> {
     titleRight: '',
     titleRightClick: () => { /** */ },
     titleRightIcon: '',
+    buttons: undefined,
   };
 
   constructor (props: Props) {
@@ -115,6 +120,7 @@ export default class AtFloatLayout extends Taro.Component<Props, State> {
     const { _isOpened } = this.state;
     const {
       title,
+      gray,
       scrollY,
       scrollX,
       scrollTop,
@@ -125,12 +131,14 @@ export default class AtFloatLayout extends Taro.Component<Props, State> {
       titleRight,
       titleRightClick,
       titleRightIcon,
+      buttons,
     } = this.props;
 
     const rootClass = classNames(
       'at-float-layout',
       {
-        'at-float-layout--active': _isOpened
+        'at-float-layout--active': _isOpened,
+        'at-float-layout-member': !!buttons
       },
       this.props.className
     );
@@ -157,7 +165,11 @@ export default class AtFloatLayout extends Taro.Component<Props, State> {
               )}
             </View>
           ) : null}
-          <View className='layout-body'>
+          <View 
+            className={classNames('layout-body', {
+              'layout-body-gray': gray
+            })} 
+          >
             <ScrollView
               scrollY={scrollY}
               scrollX={scrollX}
@@ -174,6 +186,25 @@ export default class AtFloatLayout extends Taro.Component<Props, State> {
               {this.props.children}
             </ScrollView>
           </View>
+
+          {buttons && (
+            <View className={`product-add-buttons`}>
+              {buttons.map((button) => {
+                return (
+                  <View 
+                    key={button.title}
+                    className={classNames(
+                      `cart-buttons-button`, 
+                      `cart-buttons-${button.type || 'confirm'}`, 
+                      {[`cart-buttons-two`]: buttons.length > 1}
+                    )}
+                  >
+                    {button.title}
+                  </View>
+                );
+              })}
+            </View>
+          )}
         </View>
       </View>
     );

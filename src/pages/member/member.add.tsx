@@ -2,13 +2,14 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-18 17:12:21
+ * @Last Modified time: 2019-12-25 14:45:43
  * 
  * @todo 添加会员页面
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Picker } from '@tarojs/components';
 import "../style/member.less";
+import "../../component/card/form.card.less";
 import FormCard from '../../component/card/form.card';
 import { FormRowProps } from '../../component/card/form.row';
 import { AtButton, AtMessage } from 'taro-ui';
@@ -20,10 +21,15 @@ import { MemberInterface, MemberInterfaceMap, MemberService } from '../../consta
 import memberService from '../../constants/member/member.service';
 import { ResponseCode } from '../../constants/index';
 import { store } from '../../app';
+import { connect } from '@tarojs/redux';
+import { getMemberLevel } from '../../reducers/app.member';
 
 const cssPrefix: string = 'member';
 
-interface Props { }
+interface Props { 
+  memberLevel: MemberInterface.MemberLevel[];
+  memberSelector: string[];
+}
 
 interface State { 
   sex: 'male' | 'female'; // 会员性别
@@ -33,6 +39,7 @@ interface State {
   birthday: string;       // 会员生日
   memberStatus: boolean;  // 会员状态
   needCallback: boolean;  // 添加成功之后是否需要回调这个会员数据
+  levelValue: number;
 }
 
 class MemberMain extends Taro.Component<Props, State> {
@@ -42,6 +49,7 @@ class MemberMain extends Taro.Component<Props, State> {
     phone: '',
     name: '',
     birthday: '',
+    levelValue: 0,
     memberStatus: true,
     needCallback: false,
   };
@@ -75,6 +83,11 @@ class MemberMain extends Taro.Component<Props, State> {
   
   public init = async () => {
     try {
+      const levels = await MemberAction.memberLevelList();
+      // if (levels.code === ResponseCode.success) {
+      //   this.setState({levelName: levels.data[0].levelName});
+      // }
+
       const result = await MemberService.getRandomCaroNo();  
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       this.setState({ cardNo: result.data });
@@ -149,6 +162,11 @@ class MemberMain extends Taro.Component<Props, State> {
     this.setState({ memberStatus: status });
   }
 
+  public changeLevel = (event: any) => {
+    const value: number = event.detail.value;
+    this.setState({levelValue: value});
+  }
+
   /**
    * @todo [判断是否通过校验]
    *
@@ -183,13 +201,15 @@ class MemberMain extends Taro.Component<Props, State> {
       const { success, result } = this.validate();
       invariant(success, result || ' ');
 
-      const { cardNo, name } = this.state;
+      const { memberLevel } = this.props;
+      const { cardNo, name, levelValue } = this.state;
       let params: MemberInterface.MemberInfoAddParams = {
         ...result,
-        birthDate: this.state.birthday,
+        birthDate: this.state.birthday || null,
         merchantId: 1,
         sex: this.state.sex === 'male' ? 0 : 1,
         status: this.state.memberStatus === true ? 0 : 1,
+        levelId: memberLevel[levelValue] && memberLevel[levelValue].id,
       };
       if (cardNo !== '') {
         params.cardNo = cardNo;
@@ -232,7 +252,7 @@ class MemberMain extends Taro.Component<Props, State> {
   }
 
   render () {
-    const { cardNo } = this.state;
+    const { cardNo, levelValue } = this.state;
     const memberDetailForm: FormRowProps[] = [
       {
         title: '卡号',
@@ -254,11 +274,15 @@ class MemberMain extends Taro.Component<Props, State> {
       {
         title: '姓名',
         isInput: true,
+        hasBorder: false,
         inputName: 'member.name',
         inputValue: this.state.name,
         inputPlaceHolder: '请输入姓名',
         inputOnChange: this.onChangeMemberName,
-      },
+      }
+    ];
+
+    const from2: FormRowProps[] = [
       {
         title: '性别',
         buttons: [
@@ -275,11 +299,29 @@ class MemberMain extends Taro.Component<Props, State> {
         ]
       }
     ];
+    const { memberSelector, memberLevel } = this.props;
     return (
       <ScrollView scrollY={true} className={`container`}>
         <AtMessage />
         <View className={`container ${cssPrefix} ${cssPrefix}-add`}>
-          <FormCard items={memberDetailForm}>
+          <FormCard items={memberDetailForm}/>
+
+          <View className="component-form">
+            <Picker 
+              mode="selector"
+              range={memberSelector}
+              onChange={this.changeLevel}
+              value={levelValue}
+            >
+              <FormRow 
+                title="等级"
+                extraText={memberLevel[levelValue] && memberLevel[levelValue].levelName || ''}
+                arrow="right"
+              />
+            </Picker>
+            {from2.map((item) => {
+              return <FormRow key={item.title} {...item} />
+            })}
             <Picker 
               mode='date'
               onChange={this.onDateChange} 
@@ -288,13 +330,13 @@ class MemberMain extends Taro.Component<Props, State> {
               <FormRow 
                 title="生日" 
                 extraText={this.state.birthday || '请选择生日'} 
+                hasBorder={false}
               />
             </Picker>
-          </FormCard>
-
+          </View>
           <View className={`${cssPrefix}-edit`}>
             <AtButton 
-              className="theme-button "
+              className="theme-button"
               onClick={this.onAddMember}
             >
               保存
@@ -306,4 +348,15 @@ class MemberMain extends Taro.Component<Props, State> {
   }
 }
 
-export default MemberMain;
+const select = (state: any) => {
+  const memberLevel = getMemberLevel(state);
+  const memberSelector: string[] = memberLevel.map((item) => {
+    return item.levelName;
+  });
+  return {
+    memberLevel,
+    memberSelector,
+  };
+};
+
+export default connect(select)(MemberMain);

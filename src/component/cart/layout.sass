@@ -9,7 +9,10 @@ $float-layout-timer: 300ms;
   top: 0;
   left: 0;
   visibility: hidden;
-  z-index: $zindex-flot-layout;
+  z-index: 810;
+  &-member {
+    z-index: 1000 !important;
+  }
   transition: visibility $float-layout-timer cubic-bezier(0.36, 0.66, 0.04, 1);
 
   /* elements */
@@ -83,7 +86,9 @@ $float-layout-timer: 300ms;
     &-body {
       font-size: $font-size-base;
       padding-bottom: 128px;
-
+      &-gray {
+        background-color: #f2f2f2;  
+      }
       &__content {
         max-height: 600px;
       }

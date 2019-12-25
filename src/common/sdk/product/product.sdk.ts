@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-18 15:56:54
+ * @Last Modified time: 2019-12-25 15:08:23
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -65,24 +65,27 @@ export declare namespace ProductCartInterface {
     updateTime: string;   // 更新日期
   }
 
+  interface ProductInfoPayload {
+    activities: Array<Partial<ProductOrderActivity>>;
+    barcode: string;
+    brand: string;
+    discountAmount: number;
+    discountType: number;
+    productId: number;
+    productName: string;
+    sellNum: number;
+    standard: string;
+    unitPrice: number;
+    totalAmount: number;
+    transAmount: number;
+    type: number;
+  }
+
   interface ProductPayPayload {
     flag: boolean;
     order: ProductOrderPayload;
     pic?: string;
-    productInfoList: Array<{
-      activities: Array<Partial<ProductOrderActivity>>;
-      barcode: string;
-      brand: string;
-      discountAmount: number;
-      discountType: number;
-      productId: number;
-      productName: string;
-      sellNum: number;
-      standard: string;
-      totalAmount: number;
-      transAmount: number;
-      type: number;
-    }>;
+    productInfoList: Array<ProductInfoPayload>;
     transProp: boolean;   // true=正常支付流程,false=订单再次支付],直接收款=true
   }
 
@@ -354,7 +357,8 @@ class ProductSDK {
             totalAmount: item.price * item.sellNum,
             transAmount: itemPrice * item.sellNum,
             type: item.typeId,
-          };
+            unitPrice: itemPrice,
+          } as ProductCartInterface.ProductInfoPayload;
         } else if (this.isNonBarcodeProduct(item)) {
           // 如果是无码商品则特殊处理
           return {
@@ -385,7 +389,8 @@ class ProductSDK {
             totalAmount: item.price * item.sellNum,
             transAmount: itemPrice * item.sellNum,
             type: item.typeId,
-          };
+            unitPrice: itemPrice,
+          } as ProductCartInterface.ProductInfoPayload;
         }
       }),
       transProp: true
@@ -394,7 +399,7 @@ class ProductSDK {
     return payload;
   }
 
-  public getDirectProductInterfacePayload = (money: number): ProductCartInterface.ProductPayPayload  => {
+  public getDirectProductInterfacePayload = (money: number, payType: number = 2): ProductCartInterface.ProductPayPayload  => {
     return {
       flag: true,
       order: {
@@ -404,7 +409,7 @@ class ProductSDK {
         memberId: -1,
         orderNo: '',
         orderSource: 1,
-        payType: 2,
+        payType,
         terminalCd: '-1',
         terminalSn: '-1',
         totalAmount: money,

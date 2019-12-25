@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-23 17:00:26
+ * @Last Modified time: 2019-12-25 15:45:26
  * 
  * @todo 开单页面
  */
@@ -222,7 +222,7 @@ class ProductOrder extends Taro.Component<Props, State> {
             />
             {searchValue !== '' && (
               <View 
-                className={`${memberPrefix}-main-header-search-scan`} 
+                className={`${memberPrefix}-main-header-search-scan ${memberPrefix}-main-header-search-mar`} 
                 onClick={() => this.onInput({detail: {value: ''}})}  
               >
                 <Image 
@@ -333,6 +333,7 @@ class ProductOrder extends Taro.Component<Props, State> {
                 </View>
               )
             }
+            <View style="height: 100px" />
           </ScrollView>  
         </View>
       );

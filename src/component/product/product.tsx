@@ -61,7 +61,7 @@ class ProductComponent extends Taro.Component<Props, State> {
             <Text className={`${cssPrefix}-normal`}>
               <Text className={`${cssPrefix}-price-bge`}>￥</Text>
               <Text className={`${cssPrefix}-price`}>{product.price}</Text>
-              /{product.unit}
+              {` /${product.unit}`}
             </Text>
           </View>
           {this.renderStepper()}

@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-03 10:27:01
+ * @Last Modified time: 2019-12-25 14:42:37
  * 
  * @todo [商品相关的类型定义]
  */
@@ -93,8 +93,9 @@ export declare namespace ProductInterface {
     name?: string;           // 商品名称
     orderByColumn?: string;  // 排序 amount desc
     status?: number;         // 商品状态
-    supplierId?: number;     // 供应商
-    type?: number;           // 品类
+    supplierId?: string;     // 供应商
+    type?: string;           // 品类
+    words?: string;
   }
 
   interface ProductType {

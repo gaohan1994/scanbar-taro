@@ -694,6 +694,7 @@ class ProductDetail extends Taro.Component<Props, State> {
         placeholder: `${productDetail.memberPrice}`,
         value: `${productChangeDetail.memberPrice || ''}`,
         onInput: ({detail: {value}}) => this.onNumberValueChange('memberPrice', value),
+        // focus: true,
       },
       {
         title: '价格差额',
@@ -710,6 +711,7 @@ class ProductDetail extends Taro.Component<Props, State> {
         value: `${productChangeDetail.number || ''}`,
         placeholder: '请输入现有库存',
         onInput: ({detail: {value}}) => this.onNumberValueChange('number', value),
+        // focus: true,
       },
       {
         title: '库存差额',
@@ -726,6 +728,7 @@ class ProductDetail extends Taro.Component<Props, State> {
         value: `${productChangeDetail.limitNum || ''}`,
         placeholder: '请输入现有库存预警',
         onInput: ({detail: {value}}) => this.onNumberValueChange('limitNum', value),
+        // focus: true,
       },
       {
         title: '预警差额',

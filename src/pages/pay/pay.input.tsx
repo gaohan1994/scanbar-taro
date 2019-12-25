@@ -82,8 +82,7 @@ class PayInput extends Taro.Component<Props, State> {
             <View className={`${cssPrefix}-input-box-title`}>收款金额</View>
             <View className={`${cssPrefix}-input-box-input`}>
               <View className={`${cssPrefix}-input-box-input-money`}>￥</View>
-              <Input 
-                // cursorSpacing={300}
+              <Input
                 className={`${cssPrefix}-input-box-input-input`} 
                 value={inputValue}
                 onInput={({detail: {value}}) => this.onChangeValue(value)}

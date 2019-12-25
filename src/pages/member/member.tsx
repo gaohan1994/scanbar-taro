@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-23 20:07:52
+ * @Last Modified time: 2019-12-25 14:58:22
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Input, Image, Text } from '@tarojs/components';
@@ -281,7 +281,6 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
             className={`${cssPrefix}-main-header-add`}
             onClick={() => Taro.navigateTo({url: '/pages/member/member.add'})}
           >
-            <Image src="//net.huanmusic.com/weapp/icon_add.png" className={`${cssPrefix}-main-header-add-icon`} />
             <Text className={`${cssPrefix}-main-header-add-text`}>添加</Text>
           </View>
         </View>
@@ -387,23 +386,26 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
                         <Text className={`${cssPrefix}-card-text`}>{member.username}</Text>
                         <View className={`${cssPrefix}-card-row-detail-icon`}>普通会员</View>
                       </View>
-                      <Text className={`${cssPrefix}-card-row-margin ${cssPrefix}-card-text`}>{member.phoneNumber}</Text>
+                      <Text className={`${cssPrefix}-card-row-margin ${cssPrefix}-card-phone`}>{member.phoneNumber}</Text>
                     </View>
                     {memberQuery === 'total_amount' && (
-                      <Text>{`￥${numeral(member.totalAmount).format('0.00')}`}</Text>
+                      <Text className={`${cssPrefix}-card-price`}>{`￥${numeral(member.totalAmount).format('0.00')}`}</Text>
                     )}
                     {memberQuery === 'create_time' && (
-                      <Text>{member.createTime}</Text>
+                      <Text className={`${cssPrefix}-card-price`}>{member.createTime}</Text>
                     )}
                     {memberQuery === 'last_pay_time' && (
-                      <Text>{member.lastPayTime}</Text>
+                      <Text className={`${cssPrefix}-card-price`}>{member.lastPayTime}</Text>
                     )}
                   </View>
                 );
               })}
             </View>
           ) : (
-            <View>暂无数据</View>
+            <View className={`product-suspension`}> 
+              <Image src="//net.huanmusic.com/weapp/img_kong.png" className={`product-suspension-image`} />
+              <Text className={`product-suspension-text`}>会员不存在</Text>
+            </View>
           )}
           {loading && (
             <View className={`${cssPrefix}-loading`}>

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-12 14:01:28 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-23 16:35:08
+ * @Last Modified time: 2019-12-24 16:03:35
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text, Input } from '@tarojs/components';
@@ -336,7 +336,7 @@ class PayReceive extends Taro.Component<Props, State> {
                   onInput={({detail: {value}}) => this.onChangeCash(value)}
                   placeholder="请输入收款金额"
                   placeholderClass={`${cssPrefix}-input-box-input-input-placeholder`}
-                  type="number"
+                  type="digit"
                 />
               </View>
             </View>

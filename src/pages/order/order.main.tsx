@@ -2,22 +2,25 @@
  * @Author: Ghan 
  * @Date: 2019-12-09 11:01:19 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-17 19:38:25
+ * @Last Modified time: 2019-12-25 16:23:05
  */
 
 import Taro from '@tarojs/taro';
-import { View, Text, ScrollView } from '@tarojs/components';
-import { OrderService, OrderInterface } from '../../constants';
+import { View, Text, ScrollView, Input, Image, Picker } from '@tarojs/components';
+import { OrderInterface } from '../../constants';
 import { getOrderList } from '../../reducers/app.order';
 import { connect } from '@tarojs/redux';
 import { OrderAction } from '../../actions';
 import "../style/report.less";
 import "../style/order.less";
+import "../style/member.less";
+import "../style/product.less";
 import OrderItem from '../../component/order/order';
-import classnames from 'classnames';
+import dayJs from 'dayjs';
+import { ResponseCode } from '../../constants/index';
+import invariant from 'invariant';
 
 const cssPrefix = 'order';
-const reportCssprefix = 'report';
 
 let pageNum: number = 1;
 const pageSize: number = 20;
@@ -26,12 +29,92 @@ interface Props {
   orderList: OrderInterface.OrderDetail[];
 }
 
-interface State { }
+interface State { 
+  value: string;
+  date: string;
+}
 
 class OrderMain extends Taro.Component<Props, State> {
 
+  state: State = {
+    value: '', 
+    date: dayJs().format('YYYY-MM-DD'),
+  };
+
   componentDidMount() {
     this.init();
+  }
+
+  public onChangeValue = (key: string, value: string) => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        [key]: value
+      };
+    }, () => {
+      this.searchOrder();
+    });
+  }
+
+  /**
+   * @todo [用户选择日期回调]
+   *
+   * @memberof MemberMain
+   */
+  public onDateChange = (event: any) => {
+    this.setState({date: event.detail.value}, () => {
+      this.fetchOrder(1);
+    });
+  }
+
+  public prevDate = () => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        date: dayJs(prevState.date).subtract(1, 'day').format('YYYY-MM-DD')
+      };
+    }, () => {
+      this.fetchOrder(1);
+    });
+  }
+
+  public nextDate = () => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        date: dayJs(prevState.date).add(1, 'day').format('YYYY-MM-DD')
+      };
+    }, () => {
+      this.fetchOrder(1);
+    });
+  }
+
+  public searchOrder = () => {
+    const { value } = this.state;
+  }
+
+  public fetchOrder = async (page?: number) => {
+    try {
+      const { date } = this.state;
+      const payload: OrderInterface.OrderListFetchFidle = {
+        pageNum: typeof page === 'number' ? page : pageNum,
+        pageSize: 20,
+        startTime: date,
+        endTime: date,
+      };
+      const result = await OrderAction.orderList(payload);
+      invariant(result.code === ResponseCode.success, result.msg || ' ');
+      if (typeof page === 'number') {
+        pageNum = page;
+      } else {
+        pageNum += 1;
+      }
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
   }
 
   public init = async () => {
@@ -41,53 +124,31 @@ class OrderMain extends Taro.Component<Props, State> {
 
   render () {
     return (
-      <View className="container">
-        {this.renderList()}
-      </View>
-    );
-  }
-
-  private renderList = () => {
-    return (
-      <View className={`container ${cssPrefix}`}>
-        {this.renderHeader()}
+      <View className="container container-color">
+        <View className={`${cssPrefix}-bg`} />
+        <View className={`${cssPrefix}-box`}>
+          {this.renderSearch()}
+        </View>
         {this.renderContainer()}
       </View>
     );
   }
 
-  private renderHeader = () => {
-    const tabs = [
-      {
-        title: '所有门店'
-      },
-      {
-        title: '经营报表'
-      },
-      {
-        title: '按日统计'
-      }
-    ];
-    const cssPrefix = 'report';
+  private renderSearch = () => {
+    const cssPrefix = 'member';
+    const { value } = this.state;
     return (
-      <View>
-        <View className={`order-bg`} />
-        <View className={`${cssPrefix}-tabs`}>
-          {
-            tabs.map((tab) => {
-              return (
-                <View  
-                  key={tab.title}
-                  className={`${cssPrefix}-tab`} 
-                >
-                  <View  className={`${cssPrefix}-tab`} >
-                    <Text className={`${cssPrefix}-tab-text`}>{tab.title}</Text>
-                    <View className={`${cssPrefix}-tab-icon`} />
-                  </View>
-                </View>
-              );
-            })
-          }
+      <View className={`order-header`}>
+        <View className={`${cssPrefix}-main-header-search order-search order-search`}>
+          <Image src="//net.huanmusic.com/weapp/icon_search.png" className={`${cssPrefix}-main-header-search-icon`} />
+          <Input
+            className={`${cssPrefix}-main-header-search-input`} 
+            placeholder="请输入订单号"
+            placeholderClass={`${cssPrefix}-main-header-search-input-holder`}
+            value={value}
+            onInput={({detail: {value}}) => this.onChangeValue('value', value)}
+            // onConfirm={() => this.searchMember()}
+          />
         </View>
       </View>
     );
@@ -103,19 +164,21 @@ class OrderMain extends Taro.Component<Props, State> {
           className={`${cssPrefix}-list`}
         >
           {   
-            orderList.map((orderDetail, index) => {
+            orderList.length > 0
+            ? orderList.map((orderDetail) => {
               return (
-                <View 
+                <OrderItem 
                   key={orderDetail.order.orderNo} 
-                  className={classnames(`${cssPrefix}-list-item`, {
-                    [`${cssPrefix}-list-top`]: index === 0,
-                    [`${cssPrefix}-list-bottom`]: (index + 1) === orderList.length,
-                  })}
-                >
-                  <OrderItem data={orderDetail} />
-                </View>
+                  data={orderDetail} 
+                />
               );
             })
+            : (
+              <View className={`product-suspension`}> 
+                <Image src="//net.huanmusic.com/weapp/img_kong.png" className={`product-suspension-image`} />
+                <Text className={`product-suspension-text`}>暂无内容</Text>
+              </View>
+            )
           }
         </ScrollView>
       </View>
@@ -123,11 +186,33 @@ class OrderMain extends Taro.Component<Props, State> {
   }
 
   private renderTime = () => {
+    const { date } = this.state;
     return (
       <View className={`${cssPrefix}-time`} >
-        <Text className={`${cssPrefix}-time-text`} >{`<`}</Text>
-        <View className={`${cssPrefix}-time-date`} >{`2019-09-09`}</View>
-        <Text className={`${cssPrefix}-time-text`} >{`>`}</Text>
+        <View className={`${cssPrefix}-time-box`} onClick={() => this.prevDate()}>
+          <Image 
+            src="//net.huanmusic.com/weapp/icon_time_left.png" 
+            className={`${cssPrefix}-time-icon`} 
+          />
+        </View>
+        
+        <Picker
+          mode='date'
+          onChange={this.onDateChange} 
+          value={date}
+        >
+          <View className={`${cssPrefix}-time-date`}>
+            <Text>{date}</Text>
+            <Image src="//net.huanmusic.com/weapp/icon_time_choose.png" className={`${cssPrefix}-time-wid`} />
+          </View>
+        </Picker>
+        <View className={`${cssPrefix}-time-box`} onClick={() => this.nextDate()}>
+          <Image 
+            src="//net.huanmusic.com/weapp/icon_time_right.png" 
+            className={`${cssPrefix}-time-icon`} 
+          />
+        </View>
+        
       </View>
     );
   }

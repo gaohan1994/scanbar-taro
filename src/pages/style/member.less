@@ -83,6 +83,7 @@
     }
   }
   &-card {
+    .padding(0px) !important;
     position: relative;
     background-color: #ffffff;
     &-buttons {
@@ -111,11 +112,12 @@
           font-size: 18px;
           color: #D8AE6D;
           border: 1px solid #D8AE6D;
-          .padding(6px, tb);
+          height: 30px;
           .padding(13px, lr);
           line-height: 18px;
           .flex(center, center);
           .margin(20px, l);
+          .margin(7px, t);
           border-radius: 10px;
         }
       }
@@ -128,7 +130,15 @@
     }
     &-text {
       font-size: 30px;
+      color: #333333;
+    }
+    &-phone {
+      font-size: 26px;
       color: #666666;
+    }
+    &-price {
+      font-size: 30px;
+      color: #333333;
     }
   }
   &-buttons {
@@ -165,6 +175,7 @@
       left: (@member-card-width - @member-avator-size) / 2;
       top: -(@member-avator-size - 40px);
       .theme-shadow();
+      background-color: #f2f2f2;
       border-radius: @member-avator-size / 2;
     }
     &-avator {
@@ -229,28 +240,32 @@
       &-add {
         z-index: @member-search-zindex;
         .flex(center, center, row);
+        border-radius: 30px;
+        border: 1px solid #ffffff;
+        height: 60px;
+        width: 120px;
         &-icon {
           width: @member-search-add-icon-size;
           height: @member-search-add-icon-size;
           .margin(4px, r);
         }
         &-text {
-          font-size: @member-search-icon-size;
+          font-size: 28px;
           color: #ffffff;
         }
       }
       &-search {
         z-index: @member-search-zindex + 100;
-        width: 580px;
+        width: 550px;
         height: 60px;
         border-radius: 30px;
         background-color: #ffffff;
-        .flex(center, center, row);
+        .flex(center, flex-start, row);
         &-icon {
           width: @member-search-icon-size;
           height: @member-search-icon-size;
           .margin(15px, r);
-          .margin(4px, l);
+          .margin(32px, l);
         }
         &-del {
           width: @member-search-del-size;
@@ -261,10 +276,16 @@
           height: @member-scan-icon-size;
           .flex(center, center);
         }
+        &-mar {
+          .margin(32px, r);
+        }
         &-input {
           font-size: @member-search-input-font-size;
           color: @base-font-color;
-          width: 520px - 50px - @member-scan-icon-size;
+          // width: 520px - 50px - @member-scan-icon-size;
+          display: flex;
+          flex: 1;
+          .margin(32px, r);
           &-holder {
             color: @placeholer-text-color;
           }

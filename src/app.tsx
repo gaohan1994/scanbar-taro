@@ -143,8 +143,8 @@ class App extends Component {
         text: "数据"
       }, {
         pagePath: "pages/user/user",
-        iconPath: "./assets/tab-bar/icon_nav_user.png",
-        selectedIconPath: "./assets/tab-bar/icon_nav_user_xuan.png",
+        iconPath: "./assets/tab-bar/icon_mine.png",
+        selectedIconPath: "./assets/tab-bar/icon_mine_xuan.png",
         text: "我的"
       }]
     }

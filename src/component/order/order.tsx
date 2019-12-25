@@ -3,6 +3,7 @@ import { View, Text } from '@tarojs/components';
 import './order.less';
 import { OrderInterface } from '../../constants';
 import numeral from 'numeral';
+import dayJs from 'dayjs';
 
 const cssPrefix = 'component-order-item';
 
@@ -26,18 +27,15 @@ class OrderItem extends Taro.Component<Props, State> {
       >
         {data.order && (
           <View className={`${cssPrefix}-left`}>
-            {/* {this.renderImage()} */}
             <View className={`${cssPrefix}-left-detail`}>
-              <View>{`交易单号: ${data.order.orderNo}`}</View>
-              <View>{`时间: ${data.order.transTime}`}</View>
+              <View className={`${cssPrefix}-no`}>{`${data.order.orderNo}`}</View>
+              <View className={`${cssPrefix}-time`}>{`${dayJs(data.order.transTime).format('HH:mm:ss')}`}</View>
             </View>
           </View>
         )}
         
         <View className={`${cssPrefix}-right`}>
-          {data.order && data.order.transAmount && (
-            <View>{`￥ ${numeral(data.order.transAmount).format('0.00')}`}</View>
-          )}
+          <View className={`${cssPrefix}-price`}>{`￥ ${numeral(data.order.transAmount || 0).format('0.00')}`}</View>
         </View>
       </View>
     );

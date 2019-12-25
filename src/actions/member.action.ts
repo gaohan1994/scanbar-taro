@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:28:21 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-18 17:12:07
+ * @Last Modified time: 2019-12-25 14:11:40
  */
 import memberService from "../constants/member/member.service";
 import { ResponseCode, ActionsInterface, MemberInterface, MemberInterfaceMap } from '../constants/index';
@@ -205,6 +205,16 @@ class MemberAction {
     }
   }
 
+  public memberLevelList = async () => {
+    const result = await memberService.memberLevelList();
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: MemberInterfaceMap.reducerInterfaces.RECEIVE_MEMBER_LEVEL,
+        payload: result.data
+      });
+    }
+    return result;
+  }
 }
 
 export default new MemberAction();

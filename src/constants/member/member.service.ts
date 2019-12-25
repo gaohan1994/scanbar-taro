@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:01:17 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-18 17:12:06
+ * @Last Modified time: 2019-12-25 14:08:19
  * 
  * @todo [会员相关的接口]
  * ```js
@@ -63,6 +63,10 @@ class MemberService {
 
   public getRandomCaroNo = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.get(MemberInterfaceMap.getRandomCaroNo);
+  }
+
+  public memberLevelList = async (): Promise<HTTPInterface.ResponseResultBase<MemberInterface.MemberLevel[]>> => {
+    return requestHttp.get(MemberInterfaceMap.memberLevelList);
   }
 }
 

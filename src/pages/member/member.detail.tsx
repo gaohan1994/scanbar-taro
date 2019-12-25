@@ -2,10 +2,10 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-23 19:55:39
+ * @Last Modified time: 2019-12-25 11:21:08
  */
 import Taro from '@tarojs/taro';
-import { View, ScrollView, Image, Text } from '@tarojs/components';
+import { View, Image, Text } from '@tarojs/components';
 import "../style/member.less";
 import "../style/product.less";
 import "../style/home.less";
@@ -77,15 +77,15 @@ class MemberMain extends Taro.Component<MemberMainProps> {
     const form4: FormRowProps[] = [
       {
         title: '积分',
-        extraText: '接口未返回'
+        extraText: '1000'
       },
       {
         title: '储值余额',
-        extraText: '接口未返回',
+        extraText: '￥2000',
       },
       {
         title: '优惠券',
-        extraText: '接口未返回',
+        extraText: '5',
         hasBorder: false
       },
     ];
@@ -134,11 +134,9 @@ class MemberMain extends Taro.Component<MemberMainProps> {
                 <View className={`${cssPrefix}-detail`}>
                   <View className={`title-text ${cssPrefix}-detail-name`}>
                     {memberDetail.username || ''}
-                    {memberDetail.levelId && (
-                      <View className={`${cssPrefix}-detail-name-level`}>
-                        {this.setLevel(memberDetail.levelId)}
-                      </View>
-                    )}
+                    <View className={`${cssPrefix}-detail-name-level`}>
+                      {this.setLevel(memberDetail.levelId || 1)}
+                    </View>
                   </View>
                   <View className="normal-text">{memberDetail.phoneNumber || ''}</View>
                 </View>
@@ -157,7 +155,11 @@ class MemberMain extends Taro.Component<MemberMainProps> {
 
             <View className="product-add">
               <FormCard items={form1} >
-                <FormRow title="消费偏好" hasBorder={false}>
+                <FormRow 
+                  title="消费偏好" 
+                  hasBorder={false}
+                  extraText={memberPerference.length > 0 ? '' : '暂无消费偏好'}
+                >
                   {
                     memberPerference.length > 0 && (
                       memberPerference.map((perference) => {

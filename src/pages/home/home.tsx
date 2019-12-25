@@ -29,6 +29,12 @@ const NavItems = [
     url: '/pages/pay/pay.input',
   },
   {
+    image: '//net.huanmusic.com/weapp/icon_menu_details.png',
+    value: '订单',
+    subTitle: 'Transcation details',
+    url: '/pages/order/order.main',
+  },
+  {
     image: '//net.huanmusic.com/weapp/icon_menu_procurement1.png',
     value: '采购',
     subTitle: 'Procurement',
@@ -39,12 +45,6 @@ const NavItems = [
     value: '盘点',
     subTitle: 'inventory',
     url: '/pages/',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/icon_menu_details.png',
-    value: '订单',
-    subTitle: 'Transcation details',
-    url: '/pages/order/order.main',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_more.png',
@@ -127,13 +127,19 @@ class Home extends Component {
           </View>
           <View className="home-card">
             <View className="home-buttons">
-              <View className={`home-buttons-button home-buttons-button-border ${cssPrefix}-buttons-button-start`}>
+              <View 
+                className={`home-buttons-button home-buttons-button-border ${cssPrefix}-buttons-button-start`}
+                onClick={() => Taro.switchTab({url: '/pages/report/report'})}
+              >
                 <View className={`normal-text ${cssPrefix}-buttons-button-box`}>
                   <View>{`今日销售额 >`}</View>
                 </View>
                 <View className="home-money">100000.00</View>
               </View>
-              <View className="home-buttons-button home-buttons-button-end">
+              <View 
+                className="home-buttons-button home-buttons-button-end"
+                onClick={() => Taro.switchTab({url: '/pages/report/report'})}
+              >
                 <View className={`normal-text ${cssPrefix}-buttons-button-box`}>
                   <View>{`销售笔数 >`}</View>
                 </View>

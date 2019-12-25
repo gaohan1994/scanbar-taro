@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-11 10:23:20 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-06 14:38:06
+ * @Last Modified time: 2019-12-25 14:11:05
  */
 import merge from 'lodash.merge';
 import { MemberInterface, MemberInterfaceMap } from '../constants';
@@ -27,6 +27,7 @@ export declare namespace MemberReducer {
     memberPerference: MemberInterface.MemberPerference[];
     memberOrderInfo: MemberInterface.MemberOrderInfo;
     selectMember?: MemberInterface.MemberInfo;
+    memberLevel: MemberInterface.MemberLevel[];
   }
 
   interface MemberAction {
@@ -35,7 +36,8 @@ export declare namespace MemberReducer {
       | MemberInterface.RECEIVE_MEMBER_LIST
       | MemberInterface.RECEIVE_MEMBER_PERFERENCE
       | MemberInterface.RECEIVE_MEMBER_ORDER_INFO
-      | MemberInterface.SET_MEMBER_SELECT;
+      | MemberInterface.SET_MEMBER_SELECT
+      | MemberInterface.RECEIVE_MEMBER_LEVEL;
     payload: any;
   }
 }
@@ -45,15 +47,7 @@ const initState: MemberReducer.MemberInitState = {
     total: 0,
     data: []
   },
-  memberDetail: {
-    createTime: '',
-    id: 0,
-    merchantId: 0,
-    phoneNumber: '',
-    sex: '0',
-    status: 1,
-    username: '',
-  },
+  memberDetail: {} as any,
   memberPerference: [],
   memberOrderInfo: {
     totalTimes: 0,
@@ -61,10 +55,19 @@ const initState: MemberReducer.MemberInitState = {
     lastPayTime: ''
   },
   selectMember: undefined,
+  memberLevel: [],
 };
 
 export default function memberReducer (state: MemberReducer.MemberInitState = initState, action: MemberReducer.MemberAction): MemberReducer.MemberInitState {
   switch (action.type) {
+    case MemberInterfaceMap.reducerInterfaces.RECEIVE_MEMBER_LEVEL: {
+      const { payload: { rows } } = action;
+      return {
+        ...state,
+        memberLevel: rows
+      };
+    }
+    
     case MemberInterfaceMap.reducerInterfaces.SET_MEMBER_SELECT: {
       const { payload: { selectMember } } = action;
       return {
@@ -121,3 +124,5 @@ export const getMemberOrderInfo = (state: AppReducer.AppState) => state.member.m
 export const getSelectMember = (state: AppReducer.AppState) => state.member.selectMember;
 
 export const getMemberList = (state: AppReducer.AppState) => state.member.memberList;
+
+export const getMemberLevel = (state: AppReducer.AppState) => state.member.memberLevel;

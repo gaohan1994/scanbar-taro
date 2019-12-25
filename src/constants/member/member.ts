@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:09:10 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-23 20:06:14
+ * @Last Modified time: 2019-12-25 14:09:13
  */
 import { jsonToQueryString, HTTPInterface } from '../index';
 
@@ -113,6 +113,12 @@ export declare namespace MemberInterface {
     id: number;
   }
 
+  interface MemberLevel {
+    id: number;
+    merchantId: number;
+    levelName: string;
+  }
+
   interface MemberByPreciseInfo {
     identity: string | number;
   }
@@ -122,6 +128,7 @@ export declare namespace MemberInterface {
   type RECEIVE_MEMBER_PERFERENCE = string;
   type RECEIVE_MEMBER_ORDER_INFO = string;
   type SET_MEMBER_SELECT = string; // 设置添加会员成功之后的回调数据存放处
+  type RECEIVE_MEMBER_LEVEL = string;
 
   interface MemberReducerInterface {
     RECEIVE_MEMBER_LIST: RECEIVE_MEMBER_LIST;
@@ -129,6 +136,7 @@ export declare namespace MemberInterface {
     RECEIVE_MEMBER_PERFERENCE: RECEIVE_MEMBER_PERFERENCE;
     RECEIVE_MEMBER_ORDER_INFO: RECEIVE_MEMBER_ORDER_INFO;
     SET_MEMBER_SELECT: SET_MEMBER_SELECT;
+    RECEIVE_MEMBER_LEVEL: RECEIVE_MEMBER_LEVEL;
   }
   
 }
@@ -137,6 +145,7 @@ interface MemberInterfaceMap {
   memberInfoAdd: string;
   memberInfoEdit: string;
   getRandomCaroNo: string;
+  memberLevelList: string;
   memberPreference(params: MemberInterface.MemberInfoDetail): string;
   memberInfoList(params?: MemberInterface.MemberInfoListFetchFidle): string;
   memberInfoSearch(params?: MemberInterface.MemberInfoSearchFidle): string;
@@ -155,11 +164,13 @@ class MemberInterfaceMap {
     RECEIVE_MEMBER_PERFERENCE: 'RECEIVE_MEMBER_PERFERENCE',
     RECEIVE_MEMBER_ORDER_INFO: 'RECEIVE_MEMBER_ORDER_INFO',
     SET_MEMBER_SELECT: 'SET_MEMBER_SELECT',
+    RECEIVE_MEMBER_LEVEL: 'RECEIVE_MEMBER_LEVEL',
   };
   
   public memberInfoAdd = '/memberInfo/add';
   public memberInfoEdit = '/memberInfo/edit';
   public getRandomCaroNo = '/memberInfo/getRandomCaroNo';
+  public memberLevelList = '/memberLevel/list';
   /**
    * @todo [请求会员列表]
    *

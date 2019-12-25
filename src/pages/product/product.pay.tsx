@@ -7,6 +7,7 @@ import productSdk, { ProductCartInterface } from '../../common/sdk/product/produ
 import "../../component/card/form.card.less";
 import '../style/product.less';
 import '../../styles/theme.less';
+import "../../component/cart/cart.less";
 import classnames from 'classnames';
 import FormCard from '../../component/card/form.card';
 import { FormRowProps } from '../../component/card/form.row';
@@ -17,12 +18,12 @@ import { ProductInterfaceMap } from '../../constants';
 import Modal from '../../component/modal/modal';
 import numeral from 'numeral';
 import memberService from '../../constants/member/member.service';
-import { AtFloatLayout } from 'taro-ui';
 import { Card } from '../../component/common/card/card.common';
 import FormRow from '../../component/card/form.row';
 import merge from 'lodash.merge';
 import { PayReducer } from '../../reducers/app.pay';
 import { getSelectMember } from '../../reducers/app.member';
+import { ModalInput } from '../../component/modal/modal';
 
 const cssPrefix = 'product';
 
@@ -43,6 +44,8 @@ interface State {
   memberLayout: boolean;
   memberValue: string;
   selectMember?: SelectMember;
+  receiveValue: string;     // 应收金额
+  receiveDiscount: string;  // 整单折扣
 }
 
 class ProductPay extends Taro.Component<Props, State> {
@@ -53,6 +56,8 @@ class ProductPay extends Taro.Component<Props, State> {
     memberModal: false,
     memberValue: '',
     memberLayout: false,
+    receiveValue: '',
+    receiveDiscount: '',
     selectMember: undefined,
   };
 
@@ -67,6 +72,8 @@ class ProductPay extends Taro.Component<Props, State> {
       memberModal: false,
       memberValue: '',
       memberLayout: false,
+      receiveValue: '',
+      receiveDiscount: '',
     });
     productSdk.setErase(undefined);
 
@@ -99,6 +106,49 @@ class ProductPay extends Taro.Component<Props, State> {
       return {
         ...prevState,
         [key]: value
+      };
+    });
+  }
+
+  public onChangeReceive = (key: string, value: string) => {
+    if (value === '') {
+      productSdk.setErase(undefined);
+      this.setState({
+        receiveValue: '',
+        receiveDiscount: '',
+        eraseValue: '',
+      });
+      return;
+    }
+
+    /**
+     * @todo [第一步，先拿到除了改价之外的最终价格]
+     * @todo [第二步，计算整单改价的价格和比例]
+     */
+    const memberPrice: number = productSdk.getProductMemberPrice();
+    let nextReceiveValue: string = '';
+    let nextReceiveDiscount: string = '';
+    let nextEraseValue: string = '';
+    if (key === 'receiveValue') {
+      const erasePrice = numeral(memberPrice - numeral(value).value()).value();
+      productSdk.setErase(`${erasePrice}`);
+      nextReceiveValue = value;
+      nextReceiveDiscount = `${numeral(value).value() / memberPrice * 100}`;
+      nextEraseValue = `${erasePrice}`;
+    } else {
+      const erasePrice = numeral(memberPrice - (memberPrice * numeral(value).value() / 100)).value();
+      productSdk.setErase(`${erasePrice}`);
+      nextReceiveValue = `${memberPrice * numeral(value).value() / 100}`;
+      nextReceiveDiscount = value;
+      nextEraseValue = `${erasePrice}`;
+    }
+
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        receiveValue: nextReceiveValue,
+        receiveDiscount: nextReceiveDiscount,
+        eraseValue: nextEraseValue,
       };
     });
   }
@@ -164,9 +214,16 @@ class ProductPay extends Taro.Component<Props, State> {
       
       Taro.hideLoading();
       productSdk.setMember(selectMember);
+      /**
+       * @todo [目前重新设置会员之后重置抹零]
+       */
+      productSdk.setErase(undefined);
       this.setState({ 
         selectMember,
         memberModal: false,
+        eraseValue: '',
+        receiveValue: '',
+        receiveDiscount: '',
       });
     } catch (error) {
       Taro.showLoading();
@@ -232,19 +289,34 @@ class ProductPay extends Taro.Component<Props, State> {
 
   private renderMemberLayout = () => {
     const { memberLayout, selectMember } = this.state;
-    if (selectMember !== undefined) {
+    if (selectMember !== undefined && memberLayout) {
       const cssPrefix = 'member';
       const memberForm: FormRowProps[] = [{
         title: '上次消费时间',
         extraText: selectMember.orderInfo !== undefined ? selectMember.orderInfo.lastPayTime : '暂无消费记录'
       }];
+      const buttons = [
+        {title: '取消选择', type: 'cancel', onClick: () => this.changeModalVisible('memberLayout', false)},
+        {title: '更换会员', type: 'confirm', onClick: () => this.changeMember()},
+      ];
+      const form4: FormRowProps[] = [
+        {
+          title: '积分',
+          extraText: '1000'
+        },
+        {
+          title: '储值余额',
+          extraText: '￥2000',
+        },
+        {
+          title: '优惠券',
+          extraText: '5',
+          hasBorder: false
+        },
+      ];
       return (
-        <AtFloatLayout
-          isOpened={memberLayout}
-          className={`product-pay-member-layout`}
-          onClose={() => this.changeModalVisible('memberLayout', false)}
-        >
-          <View className={`product-pay-member-layout-container`}>
+        <View className={`product-pay-member-layout-mask`} >
+          <View className={`product-pay-member-layout-box product-pay-member-layout-container`}>
             <View 
               className={`product-detail-modal-close`}
               onClick={() => this.changeModalVisible('memberLayout', false)}
@@ -254,24 +326,21 @@ class ProductPay extends Taro.Component<Props, State> {
                 src="//net.huanmusic.com/weapp/icon_del.png" 
               />
             </View>
-            <View 
-              className={`product-detail-modal-change`}
-              onClick={() => this.changeMember()}
-            >
-              <View className={`product-detail-modal-change-text`}>更换会员</View>
-            </View>
             <Card card-class="home-card member-card product-pay-member-layout-card">
               <View className={classnames(`${cssPrefix}-detail-img`)}>
                 <Image className={`${cssPrefix}-detail-avator`} src="//net.huanmusic.com/weapp/icon_user.png" />
               </View>
               <View className={`${cssPrefix}-detail`}>
-                <View className="title-text">{selectMember.username || ''}</View>
+                <View className={`title-text ${cssPrefix}-detail-name`}>
+                  {selectMember.username || ''}
+                  <View className={`${cssPrefix}-detail-name-level`}>普通会员</View>
+                </View>
                 <View className="small-text">{selectMember.phoneNumber || ''}</View>
               </View>
               <View className="home-buttons member-buttons">
                 <View className="member-buttons-button home-buttons-button-border">
                   <View className="title-text">
-                    {numeral(selectMember.orderInfo !== undefined && selectMember.orderInfo.totalAmount || 0).format('0.00')}
+                    ￥{numeral(selectMember.orderInfo !== undefined && selectMember.orderInfo.totalAmount || 0).format('0.00')}
                   </View>
                   <View className="small-text">累计消费</View>
                 </View>
@@ -287,35 +356,66 @@ class ProductPay extends Taro.Component<Props, State> {
               {memberForm.map((item) => {
                 return <FormRow key={item.title} {...item} />;
               })}
-              <View className={`product-pay-member-layout-card-row`}>
-                <Text className={`product-pay-member-layout-card-row-text`}>消费偏好</Text>
-                {selectMember.perference !== undefined ? (
-                  <View className={`${cssPrefix}-detail-row-icons product-pay-member-layout-card-row-icons`}>
-                    {
-                      selectMember.perference.map((per) => {
-                        return (
-                          <View  
-                            key={per.barcode}
-                            className={`${cssPrefix}-detail-row-icon`}
-                          >
-                            {per.productName}
-                          </View>
-                        );
-                      })
-                    }
-                  </View>
-                ) : (
-                  <Text className={`product-pay-member-layout-card-row-text`}>暂无消费偏好</Text>
-                )}
-              </View>
+              <FormRow 
+                title="消费偏好" 
+                hasBorder={false}
+                extraText={selectMember.perference !== undefined && selectMember.perference.length > 0 ? '' : '暂无消费偏好'}
+              >
+                {
+                  selectMember.perference !== undefined && selectMember.perference.length > 0 && (
+                    selectMember.perference.map((perference) => {
+                      return (
+                        <View 
+                          key={perference.barcode} 
+                          className={`member-detail-row-icons`}
+                        >
+                          <View  className={`member-detail-row-icon`}>{perference.productName}</View>
+                        </View>
+                      );
+                    })
+                  )
+                }
+              </FormRow>
             </Card>
+            <Card card-class="home-card member-card">
+              {form4.map((item) => {
+                return <FormRow key={item.title} {...item} />;
+              })}
+            </Card>
+            <View style="height: 100px; width: 100%" />
+            {buttons && (
+              <View className={`product-add-buttons`}>
+                {buttons.map((button) => {
+                  return (
+                    <View 
+                      key={button.title}
+                      className={classnames(
+                        `cart-buttons-button`, 
+                        `cart-buttons-${button.type || 'confirm'}`, 
+                        {[`cart-buttons-two`]: buttons.length > 1}
+                      )}
+                      onClick={button.onClick}
+                    >
+                      {button.title}
+                    </View>
+                  );
+                })}
+              </View>
+            )}
           </View>
-        </AtFloatLayout>
+        </View>
       );
     }
     return (
       <View />
     );
+  }
+
+  private setNumber = (num: number): string => {
+    if (Number.isInteger(num)) {
+      return `${num}`;
+    } 
+    return numeral(num).format('0.00');
   }
 
   private renderMemberModal = () => {
@@ -359,7 +459,9 @@ class ProductPay extends Taro.Component<Props, State> {
   }
 
   private renderEraseModal = () => {
-    const { eraseModal, eraseValue } = this.state;
+    const { eraseModal, eraseValue, receiveValue, receiveDiscount } = this.state;
+    const receivePrice = numeral(productSdk.getProductMemberPrice() - numeral(eraseValue).value()).value();
+
     const eraseButtons = [
       {
         title: '取消',
@@ -375,52 +477,30 @@ class ProductPay extends Taro.Component<Props, State> {
         onPress: () => this.changeModalVisible('eraseModal', false)
       },
     ];
-    const eraseForm: FormRowProps[] = [
+    const eraseInputs: ModalInput[] = [
       {
-        title: '改价金额（￥）',
-        isInput: true,
-        inputValue: eraseValue,
-        inputType: 'digit',
-        inputOnChange: (value) => this.onChangeValue('eraseValue', value)
+        title: '应收金额',
+        value: receiveValue,
+        onInput: ({detail: {value}}) => this.onChangeReceive('receiveValue', value),
+        placeholder: `￥${this.setNumber(receivePrice)}`,
+        // focus: true,
       },
       {
-        title: '应收金额（￥）',
-        extraText: `￥${numeral(productSdk.getProductMemberPrice() - numeral(eraseValue).value()).format('0.00')}`,
-        hasBorder: false
-      },
+        title: '整单折扣',
+        value: receiveDiscount,
+        onInput: ({detail: {value}}) => this.onChangeReceive('receiveDiscount', value),
+        placeholder: '100%',
+      }
     ];
     return (
-      // <Modal
-      //   onClose={() => this.changeModalVisible('eraseModal', false)}
-      //   isOpened={eraseModal}
-      //   buttons={eraseButtons}
-      //   header="抹零"
-      // >
-      //   <View className={`product-detail-modal`}>
-      //     <View>asd</View>
-      //     <FormCard items={eraseForm} />
-      //   </View>
-      // </Modal>
       <Modal 
         onClose={() => this.changeModalVisible('eraseModal', false)}
         isOpened={eraseModal}
         buttons={eraseButtons}
-        header="改价"
-      >
-        <View className="product-detail-modal">
-          <View 
-            className={classnames('component-form', {
-              'component-form-shadow': true
-            })}
-          > 
-            {
-              eraseForm.map((item) => {
-                return <FormRow key={item.title} {...item} />;
-              })
-            }
-          </View>
-        </View>
-      </Modal>
+        header="整单改价"
+        tip={`当前金额：￥${this.setNumber(receivePrice)}`}
+        inputs={eraseInputs}
+      />
     );
   }
 
@@ -516,7 +596,7 @@ class ProductPay extends Taro.Component<Props, State> {
     const priceForm: FormRowProps[] = [
       {
         title: '应收金额',
-        extraText: `￥${numeral(productSdk.getProductTransPrice()).format('0.00')}`,
+        extraText: `￥${this.setNumber(numeral(productSdk.getProductTransPrice()).value())}`,
         extraTextColor: '#333333',
         extraTextBold: 'bold',
         extraTextSize: '36',
@@ -531,7 +611,7 @@ class ProductPay extends Taro.Component<Props, State> {
       },
       {
         title: '原价金额',
-        extraText: `￥${numeral(productSdk.getProductPrice()).format('0.00')}`
+        extraText: `￥${this.setNumber(numeral(productSdk.getProductPrice()).value())}`
       },
       {
         title: '商品优惠',
@@ -566,7 +646,7 @@ class ProductPay extends Taro.Component<Props, State> {
         <View className={`${cssPrefix}-pay-footer-bg`}>
           <View className={`${cssPrefix}-pay-footer-left`}>
             <View 
-              className={`${cssPrefix}-pay-footer-left-item`}
+              className="cart-suspension-left-item"
               onClick={() => {
                 if (selectMember !== undefined) {
                   this.changeModalVisible('memberLayout', true);
@@ -576,16 +656,16 @@ class ProductPay extends Taro.Component<Props, State> {
               }}
             >
               <Image src='//net.huanmusic.com/weapp/icon_member.png' className={`${cssPrefix}-pay-footer-left-item-icon`} />
-              <Text className={`${cssPrefix}-pay-footer-left-item-font`}>
+              <Text className="cart-suspension-left-item-text">
                 {`${selectMember && (selectMember as MemberInterface.MemberInfo).username || '会员'}`}
               </Text>
             </View>
             <View 
-              className={`${cssPrefix}-pay-footer-left-item`}
+              className="cart-suspension-left-item"
               onClick={() => this.changeModalVisible('eraseModal', true)}
             >
               <Image src='//net.huanmusic.com/weapp/icon_molin.png' className={`${cssPrefix}-pay-footer-left-item-erase`} />
-              <Text className={`${cssPrefix}-pay-footer-left-item-font`}>{eraseValue === '' ? '改价' : '已改价'}</Text>
+              <Text className="cart-suspension-left-item-text">{eraseValue === '' ? '改价' : '已改价'}</Text>
             </View>
           </View>
           <View
@@ -595,7 +675,7 @@ class ProductPay extends Taro.Component<Props, State> {
             })}
             onClick={() => this.onPayHandle()}
           >
-            收款￥{numeral(this.getTransValue()).format('0.00')}
+            收款￥{this.setNumber(numeral(this.getTransValue()).value())}
           </View>
         </View>
       </View>

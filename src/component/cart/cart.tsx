@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-23 13:51:18
+ * @Last Modified time: 2019-12-25 15:35:04
  * 
  * @todo [购物车组件]
  */
@@ -20,8 +20,6 @@ import {
 import { connect } from '@tarojs/redux';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import Modal from '../modal/modal';
-import FormCard from '../card/form.card';
-import { FormRowProps } from '../card/form.row';
 import { ProductInterface, ProductService } from '../../constants';
 import numeral from 'numeral';
 import merge from 'lodash.merge';
@@ -309,6 +307,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
             );
           })
         }
+        <View style="height: 50px; width: 100%" />
       </CartLayout>
     );
   }
@@ -391,6 +390,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
         value: nonBarcodePrice,
         onInput: ({detail: {value}}) => this.onChangeValue('nonBarcodePrice', value),
         placeholder: '请输入商品价格',
+        // focus: true,
       },
       {
         title: '备注',
@@ -434,6 +434,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       {
         title: '重量',
         type: 'digit',
+        // focus: true,
         main: true,
         value: weightProductSellNum,
         onInput: ({detail: {value}}) => this.onChangeValue('weightProductSellNum', value),

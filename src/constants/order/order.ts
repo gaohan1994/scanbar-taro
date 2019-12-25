@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-18 10:58:52
+ * @Last Modified time: 2019-12-25 16:08:28
  * 
  * @todo [商品相关的类型定义]
  */
@@ -73,6 +73,8 @@ export declare namespace OrderInterface {
     terminalSn?: string;
     transFlag?: number;
     transType?: number;
+    startTime?: string;
+    endTime?: string;
   }
 
   interface OrderDetailFetchField { 

@@ -71,6 +71,22 @@ class OrderDetail extends Taro.Component<Props, State> {
           {this.renderStatus()}
           {this.renderCards()}
         </View>
+        {this.renderButtons()}
+      </View>
+    );
+  }
+
+  private renderButtons = () => {
+    return (
+      <View className={`product-add-buttons`}>
+        <View style="width: 100%">
+          <AtButton 
+            className="theme-button"
+            onClick={() => {}}
+          >
+            退货
+          </AtButton>
+        </View>
       </View>
     );
   }
@@ -162,9 +178,9 @@ class OrderDetail extends Taro.Component<Props, State> {
         {Form3 && (
           <FormCard items={Form3} />
         )}
-        {memberForm && (
+        {/* {memberForm && (
           <FormCard items={memberForm} />
-        )}
+        )} */}
         {orderDetail.orderDetailList && (
           <FormCard>
             <FormRow title="商品详情" />
@@ -172,19 +188,6 @@ class OrderDetail extends Taro.Component<Props, State> {
           </FormCard>
         )}
         <View className={`${cssPrefix}-area`} />
-        {orderDetail.orderDetailList && (
-          <View>
-            <AtButton
-              className="theme-button"
-              onClick={() => Taro.showToast({title: '正在开发中', icon: 'none'})}
-            >
-              <Text className={`theme-button-text`}>
-                退货
-              </Text>
-            </AtButton>
-            <View className={`${cssPrefix}-area`} />
-          </View>
-        )}
       </View>
     );
   }

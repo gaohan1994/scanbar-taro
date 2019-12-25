@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-04 13:49:58 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-23 13:44:53
+ * @Last Modified time: 2019-12-25 15:03:20
  * 
  * @Usage
  * ```jsx
@@ -69,7 +69,7 @@ class Modal extends Taro.Component<Props, State> {
   render () {
     const { header, buttons, renderHeader, renderFooter, tip, inputs } = this.props;
     const showHeader = header && header.length > 0;
-
+    
     /**
      * @param {ModalProps} HackerCode
      */
@@ -101,7 +101,9 @@ class Modal extends Taro.Component<Props, State> {
                       className={`${ModalCssPrefix}-content-item`}
                     >
                       <View 
-                        className={classnames(`${ModalCssPrefix}-content-item-title`)}
+                        className={classnames(`${ModalCssPrefix}-content-item-title`, {
+                          [`${ModalCssPrefix}-content-item-title-short`]: !(inputs.some(i => i.title.length > 2))
+                        })}
                       >
                         {main && (
                           <View className={`${ModalCssPrefix}-content-item-title-main`}>*</View>
@@ -114,6 +116,7 @@ class Modal extends Taro.Component<Props, State> {
                         type={item.type}
                         disabled={item.disabled}
                         placeholder={item.placeholder}
+                        focus={item.focus}
                         className={`${ModalCssPrefix}-content-item-input`}
                         placeholderClass={`${ModalCssPrefix}-content-item-input-place`}
                       />
