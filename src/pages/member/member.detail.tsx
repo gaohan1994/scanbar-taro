@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-25 11:21:08
+ * @Last Modified time: 2019-12-26 18:12:32
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
@@ -118,7 +118,7 @@ class MemberMain extends Taro.Component<MemberMainProps> {
     return (
       <View className={`container`}>
         <Image src="//net.huanmusic.com/weapp/bg_member.png" className={`${cssPrefix}-bg`} />
-        {Number(this.$router.params.id) !== Number(memberDetail.id)
+        {!memberDetail.id
         ? (
           <View className={`container ${cssPrefix}-member`}>
             <AtActivityIndicator mode="center" />

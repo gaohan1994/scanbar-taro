@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-15 11:17:25 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-25 15:46:16
+ * @Last Modified time: 2019-12-26 15:56:03
  * 
  * @todo [商品管理页面]
  */
@@ -18,7 +18,7 @@ import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
 import { getProductManageList, getProductManageListIndexes, getProductType, getProductSupplier } from '../../reducers/app.product';
 import ProductManageComponent from '../../component/product/product.manage';
-import { AtFloatLayout, AtButton } from 'taro-ui';
+import { AtButton } from 'taro-ui';
 import classnames from 'classnames';
 import productSdk from '../../common/sdk/product/product.sdk';
 import merge from 'lodash.merge';
@@ -269,7 +269,6 @@ class ProductManage extends Taro.Component<Props, State> {
           <View className={`${memberPrefix}-main-header-search ${cssPrefix}-header-search`}>
             <Image src="//net.huanmusic.com/weapp/icon_import.png" className={`${memberPrefix}-main-header-search-icon`} />
             <Input
-              // cursorSpacing={300}
               className={`${memberPrefix}-main-header-search-input`} 
               placeholder="请输入商品名称或条码"
               value={searchValue}
@@ -340,15 +339,16 @@ class ProductManage extends Taro.Component<Props, State> {
             className={`product-pay-member-layout-box product-pay-member-layout-container`}
             style="background-color: #ffffff;"
           >
-            <View 
+            <Image 
+              src="//net.huanmusic.com/weapp/icon_del.png" 
               className={`${cssPrefix}-select-header-close`}
               onClick={() => this.changeSelectVisible(false)}
-            >
-              <Image 
+            />
+              {/* <Image 
                 className={`${cssPrefix}-select-header-close-image`} 
                 src="//net.huanmusic.com/weapp/icon_del.png" 
               />
-            </View>
+            </View> */}
             <View className={`${cssPrefix}-select-header`}>筛选</View>
             <View className={`${cssPrefix}-select-content`}>
               {productType.length > 0 && (
@@ -463,21 +463,26 @@ class ProductManage extends Taro.Component<Props, State> {
               </View>
             </View>
             <View className={`${cssPrefix}-select-content-item-pos`}>
-            <AtButton
-              type="primary"
-              onClick={() => this.reset()}
-              className={`product-manage-select-modal-button-reset`}
-            >
-              <Text className={`product-manage-select-modal-button-reset-text`}>重置</Text>
-            </AtButton>
-            <AtButton
-              type="primary"
-              onClick={() => this.submit()}
-              className={`product-manage-select-modal-button-submit`}
-            >
-              <Text className={`product-manage-select-modal-button-submit-text`}>确定</Text>
-            </AtButton>
-          </View>
+              <View className={`${cssPrefix}-add-buttons-button`}>
+                <AtButton
+                  type="primary"
+                  onClick={() => this.reset()}
+                  className={`product-manage-select-modal-button-reset`}
+                >
+                  <Text className={`product-manage-select-modal-button-reset-text`}>重置</Text>
+                </AtButton>
+              </View>
+              <View className={`${cssPrefix}-add-buttons-button`}>
+                <AtButton
+                  type="primary"
+                  onClick={() => this.submit()}
+                  className={`product-manage-select-modal-button-submit`}
+                >
+                  <Text className={`product-manage-select-modal-button-submit-text`}>确定</Text>
+                </AtButton>
+              </View>
+             
+            </View>
           </View>
         </View>
       );

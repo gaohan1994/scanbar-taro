@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-01 15:44:11
+ * @Last Modified time: 2019-12-26 14:07:49
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
@@ -43,7 +43,7 @@ class UserMain extends Taro.Component<UserMainProps> {
 
   render () {
     return (
-      <View className="container">
+      <View className="container container-color">
         <View className={`${cssPrefix}-bg`} />
         <View className={`${cssPrefix}-container`}>
           <View className={`${cssPrefix}-user`}>

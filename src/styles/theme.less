@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-10-30 11:33:11 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-23 14:08:52
+ * @Last Modified time: 2019-12-27 10:32:00
  */
 
 // 主色调
@@ -53,6 +53,20 @@
   height: 100%;
   &-color {
     background-color: #f2f2f2;
+  }
+  &-border::after {
+    content: '';
+    position: absolute;
+    transform-origin: center;
+    box-sizing: border-box;
+    pointer-events: none;
+    
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: scaleY(0.5);
+    border-bottom: 1px solid #e3e3e3;
   }
 }
 
@@ -166,6 +180,13 @@
   }
 }
 
+.theme-button-cancel {
+  .config-button(#999999, @primary-button-size, @primary-button-size / 2,  32px);
+  &-text {
+    .config-button-text(@primary-button-size, 32px, #ffffff);
+  }
+}
+
 .theme-input-placeholder {
   font-size: @normal-text-fontsize;
   color: #cccccc;
@@ -260,7 +281,7 @@
 }
 
 @select-cancel-color: #F8F8FA;
-@select-button-size: 60px;
+@select-button-size: 66px;
 @select-button-radius: 20px;
 @select-button-font-size: 32px;
 @select-reset-color: #999999;

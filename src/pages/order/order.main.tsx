@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-12-09 11:01:19 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-25 16:23:05
+ * @Last Modified time: 2019-12-27 10:09:37
  */
 
 import Taro from '@tarojs/taro';
@@ -174,7 +174,7 @@ class OrderMain extends Taro.Component<Props, State> {
               );
             })
             : (
-              <View className={`product-suspension`}> 
+              <View className={`product-suspension order-list-empty`}> 
                 <Image src="//net.huanmusic.com/weapp/img_kong.png" className={`product-suspension-image`} />
                 <Text className={`product-suspension-text`}>暂无内容</Text>
               </View>

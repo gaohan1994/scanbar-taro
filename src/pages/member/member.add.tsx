@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-25 14:45:43
+ * @Last Modified time: 2019-12-27 11:18:45
  * 
  * @todo 添加会员页面
  */
@@ -26,7 +26,7 @@ import { getMemberLevel } from '../../reducers/app.member';
 
 const cssPrefix: string = 'member';
 
-interface Props { 
+export interface Props { 
   memberLevel: MemberInterface.MemberLevel[];
   memberSelector: string[];
 }

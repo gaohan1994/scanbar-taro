@@ -159,6 +159,18 @@ class ProductPay extends Taro.Component<Props, State> {
     return productSdk.getProductTransPrice();
   }
 
+  public cancelMember = () => {
+    productSdk.setMember(undefined);
+    productSdk.setErase(undefined);
+    this.setState({ 
+      selectMember: undefined,
+      memberModal: false,
+      eraseValue: '',
+      receiveValue: '',
+      receiveDiscount: '',
+    });
+  }
+
   public changeMember = () => {
     this.changeModalVisible('memberLayout', false);
     this.changeModalVisible('memberModal', true);
@@ -296,7 +308,7 @@ class ProductPay extends Taro.Component<Props, State> {
         extraText: selectMember.orderInfo !== undefined ? selectMember.orderInfo.lastPayTime : '暂无消费记录'
       }];
       const buttons = [
-        {title: '取消选择', type: 'cancel', onClick: () => this.changeModalVisible('memberLayout', false)},
+        {title: '取消选择', type: 'cancel', onClick: () => this.cancelMember()},
         {title: '更换会员', type: 'confirm', onClick: () => this.changeMember()},
       ];
       const form4: FormRowProps[] = [
@@ -411,10 +423,10 @@ class ProductPay extends Taro.Component<Props, State> {
     );
   }
 
-  private setNumber = (num: number): string => {
-    if (Number.isInteger(num)) {
-      return `${num}`;
-    } 
+  private setNumber = (num: number | string): string => {
+    // if (Number.isInteger(num)) {
+    //   return `${num}`;
+    // } 
     return numeral(num).format('0.00');
   }
 
@@ -460,7 +472,7 @@ class ProductPay extends Taro.Component<Props, State> {
 
   private renderEraseModal = () => {
     const { eraseModal, eraseValue, receiveValue, receiveDiscount } = this.state;
-    const receivePrice = numeral(productSdk.getProductMemberPrice() - numeral(eraseValue).value()).value();
+    const receivePrice = productSdk.getProductMemberPrice();
 
     const eraseButtons = [
       {
@@ -497,16 +509,15 @@ class ProductPay extends Taro.Component<Props, State> {
         onClose={() => this.changeModalVisible('eraseModal', false)}
         isOpened={eraseModal}
         buttons={eraseButtons}
-        header="整单改价"
+        header="整单优惠"
         tip={`当前金额：￥${this.setNumber(receivePrice)}`}
         inputs={eraseInputs}
       />
     );
   }
 
-  private renderWeightProductDetail = (item: ProductCartInterface.ProductCartInfo) => {
+  private renderProductDetail = (item: ProductCartInterface.ProductCartInfo) => {
     const { selectMember } = this.state;
-
     // 如果称重商品有改价 则优先计算改价，如果没有优先计算会员价
     const itemPrice: number = item.changePrice !== undefined
       ? numeral(item.changePrice).value()
@@ -517,41 +528,21 @@ class ProductPay extends Taro.Component<Props, State> {
       <View className={`${cssPrefix}-row-content-item ${cssPrefix}-row-content-top`}>
         {item.changePrice !== undefined ? (
           <View className={`${cssPrefix}-row-content-items`}>
-            <Text className={`${cssPrefix}-row-normal ${cssPrefix}-row-line`}>{`￥ ${numeral(item.price).format('0.00')}`}</Text>
+            <Text className={`${cssPrefix}-row-normal ${cssPrefix}-row-line`}>{`￥ ${this.setNumber(item.price)}`}</Text>
             <View className={`${cssPrefix}-row-icon ${cssPrefix}-row-icon-member`}>改价</View>
             <Text className={`${cssPrefix}-row-normal`}>{`￥ ${numeral(item.changePrice).format('0.00')}`}</Text>
           </View>
         ) : selectMember !== undefined ? (
           <View className={`${cssPrefix}-row-content-items`}>
-            <Text className={`${cssPrefix}-row-normal ${cssPrefix}-row-line`}>{`￥ ${item.price}`}</Text>
+            <Text className={`${cssPrefix}-row-normal ${cssPrefix}-row-line`}>{`￥ ${this.setNumber(item.price)}`}</Text>
             <View className={`${cssPrefix}-row-icon ${cssPrefix}-row-icon-member`}>会员价</View>
-            <Text className={`${cssPrefix}-row-normal`}>{`￥ ${item.memberPrice}`}</Text>
+            <Text className={`${cssPrefix}-row-normal`}>{`￥ ${this.setNumber(item.memberPrice)}`}</Text>
           </View>
         ) : (
-          <Text className={`${cssPrefix}-row-normal`}>{`￥ ${item.price}`}</Text>
+          <Text className={`${cssPrefix}-row-normal`}>{`￥ ${this.setNumber(item.price)}`}</Text>
         )}
         <Text className={`${cssPrefix}-row-normal`}>
-          {`小计：￥ ${itemPrice * item.sellNum}`}
-        </Text>
-      </View>
-    );
-  }
-
-  private renderProductDetail = (item: ProductCartInterface.ProductCartInfo) => {
-    const { selectMember } = this.state;
-    return (
-      <View className={`${cssPrefix}-row-content-item ${cssPrefix}-row-content-top`}>
-        {selectMember !== undefined ? (
-          <View className={`${cssPrefix}-row-content-items`}>
-            <Text className={`${cssPrefix}-row-normal ${cssPrefix}-row-line`}>{`￥ ${item.price}`}</Text>
-            <View className={`${cssPrefix}-row-icon ${cssPrefix}-row-icon-member`}>会员价</View>
-            <Text className={`${cssPrefix}-row-normal`}>{`￥ ${item.memberPrice}`}</Text>
-          </View>
-        ) : (
-          <Text className={`${cssPrefix}-row-normal`}>{`￥ ${item.price}`}</Text>
-        )}
-        <Text className={`${cssPrefix}-row-normal`}>
-          {`小计：￥ ${selectMember !== undefined ? item.sellNum * item.memberPrice : item.sellNum * item.price}`}
+          {`小计：￥ ${this.setNumber(itemPrice * item.sellNum)}`}
         </Text>
       </View>
     );
@@ -560,32 +551,37 @@ class ProductPay extends Taro.Component<Props, State> {
   private renderListProductCard = () => {
     const { productCartList } = this.props;
     return (
-      <View 
-        className={classnames('component-form', {
-          'component-form-shadow': true
-        })}
-      >
-        <View className={`${cssPrefix}-row ${cssPrefix}-row-border`}>
-          <Text className={`${cssPrefix}-row-normal`}>商品详情</Text>
-        </View>
-        {
-          productCartList.map((item, index) => {
-            return (
-              <View 
-                key={item.id}
-                className={classnames(`${cssPrefix}-row ${cssPrefix}-row-content`, {
-                  [`${cssPrefix}-row-border`]: index !== (productCartList.length - 1)
-                })}
-              >
-                <View className={`${cssPrefix}-row-content-item`}>
-                  <Text className={`${cssPrefix}-row-name`}>{item.name}</Text>
-                  <Text className={`${cssPrefix}-row-normal`}>{`x ${item.sellNum}`}</Text>
+      <View className={`${cssPrefix}-pay-pos`}>
+        <View 
+          className={classnames('component-form', {
+            'component-form-shadow': true
+          })}
+        >
+          <View className={`${cssPrefix}-row ${cssPrefix}-row-border`}>
+            <Text className={`${cssPrefix}-row-normal`}>商品详情</Text>
+          </View>
+          {
+            productCartList.map((item, index) => {
+              return (
+                <View 
+                  key={item.id}
+                  className={classnames(`${cssPrefix}-row ${cssPrefix}-row-content`, {
+                    // [`${cssPrefix}-row-border`]: index !== (productCartList.length - 1)
+                    [`container-border`]: index !== (productCartList.length - 1)
+                  })}
+                >
+                  <View className={`${cssPrefix}-row-content-item`}>
+                    <Text className={`${cssPrefix}-row-name`}>{item.name}</Text>
+                    <Text className={`${cssPrefix}-row-normal`}>{`x ${item.sellNum}`}</Text>
+                  </View>
+                  {this.renderProductDetail(item)}
+                  {/* {!productSdk.isWeighProduct(item) ? this.renderProductDetail(item) : this.renderWeightProductDetail(item)} */}
                 </View>
-                {!productSdk.isWeighProduct(item) ? this.renderProductDetail(item) : this.renderWeightProductDetail(item)}
-              </View>
-            );
-          })
-        }
+              );
+            })
+          }
+        </View>
+        <View style="height: 100px; width: 100%" />
       </View>
     );
   }
@@ -616,22 +612,22 @@ class ProductPay extends Taro.Component<Props, State> {
       {
         title: '商品优惠',
         extraText: `${selectMember !== undefined
-          ? `- ￥${numeral(productSdk.getProductPrice() - productSdk.getProductMemberPrice()).format('0.00')}`
-          : '￥0'}`,
+          ? `- ￥${this.setNumber(productSdk.getProductPrice() - productSdk.getProductMemberPrice())}`
+          : '￥0.00'}`,
         extraTextStyle: 'price'
       },
       {
-        title: '整单改价',
+        title: '整单优惠',
         extraText: `${eraseValue !== ''
-          ? `- ￥${numeral(eraseValue).format('0.00')}`
-          : '￥0'}`,
+          ? `- ￥${this.setNumber(eraseValue)}`
+          : '￥0.00'}`,
         extraTextStyle: 'price',
         hasBorder: false,
       },
      
     ];
     return (
-      <View>
+      <View className={`${cssPrefix}-pay-pos`}>
         <FormCard items={priceForm} />
         <FormCard items={formCard} />
       </View>

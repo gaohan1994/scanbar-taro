@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-25 14:58:22
+ * @Last Modified time: 2019-12-26 16:17:23
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Input, Image, Text } from '@tarojs/components';
@@ -291,11 +291,11 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
               <View className="home-buttons member-card-buttons">
                 <View className={`home-buttons-button home-buttons-button-border ${cssPrefix}-main-button`}>
                   <View className="home-money">2000</View>
-                  <View className={`normal-text home-buttons-button-box`}>会员总数</View>
+                  <View className={`normal-text home-buttons-button-box home-buttons-button-mar`}>会员总数</View>
                 </View>
                 <View className={`home-buttons-button  ${cssPrefix}-main-button`}>
                   <View className="home-money">200</View>
-                  <View className={`normal-text home-buttons-button-box`}>今日新增</View>
+                  <View className={`normal-text home-buttons-button-box home-buttons-button-mar`}>今日新增</View>
                 </View>
               </View>
             </View>

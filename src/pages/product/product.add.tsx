@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-20 13:37:23 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-23 21:04:23
+ * @Last Modified time: 2019-12-27 10:59:50
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Picker, Text } from '@tarojs/components';
@@ -472,7 +472,8 @@ class ProductAdd extends Taro.Component<Props, State> {
         inputValue: name,
         inputOnChange: (value) => this.onChangeValue('name', value),
         inputPlaceHolder: '请输入商品名称',
-        hasBorder: false
+        maxInput: true,
+        hasBorder: false,
       }
     ];
     const formPrice: FormRowProps[] = [

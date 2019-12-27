@@ -7,7 +7,7 @@ import merge from 'lodash.merge';
  * @Author: Ghan 
  * @Date: 2019-11-22 14:20:31 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-11 11:37:46
+ * @Last Modified time: 2019-12-26 11:56:25
  * @todo productsdk
  */
 export declare namespace ProductSDKReducer {
@@ -23,6 +23,8 @@ export declare namespace ProductSDKReducer {
     changeWeightProduct: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo;
     nonBarcodeProduct?: Partial<ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo>;
     suspensionCartList: Array<SuspensionCartBase>;
+    changeProduct?: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo;
+    changeProductVisible: boolean;
   }
 
   interface AddSuspensionCartPayload {
@@ -65,6 +67,23 @@ export declare namespace ProductSDKReducer {
       type: ProductCartInterface.MANAGE_CART;
       payload: { productCartList: ProductCartInterface.ProductCartInfo[] };
     }
+    
+    interface ChangeProductAction {
+      type: ProductCartInterface.CHANGE_PRODUCT;
+      payload: { 
+        product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo;
+        sellNum?: number;
+        changePrice?: number;
+      };
+    }
+
+    interface ChangeProductVisible {
+      type: ProductCartInterface.CHANGE_PRODUCT_VISIBLE;
+      payload: { 
+        visible: boolean,
+        product?: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo;
+      };
+    }
   }
 
   /**
@@ -92,6 +111,8 @@ export declare namespace ProductSDKReducer {
     | Reducers.DeleteSuspensionAction
     | Reducers.EmptySuspensionAction
     | Reducers.ManageCartList
+    | Reducers.ChangeProductAction
+    | Reducers.ChangeProductVisible
     | {
       type: 
         ProductCartInterface.ADD_SUSPENSION_CART 
@@ -104,36 +125,10 @@ export declare namespace ProductSDKReducer {
 const initState: ProductSDKReducer.State = {
   productCartList: [],
   suspensionCartList: [],
-  changeWeightProduct: {
-    id: -1,
-    cost: -1,
-    limitNum: -1,
-    memberPrice: -1,
-    merchantId: -1,
-    number: -1,
-    price: -1,
-    saleType: -1,
-    status: -1,
-    typeId: -1,
-    type: -1,
-    typeName: '',
-    barcode: '',
-    brand: '',
-    pictures: '',
-    standard: '',
-    supplier: '',
-    unit: '',
-    firstLetter: '',
-    name: '',
-    updateBy: '',
-    createBy: '',
-    createTime: '',
-    updateTime: '',
-    imgs: [],
-    supplierId: -1,
-    supplierName: '',
-  },
-  nonBarcodeProduct: {}
+  changeWeightProduct: {} as any,
+  nonBarcodeProduct: {},
+  changeProduct: {} as any,
+  changeProductVisible: false,
 };
 
 export default function productSDKReducer (
@@ -141,6 +136,53 @@ export default function productSDKReducer (
   action: ProductSDKReducer.Action
 ): ProductSDKReducer.State {
   switch (action.type) {
+    case productSdk.reducerInterface.CHANGE_PRODUCT_VISIBLE: {
+      const { payload } = action as ProductSDKReducer.Reducers.ChangeProductVisible;
+      console.log('payload: ', payload);
+      const { visible, product } = payload; 
+      return {
+        ...state,
+        changeProductVisible: visible,
+        changeProduct: product
+      };
+    }
+
+    case productSdk.reducerInterface.CHANGE_PRODUCT: {
+      const { payload } = action as ProductSDKReducer.Reducers.ChangeProductAction;
+      const { product, sellNum, changePrice } = payload;
+      
+      const index = state.productCartList.findIndex(p => p.id === product.id);
+      if (index !== -1) {
+        const nextList: ProductCartInterface.ProductCartInfo[] = merge([], state.productCartList);
+        const prevProduct = merge({}, state.productCartList[index]);
+        let newProduct: ProductCartInterface.ProductCartInfo = { 
+          ...product, 
+          sellNum: typeof sellNum === 'number' ? sellNum : prevProduct.sellNum,
+        };
+        if (typeof changePrice === 'number') {
+          newProduct.changePrice = changePrice;
+        }
+        nextList[index] = newProduct;
+        return {
+          ...state,
+          productCartList: nextList
+        };
+      }
+
+      let newProduct: ProductCartInterface.ProductCartInfo = { 
+        ...product, 
+        sellNum: typeof sellNum === 'number' ? sellNum : 1,
+      };
+      if (typeof changePrice === 'number') {
+        newProduct.changePrice = changePrice;
+      }
+      const nextList = merge([], state.productCartList);
+      nextList.push(newProduct);
+      return {
+        ...state,
+        productCartList: nextList
+      };
+    }
 
     case productSdk.reducerInterface.DELETE_SUSPENSION_CART: {
       const { payload } = action as ProductSDKReducer.Reducers.DeleteSuspensionAction;
@@ -393,3 +435,7 @@ export const getChangeWeigthProduct = (state: AppReducer.AppState) => state.prod
 export const getSuspensionCartList = (state: AppReducer.AppState) => state.productSDK.suspensionCartList;
 
 export const getNonBarcodeProduct = (state: AppReducer.AppState) => state.productSDK.nonBarcodeProduct;
+
+export const getChangeProductVisible = (state: AppReducer.AppState) => state.productSDK.changeProductVisible;
+
+export const getChangeProduct = (state: AppReducer.AppState) => state.productSDK.changeProduct;

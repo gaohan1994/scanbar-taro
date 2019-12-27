@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 14:41:35 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-23 16:14:05
+ * @Last Modified time: 2019-12-27 10:59:16
  * 
  * @todo [fockedTaroUiListItem,增加以及修改了一些属性]
  */
@@ -46,6 +46,7 @@ export interface FormRowProps {
   extraTextSize?: string;       // 右边字体大小
   extraTextBold?: 'bold';       // 是否加粗
   inputCursorSpacing?: number;  // cursorSpacing
+  maxInput?: boolean;           // 右侧450px input
 }
 
 interface FormRowState { }
@@ -69,6 +70,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
     extraThumbClick: () => {/** */},
     buttons: [],
     isInput: false,
+    maxInput: false,
     inputValue: '',
     inputName: 'form.row.name',
     inputPlaceHolder: '',
@@ -97,6 +99,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
       infoColor,
       isInput,
       inputType,
+      maxInput,
       inputName,
       inputValue,
       inputPlaceHolder,
@@ -162,7 +165,8 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
             {isInput === true && (
               <View 
                 className={classnames({
-                  ["component-form-input"]: buttons && buttons.length > 0
+                  ["component-form-input"]: buttons && buttons.length > 0,
+                  ['component-form-input-max']: maxInput,
                 })}
               >
                 <AtInput 

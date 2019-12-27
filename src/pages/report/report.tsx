@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-06 17:55:33
+ * @Last Modified time: 2019-12-26 14:07:39
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
@@ -57,7 +57,7 @@ class ReportMain extends Taro.Component<ReportMainProps> {
 
   render () {
     return (
-      <View className="container">
+      <View className="container container-color">
         <View className={`${cssPrefix}-bg`} />
         <View className={`${cssPrefix}-tabs`}>
           {

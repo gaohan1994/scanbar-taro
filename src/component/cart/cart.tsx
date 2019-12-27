@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-25 15:35:04
+ * @Last Modified time: 2019-12-26 14:13:09
  * 
  * @todo [购物车组件]
  */
@@ -16,6 +16,8 @@ import {
   getProductCartList, 
   getChangeWeigthProduct, 
   getNonBarcodeProduct,
+  getChangeProductVisible,
+  getChangeProduct,
 } from '../../common/sdk/product/product.sdk.reducer';
 import { connect } from '@tarojs/redux';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
@@ -35,6 +37,8 @@ interface CartBarProps {
   productCartList: Array<ProductCartInterface.ProductCartInfo>;
   changeWeightProduct: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo;
   nonBarcodeProduct: Partial<ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo>;
+  changeProductVisible: boolean;
+  changeProduct?: ProductCartInterface.ProductCartInfo;
 }
 
 interface CartBarState { 
@@ -43,6 +47,8 @@ interface CartBarState {
   weightProductChangePrice: string; // 称重商品改价
   nonBarcodePrice: string;          // 无码商品价格
   nonBarcodeRemark: string;         // 无码商品备注
+  changePrice: string;              // 商品改价
+  changeSellNum: string;            // 商品改数量
 }
 
 class CartBar extends Taro.Component<CartBarProps, CartBarState> {
@@ -53,6 +59,8 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     weightProductChangePrice: '',
     nonBarcodePrice: '',
     nonBarcodeRemark: '',
+    changePrice: '',
+    changeSellNum: '',
   };
 
   componentWillReceiveProps (nextProps: CartBarProps) {
@@ -62,6 +70,13 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     if (nextProps.changeWeightProduct && nextProps.changeWeightProduct.id) {
       this.setState({ 
         weightProductChangePrice: `${nextProps.changeWeightProduct.price}`,
+      });
+    }
+
+    if (nextProps.changeProduct && nextProps.changeProduct.id) {
+      this.setState({
+        changePrice: `${nextProps.changeProduct.changePrice || nextProps.changeProduct.price || ''}`,
+        changeSellNum: `${nextProps.changeProduct.sellNum || ''}`,
       });
     }
   }
@@ -191,6 +206,17 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     }
   }
 
+  public confirmChangeProduct = () => {
+    const { changeProduct } = this.props;
+    const { changeSellNum, changePrice } = this.state;
+
+    if (changeSellNum === '' && changePrice === '') {
+      return;
+    }
+    productSdk.changeProduct(changeProduct as any, Number(changeSellNum), Number(changePrice));
+    productSdk.changeProductVisible(false, undefined);
+  }
+
   render () {
     const { productCartList } = this.props;
     const buttonClassNames = classnames(
@@ -206,6 +232,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
         {this.renderContent()}
         {this.renderWeightProductModal()}
         {this.renderNonBarcodeProductModal()}
+        {this.renderChangeProductModal()}
         <View className="cart">
           <View className="cart-bg">
             {this.renderScan()}
@@ -287,8 +314,8 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                       {product.name}{product.remark && `（${product.remark}）`}
                     </Text>
                     <Text className={`${cssPrefix}-product-container-normal`}>
-                      <Text className={`${cssPrefix}-product-container-price`}>{`￥ ${product.price}`}</Text>
-                      / {product.unit}
+                      <Text className={`${cssPrefix}-product-container-price`}>{`￥ ${product.changePrice || product.price}`}</Text>
+                      {` /${product.unit}`}
                     </Text>
                     <View className={`${cssPrefix}-product-stepper`}>      
                       <View 
@@ -427,6 +454,51 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     productSdk.closeWeightModal();
   }
 
+  private onChangeProductClose = () => {
+    productSdk.changeProductVisible(false);
+  }
+
+  private renderChangeProductModal = () => {
+    const { changePrice, changeSellNum } = this.state;
+    const { changeProductVisible } = this.props;
+    const inputs: ModalInput[] = [
+      {
+        title: '数量',
+        value: changeSellNum,
+        type: "digit",
+        onInput: ({detail: {value}}) => this.onChangeValue('changeSellNum', value)
+        // inputValue: 
+      },
+      {
+        title: '价格',
+        value: changePrice,
+        type: 'digit',
+        onInput: ({detail: {value}}) => this.onChangeValue('changePrice', value)
+      },
+    ];
+    const buttons = [
+      {
+        title: '取消',
+        type: 'cancel',
+        onPress: () => this.onChangeProductClose()
+      },
+      {
+        title: '确定',
+        type: 'confirm',
+        onPress: () => this.confirmChangeProduct()
+      },
+    ];
+    return (
+      <Modal
+        header="商品改价"
+        isOpened={changeProductVisible}
+        onClose={() => this.onChangeProductClose()}
+        inputs={inputs}
+        buttons={buttons}
+      />
+    );
+  }
+
   private renderWeightProductModal = () => {
     const { weightProductSellNum, weightProductChangePrice } = this.state;
     const { changeWeightProduct } = this.props;
@@ -477,6 +549,8 @@ const select = (state: AppReducer.AppState) => ({
   productCartList: getProductCartList(state),
   changeWeightProduct: getChangeWeigthProduct(state),
   nonBarcodeProduct: getNonBarcodeProduct(state),
+  changeProductVisible: getChangeProductVisible(state),
+  changeProduct: getChangeProduct(state),
 });
 
 export default connect(select)(CartBar as any);

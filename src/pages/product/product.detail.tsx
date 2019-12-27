@@ -456,6 +456,7 @@ class ProductDetail extends Taro.Component<Props, State> {
         title: '名称',
         main: true,
         isInput: true,
+        maxInput: true,
         inputValue: productChangeDetail.name,
         inputOnChange: (value) => this.onValueChange('name', value),
         hasBorder: false

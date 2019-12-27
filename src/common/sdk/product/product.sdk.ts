@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-25 15:08:23
+ * @Last Modified time: 2019-12-26 11:56:09
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -119,6 +119,8 @@ export declare namespace ProductCartInterface {
   type DELETE_SUSPENSION_CART = string;
   type EMPTY_SUSPENSION_CART = string;
   type CHANGE_NON_BARCODE_PRODUCT = string;
+  type CHANGE_PRODUCT = string;
+  type CHANGE_PRODUCT_VISIBLE = string;
 
   type ReducerInterface = {
     MANAGE_CART: MANAGE_CART;
@@ -130,6 +132,8 @@ export declare namespace ProductCartInterface {
     DELETE_SUSPENSION_CART: DELETE_SUSPENSION_CART;
     EMPTY_SUSPENSION_CART: EMPTY_SUSPENSION_CART;
     CHANGE_NON_BARCODE_PRODUCT: CHANGE_NON_BARCODE_PRODUCT;
+    CHANGE_PRODUCT: CHANGE_PRODUCT; // 改价和改数量
+    CHANGE_PRODUCT_VISIBLE: CHANGE_PRODUCT_VISIBLE; // 改价modal是否显示
   };
 
   type ProductCartAdd = string;
@@ -168,6 +172,8 @@ class ProductSDK {
     DELETE_SUSPENSION_CART: 'DELETE_SUSPENSION_CART',
     EMPTY_SUSPENSION_CART: 'EMPTY_SUSPENSION_CART',
     CHANGE_NON_BARCODE_PRODUCT: 'CHANGE_NON_BARCODE_PRODUCT',
+    CHANGE_PRODUCT: 'CHANGE_PRODUCT',
+    CHANGE_PRODUCT_VISIBLE: 'CHANGE_PRODUCT_VISIBLE',
   };
   
   /**
@@ -245,7 +251,7 @@ class ProductSDK {
       /**
        * @todo 如果有改价价格，则计算改价价格
        */
-      if (this.isWeighProduct(item) && item.changePrice !== undefined) {
+      if (item.changePrice !== undefined) {
         return prevTotal + (item.changePrice * item.sellNum); 
       }
 
@@ -269,7 +275,7 @@ class ProductSDK {
         /**
          * @todo 如果有改价价格，则计算改价价格
          */
-        if (this.isWeighProduct(item) && item.changePrice !== undefined) {
+        if (item.changePrice !== undefined) {
           return prevTotal + (item.changePrice * item.sellNum); 
         }
 
@@ -337,8 +343,8 @@ class ProductSDK {
         transAmount: this.getProductTransPrice(),
       },
       productInfoList: productList.map((item) => {
-        if (this.isWeighProduct(item) as boolean) {
-          // 如果是称重商品，则 改价价格 > 会员价格 > 普通价格
+        if (!this.isNonBarcodeProduct(item)) {
+          // 如果是称重商品和普通商品，则 改价价格 > 会员价格 > 普通价格
           const itemPrice: number = item.changePrice !== undefined
             ? numeral(item.changePrice).value()
             : this.member !== undefined 
@@ -359,7 +365,7 @@ class ProductSDK {
             type: item.typeId,
             unitPrice: itemPrice,
           } as ProductCartInterface.ProductInfoPayload;
-        } else if (this.isNonBarcodeProduct(item)) {
+        } else {
           // 如果是无码商品则特殊处理
           return {
             activities: [],
@@ -371,26 +377,6 @@ class ProductSDK {
             totalAmount: item.price * item.sellNum,
             transAmount: item.price * item.sellNum,
           } as any;
-        } else {
-          // 正常商品 则 会员价格 > 普通价格
-          const itemPrice: number = this.member !== undefined 
-            ? item.memberPrice
-            : item.price;
-          return {
-            activities: [],
-            barcode: item.barcode,
-            brand: item.brand,
-            discountAmount: 0,
-            discountType: 0,
-            productId: item.id,
-            productName: item.name,
-            sellNum: item.sellNum,
-            standard: item.standard,
-            totalAmount: item.price * item.sellNum,
-            transAmount: itemPrice * item.sellNum,
-            type: item.typeId,
-            unitPrice: itemPrice,
-          } as ProductCartInterface.ProductInfoPayload;
         }
       }),
       transProp: true
@@ -431,6 +417,17 @@ class ProductSDK {
 
   public isNonBarcodeProduct (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo): boolean {
     return String(product.id).startsWith(this.nonBarcodeKey);
+  }
+
+  public changeProduct = (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, sellNum?: number, changePrice?: number) => {
+    store.dispatch({
+      type: this.reducerInterface.CHANGE_PRODUCT,
+      payload: {
+        product,
+        sellNum,
+        changePrice
+      }
+    });
   }
 
   /**
@@ -565,6 +562,19 @@ class ProductSDK {
       type: this.reducerInterface.CHANGE_WEIGHT_PRODUCT_MODAL,
       payload: {product: {}}
     });
+  }
+
+  public changeProductVisible = (visible: boolean, product?: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo) => {
+    console.log('visible: ', visible);
+    console.log('product: ', product);
+    const reducer: ProductSDKReducer.Reducers.ChangeProductVisible = {
+      type: this.reducerInterface.CHANGE_PRODUCT_VISIBLE,
+      payload: { 
+        visible,
+        product,
+      }
+    };
+    store.dispatch(reducer);
   }
 
   public cashierPay = async (params: ProductCartInterface.ProductPayPayload) => {

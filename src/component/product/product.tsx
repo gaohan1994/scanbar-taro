@@ -8,8 +8,7 @@ import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import classnames from 'classnames';
 import Modal from '../modal/modal';
-import { FormRowProps } from '../card/form.row';
-import FormCard from '../card/form.card';
+import { ModalInput } from '../modal/modal';
 
 const cssPrefix = 'component-product';
 interface Props { 
@@ -19,9 +18,17 @@ interface Props {
 
 interface State {
   priceModal: boolean;
+  changePrice: string;
+  changeSellNum: string;
 }
 
 class ProductComponent extends Taro.Component<Props, State> {
+
+  state = {
+    priceModal: false,
+    changePrice: '',
+    changeSellNum: '',
+  };
 
   /**
    * @todo [新增商品点击改价]
@@ -29,11 +36,33 @@ class ProductComponent extends Taro.Component<Props, State> {
    * @memberof ProductComponent
    */
   public onProductPress = () => {
-    this.changePriceModal(true);
+    this.changePriceModal();
   }
 
-  public changePriceModal = (visible: boolean) => {
-    this.setState({priceModal: visible});
+  public changeValue = (key: string, value: string) => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        [key]: value
+      };
+    });
+  }
+
+  public changePriceModal = () => {
+    const { productInCart, product } = this.props;
+    const payloadProduct = productInCart !== undefined ? productInCart : product;
+    productSdk.changeProductVisible(true, payloadProduct);
+  }
+
+  public confirmChangeProduct = () => {
+    this.changePriceModal();
+    const { product } = this.props;
+    const { changeSellNum, changePrice } = this.state;
+
+    if (changeSellNum === '' && changePrice === '') {
+      return;
+    }
+    productSdk.changeProduct(product, Number(changeSellNum), Number(changePrice));
   }
 
   public manageProduct = (type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce) => {
@@ -47,9 +76,11 @@ class ProductComponent extends Taro.Component<Props, State> {
       <View className={`${cssPrefix} ${cssPrefix}-border`}>
         <View 
           className={`${cssPrefix}-content`}
-          // onClick={() => this.onProductPress()}
         >
-          <View className={`${cssPrefix}-content-cover`}>
+          <View 
+            className={`${cssPrefix}-content-cover`} 
+            onClick={() => this.onProductPress()}
+          >
             {product.pictures && product.pictures !== '' ? (
               <Image src={product.pictures[0]} className={`${cssPrefix}-content-cover-image`} />
             ) : (
@@ -57,7 +88,12 @@ class ProductComponent extends Taro.Component<Props, State> {
             )}
           </View>
           <View className={`${cssPrefix}-content-detail`}>
-            <View className={`${cssPrefix}-title`}>{product.name}</View>
+            <View 
+              className={`${cssPrefix}-title`}
+              onClick={() => this.onProductPress()}
+            >
+              {product.name}
+            </View>
             <Text className={`${cssPrefix}-normal`}>
               <Text className={`${cssPrefix}-price-bge`}>￥</Text>
               <Text className={`${cssPrefix}-price`}>{product.price}</Text>
@@ -66,28 +102,7 @@ class ProductComponent extends Taro.Component<Props, State> {
           </View>
           {this.renderStepper()}
         </View>
-        {this.renderModal()}
       </View>
-    );
-  }
-
-  private renderModal = () => {
-    const { priceModal } = this.state;
-    // const { product, productInCart } = this.props;
-    const priceForm: FormRowProps[] = [
-      {
-        title: '数量',
-        isInput: true,
-        // inputValue: 
-      },
-    ];
-    return (
-      <Modal
-        isOpened={priceModal}
-        onClose={() => this.changePriceModal(false)}
-      >
-        <FormCard items={priceForm} />
-      </Modal>
     );
   }
 
