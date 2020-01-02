@@ -99,6 +99,8 @@ class App extends Component {
           'product.detail',
           'product.add',
           'product.suspension',
+          'product.refund',
+          'product.refund.pay',
         ],
       },
       {

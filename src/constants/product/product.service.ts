@@ -94,6 +94,10 @@ class ProductService {
     Promise<HTTPInterface.ResponseResultBase<ProductCartInterface.QueryStatus>> => {
     return requestHttp.post(ProductInterfaceMap.cashierQueryStatus(params), '');
   }
+
+  public cashierRefund = async (params: ProductInterface.CashierRefund): Promise<HTTPInterface.ResponseResultBase<any>>=> {
+    return requestHttp.post(ProductInterfaceMap.cashierRefund, params);
+  }
 }
 
 export default new ProductService();

@@ -4,16 +4,15 @@ import './product.less';
 import { ProductInterface } from '../../constants';
 import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
-import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
+import { getProductCartList, getProductRefundList } from '../../common/sdk/product/product.sdk.reducer';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import classnames from 'classnames';
-import Modal from '../modal/modal';
-import { ModalInput } from '../modal/modal';
 
 const cssPrefix = 'component-product';
 interface Props { 
   product: ProductInterface.ProductInfo;
   productInCart?: ProductCartInterface.ProductCartInfo;
+  sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
 }
 
 interface State {
@@ -56,18 +55,18 @@ class ProductComponent extends Taro.Component<Props, State> {
 
   public confirmChangeProduct = () => {
     this.changePriceModal();
-    const { product } = this.props;
+    const { product, sort } = this.props;
     const { changeSellNum, changePrice } = this.state;
 
     if (changeSellNum === '' && changePrice === '') {
       return;
     }
-    productSdk.changeProduct(product, Number(changeSellNum), Number(changePrice));
+    productSdk.changeProduct(product, Number(changeSellNum), Number(changePrice), sort);
   }
 
   public manageProduct = (type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce) => {
-    const { product } = this.props;
-    productSdk.manage({type, product});
+    const { product, sort } = this.props;
+    productSdk.manage({type, product, sort});
   }
 
   render () {
@@ -138,9 +137,11 @@ class ProductComponent extends Taro.Component<Props, State> {
 }
 
 const select = (state: AppReducer.AppState, ownProps: Props) => {
-  const { product } = ownProps;
-  const productCartList = getProductCartList(state);
-  const productInCart = product !== undefined && productCartList.find(p => p.id === product.id);
+  const { product, sort } = ownProps;
+  const productList = sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
+    ? getProductCartList(state)
+    : getProductRefundList(state);
+  const productInCart = product !== undefined && productList.find(p => p.id === product.id);
   return {
     product,
     productInCart,

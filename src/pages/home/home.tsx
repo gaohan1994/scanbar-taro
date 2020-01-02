@@ -54,6 +54,12 @@ const NavItems = [
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_more.png',
+    value: '退货',
+    subTitle: 'Even more',
+    url: '/pages/product/product.refund',
+  },
+  {
+    image: '//net.huanmusic.com/weapp/icon_menu_more.png',
     value: '测试主页',
     subTitle: 'Even more',
     url: '/pages/test/test',

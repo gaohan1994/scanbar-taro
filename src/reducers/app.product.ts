@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:26:45 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-23 10:51:43
+ * @Last Modified time: 2019-12-27 15:12:11
  */
 
 import { ProductInterface, ProductInterfaceMap } from "../constants";
@@ -35,7 +35,7 @@ export declare namespace ProductReducer {
   }
 }
 
-const initState: ProductReducer.InitState = {
+export const initState: ProductReducer.InitState = {
   productList: [],
   productSearchList: [],
   productManageList: {

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-31 13:59:38
+ * @Last Modified time: 2019-12-31 14:39:05
  * 
  * @todo 开单页面
  */
@@ -21,10 +21,7 @@ import invariant from 'invariant';
 import { ResponseCode } from '../../constants/index';
 import productSdk from '../../common/sdk/product/product.sdk';
 import { store } from '../../app';
-import { getProductCartList, getSuspensionCartList, ProductSDKReducer } from '../../common/sdk/product/product.sdk.reducer';
-import { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import HeaderInput from '../../component/header/header.input';
-import ButtonCostom from '../../component/button/button';
 import ProductListView from '../../component/product/product.listview';
 
 const cssPrefix = 'product';
@@ -32,7 +29,6 @@ const cssPrefix = 'product';
 interface Props { 
   /**
    * @param {productList} 商品数据，商品在分类里
-   *
    * @type {ProductInterface.ProductList[]}
    * @memberof Props
    */
@@ -41,15 +37,6 @@ interface Props {
   pureProductSearchList: ProductInterface.ProductInfo[];
   selectProduct: ProductInterface.ProductInfo;
   productTypeList: ProductInterface.ProductTypeInfo[];
-  /**
-   * @param {productCartList}  
-   * @param {suspensionList} 
-   *
-   * @type {ProductCartInterface.ProductCartInfo[]}
-   * @memberof Props
-   */
-  productCartList: ProductCartInterface.ProductCartInfo[];
-  suspensionList: ProductSDKReducer.SuspensionCartBase[];
 }
 
 interface State {
@@ -64,7 +51,7 @@ interface State {
   loading: boolean;              
 }
 
-class ProductOrder extends Taro.Component<Props, State> {
+class ProductRefund extends Taro.Component<Props, State> {
   
   readonly state: State = {
     currentType: {
@@ -147,16 +134,6 @@ class ProductOrder extends Taro.Component<Props, State> {
     }
   }
 
-  public onNonBarcodeProductClick = () => {
-    const product: any = {
-      id: `${productSdk.nonBarcodeKey}${new Date().getTime()}`
-    };
-    productSdk.manage({
-      type: productSdk.productCartManageType.ADD,
-      product
-    });
-  }
-
   /**
    * @todo [点击菜单的时候修改当前菜单并跳转至对应商品]
    *
@@ -165,17 +142,6 @@ class ProductOrder extends Taro.Component<Props, State> {
   public onTypeClick = (params: ProductInterface.ProductTypeInfo) => {
     this.onInput({detail: {value: ''}});
     this.changeCurrentType(params);
-  }
-
-  public onSuspensionHandle = () => {
-    const { productCartList } = this.props;
-    if (productCartList.length > 0) {
-      productSdk.suspensionCart();
-    } else {
-      Taro.navigateTo({
-        url: `/pages/product/product.suspension`
-      });
-    }
   }
 
   /**
@@ -191,7 +157,6 @@ class ProductOrder extends Taro.Component<Props, State> {
 
   render () {
     const { searchValue } = this.state;
-    const { suspensionList } = this.props;
     return (
       <View className={`container ${cssPrefix}`}>
         <HeaderInput
@@ -200,19 +165,13 @@ class ProductOrder extends Taro.Component<Props, State> {
           onInput={this.onInput}
           isRenderInputRight={true}
           inputRightClick={() => this.onInput({detail: {value: ''}})}
-        >
-          <ButtonCostom
-            title="挂单"
-            onClick={() => this.onSuspensionHandle()}
-            badge={suspensionList.length}
-          />
-        </HeaderInput>
+        />
         
         <View className={`${cssPrefix}-list-container`}>
           {this.renderLeft()}  
           {this.renderRight()}
         </View>
-        <CartBar />
+        <CartBar sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND} />
       </View>
     );
   }
@@ -231,12 +190,6 @@ class ProductOrder extends Taro.Component<Props, State> {
         scrollY={true}
         className={`${cssPrefix}-list-left`}
       >
-        <View 
-          className={classnames(`${cssPrefix}-list-left-item`)}
-          onClick={() => this.onNonBarcodeProductClick()}
-        >
-          无码商品
-        </View>
         {
           productTypeList && productTypeList.length > 0
             ? productTypeList.map((type) => {
@@ -276,6 +229,7 @@ class ProductOrder extends Taro.Component<Props, State> {
             loading={loading}
             productList={productList}
             className={`${cssPrefix}-list-right-container`}
+            sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND}
           />
         </View>
       );
@@ -285,6 +239,7 @@ class ProductOrder extends Taro.Component<Props, State> {
         <ProductListView
           productList={pureProductSearchList}
           className={`${cssPrefix}-list-right-container-search`}
+          sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND}
         />
       </View>
     );
@@ -304,9 +259,7 @@ const mapState = (state: AppReducer.AppState) => {
     pureProductSearchList,
     selectProduct,
     productTypeList: getProductType(state),
-    productCartList: getProductCartList(state),
-    suspensionList: getSuspensionCartList(state)
   };
 };
 
-export default connect(mapState)(ProductOrder);
+export default connect(mapState)(ProductRefund);

@@ -1,3 +1,4 @@
+// @ts-ignore
 const getBaseUrl = (url: string) => {
   let BASE_URL = '';
   if (process.env.NODE_ENV === 'development') {

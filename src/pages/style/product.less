@@ -129,9 +129,20 @@
       }
     }
     &-right {
+      position: relative;
       display: flex;
       flex-direction: column;
       flex: 1;
+      &-container {
+        position: absolute;
+        top: 70px;
+        bottom: 0px;
+        &-search {
+          position: absolute;
+          top: 0px;
+          bottom: 0px;
+        }
+      }
       &-header {
         border-bottom: 1px solid #f9f9f9;
         .padding(20px);

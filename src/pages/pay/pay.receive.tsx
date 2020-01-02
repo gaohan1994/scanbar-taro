@@ -65,6 +65,7 @@ class PayReceive extends Taro.Component<Props, State> {
   };
 
   componentDidMount() {
+    productSdk.setSort(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER);
     this.queryStatus();
   }
   

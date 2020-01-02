@@ -23,6 +23,11 @@ class PayInput extends Taro.Component<Props, State> {
     inputValue: ''
   };
 
+  componentDidMount() {
+    productSdk.setSort(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER);
+  }
+  
+
   /**
    * @todo 刚进页面的时候清空输入值
    *

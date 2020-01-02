@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-26 11:56:09
+ * @Last Modified time: 2019-12-31 14:44:15
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -121,6 +121,12 @@ export declare namespace ProductCartInterface {
   type CHANGE_NON_BARCODE_PRODUCT = string;
   type CHANGE_PRODUCT = string;
   type CHANGE_PRODUCT_VISIBLE = string;
+  type PAYLOAD_ORDER = string;
+  type PAYLOAD_REFUND = string;
+  type PAYLOAD_SORT = {
+    PAYLOAD_ORDER: PAYLOAD_ORDER;
+    PAYLOAD_REFUND: PAYLOAD_REFUND;
+  };
 
   type ReducerInterface = {
     MANAGE_CART: MANAGE_CART;
@@ -134,6 +140,7 @@ export declare namespace ProductCartInterface {
     CHANGE_NON_BARCODE_PRODUCT: CHANGE_NON_BARCODE_PRODUCT;
     CHANGE_PRODUCT: CHANGE_PRODUCT; // 改价和改数量
     CHANGE_PRODUCT_VISIBLE: CHANGE_PRODUCT_VISIBLE; // 改价modal是否显示
+    PAYLOAD_SORT: PAYLOAD_SORT;
   };
 
   type ProductCartAdd = string;
@@ -149,6 +156,7 @@ export declare namespace ProductCartInterface {
     type: ProductCartAdd | ProductCartReduce | ProductCartEmpty;
     product: ProductInterface.ProductInfo | ProductCartInfo;
     suspension?: number;
+    sort?: PAYLOAD_ORDER | PAYLOAD_REFUND;
   }
 }
 
@@ -174,6 +182,10 @@ class ProductSDK {
     CHANGE_NON_BARCODE_PRODUCT: 'CHANGE_NON_BARCODE_PRODUCT',
     CHANGE_PRODUCT: 'CHANGE_PRODUCT',
     CHANGE_PRODUCT_VISIBLE: 'CHANGE_PRODUCT_VISIBLE',
+    PAYLOAD_SORT: {
+      PAYLOAD_ORDER: 'PAYLOAD_ORDER',
+      PAYLOAD_REFUND: 'PAYLOAD_REFUND',
+    }
   };
   
   /**
@@ -194,9 +206,20 @@ class ProductSDK {
    */
   private member?: MemberInterface.MemberInfo;
 
+  /**
+   * @param {sort}
+   * [类别：order是开单，refund是退货]
+   *
+   * @private
+   * @type {(ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND)}
+   * @memberof ProductSDK
+   */
+  private sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
+
   constructor () {
     this.erase = undefined;
     this.member = undefined;
+    this.sort = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER;
   }
 
   public setErase = (erase?: string): this => {
@@ -206,6 +229,11 @@ class ProductSDK {
 
   public setMember = (member?: MemberInterface.MemberInfo): this => {
     this.member = member;
+    return this;
+  }
+
+  public setSort = (sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND): this => {
+    this.sort = sort ? sort : this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER;
     return this;
   }
 
@@ -232,8 +260,14 @@ class ProductSDK {
    *
    * @memberof ProductSDK
    */
-  public getProductNumber = (products?: ProductCartInterface.ProductCartInfo[]) => {
-    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+  public getProductNumber = (
+    products?: ProductCartInterface.ProductCartInfo[], 
+    // sort: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
+  ) => {
+    const key = this.sort === this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER ? 'productCartList' : 'productRefundList';
+    const productList = products !== undefined 
+      ? products 
+      : store.getState().productSDK[key];
     const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.sellNum;
     const total = productList.reduce(reduceCallback, 0);
     return total;
@@ -244,10 +278,13 @@ class ProductSDK {
    *
    * @memberof ProductSDK
    */
-  public getProductPrice = (products?: ProductCartInterface.ProductCartInfo[]) => {
-    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+  public getProductPrice = (
+    products?: ProductCartInterface.ProductCartInfo[],
+    // sort: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
+  ) => {
+    const key = this.sort === this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER ? 'productCartList' : 'productRefundList';
+    const productList = products !== undefined ? products : store.getState().productSDK[key];
     const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => {
-
       /**
        * @todo 如果有改价价格，则计算改价价格
        */
@@ -419,13 +456,19 @@ class ProductSDK {
     return String(product.id).startsWith(this.nonBarcodeKey);
   }
 
-  public changeProduct = (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, sellNum?: number, changePrice?: number) => {
+  public changeProduct = (
+    product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, 
+    sellNum?: number, 
+    changePrice?: number,
+    sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND,
+  ) => {
     store.dispatch({
       type: this.reducerInterface.CHANGE_PRODUCT,
       payload: {
         product,
         sellNum,
-        changePrice
+        changePrice,
+        sort,
       }
     });
   }
@@ -436,7 +479,12 @@ class ProductSDK {
    *
    * @memberof ProductSDK
    */
-  public add = (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, sellNum?: number, suspension?: number) => {
+  public add = (
+    product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, 
+    sellNum?: number, 
+    suspension?: number,
+    sort: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
+  ) => {
     Taro.showToast({
       title: '加入购物车'
     });
@@ -450,6 +498,7 @@ class ProductSDK {
             sellNum: sellNum || 1
           },
           suspension,
+          sort,
         }
       };
       store.dispatch(reducer);
@@ -460,6 +509,7 @@ class ProductSDK {
           type: this.productCartManageType.ADD,
           product,
           suspension,
+          sort,
         }
       };
       store.dispatch(reducer);
@@ -472,7 +522,12 @@ class ProductSDK {
    *
    * @memberof ProductSDK
    */
-  public reduce = (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, sellNum?: number, suspension?: number) => {
+  public reduce = (
+    product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, 
+    sellNum?: number, 
+    suspension?: number, 
+    sort: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
+  ) => {
     if (this.isWeighProduct(product)) {
       const reducer: ProductSDKReducer.ProductManageWeightCart = {
         type: this.reducerInterface.MANAGE_CART_WEIGHT_PRODUCT,
@@ -482,7 +537,8 @@ class ProductSDK {
             ...product,
             sellNum: sellNum || 1
           },
-          suspension
+          suspension,
+          sort,
         }
       };
       store.dispatch(reducer);
@@ -492,7 +548,8 @@ class ProductSDK {
         payload: {
           type: this.productCartManageType.REDUCE,
           product,
-          suspension
+          suspension,
+          sort,
         }
       };
       store.dispatch(reducer);
@@ -507,7 +564,7 @@ class ProductSDK {
   }
 
   public manage = (params: ProductCartInterface.ProductSDKManageInterface) => {
-    const { product, type, suspension } = params;
+    const { product, type, suspension, sort } = params;
     if (type === this.productCartManageType.EMPTY) {
       this.empty();
       return;
@@ -520,7 +577,7 @@ class ProductSDK {
           payload: { product }
         });
       } else {
-        this.reduce(product, undefined, suspension);
+        this.reduce(product, undefined, suspension, sort);
       }
     } else if (this.isNonBarcodeProduct(product)) {
       // 如果是无码商品
@@ -535,9 +592,9 @@ class ProductSDK {
     } else {
       // 如果是其他商品
       if (type === this.productCartManageType.ADD) {
-        this.add(product, undefined, suspension);
+        this.add(product, undefined, suspension, sort);
       } else {
-        this.reduce(product, undefined, suspension);
+        this.reduce(product, undefined, suspension, sort);
       }
     }
   }

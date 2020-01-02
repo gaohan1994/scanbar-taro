@@ -102,6 +102,10 @@ class ProductAction {
   public productInfoEdit = async (params: Partial<ProductInterface.ProductInfo>) => {
     return ProductService.productInfoEdit(params);
   }
+
+  public productRefund = async (params: ProductInterface.CashierRefund) => {
+    return ProductService.cashierRefund(params);
+  }
 }
 
 export default new ProductAction();

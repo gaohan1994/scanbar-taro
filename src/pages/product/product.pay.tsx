@@ -24,10 +24,11 @@ import merge from 'lodash.merge';
 import { PayReducer } from '../../reducers/app.pay';
 import { getSelectMember } from '../../reducers/app.member';
 import { ModalInput } from '../../component/modal/modal';
+import ProductPayListView from '../../component/product/product.pay.listview';
 
 const cssPrefix = 'product';
 
-interface SelectMember extends MemberInterface.MemberInfo {
+export interface SelectMember extends MemberInterface.MemberInfo {
   perference?: MemberInterface.MemberPerference[];
   orderInfo?: MemberInterface.MemberOrderInfo;
 }
@@ -63,6 +64,7 @@ class ProductPay extends Taro.Component<Props, State> {
 
   public componentDidShow = () => {
     const { addSelectMember } = this.props; 
+    productSdk.setSort(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER);
     /**
      * 每次进入结算页面的时候重置数据并清空 productsdk
      */
@@ -424,9 +426,6 @@ class ProductPay extends Taro.Component<Props, State> {
   }
 
   private setNumber = (num: number | string): string => {
-    // if (Number.isInteger(num)) {
-    //   return `${num}`;
-    // } 
     return numeral(num).format('0.00');
   }
 
@@ -516,73 +515,14 @@ class ProductPay extends Taro.Component<Props, State> {
     );
   }
 
-  private renderProductDetail = (item: ProductCartInterface.ProductCartInfo) => {
-    const { selectMember } = this.state;
-    // 如果称重商品有改价 则优先计算改价，如果没有优先计算会员价
-    const itemPrice: number = item.changePrice !== undefined
-      ? numeral(item.changePrice).value()
-      : selectMember !== undefined 
-        ? item.memberPrice
-        : item.price;
-    return (
-      <View className={`${cssPrefix}-row-content-item ${cssPrefix}-row-content-top`}>
-        {item.changePrice !== undefined ? (
-          <View className={`${cssPrefix}-row-content-items`}>
-            <Text className={`${cssPrefix}-row-normal ${cssPrefix}-row-line`}>{`￥ ${this.setNumber(item.price)}`}</Text>
-            <View className={`${cssPrefix}-row-icon ${cssPrefix}-row-icon-member`}>改价</View>
-            <Text className={`${cssPrefix}-row-normal`}>{`￥ ${numeral(item.changePrice).format('0.00')}`}</Text>
-          </View>
-        ) : selectMember !== undefined ? (
-          <View className={`${cssPrefix}-row-content-items`}>
-            <Text className={`${cssPrefix}-row-normal ${cssPrefix}-row-line`}>{`￥ ${this.setNumber(item.price)}`}</Text>
-            <View className={`${cssPrefix}-row-icon ${cssPrefix}-row-icon-member`}>会员价</View>
-            <Text className={`${cssPrefix}-row-normal`}>{`￥ ${this.setNumber(item.memberPrice)}`}</Text>
-          </View>
-        ) : (
-          <Text className={`${cssPrefix}-row-normal`}>{`￥ ${this.setNumber(item.price)}`}</Text>
-        )}
-        <Text className={`${cssPrefix}-row-normal`}>
-          {`小计：￥ ${this.setNumber(itemPrice * item.sellNum)}`}
-        </Text>
-      </View>
-    );
-  }
-
   private renderListProductCard = () => {
+    const { selectMember } = this.state;
     const { productCartList } = this.props;
     return (
-      <View className={`${cssPrefix}-pay-pos`}>
-        <View 
-          className={classnames('component-form', {
-            'component-form-shadow': true
-          })}
-        >
-          <View className={`${cssPrefix}-row ${cssPrefix}-row-border`}>
-            <Text className={`${cssPrefix}-row-normal`}>商品详情</Text>
-          </View>
-          {
-            productCartList.map((item, index) => {
-              return (
-                <View 
-                  key={item.id}
-                  className={classnames(`${cssPrefix}-row ${cssPrefix}-row-content`, {
-                    // [`${cssPrefix}-row-border`]: index !== (productCartList.length - 1)
-                    [`container-border`]: index !== (productCartList.length - 1)
-                  })}
-                >
-                  <View className={`${cssPrefix}-row-content-item`}>
-                    <Text className={`${cssPrefix}-row-name`}>{item.name}</Text>
-                    <Text className={`${cssPrefix}-row-normal`}>{`x ${item.sellNum}`}</Text>
-                  </View>
-                  {this.renderProductDetail(item)}
-                  {/* {!productSdk.isWeighProduct(item) ? this.renderProductDetail(item) : this.renderWeightProductDetail(item)} */}
-                </View>
-              );
-            })
-          }
-        </View>
-        <View style="height: 100px; width: 100%" />
-      </View>
+      <ProductPayListView
+        productList={productCartList}
+        selectMember={selectMember}
+      />
     );
   }
 

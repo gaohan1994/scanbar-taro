@@ -153,6 +153,30 @@ export declare namespace ProductInterface {
     orderNo: string;
   }
 
+  interface CashierRefundOrder {
+    memberId: number;
+    orderSource: number;
+    payType: number;
+    totalAmount: number;
+    totalNum: number;
+    transAmount: number;
+    orderNo: string;
+    terminalCd: string;
+    terminalSn: string;
+  }
+
+  interface CashierRefundProduct {
+    changeNumber: number;
+    productId: number;
+    unitPrice: number;
+    remark: string;
+  }
+
+  interface CashierRefund {
+    order: Partial<CashierRefundOrder>;
+    productInfoList: CashierRefundProduct[];
+  }
+
   type RECEIVE_PRODUCT_LIST = string;
   type RECEIVE_PRODUCT_SEARCH_LIST = string;
   type RECEIVE_PRODUCT_MANAGE_LIST = string;
@@ -182,6 +206,7 @@ interface ProductInterfaceMap {
   productInfoGetBarcode: string;
   productInfoAdd: string;
   cashierPay: string;
+  cashierRefund: string;
   cashierQueryStatus (params: ProductInterface.ProductCashierQueryStatus): string;
   productInfoGetList (params?: ProductInterface.ProductInfoGetListFetchFidle): string;
   productInfoList (params?: ProductInterface.ProductInfoListFetchFidle): string;
@@ -209,6 +234,7 @@ class ProductInterfaceMap {
   public productInfoGetBarcode = '/product/productInfo/genBarcode';
   public productInfoAdd = '/product/productInfo/add';
   public cashierPay = '/cashier/pay';
+  public cashierRefund = '/cashier/refund';
 
   public cashierQueryStatus = (params: ProductInterface.ProductCashierQueryStatus) => {
     return `/cashier/queryStatus/${params.orderNo}`;
@@ -219,7 +245,7 @@ class ProductInterfaceMap {
   }
 
   public productInfoList = (params?: ProductInterface.ProductInfoListFetchFidle) => {
-    return `/product/productInfo/list${params ? jsonToQueryString(params) : ''}`;
+    return `/product/productInfo/getList${params ? jsonToQueryString(params) : ''}`;
   }
 
   public productInfoDetail = (params: ProductInterface.ProductDetailFetchFidle) => {
