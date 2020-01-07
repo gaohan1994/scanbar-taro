@@ -30,7 +30,7 @@ class ProductPayListView extends Taro.Component<Props> {
             <Text className={`${cssPrefix}-row-normal`}>商品详情</Text>
           </View>
           {
-            productList.map((item, index) => {
+            productList && productList.length > 0 && productList.map((item, index) => {
               return (
                 <View 
                   key={item.id}

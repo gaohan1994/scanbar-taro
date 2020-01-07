@@ -1,6 +1,7 @@
 import Taro from '@tarojs/taro';
 import { ScrollView, View } from '@tarojs/components';
 import ProductComponent from './product';
+import ProductManageComponent from './product.manage';
 import "../../pages/style/product.less";
 import { ProductInterface } from '../../constants';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
@@ -51,6 +52,21 @@ class ProductListView extends Taro.Component<Props> {
                     product={product}
                     sort={sort}
                   />  
+                  {/* {
+                    sort !== productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE
+                    ? (
+                      <ProductComponent
+                        product={product}
+                        sort={sort}
+                      />  
+                    )
+                    : (
+                      <ProductManageComponent
+                        product={product}
+                        sort={sort}
+                      />
+                    )
+                  } */}
                 </View>
               );
             })

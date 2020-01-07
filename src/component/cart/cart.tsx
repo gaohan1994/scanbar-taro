@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-31 15:50:24
+ * @Last Modified time: 2020-01-03 16:07:04
  * 
  * @todo [购物车组件]
  */
@@ -136,9 +136,18 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
         });
         return;
       }
-      Taro.navigateTo({
-        url: `/pages/product/product.refund.pay`
-      });
+      if (sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND) {
+        Taro.navigateTo({
+          url: `/pages/product/product.refund.pay`
+        });
+        return;
+      }
+      if (sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE) {
+        Taro.navigateTo({
+          url: `/pages/inventory/inventory.pay`
+        });
+        return;
+      }
       return;
     } else {
       Taro.showToast({
@@ -151,18 +160,18 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
 
   public setText = (): string => {
     const { sort } = this.props;
-    return sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER ? '结算' : '退货';
+    return sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND ? '退货' : '结算';
   }
 
   public emptyCart = () => {
-    const { productCartList } = this.props;
+    const { productCartList, sort } = this.props;
     if (productCartList.length > 0) {
       Taro.showModal({
         title: '提示',
         content: '确定清空购物车吗?',
         success: (res) => {
           if (res.confirm) {
-            productSdk.manage({type: productSdk.productCartManageType.EMPTY, product: {} as any});
+            productSdk.manage({type: productSdk.productCartManageType.EMPTY, product: {} as any, sort});
             this.onChangeCartListVisible(false);
           }
         }
@@ -237,6 +246,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     if (changeSellNum === '' && changePrice === '') {
       return;
     }
+    console.log('this.props: ', this.props);
     productSdk.changeProduct(changeProduct as any, Number(changeSellNum), Number(changePrice), sort);
     productSdk.changeProductVisible(false, undefined);
   }
@@ -571,9 +581,8 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
 
 const select = (state: AppReducer.AppState, ownProps: CartBarProps) => {
   const { sort } = ownProps;
-  const productCartList = sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
-  ? getProductCartList(state)
-  : getProductRefundList(state);
+  const productKey = productSdk.getSortDataKey(sort);
+  const productCartList = state.productSDK[productKey];
   return {
     productCartList,
     changeWeightProduct: getChangeWeigthProduct(state),

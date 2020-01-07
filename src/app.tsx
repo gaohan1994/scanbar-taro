@@ -36,6 +36,18 @@ class App extends Component {
     subPackages: [
       {
         /**
+         * @todo [盘点模块]
+         */
+        root: 'pages/inventory',
+        pages: [
+          'inventory.main',
+          'inventory.pay',
+          'inventory.purchase.detail',
+          'inventory.list',
+        ]
+      },
+      {
+        /**
          * @todo 订单模块
          * 
          * ```ts

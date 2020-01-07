@@ -16,6 +16,9 @@ export { ProductInterface, default as ProductInterfaceMap } from './product/prod
 export { default as OrderService } from './order/order.service';
 export { OrderInterface, default as OrderInterfaceMap } from './order/order';
 
+export { default as InventoryService } from './inventory/inventory.service';
+export { InventoryInterface, default as InventoryInterfaceMap } from './inventory/inventory';
+
 export const ResponseCode = {
   success: 'response.success',
   error: '服务器开了个小差',

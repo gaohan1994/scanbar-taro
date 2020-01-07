@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-31 14:44:15
+ * @Last Modified time: 2020-01-03 16:22:02
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -123,9 +123,13 @@ export declare namespace ProductCartInterface {
   type CHANGE_PRODUCT_VISIBLE = string;
   type PAYLOAD_ORDER = string;
   type PAYLOAD_REFUND = string;
+  type PAYLOAD_PURCHASE = string;
+  type PAYLOAD_MANAGE = string;
   type PAYLOAD_SORT = {
     PAYLOAD_ORDER: PAYLOAD_ORDER;
     PAYLOAD_REFUND: PAYLOAD_REFUND;
+    PAYLOAD_PURCHASE: PAYLOAD_PURCHASE;
+    PAYLOAD_MANAGE: PAYLOAD_MANAGE;
   };
 
   type ReducerInterface = {
@@ -185,6 +189,8 @@ class ProductSDK {
     PAYLOAD_SORT: {
       PAYLOAD_ORDER: 'PAYLOAD_ORDER',
       PAYLOAD_REFUND: 'PAYLOAD_REFUND',
+      PAYLOAD_PURCHASE: 'PAYLOAD_PURCHASE',
+      PAYLOAD_MANAGE: 'PAYLOAD_MANAGE',
     }
   };
   
@@ -255,6 +261,15 @@ class ProductSDK {
     this.erase = 0;
   }
 
+  public getSortDataKey = (sort?: string): string => {
+    const data = (sort && typeof sort === 'string') ? sort : this.sort;
+    return data === this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
+    ? 'productCartList'
+    : data === this.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND
+      ? 'productRefundList'
+      : 'productPurchaseList';
+  }
+
   /**
    * @todo 获取商品的数量
    *
@@ -264,13 +279,26 @@ class ProductSDK {
     products?: ProductCartInterface.ProductCartInfo[], 
     // sort: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
   ) => {
-    const key = this.sort === this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER ? 'productCartList' : 'productRefundList';
+    const key = this.getSortDataKey();
     const productList = products !== undefined 
       ? products 
       : store.getState().productSDK[key];
     const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.sellNum;
     const total = productList.reduce(reduceCallback, 0);
     return total;
+  }
+
+  /**
+   * @todo [拿到单个商品的价格，有改价返回改价，有会员价返回会员价，没有就原价]
+   */
+  public getProductItemPrice = (product: ProductCartInterface.ProductCartInfo) => {
+    if (product.changePrice !== undefined) {
+      return product.changePrice;
+    }
+    if (this.member !== undefined) {
+      return product.memberPrice || product.price;
+    }
+    return product.price;
   }
 
   /**
@@ -282,7 +310,7 @@ class ProductSDK {
     products?: ProductCartInterface.ProductCartInfo[],
     // sort: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
   ) => {
-    const key = this.sort === this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER ? 'productCartList' : 'productRefundList';
+    const key = this.getSortDataKey();
     const productList = products !== undefined ? products : store.getState().productSDK[key];
     const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => {
       /**
@@ -483,7 +511,8 @@ class ProductSDK {
     product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, 
     sellNum?: number, 
     suspension?: number,
-    sort: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
+    sort: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND | ProductCartInterface.PAYLOAD_PURCHASE 
+      = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
   ) => {
     Taro.showToast({
       title: '加入购物车'
@@ -556,17 +585,17 @@ class ProductSDK {
     }
   }
 
-  public empty = () => {
+  public empty = (sort?: string) => {
     store.dispatch({
       type: this.reducerInterface.MANAGE_EMPTY_CART,
-      payload: {}
+      payload: { sort }
     });
   }
 
   public manage = (params: ProductCartInterface.ProductSDKManageInterface) => {
     const { product, type, suspension, sort } = params;
     if (type === this.productCartManageType.EMPTY) {
-      this.empty();
+      this.empty(sort);
       return;
     }
     if (this.isWeighProduct(product)) {
@@ -621,14 +650,19 @@ class ProductSDK {
     });
   }
 
-  public changeProductVisible = (visible: boolean, product?: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo) => {
-    console.log('visible: ', visible);
+  public changeProductVisible = (
+    visible: boolean, 
+    product?: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, 
+    sort: string = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER,
+  ) => {
     console.log('product: ', product);
+    console.log('sort: ', sort);
     const reducer: ProductSDKReducer.Reducers.ChangeProductVisible = {
       type: this.reducerInterface.CHANGE_PRODUCT_VISIBLE,
       payload: { 
         visible,
         product,
+        sort,
       }
     };
     store.dispatch(reducer);

@@ -41,12 +41,17 @@
     &-detail {
       .margin(10px, l);
       display: flex;
-      width: @product-content-width;
-      height: @product-content-size;
+      flex: 1;
+      // width: @product-content-width;
+      // height: @product-content-size;
       flex-direction: column;
       justify-content: space-between;
       &-bar {
         .flex(center, flex-start, row);
+      }
+      &-box {
+        display: flex;
+        flex-direction: column;
       }
     }
     &-manage {
@@ -62,7 +67,7 @@
   }
 
   &-title {
-    width: @product-content-width;
+    // width: @product-content-width;
     font-size: @product-title-font;
     // line-height: @product-title-font + 4px;
     color: @product-title-color;

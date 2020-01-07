@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-25 14:42:37
+ * @Last Modified time: 2020-01-03 16:17:58
  * 
  * @todo [商品相关的类型定义]
  */
@@ -170,6 +170,7 @@ export declare namespace ProductInterface {
     productId: number;
     unitPrice: number;
     remark: string;
+    transAmount: number;
   }
 
   interface CashierRefund {

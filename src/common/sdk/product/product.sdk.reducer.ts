@@ -7,7 +7,7 @@ import merge from 'lodash.merge';
  * @Author: Ghan 
  * @Date: 2019-11-22 14:20:31 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-31 14:22:16
+ * @Last Modified time: 2020-01-03 16:03:35
  * @todo productsdk
  */
 export declare namespace ProductSDKReducer {
@@ -26,6 +26,8 @@ export declare namespace ProductSDKReducer {
     changeProduct?: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo;
     changeProductVisible: boolean;
     productRefundList: Array<ProductCartInterface.ProductCartInfo>;
+    productPurchaseList: Array<ProductCartInterface.ProductCartInfo>;
+    changeProductSort: string;
   }
 
   interface AddSuspensionCartPayload {
@@ -85,7 +87,8 @@ export declare namespace ProductSDKReducer {
     interface ChangeProductVisible {
       type: ProductCartInterface.CHANGE_PRODUCT_VISIBLE;
       payload: { 
-        visible: boolean,
+        visible: boolean;
+        sort: string;
         product?: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo;
       };
     }
@@ -130,10 +133,12 @@ const initState: ProductSDKReducer.State = {
   productCartList: [],
   productRefundList: [],
   suspensionCartList: [],
+  productPurchaseList: [],
   changeWeightProduct: {} as any,
   nonBarcodeProduct: {},
   changeProduct: {} as any,
   changeProductVisible: false,
+  changeProductSort: '',
 };
 
 export default function productSDKReducer (
@@ -143,19 +148,19 @@ export default function productSDKReducer (
   switch (action.type) {
     case productSdk.reducerInterface.CHANGE_PRODUCT_VISIBLE: {
       const { payload } = action as ProductSDKReducer.Reducers.ChangeProductVisible;
-      const { visible, product } = payload; 
+      const { visible, product, sort } = payload; 
       return {
         ...state,
         changeProductVisible: visible,
-        changeProduct: product
+        changeProduct: product,
+        changeProductSort: sort,
       };
     }
 
     case productSdk.reducerInterface.CHANGE_PRODUCT: {
       const { payload } = action as ProductSDKReducer.Reducers.ChangeProductAction;
       const { product, sellNum, changePrice, sort = productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER } = payload;
-      
-      const nextProductKey = sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER ? `productCartList` : `productRefundList`;
+      const nextProductKey = productSdk.getSortDataKey(sort);
       const index = state[nextProductKey].findIndex(p => p.id === product.id);
       if (index !== -1) {
         const nextList: ProductCartInterface.ProductCartInfo[] = merge([], state[nextProductKey]);
@@ -181,11 +186,11 @@ export default function productSDKReducer (
       if (typeof changePrice === 'number') {
         newProduct.changePrice = changePrice;
       }
-      const nextList = merge([], state.productCartList);
+      const nextList: ProductCartInterface.ProductCartInfo[] = merge([], state[nextProductKey]);
       nextList.push(newProduct);
       return {
         ...state,
-        productCartList: nextList
+        [`${nextProductKey}`]: nextList
       };
     }
 
@@ -264,9 +269,12 @@ export default function productSDKReducer (
       };
     }
     case productSdk.reducerInterface.MANAGE_EMPTY_CART: {
+      const { payload } = action;
+      const { sort = productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER } = payload;
+      const productKey = productSdk.getSortDataKey(sort);
       return {
         ...state,
-        productCartList: [],
+        [`${productKey}`]: [],
       };
     }
     case productSdk.reducerInterface.MANAGE_CART_PRODUCT: {
@@ -303,7 +311,8 @@ export default function productSDKReducer (
         };
       }
 
-      const nextProductKey = sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER ? `productCartList` : `productRefundList`;
+      const nextProductKey = productSdk.getSortDataKey(sort);
+      console.log('nextProductKey: ', nextProductKey);
       const productCartList: Array<ProductCartInterface.ProductCartInfo> = merge([], state[nextProductKey]);
       const index = productCartList.findIndex(p => p.id === product.id);
       if (type === productSdk.productCartManageType.ADD) {
@@ -446,3 +455,5 @@ export const getChangeProductVisible = (state: AppReducer.AppState) => state.pro
 export const getChangeProduct = (state: AppReducer.AppState) => state.productSDK.changeProduct;
 
 export const getProductRefundList = (state: AppReducer.AppState) => state.productSDK.productRefundList;
+
+export const getProductPurchaseList = (state: AppReducer.AppState) => state.productSDK.productPurchaseList;

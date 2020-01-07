@@ -38,13 +38,13 @@ const NavItems = [
     image: '//net.huanmusic.com/weapp/icon_menu_procurement1.png',
     value: '采购',
     subTitle: 'Procurement',
-    url: '/pages/',
+    url: '/pages/inventory/inventory.list',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_inventory1.png',
-    value: '盘点',
+    value: '进货',
     subTitle: 'inventory',
-    url: '/pages/',
+    url: '/pages/inventory/inventory.main',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_more.png',
@@ -109,7 +109,6 @@ class Home extends Component {
    */
   public onNavHandle = (item: any) => {
     if (
-      item.value === '采购' ||
       item.value === '盘点' ||
       item.value === '更多'
     ) {

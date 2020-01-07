@@ -1,6 +1,6 @@
 import Taro from '@tarojs/taro';
 import { View } from '@tarojs/components';
-import { getProductRefundList } from '../../common/sdk/product/product.sdk.reducer';
+import { getProductPurchaseList } from '../../common/sdk/product/product.sdk.reducer';
 import { connect } from '@tarojs/redux';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import "../../component/card/form.card.less";
@@ -13,62 +13,58 @@ import { FormRowProps } from '../../component/card/form.row';
 import invariant from 'invariant';
 import numeral from 'numeral';
 import ProductPayListView from '../../component/product/product.pay.listview';
-import { ProductService, ProductInterface, ResponseCode } from '../../constants';
+import { ResponseCode, InventoryInterface, ProductInterface } from '../../constants';
+import { InventoryAction, ProductAction } from '../../actions';
+import { getProductSupplier } from '../../reducers/app.product';
 
 const cssPrefix = 'product';
 
 type Props = { 
-  productRefundList: ProductCartInterface.ProductCartInfo[];
+  productPurchaseList: ProductCartInterface.ProductCartInfo[];
+  productSupplier: ProductInterface.ProductSupplier[];
 };
 
-class ProductRefundPay extends Taro.Component<Props> {
+class InventoryPay extends Taro.Component<Props> {
 
   componentDidMount() {
+    ProductAction.productInfoSupplier();
     productSdk.setSort(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND);
   }
 
-  public onRefundHandle = async () => {
+  /**
+   * @todo [进货]
+   * @todo [进货成功之后toast，1秒之后跳转到这次进货详情页面]
+   *
+   * @memberof InventoryPay
+   */
+  public onPayHandle = async () => {
     try {
-      const { productRefundList } = this.props;
       Taro.showLoading();
-      const payload: ProductInterface.CashierRefund = {
-        order: {
-          memberId: null as any,
-          orderNo: null as any,
-          orderSource: 1,
-          payType: 0,
-          terminalCd: '-1',
-          terminalSn: '-1',
-          totalAmount: productSdk.getProductMemberPrice(),
-          totalNum: productSdk.getProductNumber(),
-          transAmount: productSdk.getProductTransPrice(),
-        },
-        productInfoList: productRefundList.map((product) => {
-          return {
-            changeNumber: product.sellNum,
-            productId: product.id,
-            unitPrice: product.unitPrice || 0,
-            remark: product.remark || '',
-            transAmount: product.sellNum * productSdk.getProductItemPrice(product)
-          };
-        }),
+      const { productPurchaseList, productSupplier } = this.props;
+      const products = InventoryAction.getProductPayload(productPurchaseList);
+      const payload: InventoryInterface.Interfaces.StockAdd = {
+        productList: products,
+        supplierId: productSupplier[0].id,
       };
-      const result = await ProductService.cashierRefund(payload);
-      Taro.hideLoading();
+      const result = await InventoryAction.stockAdd(payload);
       invariant(result.code === ResponseCode.success, result.msg || ' ');
-      Taro.showToast({
-        title: '退款成功！', 
-        duration: 1000,
-        success: () => {
-          setTimeout(() => {
-            Taro.navigateBack({delta: 10});  
-          }, 1000);
-        }
+      Taro.showToast({ 
+        title: '进货成功', 
+        icon: 'success',
+        duration: 10000
       });
+      if (result.data.businessNumber) {
+        setTimeout(() => {
+          Taro.redirectTo({
+            url: `/pages/inventory/inventory.purchase.detail?id=${result.data.businessNumber}&entry='inventory'`
+          });  
+        }, 1000);        
+      }
     } catch (error) {
+      Taro.hideLoading();
       Taro.showToast({
-        title: error.message,
-        icon: 'none'
+        icon: 'none',
+        title: error.message
       });
     }
   }
@@ -90,18 +86,18 @@ class ProductRefundPay extends Taro.Component<Props> {
   }
 
   private renderFooter = () => {
-    const { productRefundList } = this.props;
+    const { productPurchaseList } = this.props;
     return (
       <View className={`${cssPrefix}-pay-footer`}>
         <View className={`${cssPrefix}-pay-footer-bg`}>
           <View
             className={classnames(`${cssPrefix}-pay-footer-right`, {
-              [`${cssPrefix}-pay-footer-right-active`]: productRefundList.length > 0,
-              [`${cssPrefix}-pay-footer-right-disabled`]: productRefundList.length === 0,
+              [`${cssPrefix}-pay-footer-right-active`]: productPurchaseList.length > 0,
+              [`${cssPrefix}-pay-footer-right-disabled`]: productPurchaseList.length === 0,
             })}
-            onClick={() => this.onRefundHandle()}
+            onClick={() => this.onPayHandle()}
           >
-            退款￥{this.setNumber(numeral(productSdk.getProductTransPrice()).value())}
+            结算￥{this.setNumber(numeral(productSdk.getProductTransPrice()).value())}
           </View>
         </View>
       </View>
@@ -109,10 +105,10 @@ class ProductRefundPay extends Taro.Component<Props> {
   }
 
   private renderListProductCard = () => {
-    const { productRefundList } = this.props;
+    const { productPurchaseList } = this.props;
     return (
       <ProductPayListView
-        productList={productRefundList}
+        productList={productPurchaseList}
       />
     );
   }
@@ -150,7 +146,8 @@ class ProductRefundPay extends Taro.Component<Props> {
 }
 
 const select = (state: any) => ({
-  productRefundList: getProductRefundList(state),
+  productPurchaseList: getProductPurchaseList(state),
+  productSupplier: getProductSupplier(state),
 });
 
-export default connect(select)(ProductRefundPay);
+export default connect(select)(InventoryPay);

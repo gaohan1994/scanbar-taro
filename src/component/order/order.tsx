@@ -1,5 +1,5 @@
 import Taro from '@tarojs/taro';
-import { View, Text } from '@tarojs/components';
+import { View } from '@tarojs/components';
 import './order.less';
 import { OrderInterface } from '../../constants';
 import numeral from 'numeral';
@@ -13,6 +13,10 @@ type Props = {
 type State = {};
 
 class OrderItem extends Taro.Component<Props, State> {
+
+  static defaultProps = {
+    data: {}
+  };
 
   public onClickOrder = (order: OrderInterface.OrderDetail) => {
     Taro.navigateTo({url: `/pages/order/order.detail?id=${order.order.orderNo}`});
@@ -35,24 +39,11 @@ class OrderItem extends Taro.Component<Props, State> {
         )}
         
         <View className={`${cssPrefix}-right`}>
-          <View className={`${cssPrefix}-price`}>{`￥ ${numeral(data.order.transAmount || 0).format('0.00')}`}</View>
+          <View className={`${cssPrefix}-price`}>{`￥ ${numeral(data.order && data.order.transAmount || 0).format('0.00')}`}</View>
         </View>
       </View>
     );
   }
-
-  // private renderImage = () => {
-  //   const { data } = this.props;
-  //   // 0=现金,1=支付宝主扫,2=微信主扫,3=支付宝被扫,4微信被扫,5=银行卡,6=刷脸
-  //   switch (data.order.payType) {
-  //     case 0: {
-  //       return <Image src="" />;
-  //     }
-  //     default: {
-  //       return <View/>;
-  //     }
-  //   }
-  // }
 }
 
 export default OrderItem;

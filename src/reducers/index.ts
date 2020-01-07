@@ -4,6 +4,7 @@ import member, { MemberReducer } from './app.member';
 import product, { ProductReducer } from './app.product';
 import pay, { PayReducer } from './app.pay';
 import order, { OrderReducer } from './app.order';
+import inventory, { InventoryReducer } from './app.inventory';
 import productSDK, { ProductSDKReducer } from '../common/sdk/product/product.sdk.reducer';
 
 export declare namespace AppReducer {
@@ -13,6 +14,7 @@ export declare namespace AppReducer {
     productSDK: ProductSDKReducer.State;
     pay: PayReducer.State;
     order: OrderReducer.State;
+    inventory: InventoryReducer.State;
   }
 }
 
@@ -23,4 +25,5 @@ export default combineReducers({
   productSDK,
   pay,
   order,
+  inventory,
 });

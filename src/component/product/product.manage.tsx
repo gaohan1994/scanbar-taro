@@ -2,10 +2,16 @@ import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import './product.less';
 import { ProductInterface } from '../../constants';
+import { connect } from '@tarojs/redux';
+import { AppReducer } from '../../reducers';
+import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
+import classnames from 'classnames';
 
 const cssPrefix = 'component-product';
 interface Props { 
   product: ProductInterface.ProductInfo;
+  productInCart?: ProductCartInterface.ProductCartInfo;
+  sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
 }
 
 class ProductManageComponent extends Taro.Component<Props> {
@@ -18,7 +24,7 @@ class ProductManageComponent extends Taro.Component<Props> {
   }
 
   render () {
-    const { product } = this.props;
+    const { product, sort } = this.props;
     return (
       <View 
         className={`${cssPrefix}-manage ${cssPrefix}-border`}
@@ -32,7 +38,7 @@ class ProductManageComponent extends Taro.Component<Props> {
               <Image src="//net.huanmusic.com/weapp/img_nolist.png" className={`${cssPrefix}-content-cover-image`} />
             )}
           </View>
-          <View className={`${cssPrefix}-content-manage`}>
+          <View className={`${cssPrefix}-content-detail`}>
             <Text className={`${cssPrefix}-title ${cssPrefix}-title-manage`}>{product.name}</Text>
             <View className={`${cssPrefix}-manage-detail`}>
               <Text className={`${cssPrefix}-manage-font`}>进价: ￥{product.cost}</Text>
@@ -42,13 +48,39 @@ class ProductManageComponent extends Taro.Component<Props> {
             </View>
           </View>
 
-          <View className={`${cssPrefix}-manage-corner`}>
-            <Text className={`${cssPrefix}-manage-font`}>库存: {product.number}{product.unit}</Text>
-          </View>
+          {this.renderCorner()}
         </View>
+      </View>
+    );
+  }
+
+  private renderCorner = () => {
+    const { product, sort } = this.props;
+    if (sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE) {
+      return (
+        <View className={`${cssPrefix}-manage-corner`}>
+          stepper
+        </View>
+      );
+    }
+
+    return (
+      <View className={`${cssPrefix}-manage-corner`}>
+        <Text className={`${cssPrefix}-manage-font`}>库存: {product.number}{product.unit}</Text>
       </View>
     );
   }
 }
 
-export default ProductManageComponent;
+const select = (state: AppReducer.AppState, ownProps: Props) => {
+  const { product, sort } = ownProps;
+  const productKey = productSdk.getSortDataKey(sort);
+  const productList = state.productSDK[productKey];
+  const productInCart = product !== undefined && productList.find(p => p.id === product.id);
+  return {
+    product,
+    productInCart,
+  };
+};
+
+export default connect(select)(ProductManageComponent as any);
