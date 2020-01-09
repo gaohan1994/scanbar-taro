@@ -14,6 +14,7 @@ import invariant from 'invariant';
 import numeral from 'numeral';
 import ProductPayListView from '../../component/product/product.pay.listview';
 import { ProductService, ProductInterface, ResponseCode } from '../../constants';
+import { InventoryAction } from '../../actions';
 
 const cssPrefix = 'product';
 
@@ -40,8 +41,8 @@ class ProductRefundPay extends Taro.Component<Props> {
           terminalCd: '-1',
           terminalSn: '-1',
           totalAmount: productSdk.getProductMemberPrice(),
-          totalNum: productSdk.getProductNumber(),
-          transAmount: productSdk.getProductTransPrice(),
+          // totalNum: productSdk.getProductNumber(),
+          // transAmount: productSdk.getProductTransPrice(),
         },
         productInfoList: productRefundList.map((product) => {
           return {
@@ -49,7 +50,7 @@ class ProductRefundPay extends Taro.Component<Props> {
             productId: product.id,
             unitPrice: product.unitPrice || 0,
             remark: product.remark || '',
-            transAmount: product.sellNum * productSdk.getProductItemPrice(product)
+            // transAmount: product.sellNum * productSdk.getProductItemPrice(product)
           };
         }),
       };
@@ -61,6 +62,7 @@ class ProductRefundPay extends Taro.Component<Props> {
         duration: 1000,
         success: () => {
           setTimeout(() => {
+            InventoryAction.stockSuccessCallback(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND);
             Taro.navigateBack({delta: 10});  
           }, 1000);
         }

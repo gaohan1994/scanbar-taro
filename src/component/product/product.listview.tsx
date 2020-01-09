@@ -51,22 +51,7 @@ class ProductListView extends Taro.Component<Props> {
                   <ProductComponent
                     product={product}
                     sort={sort}
-                  />  
-                  {/* {
-                    sort !== productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE
-                    ? (
-                      <ProductComponent
-                        product={product}
-                        sort={sort}
-                      />  
-                    )
-                    : (
-                      <ProductManageComponent
-                        product={product}
-                        sort={sort}
-                      />
-                    )
-                  } */}
+                  /> 
                 </View>
               );
             })

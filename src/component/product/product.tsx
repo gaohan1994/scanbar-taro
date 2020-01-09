@@ -118,13 +118,19 @@ class ProductComponent extends Taro.Component<Props, State> {
             )}
           </View>
         )
-        : (
-          <Text className={`${cssPrefix}-normal`}>
-            <Text className={`${cssPrefix}-price-bge`}>￥</Text>
-            <Text className={`${cssPrefix}-price`}>{product.price}</Text>
-            {` /${product.unit || '个'}`}
-          </Text>
-        )}
+        : sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK
+          ? (
+            <Text className={`${cssPrefix}-normal`}>
+              <Text className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>{`库存：${product.number}${product.unit || '个'}`}</Text>
+            </Text>
+          )
+          : (
+            <Text className={`${cssPrefix}-normal`}>
+              <Text className={`${cssPrefix}-price-bge`}>￥</Text>
+              <Text className={`${cssPrefix}-price`}>{product.price}</Text>
+              {` /${product.unit || '个'}`}
+            </Text>
+          )}
       </View>
     );
   }
@@ -141,15 +147,15 @@ class ProductComponent extends Taro.Component<Props, State> {
     }
 
     if (
-      sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE || 
-      sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND
+      sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE ||
+      sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK
     ) {
       return (
-        <View className={`${cssPrefix}-stepper`}>
-          {productInCart !== undefined ? (
-            <View>{productInCart.sellNum}</View>
-          ) : (
-            <View>未加入购物车</View>
+        <View className={`${cssPrefix}-stepper ${cssPrefix}-stepper-purchase`}>
+          {productInCart !== undefined && (
+            <Text>
+            +{productInCart.sellNum}
+            </Text>
           )}
         </View>
       );

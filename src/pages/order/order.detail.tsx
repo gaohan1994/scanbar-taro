@@ -8,11 +8,12 @@ import { OrderAction } from '../../actions';
 import invariant from 'invariant';
 import { ResponseCode, OrderInterface } from '../../constants/index';
 import { getOrderDetail } from '../../reducers/app.order';
-import FormRow, { FormRowProps } from '../../component/card/form.row';
+import { FormRowProps } from '../../component/card/form.row';
 import FormCard from '../../component/card/form.card';
 import numeral from 'numeral';
-import classnames from 'classnames';
-import { AtButton } from 'taro-ui';
+import ProductPayListView from '../../component/product/product.pay.listview';
+import { ProductCartInterface } from 'src/common/sdk/product/product.sdk';
+import ButtonFooter from '../../component/button/button.footer';
 
 const cssPrefix = 'order';
 
@@ -78,16 +79,12 @@ class OrderDetail extends Taro.Component<Props, State> {
 
   private renderButtons = () => {
     return (
-      <View className={`product-add-buttons`}>
-        <View style="width: 100%">
-          <AtButton 
-            className="theme-button"
-            onClick={() => {}}
-          >
-            退货
-          </AtButton>
-        </View>
-      </View>
+      <ButtonFooter
+        buttons={[{
+          title: "退货",
+          onPress: () => {},
+        }]}
+      />
     );
   }
 
@@ -181,12 +178,7 @@ class OrderDetail extends Taro.Component<Props, State> {
         {/* {memberForm && (
           <FormCard items={memberForm} />
         )} */}
-        {orderDetail.orderDetailList && (
-          <FormCard>
-            <FormRow title="商品详情" />
-            {this.renderList()}
-          </FormCard>
-        )}
+        {this.renderList()}
         <View className={`${cssPrefix}-area`} />
       </View>
     );
@@ -194,29 +186,23 @@ class OrderDetail extends Taro.Component<Props, State> {
 
   private renderList = () => {
     const { orderDetail } = this.props;
-    const cssPrefix = 'product';
-
-    return orderDetail.orderDetailList && orderDetail.orderDetailList.map((item, index) => {
+    if (orderDetail.orderDetailList) {
+      const productList: ProductCartInterface.ProductCartInfo[] = orderDetail.orderDetailList.map((item) => {
+        return {
+          id: item.productId,
+          name: item.productName,
+          price: item.transAmount / item.num,
+          sellNum: item.num,
+        } as any;
+      });
       return (
-        <View 
-          key={item.orderNo}
-          className={classnames(`${cssPrefix}-row ${cssPrefix}-row-content`, {
-            [`${cssPrefix}-row-border`]: index !== ((orderDetail.orderDetailList as any).length - 1)
-          })}
-        >
-          <View className={`${cssPrefix}-row-content-item`}>
-            <Text className={`${cssPrefix}-row-name`}>{item.productName}</Text>
-            <Text className={`${cssPrefix}-row-normal`}>{`x ${item.num}`}</Text>
-          </View>
-          <View className={`${cssPrefix}-row-content-item ${cssPrefix}-row-content-top`}>
-            <Text className={`${cssPrefix}-row-normal`}>{`￥ 没有该字段`}</Text>
-            <Text className={`${cssPrefix}-row-normal`}>
-              {`小计：￥ ${numeral(item.transAmount).format('0.00')}`}
-            </Text>
-          </View>
-        </View>
+        <ProductPayListView
+          padding={false}
+          productList={productList}
+        />
       );
-    });
+    }
+    return <View />;
   }
 }
 

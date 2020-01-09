@@ -12,6 +12,10 @@ export declare namespace InventoryInterface {
   interface InventoryProductDetail {
     changedNumber: number;
     cost: number;
+    itemCost: number;
+    itemPrice: number;
+    unit: string;
+    perCost: number;
     flag: number;
     id: number;
     merchantId: number;
@@ -72,11 +76,15 @@ export declare namespace InventoryInterface {
     reducerInterface: {
       RECEIVE_PURCHASE_INVENTORY_LIST: string;
       RECEIVE_PURCHASE_STOCK_DETAIL: string;
+      RECEIVE_MERCHANT_STOCK_LIST: string;
+      RECEIVE_MERCHANT_STOCK_DETIAL: string;
     };
     stockCheck: string;
     stockAdd: string;
     stockList: string;
+    merchantStockList: string;
     stockDetail: (id: string) => string;
+    merchantStockDetail: (id: string) => string;
   }
 }
 
@@ -85,11 +93,15 @@ class InventoryInterfaceMap implements InventoryInterface.InventoryInterfaceMap 
   public reducerInterface = {
     RECEIVE_PURCHASE_INVENTORY_LIST: 'RECEIVE_PURCHASE_INVENTORY_LIST',
     RECEIVE_PURCHASE_STOCK_DETAIL: 'RECEIVE_PURCHASE_STOCK_DETAIL',
+    RECEIVE_MERCHANT_STOCK_LIST: 'RECEIVE_MERCHANT_STOCK_LIST',
+    RECEIVE_MERCHANT_STOCK_DETIAL: 'RECEIVE_MERCHANT_STOCK_DETIAL',
   };
 
-  public stockCheck = '/purchase/stock/check';
   public stockAdd = '/purchase/stock/receive/add';
   public stockList = '/purchase/stock/list';
+  public stockCheck = '/merchant/stock/check';
+  public merchantStockList = '/merchant/stock/list';
+  public merchantStockDetail = (id: string) => `/merchant/stock/detail/${id}`;
   public stockDetail = (id: string) => `/purchase/stock/detail/${id}`;
 }
 

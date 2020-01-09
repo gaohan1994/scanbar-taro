@@ -44,6 +44,10 @@ class App extends Component {
           'inventory.pay',
           'inventory.purchase.detail',
           'inventory.list',
+          'inventory.stock',
+          'inventory.stock.detail',
+          'inventory.stock.pay',
+          'inventory.stock.list',
         ]
       },
       {

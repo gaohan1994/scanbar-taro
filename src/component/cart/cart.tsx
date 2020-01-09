@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-03 16:07:04
+ * @Last Modified time: 2020-01-09 11:57:40
  * 
  * @todo [购物车组件]
  */
@@ -13,17 +13,15 @@ import "../product/product.less";
 import classnames from 'classnames';
 import { AppReducer } from '../../reducers';
 import { 
-  getProductCartList, 
   getChangeWeigthProduct, 
   getNonBarcodeProduct,
   getChangeProductVisible,
   getChangeProduct,
-  getProductRefundList,
 } from '../../common/sdk/product/product.sdk.reducer';
 import { connect } from '@tarojs/redux';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import Modal from '../modal/modal';
-import { ProductInterface, ProductService } from '../../constants';
+import { ProductInterface, ProductService, ProductInterfaceMap } from '../../constants';
 import numeral from 'numeral';
 import merge from 'lodash.merge';
 import invariant from 'invariant';
@@ -31,6 +29,8 @@ import CartLayout from './cart.layout';
 import Badge from '../badge/badge';
 import { ResponseCode } from '../../constants/index';
 import { ModalInput } from '../modal/modal';
+import { getSelectProduct } from '../../reducers/app.product';
+import { store } from '../../app';
 
 const cssPrefix = 'cart';
 
@@ -39,6 +39,7 @@ interface CartBarProps {
   changeWeightProduct: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo;
   nonBarcodeProduct: Partial<ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo>;
   changeProductVisible: boolean;
+  selectProduct?: ProductInterface.ProductInfo;
   changeProduct?: ProductCartInterface.ProductCartInfo;
   sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
 }
@@ -88,8 +89,25 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
   }
 
   componentDidShow () {
-    const { sort } = this.props;
+    const { sort, selectProduct } = this.props;
     productSdk.setSort(sort);
+
+    /**
+     * @todo [尝试添加一个全局入口：增加商品回调之后在购物车内执行，需要真机测试还未验证01.08]
+     */
+    if (selectProduct !== undefined) {
+      productSdk.manage({
+        type: productSdk.productCartManageType.ADD,
+        product: selectProduct,
+        sort: sort,
+      });
+      setTimeout(() => {
+        store.dispatch({
+          type: ProductInterfaceMap.reducerInterfaces.SET_SELECT_PRODUCT,
+          payload: { selectProduct: undefined }
+        });
+      }, 100);
+    }
   }
 
   /**
@@ -148,6 +166,12 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
         });
         return;
       }
+      if (sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK) {
+        Taro.navigateTo({
+          url: `/pages/inventory/inventory.stock.pay`
+        });
+        return;
+      }
       return;
     } else {
       Taro.showToast({
@@ -160,7 +184,14 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
 
   public setText = (): string => {
     const { sort } = this.props;
-    return sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND ? '退货' : '结算';
+    switch (sort) {
+      case productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND: {
+        return '退货';
+      }
+      default: {
+        return '结算';
+      }
+    }
   }
 
   public emptyCart = () => {
@@ -246,21 +277,11 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     if (changeSellNum === '' && changePrice === '') {
       return;
     }
-    console.log('this.props: ', this.props);
     productSdk.changeProduct(changeProduct as any, Number(changeSellNum), Number(changePrice), sort);
     productSdk.changeProductVisible(false, undefined);
   }
 
   render () {
-    const { productCartList } = this.props;
-    const buttonClassNames = classnames(
-      'cart-right',
-      {
-        'cart-right-active': productCartList.length > 0,
-        'cart-right-disabled': productCartList.length === 0,
-      }
-    );
-
     return (
       <View>
         {this.renderContent()}
@@ -270,47 +291,97 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
         <View className="cart">
           <View className="cart-bg">
             {this.renderScan()}
-            {
-              productCartList.length > 0 
-              ? (
-                <View 
-                  className="cart-icon"
-                  onClick={() => this.onChangeCartListVisible()}
-                >
-                  <Badge 
-                    value={productSdk.getProductNumber(undefined)}
-                    className="component-cart-bge"
-                  >
-                    <Image src="//net.huanmusic.com/weapp/icon_cart(1).png" className="cart-icon-image" />
-                  </Badge>
-                </View>
-              )
-              : (
-                <Image 
-                  src="//net.huanmusic.com/weapp/icon_cart_unselected.png" 
-                  className="cart-icon-image cart-icon" 
-                  onClick={() => this.onChangeCartListVisible()}
-                />
-              )
-            }
-            <View className="cart-left">
-              <View 
-                className={classnames(`${cssPrefix}-left-price`, {
-                  [`${cssPrefix}-left-price-active`]: productCartList.length > 0,
-                  [`${cssPrefix}-left-price-disabled`]: productCartList.length === 0,
-                })}
-              >
-                ￥{numeral(productSdk.getProductPrice(undefined)).format('0.00')}
-              </View>
-            </View>
-            <View 
-              className={buttonClassNames}
-              onClick={() => this.onPayHandle()}
-            >
-              {this.setText()}
-            </View>
+            {this.renderCartLeft()}
+            {this.renderCartRight()}  
           </View>
         </View>
+      </View>
+    );
+  }
+
+  private renderCartLeft = () => {
+    const { productCartList, sort } = this.props;
+    
+    if (sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE) {
+      return (
+        <View 
+          className={`cart-left-purchase`}
+          onClick={() => this.onChangeCartListVisible()}
+        >
+          <View>
+            {`${productCartList.length}种，${productSdk.getProductNumber(undefined)}件 ^`}
+          </View>
+          <View>
+            {`合计 ￥${numeral(productSdk.getProductPrice()).format('0.00')}`}
+          </View>
+        </View>
+      );
+    }
+    if (sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK) {
+      return (
+        <View 
+          className={`cart-left-purchase`}
+          onClick={() => this.onChangeCartListVisible()}
+        >
+          <View>
+            {`${productCartList.length}种`}
+          </View>
+          <View>
+            {`盈亏 ￥${numeral(productSdk.getProductPrice()).format('0.00')}`}
+          </View>
+        </View>
+      );
+    }
+    return (
+      <View style="width: 100%; height: 100%">
+        {
+          productCartList.length > 0 
+          ? (
+            <View 
+              className="cart-icon"
+              onClick={() => this.onChangeCartListVisible()}
+            >
+              <Badge 
+                value={productSdk.getProductNumber(undefined)}
+                className="component-cart-bge"
+              >
+                <Image src="//net.huanmusic.com/weapp/icon_cart(1).png" className="cart-icon-image" />
+              </Badge>
+            </View>
+          )
+          : (
+            <Image 
+              src="//net.huanmusic.com/weapp/icon_cart_unselected.png" 
+              className="cart-icon-image cart-icon" 
+              onClick={() => this.onChangeCartListVisible()}
+            />
+          )
+        }
+        <View className="cart-left">
+          <View 
+            className={classnames(`${cssPrefix}-left-price`, {
+              [`${cssPrefix}-left-price-active`]: productCartList.length > 0,
+              [`${cssPrefix}-left-price-disabled`]: productCartList.length === 0,
+            })}
+          >
+            ￥{numeral(productSdk.getProductPrice()).format('0.00')}
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  private renderCartRight = () => {
+    const { productCartList } = this.props;
+    return (
+      <View 
+        className={classnames('cart-right', {
+          ['cart-right-active']: productCartList.length > 0,
+          ['cart-right-disabled']: productCartList.length === 0,
+        })}
+        onClick={() => this.onPayHandle()}
+      >
+        {this.setText()}
       </View>
     );
   }
@@ -328,12 +399,12 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
 
   private renderContent = () => {
     const { cartListVisible } = this.state;
-    const { productCartList } = this.props;
+    const { productCartList, sort } = this.props;
     return (
       <CartLayout
         isOpened={cartListVisible}
         title={`已选择商品（${productSdk.getProductNumber(undefined) || 0}）`}
-        titleRight={'清空购物车'}
+        titleRight={sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER ? '清空购物车' : '清空'}
         titleRightIcon="//net.huanmusic.com/weapp/icon_empty.png"
         titleRightClick={() => this.emptyCart()}
         onClose={() => this.onChangeCartListVisible(false)}
@@ -351,17 +422,30 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                       <Text className={`${cssPrefix}-product-container-price`}>{`￥ ${product.changePrice || product.price}`}</Text>
                       {` /${product.unit}`}
                     </Text>
-                    <View className={`${cssPrefix}-product-stepper`}>      
-                      <View 
-                        className={classnames(`component-product-stepper-button`, `component-product-stepper-button-reduce`)}
-                        onClick={() => this.manageProduct(productSdk.productCartManageType.REDUCE, product)}
-                      />
-                      <Text className={`component-product-stepper-text`}>{product.sellNum}</Text>
-                      <View 
-                        className={classnames(`component-product-stepper-button`, `component-product-stepper-button-add`)}
-                        onClick={() => this.manageProduct(productSdk.productCartManageType.ADD, product)}
-                      />  
-                    </View>
+                    {
+                      (sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER || sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND)
+                        ? (
+                          <View className={`${cssPrefix}-product-stepper`}>      
+                            <View 
+                              className={classnames(`component-product-stepper-button`, `component-product-stepper-button-reduce`)}
+                              onClick={() => this.manageProduct(productSdk.productCartManageType.REDUCE, product)}
+                            />
+                            <Text className={`component-product-stepper-text`}>{product.sellNum}</Text>
+                            <View 
+                              className={classnames(`component-product-stepper-button`, `component-product-stepper-button-add`)}
+                              onClick={() => this.manageProduct(productSdk.productCartManageType.ADD, product)}
+                            />  
+                          </View>
+                        )
+                        : (
+                          <View 
+                            className={`${cssPrefix}-product-stepper`}
+                            onClick={() => this.onChangeProductShow(product)}
+                          >      
+                            {product.sellNum}
+                          </View>
+                        )
+                    }
                   </View>
                 </View>
               </View>
@@ -488,28 +572,50 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     productSdk.closeWeightModal();
   }
 
+  private onChangeProductShow = (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo) => {
+    const { sort } = this.props;
+    productSdk.changeProductVisible(true, product, sort);
+  }
+
   private onChangeProductClose = () => {
     productSdk.changeProductVisible(false);
   }
 
   private renderChangeProductModal = () => {
     const { changePrice, changeSellNum } = this.state;
-    const { changeProductVisible } = this.props;
-    const inputs: ModalInput[] = [
-      {
-        title: '数量',
-        value: changeSellNum,
-        type: "digit",
-        onInput: ({detail: {value}}) => this.onChangeValue('changeSellNum', value)
-        // inputValue: 
-      },
-      {
-        title: '价格',
-        value: changePrice,
-        type: 'digit',
-        onInput: ({detail: {value}}) => this.onChangeValue('changePrice', value)
-      },
-    ];
+    const { changeProductVisible, sort, changeProduct } = this.props;
+    let inputs: ModalInput[] = [];
+    switch (sort) {
+      case productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK: {
+        inputs = [
+          {
+            title: '盘点数量',
+            value: changeSellNum,
+            type: "digit",
+            onInput: ({detail: {value}}) => this.onChangeValue('changeSellNum', value),
+            placeholder: '请输入盘点数量',
+          },
+        ];
+        break;
+      }
+      default: {
+        inputs = [
+          {
+            title: '数量',
+            value: changeSellNum,
+            type: "digit",
+            onInput: ({detail: {value}}) => this.onChangeValue('changeSellNum', value)
+          },
+          {
+            title: '价格',
+            value: changePrice,
+            type: 'digit',
+            onInput: ({detail: {value}}) => this.onChangeValue('changePrice', value)
+          },
+        ];
+        break;
+      }
+    }
     const buttons = [
       {
         title: '取消',
@@ -524,7 +630,10 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     ];
     return (
       <Modal
-        header="商品改价"
+        header={sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE ||
+          sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK
+          ? `${changeProduct && changeProduct.name || ''}`
+          : "商品改价"}
         isOpened={changeProductVisible}
         onClose={() => this.onChangeProductClose()}
         inputs={inputs}
@@ -589,6 +698,7 @@ const select = (state: AppReducer.AppState, ownProps: CartBarProps) => {
     nonBarcodeProduct: getNonBarcodeProduct(state),
     changeProductVisible: getChangeProductVisible(state),
     changeProduct: getChangeProduct(state),
+    selectProduct: getSelectProduct(state),
   };
 };
 

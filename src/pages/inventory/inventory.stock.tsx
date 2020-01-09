@@ -2,9 +2,9 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-08 09:39:12
+ * @Last Modified time: 2020-01-08 15:44:10
  * 
- * @todo 进货
+ * @todo 盘点
  */
 import Taro from '@tarojs/taro';
 import { View } from '@tarojs/components';
@@ -50,7 +50,7 @@ type State = {
   loading: boolean;
 };
 
-class InventoryMain extends Taro.Component<Props> {
+class InventoryStock extends Taro.Component<Props, State> {
 
   readonly state: State = {
     currentType: {
@@ -61,8 +61,9 @@ class InventoryMain extends Taro.Component<Props> {
     searchValue: '',
     loading: false,
   };
-  
+
   componentDidShow () {
+    productSdk.setSort(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK);
     this.init();
   }
 
@@ -81,20 +82,6 @@ class InventoryMain extends Taro.Component<Props> {
       const { data } = productTypeResult;
       const firstType = data[0] || {};
       this.changeCurrentType(firstType);
-
-      const { selectProduct } = this.props;
-      if (selectProduct !== undefined) {
-        productSdk.manage({
-          type: productSdk.productCartManageType.ADD,
-          product: selectProduct
-        });
-        setTimeout(() => {
-          store.dispatch({
-            type: ProductInterfaceMap.reducerInterfaces.SET_SELECT_PRODUCT,
-            payload: { selectProduct: undefined }
-          });
-        }, 100);
-      }
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -153,7 +140,7 @@ class InventoryMain extends Taro.Component<Props> {
       this.searchData();
     });
   }
-  
+
   render () {
     const { searchValue } = this.state;
     return (
@@ -169,7 +156,7 @@ class InventoryMain extends Taro.Component<Props> {
         <View className={`${cssPrefix}-list-container`}>
           {this.renderList()}
         </View>
-        <CartBar sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE} />
+        <CartBar sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK} />
       </View>
     );
   }
@@ -184,7 +171,7 @@ class InventoryMain extends Taro.Component<Props> {
             loading={loading}
             productList={productList}
             className={`${cssPrefix}-list-right-container ${cssPrefix}-list-right-container-inventory`}
-            sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE}
+            sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK}
           />
         </View>
       );
@@ -194,7 +181,7 @@ class InventoryMain extends Taro.Component<Props> {
         <ProductListView
           productList={pureProductSearchList}
           className={`${cssPrefix}-list-right-container-search`}
-          sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE}
+          sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK}
         />
       </View>
     );
@@ -203,7 +190,6 @@ class InventoryMain extends Taro.Component<Props> {
 
 const mapState = (state: AppReducer.AppState) => {
   const productList = getProductList(state) || [];
-
   const productSearchList = getProductSearchList(state) || [];
   const pureProductSearchList: any[] = productSearchList;
   const selectProduct: any = getSelectProduct(state);
@@ -217,4 +203,4 @@ const mapState = (state: AppReducer.AppState) => {
   };
 };
 
-export default connect(mapState)(InventoryMain);
+export default connect(mapState)(InventoryStock);

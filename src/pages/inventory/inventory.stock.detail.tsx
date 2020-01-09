@@ -1,7 +1,7 @@
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import { AppReducer } from '../../reducers';
-import { getInventoryStockDetail } from '../../reducers/app.inventory';
+import { getMerchantStockDetail } from '../../reducers/app.inventory';
 import { connect } from '@tarojs/redux';
 import { InventoryInterface } from '../../constants';
 import { InventoryAction } from '../../actions';
@@ -21,24 +21,24 @@ type Props = {
   stockDetail: InventoryInterface.InventoryStockDetail;
 };
 
-class InventoryPurchaseDetail extends Taro.Component<Props> {
+class InventoryStockDetail extends Taro.Component<Props> {
 
   componentWillMount() {
     const { id } = this.$router.params;
-    InventoryAction.stockDetail(id);
+    InventoryAction.merchantStockDetail(id);
   }
 
   /**
-   * @todo [继续进货，这里直接返回上一级路由]
+   * @todo [继续盘点，这里直接返回上一级路由]
    */
-  public onPurchase = () => {
+  public onStock = () => {
     const { entry } = this.$router.params;
-    if (entry && entry === 'inventory') {
+    if (entry && entry === 'stock') {
       Taro.navigateBack({});
       return;
     }
     Taro.navigateTo({
-      url: '/pages/inventory/inventory.main'
+      url: '/pages/inventory/inventory.stock'
     });
   }
 
@@ -75,8 +75,8 @@ class InventoryPurchaseDetail extends Taro.Component<Props> {
     return (
       <ButtonFooter
         buttons={[{
-          title: "继续进货",
-          onPress: () => this.onPurchase(),
+          title: "继续盘点",
+          onPress: () => this.onStock(),
         }]}
       />
     );
@@ -180,7 +180,7 @@ class InventoryPurchaseDetail extends Taro.Component<Props> {
 }
 
 const select = (state: AppReducer.AppState) => ({
-  stockDetail: getInventoryStockDetail(state),
+  stockDetail: getMerchantStockDetail(state),
 });
 
-export default connect(select)(InventoryPurchaseDetail);
+export default connect(select)(InventoryStockDetail);

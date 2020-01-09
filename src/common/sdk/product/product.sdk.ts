@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-03 16:22:02
+ * @Last Modified time: 2020-01-08 15:34:29
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -125,11 +125,13 @@ export declare namespace ProductCartInterface {
   type PAYLOAD_REFUND = string;
   type PAYLOAD_PURCHASE = string;
   type PAYLOAD_MANAGE = string;
+  type PAYLOAD_STOCK = string;
   type PAYLOAD_SORT = {
     PAYLOAD_ORDER: PAYLOAD_ORDER;
     PAYLOAD_REFUND: PAYLOAD_REFUND;
     PAYLOAD_PURCHASE: PAYLOAD_PURCHASE;
     PAYLOAD_MANAGE: PAYLOAD_MANAGE;
+    PAYLOAD_STOCK: PAYLOAD_STOCK;
   };
 
   type ReducerInterface = {
@@ -191,6 +193,7 @@ class ProductSDK {
       PAYLOAD_REFUND: 'PAYLOAD_REFUND',
       PAYLOAD_PURCHASE: 'PAYLOAD_PURCHASE',
       PAYLOAD_MANAGE: 'PAYLOAD_MANAGE',
+      PAYLOAD_STOCK: 'PAYLOAD_STOCK',
     }
   };
   
@@ -263,11 +266,24 @@ class ProductSDK {
 
   public getSortDataKey = (sort?: string): string => {
     const data = (sort && typeof sort === 'string') ? sort : this.sort;
-    return data === this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
-    ? 'productCartList'
-    : data === this.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND
-      ? 'productRefundList'
-      : 'productPurchaseList';
+
+    switch (data) {
+      case this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER: {
+        return 'productCartList';
+      }
+      case this.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND: {
+        return 'productRefundList';
+      }
+      case this.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE: {
+        return 'productPurchaseList';
+      }
+      case this.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK: {
+        return 'productStockList';
+      }
+      default: {
+        return 'productCartList';
+      }
+    }
   }
 
   /**
@@ -320,6 +336,12 @@ class ProductSDK {
         return prevTotal + (item.changePrice * item.sellNum); 
       }
 
+      /**
+       * @todo [如果没有改价，但是是进货则返回进价]
+       */
+      if (key === 'productPurchaseList') {
+        return prevTotal + (item.cost * item.sellNum);
+      }
       return prevTotal + (item.price * item.sellNum);
     };
     const total = productList.reduce(reduceCallback, 0);
@@ -446,7 +468,6 @@ class ProductSDK {
       }),
       transProp: true
     };
-    // console.log('payload: ', payload);
     return payload;
   }
 
@@ -628,10 +649,10 @@ class ProductSDK {
     }
   }
 
-  public manageCart = (productCartList: ProductCartInterface.ProductCartInfo[]) => {
+  public manageCart = (productCartList: ProductCartInterface.ProductCartInfo[], sort: string = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER) => {
     const reducer: ProductSDKReducer.Reducers.ManageCartList = {
       type: this.reducerInterface.MANAGE_CART,
-      payload: { productCartList }
+      payload: { productCartList, sort }
     };
     return store.dispatch(reducer);
   }
@@ -655,8 +676,6 @@ class ProductSDK {
     product?: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, 
     sort: string = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER,
   ) => {
-    console.log('product: ', product);
-    console.log('sort: ', sort);
     const reducer: ProductSDKReducer.Reducers.ChangeProductVisible = {
       type: this.reducerInterface.CHANGE_PRODUCT_VISIBLE,
       payload: { 

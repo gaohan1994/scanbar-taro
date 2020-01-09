@@ -7,7 +7,7 @@ import merge from 'lodash.merge';
  * @Author: Ghan 
  * @Date: 2019-11-22 14:20:31 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-03 16:03:35
+ * @Last Modified time: 2020-01-08 15:36:33
  * @todo productsdk
  */
 export declare namespace ProductSDKReducer {
@@ -20,6 +20,7 @@ export declare namespace ProductSDKReducer {
   }
   interface State {
     productCartList: Array<ProductCartInterface.ProductCartInfo>;
+    productStockList: Array<ProductCartInterface.ProductCartInfo>;
     changeWeightProduct: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo;
     nonBarcodeProduct?: Partial<ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo>;
     suspensionCartList: Array<SuspensionCartBase>;
@@ -71,7 +72,7 @@ export declare namespace ProductSDKReducer {
 
     interface ManageCartList {
       type: ProductCartInterface.MANAGE_CART;
-      payload: { productCartList: ProductCartInterface.ProductCartInfo[] };
+      payload: { productCartList: ProductCartInterface.ProductCartInfo[], sort: string };
     }
     
     interface ChangeProductAction {
@@ -131,6 +132,7 @@ export declare namespace ProductSDKReducer {
 
 const initState: ProductSDKReducer.State = {
   productCartList: [],
+  productStockList: [],
   productRefundList: [],
   suspensionCartList: [],
   productPurchaseList: [],
@@ -226,10 +228,11 @@ export default function productSDKReducer (
 
     case productSdk.reducerInterface.MANAGE_CART: {
       const { payload } = action as ProductSDKReducer.Reducers.ManageCartList;
-      const { productCartList } = payload;
+      const { productCartList, sort = productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER } = payload;
+      const productKey = productSdk.getSortDataKey(sort);
       return {
         ...state,
-        productCartList
+        [`${productKey}`]: productCartList
       };
     }
 
@@ -457,3 +460,5 @@ export const getChangeProduct = (state: AppReducer.AppState) => state.productSDK
 export const getProductRefundList = (state: AppReducer.AppState) => state.productSDK.productRefundList;
 
 export const getProductPurchaseList = (state: AppReducer.AppState) => state.productSDK.productPurchaseList;
+
+export const getProductStockList = (state: AppReducer.AppState) => state.productSDK.productStockList;

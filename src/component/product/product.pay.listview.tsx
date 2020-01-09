@@ -1,6 +1,6 @@
 import Taro from '@tarojs/taro';
 import { View, Text } from '@tarojs/components';
-import { ProductCartInterface } from '../../common/sdk/product/product.sdk';
+import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import "../card/form.card.less";
 import "../../pages/style/product.less";
 import '../../styles/theme.less';
@@ -14,23 +14,71 @@ const cssPrefix = 'product';
 type Props = { 
   productList: Array<ProductCartInterface.ProductCartInfo>;
   selectMember?: SelectMember;
+  className?: string;
+  padding?: boolean;
+  sort?: string;
 };
 
 class ProductPayListView extends Taro.Component<Props> {
+
+  static options = {
+    addGlobalClass: true
+  };
+
+  static defaultProps = {
+    padding: true,
+    sort: productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
+  };
+
   render () {
-    const { productList } = this.props;
+    const { productList, className, padding, sort } = this.props;
     return (
-      <View className={`${cssPrefix}-pay-pos`}>
+      <View 
+        className={classnames(className, {
+          [`${cssPrefix}-pay-pos`]: padding
+        })}
+      >
         <View 
           className={classnames('component-form', {
             'component-form-shadow': true
           })}
         >
-          <View className={`${cssPrefix}-row ${cssPrefix}-row-border`}>
-            <Text className={`${cssPrefix}-row-normal`}>商品详情</Text>
-          </View>
+          {sort !== productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK ? (
+            <View className={`${cssPrefix}-row ${cssPrefix}-row-border`}>
+              <Text className={`${cssPrefix}-row-normal`}>商品详情</Text>
+            </View>
+          ) : (
+            <View className={`${cssPrefix}-row ${cssPrefix}-row-border`}>
+              <Text className={`${cssPrefix}-row-normal`}>商品名称</Text>
+              <View>
+                <Text>系统数量</Text>
+                <Text>盘点数量</Text>
+              </View>
+              <View>
+                <Text>盈亏数量</Text>
+                <Text>盈亏金额</Text>
+              </View>
+            </View>
+          )}
+          
           {
             productList && productList.length > 0 && productList.map((item, index) => {
+              if (sort !== productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK) {
+                return (
+                  <View 
+                    key={item.id}
+                    className={classnames(`${cssPrefix}-row ${cssPrefix}-row-content`, {
+                      [`container-border`]: index !== (productList.length - 1)
+                    })}
+                  >
+                    <View className={`${cssPrefix}-row-content-item`}>
+                      <Text className={`${cssPrefix}-row-name`}>{item.name}</Text>
+                      <Text className={`${cssPrefix}-row-normal`}>{`x ${item.sellNum}`}</Text>
+                    </View>
+                    {this.renderProductDetail(item)}
+                  </View>
+                ); 
+              }
               return (
                 <View 
                   key={item.id}
@@ -40,9 +88,15 @@ class ProductPayListView extends Taro.Component<Props> {
                 >
                   <View className={`${cssPrefix}-row-content-item`}>
                     <Text className={`${cssPrefix}-row-name`}>{item.name}</Text>
-                    <Text className={`${cssPrefix}-row-normal`}>{`x ${item.sellNum}`}</Text>
+                    <View className={`${cssPrefix}-row-content`}>
+                      <Text className={`${cssPrefix}-row-normal`}>{item.number}</Text>
+                      <Text className={`${cssPrefix}-row-normal`}>{item.sellNum}</Text>
+                    </View>
+                    <View className={`${cssPrefix}-row-content`}>
+                      <Text className={`${cssPrefix}-row-normal`}>{item.sellNum}</Text>
+                      <Text className={`${cssPrefix}-row-normal`}>{`￥ ${item.sellNum * item.cost}`}</Text>
+                    </View>
                   </View>
-                  {this.renderProductDetail(item)}
                 </View>
               );
             })

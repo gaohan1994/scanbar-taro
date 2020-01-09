@@ -45,6 +45,22 @@ class InventoryAction {
   }
 
   /**
+   * @todo [盘点详情]
+   *
+   * @memberof InventoryAction
+   */
+  public merchantStockDetail = async (id: string) => {
+    const result = await InventoryService.merchantStockDetail(id);
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: InventoryInterfaceMap.reducerInterface.RECEIVE_MERCHANT_STOCK_DETIAL,
+        payload: result
+      });
+    }
+    return result;
+  }
+
+  /**
    * @todo [进货/退货成功之后的回调]
    * @todo [清空购物车]
    */
@@ -68,6 +84,55 @@ class InventoryAction {
       };
       store.dispatch(reducer);
     }
+    return result;
+  }
+
+  public merchantStockList = async (params: InventoryInterface.InventoryStockListFetchField) => {
+    const result = await InventoryService.merchantStockList(params);
+    if (result.code === ResponseCode.success) {
+      const reducer = {
+        type: InventoryInterfaceMap.reducerInterface.RECEIVE_MERCHANT_STOCK_LIST,
+        payload: {
+          ...result.data,
+          field: params
+        }
+      };
+      store.dispatch(reducer);
+    }
+    return result;
+  }
+
+  /**
+   * @todo [把进货详情里的商品从新组合数据并返回]
+   *
+   * @memberof InventoryAction
+   */
+  public inventoryCopyPurchase = (stockDetail: InventoryInterface.InventoryStockDetail): ProductCartInterface.ProductCartInfo[] => {
+    const { detailList } = stockDetail;
+    const productList: ProductCartInterface.ProductCartInfo[] = detailList.map((item) => {
+      let product = {
+        id: item.productId,
+        cost: item.itemCost,
+        sellNum: item.number,
+        name: item.productName,
+        pictures: item.itemPrice,
+        unit: item.unit,
+      } as any;
+      if (item.perCost !== item.itemCost) {
+        product.changePrice = item.perCost;
+      }
+      return product;
+    });
+    return productList;
+  }
+
+  /**
+   * @todo []
+   *
+   * @memberof InventoryAction
+   */
+  public inventoryStockCheck = async (params: InventoryInterface.Interfaces.StockCheck) => {
+    const result = await InventoryService.stockCheck(params);
     return result;
   }
 }

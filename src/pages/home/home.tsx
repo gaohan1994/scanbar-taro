@@ -48,15 +48,27 @@ const NavItems = [
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_more.png',
-    value: '更多',
-    subTitle: 'Even more',
-    url: '/pages/',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/icon_menu_more.png',
     value: '退货',
     subTitle: 'Even more',
     url: '/pages/product/product.refund',
+  },
+  {
+    image: '//net.huanmusic.com/weapp/icon_menu_procurement1.png',
+    value: '盘点',
+    subTitle: 'Procurement',
+    url: '/pages/inventory/inventory.stock',
+  },
+  {
+    image: '//net.huanmusic.com/weapp/icon_menu_procurement1.png',
+    value: '盘点列表',
+    subTitle: 'Procurement',
+    url: '/pages/inventory/inventory.stock.list',
+  },
+  {
+    image: '//net.huanmusic.com/weapp/icon_menu_more.png',
+    value: '更多',
+    subTitle: 'Even more',
+    url: '/pages/',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_more.png',
@@ -109,7 +121,6 @@ class Home extends Component {
    */
   public onNavHandle = (item: any) => {
     if (
-      item.value === '盘点' ||
       item.value === '更多'
     ) {
       Taro.showToast({

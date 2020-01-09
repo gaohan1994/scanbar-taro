@@ -42,8 +42,7 @@
       .margin(10px, l);
       display: flex;
       flex: 1;
-      // width: @product-content-width;
-      // height: @product-content-size;
+      min-height: 150px;
       flex-direction: column;
       justify-content: space-between;
       &-bar {
@@ -126,6 +125,12 @@
     position: absolute;
     right: 24rpx;
     bottom: 0;
+    &-purchase {
+      bottom: 20px;
+      font-size: 34px;
+      font-weight: bold;
+      color: @theme-color;
+    }
     &-container {
       .flex(center, center, row);
       .margin(14px, b);
