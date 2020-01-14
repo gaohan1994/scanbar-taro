@@ -55,7 +55,7 @@ export declare namespace InventoryInterface {
     orderByColumn?: string;
     startTime?: string;
     status?: number;
-    supplierId?: number;
+    supplierId?: string;
     type?: number;
   }
 
@@ -87,6 +87,10 @@ export declare namespace InventoryInterface {
     stockDetail: (id: string) => string;
     merchantStockDetail: (id: string) => string;
   }
+}
+
+export function isInventoryProduct (product: InventoryInterface.InventoryProductDetail | any): product is InventoryInterface.InventoryProductDetail {
+  return !!(<InventoryInterface.InventoryProductDetail> product).changeId;
 }
 
 class InventoryInterfaceMap implements InventoryInterface.InventoryInterfaceMap {

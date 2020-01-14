@@ -161,7 +161,7 @@ class OrderMain extends Taro.Component<Props, State> {
         {this.renderTime()}
         <ScrollView
           scrollY={true}
-          className={`${cssPrefix}-list`}
+          className={`${cssPrefix}-list ${cssPrefix}-list-pos`}
         >
           {   
             orderList.length > 0
@@ -189,7 +189,7 @@ class OrderMain extends Taro.Component<Props, State> {
     const { date } = this.state;
     return (
       <View className={`${cssPrefix}-time`} >
-        <View className={`${cssPrefix}-time-box`} onClick={() => this.prevDate()}>
+        <View className={`${cssPrefix}-time-box ${cssPrefix}-time-box-left`} onClick={() => this.prevDate()}>
           <Image 
             src="//net.huanmusic.com/weapp/icon_time_left.png" 
             className={`${cssPrefix}-time-icon`} 
@@ -202,11 +202,11 @@ class OrderMain extends Taro.Component<Props, State> {
           value={date}
         >
           <View className={`${cssPrefix}-time-date`}>
+            <Image src="//net.huanmusic.com/weapp/icon_rili.png" className={`${cssPrefix}-time-rili`} />
             <Text>{date}</Text>
-            <Image src="//net.huanmusic.com/weapp/icon_time_choose.png" className={`${cssPrefix}-time-wid`} />
           </View>
         </Picker>
-        <View className={`${cssPrefix}-time-box`} onClick={() => this.nextDate()}>
+        <View className={`${cssPrefix}-time-box ${cssPrefix}-time-box-right`} onClick={() => this.nextDate()}>
           <Image 
             src="//net.huanmusic.com/weapp/icon_time_right.png" 
             className={`${cssPrefix}-time-icon`} 

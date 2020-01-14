@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-14 09:57:47
+ * @Last Modified time: 2020-01-14 18:44:44
  * 
  * @todo [购物车组件]
  */
@@ -312,17 +312,17 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     const { changeSellNum, changePrice } = this.state;
 
     if (changeSellNum === '' || numeral(changeSellNum).value() < 0) {
-      Taro.showToast({
-        title: '请填写商品数量',
-        icon: 'none'
-      });
+      // Taro.showToast({
+      //   title: '请填写商品数量',
+      //   icon: 'none'
+      // });
       return;
     }
     if (changePrice === '' || numeral(changePrice).value() < 0) {
-      Taro.showToast({
-        title: '请填写商品价格',
-        icon: 'none'
-      });
+      // Taro.showToast({
+      //   title: '请填写商品价格',
+      //   icon: 'none'
+      // });
       return;
     }
 
@@ -399,21 +399,6 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
         </View>
       );
     }
-    // if (sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK) {
-    //   return (
-    //     <View 
-    //       className={`cart-left-purchase`}
-    //       onClick={() => this.onChangeCartListVisible()}
-    //     >
-    //       <View>
-    //         {`${productCartList.length}种`}
-    //       </View>
-    //       <View>
-    //         {`盈亏 ￥${numeral(productSdk.getProductPrice()).format('0.00')}`}
-    //       </View>
-    //     </View>
-    //   );
-    // }
     return (
       <View style="width: 100%; height: 100%">
         {

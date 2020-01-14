@@ -73,10 +73,43 @@
       &::after {
         .border1px;
       }
+      &-time {
+        .flex(center, space-between, row);
+        .margin(20px, t);
+      }
+      &-bor {
+        height: 2px;
+        width: 40px;
+        background-color: #e6e6e6;
+      }
+      &-box {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
       &-title {
         font-size: 32px;
         color: #4d4d4d;
         font-weight: bold;
+      }
+      &-button {
+        .margin(20px, r);
+        .margin(20px, t);
+        height: 62px;
+        border: 1px solid #e6e6e6;
+        color: #999999;
+        font-size: 28px;
+        .flex(center, center);
+        border-radius: 20px;
+        min-width: 180px;
+        &-active {
+          border-color: @theme-color;
+          color: @theme-color;
+        }
+        &-time {
+          width: 300px;
+          .margin(0px) !important;
+        }
       }
     }
   }

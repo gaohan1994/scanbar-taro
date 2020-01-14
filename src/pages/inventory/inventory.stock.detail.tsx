@@ -73,7 +73,7 @@ class InventoryStockDetail extends Taro.Component<Props> {
 
   private renderButtons = () => {
     const { entry } = this.$router.params;
-    if (entry && entry === 'inventory') {
+    if (entry && entry === 'stock') {
       return (
         <ButtonFooter
           buttons={[{
@@ -84,12 +84,7 @@ class InventoryStockDetail extends Taro.Component<Props> {
       );
     }
     return (
-      <ButtonFooter
-        buttons={[{
-          title: "复制",
-          onPress: () => this.onCopyPurchase(),
-        }]}
-      />
+      <View/>
     );
   }
 
@@ -152,19 +147,11 @@ class InventoryStockDetail extends Taro.Component<Props> {
   private renderList = () => {
     const { stockDetail } = this.props;
     if (stockDetail.detailList) {
-      const productList: ProductCartInterface.ProductCartInfo[] = stockDetail.detailList.map((item) => {
-        return {
-          id: item.productId,
-          name: item.productName,
-          price: item.perCost,
-          sellNum: item.number
-        } as any;
-      });
       return (
         <ProductPayListView
           padding={false}
           sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK}
-          productList={productList}
+          productList={stockDetail.detailList}
         />
       );
     }

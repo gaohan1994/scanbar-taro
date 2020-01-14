@@ -1,25 +1,20 @@
 import Taro from '@tarojs/taro';
-import { View, Image, Text, ScrollView } from '@tarojs/components';
+import { View, Image, Text, ScrollView, Picker } from '@tarojs/components';
 import { AppReducer } from '../../reducers';
-import { getInventoryStockList, getInventoryStockListTotal, getMerchantStockList } from '../../reducers/app.inventory';
+import { getInventoryStockListTotal, getMerchantStockList } from '../../reducers/app.inventory';
 import { connect } from '@tarojs/redux';
 import { InventoryInterface } from '../../constants';
-import { InventoryAction, MemberAction } from '../../actions';
+import { InventoryAction, MemberAction, ProductAction } from '../../actions';
 import { ResponseCode } from '../../constants/index';
 import invariant from 'invariant';
 import "../style/product.less";
 import "../style/member.less";
 import "../style/inventory.less";
-import CartBar from '../../component/cart/cart';
-import { ProductAction } from '../../actions';
-import { getProductSearchList, getSelectProduct, getProductType, getProductList } from '../../reducers/app.product';
-import { ProductInterface } from '../../constants';
-import productSdk from '../../common/sdk/product/product.sdk';
 import HeaderInput from '../../component/header/header.input';
-import ProductListView from '../../component/product/product.listview';
-import TabsHeader from '../../component/layout/tabs.header';
 import InventoryItem from '../../component/inventory/inventoy.item';
 import ModalLayout from '../../component/layout/modal.layout';
+import dayJs from 'dayjs';
+import productSdk from '../../common/sdk/product/product.sdk';
 
 const cssPrefix = 'product';
 let pageNum: number = 1;
@@ -37,6 +32,8 @@ type State = {
   searchValue: string;              
   loading: boolean;
   visible: boolean;
+  dateMin: string;
+  dateMax: string;
 };
 
 class InventoryMerchantList extends Taro.Component<Props, State> {
@@ -44,10 +41,33 @@ class InventoryMerchantList extends Taro.Component<Props, State> {
     searchValue: '',
     loading: false,
     visible: false,
+    dateMin: dayJs().format('YYYY-MM-DD'),
+    dateMax: dayJs().format('YYYY-MM-DD'),
   };
 
   componentDidShow () {
+    ProductAction.productInfoSupplier();
     this.fetchData();
+  }
+
+  public reset = () => {
+    const today = dayJs().format('YYYY-MM-DD');
+    this.setState({
+      dateMin: today,
+      dateMax: today,
+    });
+  }
+
+  /**
+   * @todo [用户选择日期回调]
+   *
+   * @memberof MemberMain
+   */
+  public onDateMinChange = (event: any) => {
+    this.setState({dateMin: event.detail.value});
+  }
+  public onDateMaxChange = (event: any) => {
+    this.setState({dateMax: event.detail.value});
   }
 
   /**
@@ -63,12 +83,23 @@ class InventoryMerchantList extends Taro.Component<Props, State> {
 
   public fetchData = async (page?: number) => {
     try {
+      const {  dateMin, dateMax } = this.state;
       const payload: InventoryInterface.InventoryStockListFetchField = {
         pageNum: typeof page === 'number' ? page : pageNum,
         pageSize: 20,
       };
+      const today = dayJs().format('YYYY-MM-DD');
+      if (dateMin !== today || dateMax !== today) {
+        payload.startTime = dateMin;
+        payload.endTime = dateMax;
+      }
       const result = await InventoryAction.merchantStockList(payload);
       invariant(result.code === ResponseCode.success, result.msg || ' ');
+      if (typeof page === 'number') {
+        pageNum = page;
+      } else {
+        pageNum += 1;
+      }
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -167,7 +198,7 @@ class InventoryMerchantList extends Taro.Component<Props, State> {
   }
 
   private renderModal = () => {
-    const { visible } = this.state;
+    const { visible, dateMin, dateMax } = this.state;
     
     return (
       <ModalLayout
@@ -176,13 +207,37 @@ class InventoryMerchantList extends Taro.Component<Props, State> {
         contentClassName={`${cssPrefix}-layout`}
         title="筛选"
         buttons={[
-          {title: '重置', onPress: () => this.onChangeValue('visible', false), type: 'cancel'},
-          {title: '确定', onPress: () => this.onChangeValue('visible', false)},
+          {title: '重置', onPress: () => this.reset(), type: 'cancel'},
+          {title: '确定', onPress: () => {
+            this.onChangeValue('visible', false);
+            this.fetchData();
+          }},
         ]}
       >
-        <View className={`inventory-select`}>
+       <View className={`inventory-select`}>
           <View className={`inventory-select-item`}>
             <View className={`inventory-select-title`}>日期</View>
+            <View className={"inventory-select-item-time"}>
+              <Picker
+                mode='date'
+                onChange={this.onDateMinChange} 
+                value={dateMin}
+              >
+                <View className="inventory-select-item-button inventory-select-item-button-time">
+                  {dateMin}
+                </View>
+              </Picker>
+              <View className="inventory-select-item-bor"/>
+              <Picker
+                mode='date'
+                onChange={this.onDateMaxChange} 
+                value={dateMax}
+              >
+                <View className="inventory-select-item-button inventory-select-item-button-time">
+                  {dateMax}
+                </View>
+              </Picker>
+            </View>
           </View>
         </View>
       </ModalLayout>
@@ -194,7 +249,7 @@ const select = (state: AppReducer.AppState) => {
   const stockList = getMerchantStockList(state);
   const stockListByDate: any = MemberAction.fliterDataByDate(stockList as any, 'makeTime');
   return {
-    stockList: getMerchantStockList(state),
+    stockList,
     stockListByDate,
     stockListTotal: getInventoryStockListTotal(state),
   };

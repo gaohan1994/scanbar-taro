@@ -8,11 +8,13 @@ import "../cart/cart.less";
 import classnames from 'classnames';
 import numeral from 'numeral';
 import { SelectMember } from '../../pages/product/product.pay';
+import { InventoryInterface } from '../../constants';
+import { isInventoryProduct } from '../../constants/inventory/inventory';
 
 const cssPrefix = 'product';
 
 type Props = { 
-  productList: Array<ProductCartInterface.ProductCartInfo>;
+  productList: Array<ProductCartInterface.ProductCartInfo | InventoryInterface.InventoryProductDetail>;
   selectMember?: SelectMember;
   className?: string;
   padding?: boolean;
@@ -48,68 +50,102 @@ class ProductPayListView extends Taro.Component<Props> {
           </View>
           {
             productList && productList.length > 0 && productList.map((item, index) => {
-              if (sort !== productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK) {
-                return (
-                  <View 
-                    key={item.id}
-                    className={classnames(`${cssPrefix}-row ${cssPrefix}-row-content`, {
-                      [`container-border`]: index !== (productList.length - 1)
-                    })}
-                  >
-                    <View className={`${cssPrefix}-row-content-item`}>
-                      <Text className={`${cssPrefix}-row-name`}>{item.name}</Text>
-                      <Text className={`${cssPrefix}-row-normal`}>{`x ${item.sellNum}`}</Text>
-                    </View>
-                    {this.renderProductDetail(item)}
-                  </View>
-                ); 
-              }
               return (
-                <View 
+                <View
                   key={item.id}
                   className={classnames(`${cssPrefix}-row ${cssPrefix}-row-content`, {
                     [`container-border`]: index !== (productList.length - 1)
                   })}
                 >
-                  <View className={`${cssPrefix}-row-stock`}>
-                    <Text className={`${cssPrefix}-row-name`}>{item.name}</Text>
-                    <View className={`${cssPrefix}-row-stock-item ${cssPrefix}-row-stock-mar`}>
-                      <View className={`${cssPrefix}-row-stock-item-detail ${cssPrefix}-row-stock-item-name`}>
-                        系统数量：
-                        <Text className={`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base`}>
-                          {item.number}
-                        </Text>
+                  {isInventoryProduct(item) ? (
+                    <View className={`${cssPrefix}-row-stock`}>
+                      <Text className={`${cssPrefix}-row-name`}>{item.productName}</Text>
+                      <View className={`${cssPrefix}-row-stock-item ${cssPrefix}-row-stock-mar`}>
+                        <View className={`${cssPrefix}-row-stock-item-detail ${cssPrefix}-row-stock-item-name`}>
+                          系统数量：
+                          <Text className={`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base`}>
+                            {item.originNumber}
+                          </Text>
+                        </View>
+                        <View className={`${cssPrefix}-row-stock-item-detail ${cssPrefix}-row-stock-item-name`}>
+                          盈亏数量：
+                          <Text 
+                            className={classnames(`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base`, {
+                              [`${cssPrefix}-row-stock-item-red`]: item.cost < 0
+                            })}
+                          >
+                            {item.changedNumber}
+                          </Text>
+                        </View>
                       </View>
-                      <View className={`${cssPrefix}-row-stock-item-detail ${cssPrefix}-row-stock-item-name`}>
-                        盈亏数量：
-                        <Text 
-                          className={classnames(`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base`, {
-                            [`${cssPrefix}-row-stock-item-red`]: item.sellNum - item.number < 0
-                          })}
-                        >
-                          {item.sellNum - item.number}
-                        </Text>
+                      <View className={`${cssPrefix}-row-stock-item`}>
+                        <View className={`${cssPrefix}-row-stock-item-detail ${cssPrefix}-row-stock-item-name`}>
+                          盘点数量：
+                          <Text className={`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base`}>
+                            {item.number}
+                          </Text>
+                        </View>
+                        <View className={`${cssPrefix}-row-stock-item-detail ${cssPrefix}-row-stock-item-name`}>
+                          盈亏金额：
+                          <Text 
+                            className={classnames(`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base ${cssPrefix}-row-stock-item-bold`, {
+                              [`${cssPrefix}-row-stock-item-red`]: item.cost < 0
+                            })}
+                          >
+                            {`${item.cost < 0 ? '-' : ''}￥${numeral(Math.abs(item.cost)).format('0.00')}`}
+                          </Text>
+                        </View>
                       </View>
                     </View>
-                    <View className={`${cssPrefix}-row-stock-item`}>
-                      <View className={`${cssPrefix}-row-stock-item-detail ${cssPrefix}-row-stock-item-name`}>
-                        盘点数量：
-                        <Text className={`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base`}>
-                          {item.sellNum}
-                        </Text>
+                  ) : sort !== productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK ? (
+                    <View>
+                      <View className={`${cssPrefix}-row-content-item`}>
+                        <Text className={`${cssPrefix}-row-name`}>{item.name}</Text>
+                        <Text className={`${cssPrefix}-row-normal`}>{`x ${item.sellNum}`}</Text>
                       </View>
-                      <View className={`${cssPrefix}-row-stock-item-detail ${cssPrefix}-row-stock-item-name`}>
-                        盈亏金额：
-                        <Text 
-                          className={classnames(`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base ${cssPrefix}-row-stock-item-bold`, {
-                            [`${cssPrefix}-row-stock-item-red`]: item.sellNum - item.number < 0
-                          })}
-                        >
-                          {`${item.sellNum - item.number < 0 ? '-' : ''}￥${numeral(Math.abs((item.sellNum - item.number) * item.cost)).format('0.00')}`}
-                        </Text>
+                      {this.renderProductDetail(item)}
+                    </View>
+                  ) : (
+                    <View className={`${cssPrefix}-row-stock`}>
+                      <Text className={`${cssPrefix}-row-name`}>{item.name}</Text>
+                      <View className={`${cssPrefix}-row-stock-item ${cssPrefix}-row-stock-mar`}>
+                        <View className={`${cssPrefix}-row-stock-item-detail ${cssPrefix}-row-stock-item-name`}>
+                          系统数量：
+                          <Text className={`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base`}>
+                            {item.number}
+                          </Text>
+                        </View>
+                        <View className={`${cssPrefix}-row-stock-item-detail ${cssPrefix}-row-stock-item-name`}>
+                          盈亏数量：
+                          <Text 
+                            className={classnames(`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base`, {
+                              [`${cssPrefix}-row-stock-item-red`]: item.sellNum - item.number < 0
+                            })}
+                          >
+                            {item.sellNum - item.number}
+                          </Text>
+                        </View>
+                      </View>
+                      <View className={`${cssPrefix}-row-stock-item`}>
+                        <View className={`${cssPrefix}-row-stock-item-detail ${cssPrefix}-row-stock-item-name`}>
+                          盘点数量：
+                          <Text className={`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base`}>
+                            {item.sellNum}
+                          </Text>
+                        </View>
+                        <View className={`${cssPrefix}-row-stock-item-detail ${cssPrefix}-row-stock-item-name`}>
+                          盈亏金额：
+                          <Text 
+                            className={classnames(`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base ${cssPrefix}-row-stock-item-bold`, {
+                              [`${cssPrefix}-row-stock-item-red`]: item.sellNum - item.number < 0
+                            })}
+                          >
+                            {`${item.sellNum - item.number < 0 ? '-' : ''}￥${numeral(Math.abs((item.sellNum - item.number) * item.cost)).format('0.00')}`}
+                          </Text>
+                        </View>
                       </View>
                     </View>
-                  </View>
+                  )}
                 </View>
               );
             })

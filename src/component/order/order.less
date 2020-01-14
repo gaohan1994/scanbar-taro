@@ -7,6 +7,7 @@
 @order-item-icon: 50px;
 
 .@{orderItemPrefix} {
+  position: relative;
   background-color: #ffffff;
   width: @order-item-width;
   .padding(30px, lr);
@@ -15,6 +16,9 @@
   border-bottom: 1px solid #e3e3e3;
   &-left {
     flex-direction: row;
+    display: flex;
+    flex: 1;
+    align-items: center;
     &-icon {
       width: @order-item-icon;
       height: @order-item-icon;
@@ -30,9 +34,18 @@
       font-size: 24px;
       color: #666666;
     }
+    &-img {
+      width: 60px;
+      height: 60px;
+      .margin(20px, r);
+    }
   }
   &-right {
-    .flex(center, flex-end, column);
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    .flex(center, center, column);
     font-size: 30px;
   }
   &-no {

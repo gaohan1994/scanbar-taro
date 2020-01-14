@@ -116,7 +116,7 @@ class TabsHeader extends Taro.Component<Props, State> {
                     className={classnames(`${cssPrefix}-content-item`)}
                     onClick={() => this.onContentItemClick(tab)}
                   >
-                    {tab.title}
+                    {tab.title.length < 5 ? tab.title : (tab.title as string).slice(0, 5)}
                   </View>
                 );
               })

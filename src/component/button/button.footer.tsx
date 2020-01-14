@@ -36,7 +36,10 @@ class ButtonFooter extends Taro.Component<Props> {
                 })}
               >
                 <AtButton 
-                  className="theme-button"
+                  className={classnames({
+                    [`theme-button`]: button.type !== 'cancel',
+                    [`theme-button-cancel`]: button.type === 'cancel',
+                  })}
                   onClick={button.onPress}
                 >
                   <Text className="theme-button-text" >{button.title}</Text>

@@ -25,41 +25,24 @@ type Props = {
 };
 
 type State = {
-  showRemark: boolean;
-  remark: string;
+
 };
 
 class InventoryStockPay extends Taro.Component<Props, State> {
 
   readonly state: State = {
-    showRemark: false,
-    remark: '',
+
   };
 
   componentDidMount() {
     productSdk.setSort(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE);
   }
 
-  public changeShowRemark = (visible?: boolean) => {
-    this.setState(prevState => {
-      return {
-        ...prevState,
-        showRemark: typeof visible === 'boolean' ? visible : !prevState.showRemark
-      };
-    });
-  }
-
-  public changeRemark = (event: any) => {
-    const value = event.detail.value;
-    this.setState({remark: value});
-  }
-
   public onStockCheck = async () => {
     try {
-      const { remark } = this.state;
       const { productStockList } = this.props;
       const payload: InventoryInterface.Interfaces.StockCheck = {
-        remark,
+        remark: '',
         productList: productStockList.map((product) => {
           return {
             amount: product.cost,
@@ -126,7 +109,6 @@ class InventoryStockPay extends Taro.Component<Props, State> {
   }
 
   private renderListDetail = () => {
-    const { showRemark, remark } = this.state;
     const stockPrice = productSdk.getStockPrice();
     const priceForm: FormRowProps[] = [
       {
@@ -149,38 +131,6 @@ class InventoryStockPay extends Taro.Component<Props, State> {
     return (
       <View className={`${cssPrefix}-pay-pos`}>
         <FormCard items={priceForm} />
-        <View className='component-form'>
-          <View className={`inventory-remark`}>
-            <View 
-              className={`inventory-remark-row`}
-              onClick={() => this.changeShowRemark()}
-            >
-              <Text className="inventory-remark-title">备注</Text>
-               {showRemark !== true ? (
-                  <Image
-                    src="//net.huanmusic.com/weapp/icon_expand_gray.png" 
-                    className={`cart-left-image`}
-                  />
-                ) : (
-                  <Image
-                    src="//net.huanmusic.com/weapp/icon_expand_gray.png" 
-                    className={`cart-left-image cart-left-image-down`}
-                  />
-                )}
-            </View>
-            {showRemark && (
-              <View>
-                <Input 
-                  value={remark} 
-                  className="inventory-remark-input"
-                  placeholderClass="inventory-remark-input-place"
-                  placeholder="请输入备注"
-                  onInput={this.changeRemark}
-                />
-              </View>
-            )}
-          </View>
-        </View>
       </View>
     );
   }

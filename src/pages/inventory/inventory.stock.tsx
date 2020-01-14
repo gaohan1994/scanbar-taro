@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-13 16:56:13
+ * @Last Modified time: 2020-01-14 18:00:54
  * 
  * @todo 盘点
  */
@@ -24,6 +24,7 @@ import { store } from '../../app';
 import HeaderInput from '../../component/header/header.input';
 import ProductListView from '../../component/product/product.listview';
 import TabsHeader from '../../component/layout/tabs.header';
+import merge from 'lodash.merge';
 
 const cssPrefix = 'product';
 
@@ -94,7 +95,13 @@ class InventoryStock extends Taro.Component<Props, State> {
 
   public fetchData = async (type: ProductInterface.ProductTypeInfo) => {
     this.setState({ loading: true });
-    const result = await ProductAction.productOrderInfoList({type: `${type.id}`, status: 0});
+    let payload: ProductInterface.ProductInfoListFetchFidle = {
+      status: 0,
+    };
+    if (type && type.id !== 999) {
+      payload.type = `${type.id}`;
+    }
+    const result = await ProductAction.productOrderInfoList(payload);
     this.setState({ loading: false });
     return result;
   }
@@ -228,13 +235,19 @@ const mapState = (state: AppReducer.AppState) => {
   const productSearchList = getProductSearchList(state) || [];
   const pureProductSearchList: any[] = productSearchList;
   const selectProduct: any = getSelectProduct(state);
-
+  const productTypeList: any[] = merge([], getProductType(state));
+  productTypeList.unshift({
+    id: 999,
+    name: '全部品类',
+    title: '全部品类',
+    createTime: '',
+  } as any);
   return {
     productList,
     productSearchList,
     pureProductSearchList,
     selectProduct,
-    productTypeList: getProductType(state),
+    productTypeList,
   };
 };
 
