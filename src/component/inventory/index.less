@@ -1,0 +1,69 @@
+@import "../../styles/theme.less";
+
+@prefix: component-inventory-item;
+
+.@{prefix} {
+  .margin(20px, t);
+  .margin(30px, l);
+  width: 690px;
+  border-radius: 20px;
+  background-color: #ffffff;
+  &-header {
+    position: relative;
+    &::after {
+      .border1px;
+    }
+    .flex(center, space-between, row);
+    .padding(28px, lr);
+    .padding(20px, tb);
+    &-img {
+      width: 32px;
+      height: 34px;
+      .margin(20px, r);
+    }
+    &-title {
+      font-size: 30px;
+      color: #333333;
+    }
+    &-time {
+      font-size: 26px;
+      color: #999999;
+    }
+  } 
+  &-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    .padding(28px, lr);
+    .padding(25px, tb);
+    &-item {
+      display: flex;
+      flex-direction: row;
+      &-bot {
+        .margin(10px, b);
+      }
+      &-name {
+        font-size: 28px;
+        color: #999999;
+        .margin(23px, r);
+      }
+      &-value {
+        font-size: 30px;
+        color: #333333;
+      }
+
+      &-price {
+        position: absolute;
+        top: 50%;
+        right: 30px;
+        transform: translateY(-50%);
+        font-size: 32px;
+        color: #333333;
+        font-weight: bold;
+      }
+      &-red {
+        color: #FC4E44 !important;
+      }
+    }
+  }
+}

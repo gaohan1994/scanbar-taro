@@ -7,7 +7,7 @@ import merge from 'lodash.merge';
  * @Author: Ghan 
  * @Date: 2019-11-22 14:20:31 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-08 15:36:33
+ * @Last Modified time: 2020-01-13 15:20:07
  * @todo productsdk
  */
 export declare namespace ProductSDKReducer {
@@ -60,6 +60,14 @@ export declare namespace ProductSDKReducer {
   }
 
   namespace Reducers {
+
+    interface DeleteProductItemreducer {
+      type: ProductCartInterface.DELETE_PRODUCT_ITEM;
+      payload: {
+        product: ProductCartInterface.ProductCartInfo;
+        sort: string;
+      };
+    }
     interface EmptySuspensionAction {
       type: ProductCartInterface.EMPTY_SUSPENSION_CART;
       payload: any;
@@ -148,6 +156,23 @@ export default function productSDKReducer (
   action: ProductSDKReducer.Action
 ): ProductSDKReducer.State {
   switch (action.type) {
+    case productSdk.reducerInterface.DELETE_PRODUCT_ITEM: {
+      const { payload } = action as ProductSDKReducer.Reducers.DeleteProductItemreducer;
+      const { product, sort } = payload;
+      const nextProductKey = productSdk.getSortDataKey(sort);
+      const nextList: ProductCartInterface.ProductCartInfo[] = merge([], state[nextProductKey]);
+      const index = nextList.findIndex(p => p.id === product.id);
+      if (index !== -1) {
+        nextList.splice(index, 1);
+        return {
+          ...state,
+          [`${nextProductKey}`]: nextList
+        };
+      }
+      return {
+        ...state,
+      };
+    }
     case productSdk.reducerInterface.CHANGE_PRODUCT_VISIBLE: {
       const { payload } = action as ProductSDKReducer.Reducers.ChangeProductVisible;
       const { visible, product, sort } = payload; 

@@ -47,9 +47,7 @@ class InventoryPurchaseDetail extends Taro.Component<Props> {
       const { stockDetail } = this.props; 
       const productList = InventoryAction.inventoryCopyPurchase(stockDetail);
       productSdk.manageCart(productList, productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE);
-      Taro.navigateTo({
-        url: `/pages/inventory/inventory.main`
-      });
+      this.onPurchase();
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -72,11 +70,22 @@ class InventoryPurchaseDetail extends Taro.Component<Props> {
   }
 
   private renderButtons = () => {
+    const { entry } = this.$router.params;
+    if (entry && entry === 'inventory') {
+      return (
+        <ButtonFooter
+          buttons={[{
+            title: "继续进货",
+            onPress: () => this.onPurchase(),
+          }]}
+        />
+      );
+    }
     return (
       <ButtonFooter
         buttons={[{
-          title: "继续进货",
-          onPress: () => this.onPurchase(),
+          title: "复制",
+          onPress: () => this.onCopyPurchase(),
         }]}
       />
     );
@@ -87,8 +96,8 @@ class InventoryPurchaseDetail extends Taro.Component<Props> {
     return (
       <View className={`${cssPrefix}-detail-status`}>
         <Image 
-          src="//net.huanmusic.com/weapp/icon_success.png" 
-          className={`${cssPrefix}-detail-status-icon`} 
+          src="//net.huanmusic.com/weapp/icon_purchase.png" 
+          className={`${cssPrefix}-detail-status-purchase`} 
         />
         <View className={`${cssPrefix}-detail-status-detail`}>
           <View
@@ -115,8 +124,8 @@ class InventoryPurchaseDetail extends Taro.Component<Props> {
     }, 0);
     const Form2: FormRowProps[] = [
       {
-        title: '应收金额',
-        extraText: `￥ ${numeral(stockDetail.amount).format('0.00')}`,
+        title: '应付金额',
+        extraText: `-￥ ${numeral(stockDetail.amount).format('0.00')}`,
         extraTextStyle: 'title',
         extraTextColor: 'red',
         extraTextBold: 'bold',
@@ -135,11 +144,6 @@ class InventoryPurchaseDetail extends Taro.Component<Props> {
         title: '供应商',
         extraText: `${stockDetail.supplierName || '暂无供应商信息'}`,
         extraTextColor: '#4d4d4d',
-      },
-      {
-        title: '备注',
-        extraText: '',
-        hasBorder: false
       }
     ];
 
@@ -149,7 +153,9 @@ class InventoryPurchaseDetail extends Taro.Component<Props> {
           <FormCard items={Form2} />
         )}
         {Form3 && (
-          <FormCard items={Form3} />
+          <FormCard items={Form3} >
+            
+          </FormCard>
         )}
         {this.renderList()}
         <View className={`${cssPrefix}-area`} />

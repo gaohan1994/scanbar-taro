@@ -35,6 +35,20 @@ class App extends Component {
     ],
     subPackages: [
       {
+        root: 'pages/mine',
+        pages: [
+          'user.merchant',
+          'user.set',
+          'user.about',
+          'user.detail',
+          'user.merchant.name',
+          'user.merchant.address',
+          'user.merchant.owner',
+          'user.merchant.password',
+          'user.merchant.phone',
+        ],
+      },
+      {
         /**
          * @todo [盘点模块]
          */

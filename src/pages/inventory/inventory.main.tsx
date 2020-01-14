@@ -2,26 +2,27 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-08 09:39:12
+ * @Last Modified time: 2020-01-13 15:47:18
  * 
  * @todo 进货
  */
 import Taro from '@tarojs/taro';
-import { View } from '@tarojs/components';
+import { View, Image, Text } from '@tarojs/components';
 import "../style/product.less";
 import "../style/member.less";
+import "../style/inventory.less";
 import CartBar from '../../component/cart/cart';
 import { ProductAction } from '../../actions';
 import { getProductSearchList, getSelectProduct, getProductType, getProductList } from '../../reducers/app.product';
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
-import { ProductInterface, ProductInterfaceMap } from '../../constants';
+import { ProductInterface } from '../../constants';
 import invariant from 'invariant';
 import { ResponseCode } from '../../constants/index';
 import productSdk from '../../common/sdk/product/product.sdk';
-import { store } from '../../app';
 import HeaderInput from '../../component/header/header.input';
 import ProductListView from '../../component/product/product.listview';
+import TabsHeader from '../../component/layout/tabs.header';
 
 const cssPrefix = 'product';
 
@@ -62,7 +63,7 @@ class InventoryMain extends Taro.Component<Props> {
     loading: false,
   };
   
-  componentDidShow () {
+  componentDidMount () {
     this.init();
   }
 
@@ -81,20 +82,18 @@ class InventoryMain extends Taro.Component<Props> {
       const { data } = productTypeResult;
       const firstType = data[0] || {};
       this.changeCurrentType(firstType);
-
-      const { selectProduct } = this.props;
-      if (selectProduct !== undefined) {
-        productSdk.manage({
-          type: productSdk.productCartManageType.ADD,
-          product: selectProduct
-        });
-        setTimeout(() => {
-          store.dispatch({
-            type: ProductInterfaceMap.reducerInterfaces.SET_SELECT_PRODUCT,
-            payload: { selectProduct: undefined }
-          });
-        }, 100);
-      }
+      // if (selectProduct !== undefined) {
+      //   productSdk.manage({
+      //     type: productSdk.productCartManageType.ADD,
+      //     product: selectProduct
+      //   });
+      //   setTimeout(() => {
+      //     store.dispatch({
+      //       type: ProductInterfaceMap.reducerInterfaces.SET_SELECT_PRODUCT,
+      //       payload: { selectProduct: undefined }
+      //     });
+      //   }, 100);
+      // }
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -153,24 +152,56 @@ class InventoryMain extends Taro.Component<Props> {
       this.searchData();
     });
   }
+
+  public onNavToList = () => {
+    Taro.navigateTo({
+      url: `/pages/inventory/inventory.list`
+    });
+  }
+
+  public onTypeChange = (type: ProductInterface.ProductTypeInfo) => {
+    this.onTypeClick(type);
+  }
   
   render () {
     const { searchValue } = this.state;
     return (
       <View className={`container ${cssPrefix}`}>
         <HeaderInput
+          className="inventory-input"
           placeholder="请输入商品名称或条码"
           value={searchValue}
           onInput={this.onInput}
           isRenderInputRight={true}
           inputRightClick={() => this.onInput({detail: {value: ''}})}
-        />
-        
-        <View className={`${cssPrefix}-list-container`}>
+        >
+          <View 
+            className={'inventory-header-item'}
+            onClick={() => this.onNavToList()}
+          >
+            <Image 
+              src="//net.huanmusic.com/weapp/icon_record_inventory.png" 
+              className={`inventory-header-item-purchase`} 
+            />
+            <Text className="inventory-header-item-text">进货纪录</Text>
+          </View>
+        </HeaderInput>
+        {this.renderTabs()}
+        <View className={`${cssPrefix}-list-container ${cssPrefix}-list-container-inventory`}>
           {this.renderList()}
         </View>
         <CartBar sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE} />
       </View>
+    );
+  }
+
+  private renderTabs = () => {
+    const { productTypeList } = this.props;
+    return (
+      <TabsHeader
+        tabs={productTypeList}
+        onChange={(type) => this.onTypeChange(type)}
+      />
     );
   }
 

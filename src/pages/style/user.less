@@ -17,6 +17,7 @@
     width: 100%;
   }
   &-user {
+    position: relative;
     .flex(center, center, column);
     .margin(-(@user-bg-size - 24px), t);
     width: 100%;
@@ -31,17 +32,33 @@
     &-text {
       font-size: 28px;
       color: #ffffff;
-      .margin(17px, t);
+      .margin(15px, t);
+    }
+    &-edit {
+      position: absolute;
+      top: 40px;
+      right: 40px;
+      &-img {
+        width: 36px;
+        height: 36px;
+      }
     }
   }
   &-rows {
     width: 100%;
   }
   &-row {
+    position: relative;
     .flex(center, space-between, row);
     .padding(27px, tb);
     .padding(29px, lr);
-    .margin(16px, b);
+    &::after {
+      .border1px;
+    }
+    &-title {
+      font-size: 30px;
+      color: #333333;
+    }
     &-left {
       display: flex;
       flex-direction: row;
@@ -61,6 +78,66 @@
         width: 14px;
         height: 24px;
         .background-image('//net.huanmusic.com/weapp/icon_into.png');
+      }
+    }
+  }
+  &-merchant {
+    .padding(30px, t);
+    .padding(30px, lr);
+    &-button {
+      .margin(80px, t);
+    }
+    &-input {
+      position: relative;
+      font-size: 30px;
+      color: #4d4d4d;
+      .padding(20px, tb);
+      background-color: #f2f2f2;
+      &::after {
+        .border1px;
+        border-color: #cccccc !important;
+      }
+    }
+    &-phone {
+      .padding(24px, tb);
+      color: #999999;
+      font-size: 30px;
+    }
+  }
+  &-detail {
+    &-img {
+      width: 80px;
+      height: 80px;
+    }
+  }
+  &-about {
+    &-box {
+      .padding(76px, t);
+      width: 100%;
+      .flex(center, center, column);
+      &-img {
+        width: 200px;
+        height: 200px;
+      }
+      &-title {
+        font-size: 36px;
+        color: #333333;
+        .margin(30px, t);
+      }
+      &-version {
+        font-size: 30px;
+        color: #666666;
+        .margin(18px, t);
+      }
+    }
+    &-bottom {
+      position: absolute;
+      bottom: 50px;
+      width: 100%;
+      .flex(center, center, column);
+      &-text {
+        font-size: 24px;
+        color: #BFBFBF;
       }
     }
   }

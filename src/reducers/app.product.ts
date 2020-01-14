@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:26:45 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-27 15:12:11
+ * @Last Modified time: 2020-01-13 11:06:36
  */
 
 import { ProductInterface, ProductInterfaceMap } from "../constants";
@@ -88,7 +88,12 @@ export default function productReducer (state: ProductReducer.InitState = initSt
       const { payload } = action;
       return { 
         ...state,
-        productType: payload
+        productType: payload.map((type) => {
+          return {
+            ...type,
+            title: type.name
+          };
+        })
       };
     }
 

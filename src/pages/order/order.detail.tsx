@@ -109,7 +109,7 @@ class OrderDetail extends Taro.Component<Props, State> {
               />
             </View>
             <Text className={`${cssPrefix}-detail-status-time`}>{orderDetail.order.transTime}</Text>
-            <Text className={`${cssPrefix}-detail-status-time`}>可乐</Text>
+            <Text className={`${cssPrefix}-detail-status-time`}>{orderDetail.order.username}</Text>
           </View>
         )}
       </View>

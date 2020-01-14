@@ -16,7 +16,7 @@ export declare namespace InventoryReducer {
 
     interface ReceiveStockListReducer {
       type: typeof InventoryInterfaceMap.reducerInterface.RECEIVE_PURCHASE_INVENTORY_LIST;
-      payload: { rows: InventoryInterface.InventoryStockDetail[], field: InventoryInterface.InventoryStockListFetchField };
+      payload: { rows: InventoryInterface.InventoryStockDetail[], field: InventoryInterface.InventoryStockListFetchField, total: number };
     }
     
     interface ReceiveMerchantListReducer {
@@ -27,6 +27,7 @@ export declare namespace InventoryReducer {
   
   interface State {
     inventoryList: InventoryInterface.InventoryStockDetail[];
+    inventoryListTotal: number;
     merchantStockList: InventoryInterface.InventoryStockDetail[];
     stockDetail: InventoryInterface.InventoryStockDetail;
     merchantStockDetail: InventoryInterface.InventoryStockDetail;
@@ -39,6 +40,7 @@ export declare namespace InventoryReducer {
 
 export const initState: InventoryReducer.State = {
   inventoryList: [],
+  inventoryListTotal: 0,
   merchantStockList: [],
   stockDetail: {} as any,
   merchantStockDetail: {} as any,
@@ -83,11 +85,12 @@ export default function inventory (state: InventoryReducer.State = initState, ac
 
     case InventoryInterfaceMap.reducerInterface.RECEIVE_PURCHASE_INVENTORY_LIST: {
       const { payload } = action as InventoryReducer.Reducers.ReceiveStockListReducer;
-      const { rows, field } = payload;
+      const { rows, field, total } = payload;
       if (field.pageNum === 1) {
         return {
           ...state,
-          inventoryList: rows
+          inventoryList: rows,
+          inventoryListTotal: total
         };
       }
       const prevList = merge([], state.inventoryList);
@@ -108,6 +111,8 @@ export default function inventory (state: InventoryReducer.State = initState, ac
 export const getInventoryStockDetail = (state: AppReducer.AppState) => state.inventory.stockDetail;
 
 export const getInventoryStockList = (state: AppReducer.AppState) => state.inventory.inventoryList;
+
+export const getInventoryStockListTotal = (state: AppReducer.AppState) => state.inventory.inventoryListTotal;
 
 export const getMerchantStockDetail = (state: AppReducer.AppState) => state.inventory.merchantStockDetail;
 

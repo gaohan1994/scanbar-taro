@@ -6,6 +6,7 @@ import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import classnames from 'classnames';
+import numeral from 'numeral';
 
 const cssPrefix = 'component-product';
 interface Props { 
@@ -96,6 +97,8 @@ class ProductComponent extends Taro.Component<Props, State> {
     const showManageDetailToken = 
       sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE ||
       sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_MANAGE;
+
+    const showUnitToken = !!product.unit && product.unit.length > 0;
     return (
       <View className={classnames(`${cssPrefix}-content-detail`)}>
         <View className={`${cssPrefix}-title`} >
@@ -120,16 +123,21 @@ class ProductComponent extends Taro.Component<Props, State> {
         )
         : sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK
           ? (
-            <Text className={`${cssPrefix}-normal`}>
-              <Text className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>{`库存：${product.number}${product.unit || '个'}`}</Text>
-            </Text>
+            <View className={classnames(`${cssPrefix}-content-detail-box`)}>
+              <Text className={`${cssPrefix}-manage-font`}>进价: ￥{numeral(product.cost).format('0.00')}</Text>
+              {showUnitToken && (
+                <Text className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>{`库存：${product.number}${product.unit}`}</Text>
+              )}
+            </View>
           )
           : (
-            <Text className={`${cssPrefix}-normal`}>
+            <View className={`${cssPrefix}-normal`}>
               <Text className={`${cssPrefix}-price-bge`}>￥</Text>
               <Text className={`${cssPrefix}-price`}>{product.price}</Text>
-              {` /${product.unit || '个'}`}
-            </Text>
+              {showUnitToken && (
+                <Text>{` /${product.unit}`}</Text>
+              )}
+            </View>
           )}
       </View>
     );
@@ -151,11 +159,23 @@ class ProductComponent extends Taro.Component<Props, State> {
       sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK
     ) {
       return (
-        <View className={`${cssPrefix}-stepper ${cssPrefix}-stepper-purchase`}>
-          {productInCart !== undefined && (
-            <Text>
-            +{productInCart.sellNum}
-            </Text>
+        <View 
+          className={classnames(`${cssPrefix}-stepper`, {
+            [`${cssPrefix}-stepper-purchase`]: productInCart !== undefined
+          })}
+        >
+          {productInCart === undefined ? (
+            <View className={`${cssPrefix}-stepper-container`}>            
+              <View className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)} />  
+            </View>
+          ) : (
+            <View>
+              {productInCart.sellNum}
+              <Image 
+                src="//net.huanmusic.com/weapp/icon_edit_blue.png"
+                className={`${cssPrefix}-stepper-edit`}
+              />
+            </View>
           )}
         </View>
       );

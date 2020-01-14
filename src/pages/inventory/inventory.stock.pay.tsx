@@ -1,10 +1,11 @@
 import Taro from '@tarojs/taro';
-import { View, Input } from '@tarojs/components';
+import { View, Input, Text, Image } from '@tarojs/components';
 import { getProductPurchaseList, getProductStockList } from '../../common/sdk/product/product.sdk.reducer';
 import { connect } from '@tarojs/redux';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import "../../component/card/form.card.less";
 import '../style/product.less';
+import '../style/inventory.less';
 import '../../styles/theme.less';
 import "../../component/cart/cart.less";
 import classnames from 'classnames';
@@ -15,7 +16,7 @@ import numeral from 'numeral';
 import ProductPayListView from '../../component/product/product.pay.listview';
 import { ResponseCode, InventoryInterface, ProductInterface } from '../../constants';
 import { InventoryAction, ProductAction } from '../../actions';
-import FormRow from '../../component/card/form.row';
+import ButtonFooter from '../../component/button/button.footer';
 
 const cssPrefix = 'product';
 
@@ -104,21 +105,13 @@ class InventoryStockPay extends Taro.Component<Props, State> {
   }
 
   private renderFooter = () => {
-    const { productStockList } = this.props;
     return (
-      <View className={`${cssPrefix}-pay-footer`}>
-        <View className={`${cssPrefix}-pay-footer-bg`}>
-          <View
-            className={classnames(`${cssPrefix}-pay-footer-right`, {
-              [`${cssPrefix}-pay-footer-right-active`]: productStockList.length > 0,
-              [`${cssPrefix}-pay-footer-right-disabled`]: productStockList.length === 0,
-            })}
-            onClick={() => this.onStockCheck()}
-          >
-            盘点￥{this.setNumber(numeral(productSdk.getProductTransPrice()).value())}
-          </View>
-        </View>
-      </View>
+      <ButtonFooter
+        buttons={[{
+          title: '盘点',
+          onPress: () => this.onStockCheck()
+        }]}
+      />
     );
   }
 
@@ -134,10 +127,11 @@ class InventoryStockPay extends Taro.Component<Props, State> {
 
   private renderListDetail = () => {
     const { showRemark, remark } = this.state;
+    const stockPrice = productSdk.getStockPrice();
     const priceForm: FormRowProps[] = [
       {
         title: '盘盈金额',
-        extraText: `￥${this.setNumber(0)}`,
+        extraText: stockPrice > 0 ? `￥${this.setNumber(stockPrice)}` : `-￥${Math.abs(stockPrice)}`,
         extraTextColor: '#333333',
         extraTextBold: 'bold',
         extraTextSize: '36',
@@ -152,38 +146,41 @@ class InventoryStockPay extends Taro.Component<Props, State> {
       }
     ];
 
-    const formCard: FormRowProps[] = [
-      {
-        title: '商品数量',
-        extraText: `${0}`
-      },
-      {
-        title: '原价金额',
-        extraText: `￥${this.setNumber(0)}`
-      },
-    ];
     return (
       <View className={`${cssPrefix}-pay-pos`}>
         <FormCard items={priceForm} />
         <View className='component-form'>
-          <View>
+          <View className={`inventory-remark`}>
             <View 
+              className={`inventory-remark-row`}
               onClick={() => this.changeShowRemark()}
             >
-              备注 {showRemark ? '^' : 'v'}
+              <Text className="inventory-remark-title">备注</Text>
+               {showRemark !== true ? (
+                  <Image
+                    src="//net.huanmusic.com/weapp/icon_expand_gray.png" 
+                    className={`cart-left-image`}
+                  />
+                ) : (
+                  <Image
+                    src="//net.huanmusic.com/weapp/icon_expand_gray.png" 
+                    className={`cart-left-image cart-left-image-down`}
+                  />
+                )}
             </View>
             {showRemark && (
               <View>
                 <Input 
                   value={remark} 
+                  className="inventory-remark-input"
+                  placeholderClass="inventory-remark-input-place"
+                  placeholder="请输入备注"
                   onInput={this.changeRemark}
                 />
               </View>
             )}
           </View>
-
         </View>
-        <FormCard items={formCard} />
       </View>
     );
   }

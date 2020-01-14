@@ -1,5 +1,7 @@
 @import "../../styles/theme.less";
 
+@report-text: #4d4d4d;
+
 .report {
   position: relative;
   &-bg {
@@ -18,9 +20,6 @@
     height: 100%;
     width: 100%;
   }
-  &-card {
-    .margin(-140px, t);
-  }
   &-detail {
     .flex(center, center, column);
     &-title {
@@ -36,8 +35,8 @@
   }
   &-tabs {
     .flex(center, space-between, row);
-    position: absolute;
-    top: 20px;
+    height: 100px;
+    background-color: @theme-color;
     width: 100%;
   }
   &-tab {
@@ -52,6 +51,113 @@
       width: 16px;
       height: 8px;
       .background-image('//net.huanmusic.com/weapp/icon_expand_white.png');
+    }
+  }
+  &-time {
+    position: relative;
+    .margin(20px, t);
+    .flex(center, space-between, row);
+    height: 60px;
+    width: 690px;
+    border-radius: 30px;
+    background-color: #ffffff;
+    &-item {
+      .padding(30px, lr);
+      .padding(17px, tb);
+    }
+    &-box {
+      .flex(center, center, row);
+    }
+    &-icon {
+      width: 13px;
+      height: 24px;
+    }
+    &-cal {
+      width: 30px;
+      height: 29px;
+      .margin(13px, r);
+    }
+    &-text {
+      font-size: 28px;
+      color: @report-text;
+    }
+  }
+  &-card {
+    .margin(20px, t);
+    width: 690px;
+    border-radius: 20px;
+    background-color: #ffffff;
+    flex-direction: column;
+    &-report {
+      position: relative;
+      width: 100%;
+      .flex(center, center, column);
+      .padding(36px, t);
+      .padding(50px, b);
+      &-text {
+        font-size: 24px;
+        color: #999999;
+      }
+      &-price {
+        font-size: 50px;
+        color: #333333;
+        .margin(10px, t);
+        font-weight: bold;
+      }
+      &::after {
+        .border1px;
+      }
+    }
+  }
+  &-layout {
+    .padding(0px, lr) !important;
+  }
+  &-row {
+    position: relative;
+    .flex(center, flex-start, row);
+    height: 126px;
+    .padding(24px, lr);
+    &-thin {
+      height: 92px !important;
+    }
+    &-icon {
+      width: 50px;
+      height: 50px;
+      .margin(22px, r);
+    }
+    &-item {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      &-text {
+        font-size: 24px;
+        color: #999999;
+      }
+      &-price {
+        font-size: 34px;
+        color: #333333;
+        font-weight: bold;
+      }
+      &-title {
+        font-size: 30px;
+        color: @report-text;
+      }
+    }
+    &-arrow {
+      position: absolute;
+      top: 50%;
+      right: 28px;
+      transform: translateY(-50%);
+      width: 13px;
+      height: 24px;
+      background-image: url('//net.huanmusic.com/weapp/icon_time_right.png');
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+    }
+    &-border {
+      &::after {
+        .border1px;
+      }
     }
   }
 }

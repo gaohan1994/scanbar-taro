@@ -11,24 +11,30 @@ const cssPrefix = 'product';
 type Props = { 
   isRenderInputRight?: boolean;
   inputRightClick?: any;
+  containerClassName?: string;
 } & InputProps;
 
 class HeaderInput extends Taro.Component<Props> {
+
+  static options: Taro.ComponentOptions = {
+    addGlobalClass: true
+  };
+
   static defaultProps = {
     renderInputRight: false,
     rightClick: undefined,
+    className: undefined,
+    containerClassName: undefined,
   };
 
   render () {
-    const { value, onInput, placeholder, isRenderInputRight, inputRightClick } = this.props;
+    const { value, onInput, placeholder, isRenderInputRight, inputRightClick, className } = this.props;
     return (
       <View className={`${cssPrefix}-header`}>
-        <View className={`${memberPrefix}-main-header-search ${cssPrefix}-header-search`}>
+        <View className={classnames(`${memberPrefix}-main-header-search`, className)}>
           <Image src="//net.huanmusic.com/weapp/icon_import.png" className={`${memberPrefix}-main-header-search-icon`} />
           <Input 
-            className={classnames(`${memberPrefix}-main-header-search-input`, {
-              [``]: true
-            })} 
+            className={classnames(`${memberPrefix}-main-header-search-input`, className)} 
             placeholder={placeholder}
             value={value}
             onInput={onInput}

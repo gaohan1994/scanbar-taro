@@ -4,7 +4,7 @@ import { AtButton } from 'taro-ui';
 import "../../pages/style/product.less";
 import classnames from 'classnames';
 
-type ButtonProps = {
+export type ButtonProps = {
   onPress: () => void;
   title: string;
   type?: string;

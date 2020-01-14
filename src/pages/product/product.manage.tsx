@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-15 11:17:25 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-03 14:42:49
+ * @Last Modified time: 2020-01-10 11:50:46
  * 
  * @todo [商品管理页面]
  */
@@ -350,11 +350,6 @@ class ProductManage extends Taro.Component<Props, State> {
               className={`${cssPrefix}-select-header-close`}
               onClick={() => this.changeSelectVisible(false)}
             />
-              {/* <Image 
-                className={`${cssPrefix}-select-header-close-image`} 
-                src="//net.huanmusic.com/weapp/icon_del.png" 
-              />
-            </View> */}
             <View className={`${cssPrefix}-select-header`}>筛选</View>
             <View className={`${cssPrefix}-select-content`}>
               {productType.length > 0 && (

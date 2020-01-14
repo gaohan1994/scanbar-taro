@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-08 15:34:29
+ * @Last Modified time: 2020-01-13 17:34:55
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -118,6 +118,7 @@ export declare namespace ProductCartInterface {
   type ADD_SUSPENSION_CART = string;
   type DELETE_SUSPENSION_CART = string;
   type EMPTY_SUSPENSION_CART = string;
+  type DELETE_PRODUCT_ITEM = string;
   type CHANGE_NON_BARCODE_PRODUCT = string;
   type CHANGE_PRODUCT = string;
   type CHANGE_PRODUCT_VISIBLE = string;
@@ -126,6 +127,7 @@ export declare namespace ProductCartInterface {
   type PAYLOAD_PURCHASE = string;
   type PAYLOAD_MANAGE = string;
   type PAYLOAD_STOCK = string;
+  
   type PAYLOAD_SORT = {
     PAYLOAD_ORDER: PAYLOAD_ORDER;
     PAYLOAD_REFUND: PAYLOAD_REFUND;
@@ -142,6 +144,7 @@ export declare namespace ProductCartInterface {
     CHANGE_WEIGHT_PRODUCT_MODAL: CHANGE_WEIGHT_PRODUCT_MODAL;
     ADD_SUSPENSION_CART: ADD_SUSPENSION_CART;
     DELETE_SUSPENSION_CART: DELETE_SUSPENSION_CART;
+    DELETE_PRODUCT_ITEM: DELETE_PRODUCT_ITEM;
     EMPTY_SUSPENSION_CART: EMPTY_SUSPENSION_CART;
     CHANGE_NON_BARCODE_PRODUCT: CHANGE_NON_BARCODE_PRODUCT;
     CHANGE_PRODUCT: CHANGE_PRODUCT; // 改价和改数量
@@ -188,6 +191,7 @@ class ProductSDK {
     CHANGE_NON_BARCODE_PRODUCT: 'CHANGE_NON_BARCODE_PRODUCT',
     CHANGE_PRODUCT: 'CHANGE_PRODUCT',
     CHANGE_PRODUCT_VISIBLE: 'CHANGE_PRODUCT_VISIBLE',
+    DELETE_PRODUCT_ITEM: 'DELETE_PRODUCT_ITEM',
     PAYLOAD_SORT: {
       PAYLOAD_ORDER: 'PAYLOAD_ORDER',
       PAYLOAD_REFUND: 'PAYLOAD_REFUND',
@@ -315,6 +319,35 @@ class ProductSDK {
       return product.memberPrice || product.price;
     }
     return product.price;
+  }
+
+  public getProductsOriginPrice = (products?: ProductCartInterface.ProductCartInfo[]) => {
+    const key = this.getSortDataKey();
+    const productList = products !== undefined ? products : store.getState().productSDK[key];
+    const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => {
+      if (key === 'productPurchaseList') {
+        return prevTotal + (item.cost * item.sellNum);
+      }
+      return prevTotal + (item.price * item.sellNum);
+    };
+    const total = productList.reduce(reduceCallback, 0);
+    return total;
+  }
+
+  /**
+   * @todo [获取盈亏金额]
+   *
+   * @memberof ProductSDK
+   */
+  public getStockPrice = (products?: ProductCartInterface.ProductCartInfo[]) => {
+    const key = this.getSortDataKey();
+    const productList = products !== undefined ? products : store.getState().productSDK[key];
+    const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => {
+      const costNumber = item.sellNum - item.number;
+      return prevTotal + (costNumber * item.cost);
+    };
+    const total = productList.reduce(reduceCallback, 0);
+    return total;
   }
 
   /**
@@ -604,6 +637,16 @@ class ProductSDK {
       };
       store.dispatch(reducer);
     }
+  }
+
+  public deleteProductItem = (product: ProductCartInterface.ProductCartInfo, sort: string = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER) => {
+    store.dispatch({
+      type: this.reducerInterface.DELETE_PRODUCT_ITEM,
+      payload: {
+        product,
+        sort,
+      }
+    });
   }
 
   public empty = (sort?: string) => {

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-31 14:39:05
+ * @Last Modified time: 2020-01-13 16:28:29
  * 
  * @todo 开单页面
  */
@@ -82,20 +82,6 @@ class ProductRefund extends Taro.Component<Props, State> {
       const { data } = productTypeResult;
       const firstType = data[0] || {};
       this.changeCurrentType(firstType);
-
-      const { selectProduct } = this.props;
-      if (selectProduct !== undefined) {
-        productSdk.manage({
-          type: productSdk.productCartManageType.ADD,
-          product: selectProduct
-        });
-        setTimeout(() => {
-          store.dispatch({
-            type: ProductInterfaceMap.reducerInterfaces.SET_SELECT_PRODUCT,
-            payload: { selectProduct: undefined }
-          });
-        }, 100);
-      }
     } catch (error) {
       Taro.showToast({
         title: error.message,

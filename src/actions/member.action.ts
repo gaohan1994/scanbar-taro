@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:28:21 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-25 14:11:40
+ * @Last Modified time: 2020-01-13 12:10:59
  */
 import memberService from "../constants/member/member.service";
 import { ResponseCode, ActionsInterface, MemberInterface, MemberInterfaceMap } from '../constants/index';
@@ -69,12 +69,15 @@ interface MemberAction {
    * @param {any[]} data
    * @param {string} [dateKey]
    */
-  fliterDataByDate: (data: MemberInterface.MemberInfo[], dateKey?: string) => Array<MemberInterface.MemberListByDate>;
+  fliterDataByDate: <T>(data: T[], dateKey?: string) => Array<{
+    date: string;
+    data: T[];
+  }>;
 }
 
 class MemberAction {
 
-  public fliterDataByDate = (data: MemberInterface.MemberInfo[], datekey = 'createTime') => {
+  public fliterDataByDate = <T>(data: T[], datekey = 'createTime') => {
     // return [];
 
     if (Array.isArray(data)) {
@@ -90,10 +93,10 @@ class MemberAction {
        * ]
        * ```
        */
-      const mergeData: MemberInterface.MemberInfo[] = merge([], data);
-      const dateIndexes: MemberInterface.MemberListByDate[] = [];
+      const mergeData = merge([], data);
+      const dateIndexes: {date: string, data: any[]}[] = [];
 
-      mergeData.forEach((item) => {
+      mergeData.forEach((item: any) => {
         const itemFormatDate = moment(item[datekey]).format('YYYY年MM月DD日');
         const dateIndex = dateIndexes.findIndex(d => d.date === itemFormatDate);
 
@@ -102,9 +105,9 @@ class MemberAction {
            * @todo [已经有了这个日期的数据,直接存,如果存在这个id那么说明重复数据不存]
            */
           const currentDateIndex = dateIndexes[dateIndex];
-          if (currentDateIndex.data && currentDateIndex.data.findIndex(d => d.id === item.id) !== -1) {
+          if (currentDateIndex.data && currentDateIndex.data.findIndex(d => (d.id || d.businessNumber) === (item.id || item.businessNumber)) !== -1) {
             return;
-          }
+          } 
           currentDateIndex.data.push(item);
         } else {
           const newDateIndex = {
@@ -116,7 +119,8 @@ class MemberAction {
       });
       return dateIndexes;
     }
-    console.error('请传入正确的参数');
+
+    return { date: '', data: [] };
   }
 
   public memberList = async (params?: MemberInterface.MemberInfoListFetchFidle) => {

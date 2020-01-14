@@ -14,17 +14,22 @@
 .@{modal-prefix} {
   background-color: #ffffff;
   &-header {
-    .padding(50px, tb);
-    .flex(center, center, row);
+    max-height: 50px;
+    .margin(50px, tb);
+    .padding(30px, lr);
+    display: flex;
+    justify-content: center;
     &-text {
       font-weight: bold;
       color: @modal-header-color;
-      max-width: @modal-header-max-size;
-      font-size: @modal-header-font;
-      line-height: @modal-header-font;
-      height: @modal-header-font;
-      overflow: hidden;
       text-align: center;
+      font-size: @modal-header-font;
+      display: -webkit-box;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-clamp: 1;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
     }
   }
   &-buttons {

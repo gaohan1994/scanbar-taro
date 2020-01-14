@@ -1,10 +1,11 @@
 import Taro from '@tarojs/taro';
-import { View, Picker, Input } from '@tarojs/components';
+import { View, Picker, Input, Text, Image } from '@tarojs/components';
 import { getProductPurchaseList } from '../../common/sdk/product/product.sdk.reducer';
 import { connect } from '@tarojs/redux';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import "../../component/card/form.card.less";
 import '../style/product.less';
+import '../style/inventory.less';
 import '../../styles/theme.less';
 import "../../component/cart/cart.less";
 import classnames from 'classnames';
@@ -17,6 +18,7 @@ import { ResponseCode, InventoryInterface, ProductInterface } from '../../consta
 import { InventoryAction, ProductAction } from '../../actions';
 import { getProductSupplier } from '../../reducers/app.product';
 import FormRow from '../../component/card/form.row';
+import ButtonFooter from '../../component/button/button.footer';
 
 const cssPrefix = 'product';
 
@@ -120,21 +122,13 @@ class InventoryPay extends Taro.Component<Props, State> {
   }
 
   private renderFooter = () => {
-    const { productPurchaseList } = this.props;
     return (
-      <View className={`${cssPrefix}-pay-footer`}>
-        <View className={`${cssPrefix}-pay-footer-bg`}>
-          <View
-            className={classnames(`${cssPrefix}-pay-footer-right`, {
-              [`${cssPrefix}-pay-footer-right-active`]: productPurchaseList.length > 0,
-              [`${cssPrefix}-pay-footer-right-disabled`]: productPurchaseList.length === 0,
-            })}
-            onClick={() => this.onPayHandle()}
-          >
-            结算￥{this.setNumber(numeral(productSdk.getProductTransPrice()).value())}
-          </View>
-        </View>
-      </View>
+      <ButtonFooter
+        buttons={[{
+          title: '进货',
+          onPress: () => this.onPayHandle()
+        }]}
+      />
     );
   }
 
@@ -142,6 +136,7 @@ class InventoryPay extends Taro.Component<Props, State> {
     const { productPurchaseList } = this.props;
     return (
       <ProductPayListView
+        sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE}
         productList={productPurchaseList}
       />
     );
@@ -153,7 +148,7 @@ class InventoryPay extends Taro.Component<Props, State> {
     const priceForm: FormRowProps[] = [
       {
         title: '应付金额',
-        extraText: `￥${this.setNumber(0)}`,
+        extraText: `￥${this.setNumber(productSdk.getProductTransPrice())}`,
         extraTextColor: '#333333',
         extraTextBold: 'bold',
         extraTextSize: '36',
@@ -166,17 +161,6 @@ class InventoryPay extends Taro.Component<Props, State> {
         extraTextSize: '36',
         hasBorder: false,
       }
-    ];
-
-    const formCard: FormRowProps[] = [
-      {
-        title: '商品数量',
-        extraText: `${0}`
-      },
-      {
-        title: '原价金额',
-        extraText: `￥${this.setNumber(0)}`
-      },
     ];
     return (
       <View className={`${cssPrefix}-pay-pos`}>
@@ -194,24 +178,37 @@ class InventoryPay extends Taro.Component<Props, State> {
               arrow="right"
             />
           </Picker>
-          <View>
+          <View className={`inventory-remark`}>
             <View 
+              className={`inventory-remark-row`}
               onClick={() => this.changeShowRemark()}
             >
-              备注 {showRemark ? '^' : 'v'}
+              <Text className="inventory-remark-title">备注</Text>
+               {showRemark !== true ? (
+                  <Image
+                    src="//net.huanmusic.com/weapp/icon_expand_gray.png" 
+                    className={`cart-left-image`}
+                  />
+                ) : (
+                  <Image
+                    src="//net.huanmusic.com/weapp/icon_expand_gray.png" 
+                    className={`cart-left-image cart-left-image-down`}
+                  />
+                )}
             </View>
             {showRemark && (
               <View>
                 <Input 
                   value={remark} 
+                  className="inventory-remark-input"
+                  placeholderClass="inventory-remark-input-place"
+                  placeholder="请输入备注"
                   onInput={this.changeRemark}
                 />
               </View>
             )}
           </View>
-
         </View>
-        <FormCard items={formCard} />
       </View>
     );
   }

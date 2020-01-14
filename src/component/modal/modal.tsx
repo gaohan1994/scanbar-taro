@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-04 13:49:58 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-25 15:03:20
+ * @Last Modified time: 2020-01-13 16:00:52
  * 
  * @Usage
  * ```jsx
@@ -83,7 +83,7 @@ class Modal extends Taro.Component<Props, State> {
         <AtModal {...ModalProps}>
           {showHeader && (
             <View className={`${ModalCssPrefix}-header`}>
-              <Text className={`${ModalCssPrefix}-header-text`}>{header}</Text>
+              <View className={`${ModalCssPrefix}-header-text`}>{header}</View>
             </View>
           )}
           {renderHeader && renderHeader()}

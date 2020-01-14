@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/bin/node /Users/Gao/.yarn/bin/yarn.js add src/component/button/button.footer --silent --no-progress
+  /usr/local/bin/node /Users/Gao/.yarn/bin/yarn.js add src/common/sdk/product/product.sdk --silent --no-progress
 
 PATH: 
   /usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/Gao/Desktop/macdesktop/scanbar/node_modules/.bin:/usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/Gao/Desktop/macdesktop/scanbar/node_modules/.bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bind:/usr/local/mongodb/bind:/usr/local/mongodb/bin:/Users/Gao/.yarn/bin:/Users/Gao/.config/yarn/global/node_modules/.bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Tomcat/bin:/Users/Gao/Library/Android/sdk/tools:/Users/Gao/Library/Android/sdk/platform-tools:
@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.npmjs.org/src%2fcomponent/button/button.footer: Request "https://registry.npmjs.org/src%2fcomponent/button/button.footer" returned a 405
+  Error: https://registry.npmjs.org/src%2fcommon/sdk/product/product.sdk: Request "https://registry.npmjs.org/src%2fcommon/sdk/product/product.sdk" returned a 405
       at Request.params.callback [as _callback] (/Users/Gao/.yarn/lib/cli.js:66067:18)
       at Request.self.callback (/Users/Gao/.yarn/lib/cli.js:129541:22)
       at Request.emit (events.js:200:13)
@@ -83,6 +83,7 @@ npm manifest:
     "devDependencies": {
       "@babel/core": "^7.7.7",
       "@babel/plugin-proposal-class-properties": "^7.7.4",
+      "@babel/plugin-proposal-object-rest-spread": "^7.7.7",
       "@babel/plugin-transform-react-jsx": "^7.7.7",
       "@babel/polyfill": "^7.7.0",
       "@babel/preset-env": "^7.1.0",
@@ -117,6 +118,7 @@ npm manifest:
       "babel-plugin-transform-decorators-legacy": "^1.3.4",
       "babel-plugin-transform-jsx-stylesheet": "^0.6.5",
       "babel-plugin-transform-object-rest-spread": "^6.26.0",
+      "babel-plugin-transform-taroapi": "^2.0.0",
       "babel-preset-env": "^1.6.1",
       "cross-env": "^5.2.0",
       "eslint": "^5.16.0",
@@ -2658,6 +2660,11 @@ Lockfile:
     version "1.3.17"
     resolved "https://registry.npmjs.org/babel-plugin-transform-taroapi/-/babel-plugin-transform-taroapi-1.3.17.tgz#74ec44bbea2c2b3c3fd6ca56b49d0cbf5bead0f2"
     integrity sha512-cltC9UzK4KdDW2wCZk4qxOLmcEEwYOr2R5iuF1cMV6P7U8Rpl+3brPPwBEdRHxMex+Q1F7aNlLRWgWcZfGouAg==
+  
+  babel-plugin-transform-taroapi@^2.0.0:
+    version "2.0.0"
+    resolved "https://registry.npmjs.org/babel-plugin-transform-taroapi/-/babel-plugin-transform-taroapi-2.0.0.tgz#5e308926a2380111715251189ad7ff8a30593d87"
+    integrity sha512-49FppW7V53J+H8B3Tlgtvan6geqK/U/KcaLANNy+e63Bk2I+BLsYXvWwlnv/1KH3Ab5R3Gz5cAT3hnM9ecpj4Q==
   
   babel-preset-env@^1.6.1:
     version "1.7.0"
@@ -11776,11 +11783,6 @@ Lockfile:
     version "4.0.2"
     resolved "https://registry.npmjs.org/xtend/-/xtend-4.0.2.tgz#bb72779f5fa465186b1f438f674fa347fdb5db54"
     integrity sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==
-  
-  xxx@^0.0.1:
-    version "0.0.1"
-    resolved "https://registry.npmjs.org/xxx/-/xxx-0.0.1.tgz#9d8b8a55dbab7901e72c2174bacd13e82fbc1340"
-    integrity sha1-nYuKVdureQHnLCF0us0T6C+8E0A=
   
   y18n@^3.2.1:
     version "3.2.1"

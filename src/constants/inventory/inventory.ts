@@ -37,6 +37,7 @@ export declare namespace InventoryInterface {
     amount: number;
     merchantId: number;
     status: number;
+    number: number;
     supplierId: number;
     supplierName: number;
     type: number;

@@ -11,18 +11,6 @@ const cssPrefix = 'home';
 
 const NavItems = [
   {
-    image: '//net.huanmusic.com/weapp/icon_menu_commodity.png',
-    value: '商品管理',
-    subTitle: 'Commodity management',
-    url: '/pages/product/product.manage',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/-icon_menu_member.png',
-    value: '会员管理',
-    subTitle: 'Member management',
-    url: '/pages/member/member',
-  },
-  {
     image: '//net.huanmusic.com/weapp/-icon_menu_proceeds.png',
     value: '收款',
     subTitle: 'Gathering',
@@ -35,40 +23,34 @@ const NavItems = [
     url: '/pages/order/order.main',
   },
   {
-    image: '//net.huanmusic.com/weapp/icon_menu_procurement1.png',
-    value: '采购',
-    subTitle: 'Procurement',
-    url: '/pages/inventory/inventory.list',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/icon_menu_inventory1.png',
-    value: '进货',
-    subTitle: 'inventory',
-    url: '/pages/inventory/inventory.main',
-  },
-  {
     image: '//net.huanmusic.com/weapp/icon_menu_more.png',
     value: '退货',
     subTitle: 'Even more',
     url: '/pages/product/product.refund',
   },
   {
+    image: '//net.huanmusic.com/weapp/-icon_menu_member.png',
+    value: '会员管理',
+    subTitle: 'Member management',
+    url: '/pages/member/member',
+  },
+  {
+    image: '//net.huanmusic.com/weapp/icon_menu_commodity.png',
+    value: '商品管理',
+    subTitle: 'Commodity management',
+    url: '/pages/product/product.manage',
+  },
+  {
+    image: '//net.huanmusic.com/weapp/icon_menu_inventory1.png',
+    value: '采购进货',
+    subTitle: 'inventory',
+    url: '/pages/inventory/inventory.main',
+  },
+  {
     image: '//net.huanmusic.com/weapp/icon_menu_procurement1.png',
     value: '盘点',
     subTitle: 'Procurement',
     url: '/pages/inventory/inventory.stock',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/icon_menu_procurement1.png',
-    value: '盘点列表',
-    subTitle: 'Procurement',
-    url: '/pages/inventory/inventory.stock.list',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/icon_menu_more.png',
-    value: '更多',
-    subTitle: 'Even more',
-    url: '/pages/',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_more.png',

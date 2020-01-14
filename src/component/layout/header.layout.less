@@ -1,0 +1,56 @@
+@import "../../styles/theme.less";
+
+@tabs-header: tabs-header;
+
+.@{tabs-header} {
+  width: 100%;
+  &-pos {
+    position: absolute;
+    z-index: 1000;
+    top: 20px + 20px + 60px;
+  }
+  &-corner {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 80px;
+    background-color: @theme-color;
+    .flex(center, center);
+    height: 100%;
+    &-image {
+      width: 18px;
+      height: 10px;
+      &-down {
+        transform: rotate(180deg);
+      }
+    }
+  }
+  &-content {
+    position: relative;
+    .padding(20px, b);
+    bottom: 0;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    &-item {
+      width: 160px;
+      height: 62px;
+      border-radius: 20px;
+      border: 1px solid #e3e3e3;
+      .flex(center, center);
+      color: #999999;
+      .margin(20px, t);
+      .margin(18px, l);
+      font-size: 28px;
+    }
+    &-mask {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: 20px + 20px + 60px + 90px;
+      background-color: rgba(0, 0, 0, 0.7)
+    }
+  }
+}

@@ -99,6 +99,9 @@
       &-suspension {
         top: 0px;
       }
+      &-inventory {
+        top: @product-header-height + 72px; 
+      }
     }
     &-left {
       width: 150px;
@@ -215,8 +218,12 @@
     &-content {
       display: flex;
       flex-direction: column;
+      width: 100%;
       .padding(34px, lr);
       .padding(135px, b);
+      &-nonfooter {
+        .padding(0, b) !important;
+      }
       &-button {
         .margin(0px, l) !important;
         .margin(18px, r) !important;
@@ -537,6 +544,9 @@
       &-member {
         background-color: #CCAE80;
       }
+      &-refund {
+        background-color: #20BBB9;
+      }
     }
     &-line {
       text-decoration: line-through;
@@ -575,6 +585,40 @@
       }
       &-top {
         .margin(20px, t);
+      }
+    }
+    &-stock {
+      display: flex;
+      flex-direction: column;
+      &-mar {
+        .margin(20px, t);
+      }
+      &-item {
+        display: flex;
+        flex-direction: row;
+        &-detail {
+          display: flex;
+          flex: 1;
+          align-items: flex-end;
+        }
+        &-name {
+          font-size: 24px;
+          color: #999999;
+        }
+        &-red {
+          color: #FC4E44 !important;
+          font-weight: normal !important;
+        }
+        &-base {
+          font-size: 28px;
+        }
+        &-value {
+          font-size: 28px;
+          color: #4d4d4d;
+        }
+        &-bold {
+          font-weight: bold;
+        }
       }
     }
   }

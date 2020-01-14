@@ -72,11 +72,22 @@ class InventoryStockDetail extends Taro.Component<Props> {
   }
 
   private renderButtons = () => {
+    const { entry } = this.$router.params;
+    if (entry && entry === 'inventory') {
+      return (
+        <ButtonFooter
+          buttons={[{
+            title: "继续盘点",
+            onPress: () => this.onStock(),
+          }]}
+        />
+      );
+    }
     return (
       <ButtonFooter
         buttons={[{
-          title: "继续盘点",
-          onPress: () => this.onStock(),
+          title: "复制",
+          onPress: () => this.onCopyPurchase(),
         }]}
       />
     );
@@ -87,14 +98,11 @@ class InventoryStockDetail extends Taro.Component<Props> {
     return (
       <View className={`${cssPrefix}-detail-status`}>
         <Image 
-          src="//net.huanmusic.com/weapp/icon_success.png" 
-          className={`${cssPrefix}-detail-status-icon`} 
+          src="//net.huanmusic.com/weapp/icon_inventory.png" 
+          className={`${cssPrefix}-detail-status-purchase`} 
         />
         <View className={`${cssPrefix}-detail-status-detail`}>
-          <View
-            // onClick={() => this.onCopy()}
-            className={`${cssPrefix}-detail-status-detail-box`}
-          >
+          <View className={`${cssPrefix}-detail-status-detail-box`}>
             <Text className={`${cssPrefix}-detail-status-result`}>{stockDetail.businessNumber}</Text>
             <Image 
               src="//net.huanmusic.com/weapp/icon_copy.png"  
@@ -115,14 +123,14 @@ class InventoryStockDetail extends Taro.Component<Props> {
     }, 0);
     const Form2: FormRowProps[] = [
       {
-        title: '应收金额',
+        title: '盘亏金额',
         extraText: `￥ ${numeral(stockDetail.amount).format('0.00')}`,
         extraTextStyle: 'title',
         extraTextColor: 'red',
         extraTextBold: 'bold',
       },
       {
-        title: `进货数量`,
+        title: `盘亏数量`,
         extraText: `${num || 0}`,
         extraTextStyle: 'title',
         extraTextBold: 'bold',
@@ -130,26 +138,10 @@ class InventoryStockDetail extends Taro.Component<Props> {
       },
     ];
 
-    const Form3: FormRowProps[] = [
-      {
-        title: '供应商',
-        extraText: `${stockDetail.supplierName || '暂无供应商信息'}`,
-        extraTextColor: '#4d4d4d',
-      },
-      {
-        title: '备注',
-        extraText: '',
-        hasBorder: false
-      }
-    ];
-
     return (
       <View className={`${cssPrefix}-detail-cards`}>
         {Form2 && (
           <FormCard items={Form2} />
-        )}
-        {Form3 && (
-          <FormCard items={Form3} />
         )}
         {this.renderList()}
         <View className={`${cssPrefix}-area`} />
@@ -171,6 +163,7 @@ class InventoryStockDetail extends Taro.Component<Props> {
       return (
         <ProductPayListView
           padding={false}
+          sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK}
           productList={productList}
         />
       );

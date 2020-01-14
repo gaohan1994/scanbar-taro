@@ -27,13 +27,13 @@ module.exports = {
       diagnostics: false
     }
   },
-  moduleNameMapper: {
-    react: 'nervjs',
-    'react-addons-test-utils': 'nerv-test-utils',
-    'react-dom': 'nervjs',
-    'weui': '<rootDir>/__mock__/styleMock.js',
-    '\\.(css|less|sass|scss)$': '<rootDir>/__mock__/styleMock.js'
-  }
+  // moduleNameMapper: {
+  //   react: 'nervjs',
+  //   'react-addons-test-utils': 'nerv-test-utils',
+  //   'react-dom': 'nervjs',
+  //   'weui': '<rootDir>/__mock__/styleMock.js',
+  //   '\\.(css|less|sass|scss)$': '<rootDir>/__mock__/styleMock.js'
+  // }
 }
 
 // "jest": {

@@ -2,14 +2,15 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-08 15:44:10
+ * @Last Modified time: 2020-01-13 16:56:13
  * 
  * @todo 盘点
  */
 import Taro from '@tarojs/taro';
-import { View } from '@tarojs/components';
+import { View, Image, Text } from '@tarojs/components';
 import "../style/product.less";
 import "../style/member.less";
+import "../style/inventory.less";
 import CartBar from '../../component/cart/cart';
 import { ProductAction } from '../../actions';
 import { getProductSearchList, getSelectProduct, getProductType, getProductList } from '../../reducers/app.product';
@@ -22,6 +23,7 @@ import productSdk from '../../common/sdk/product/product.sdk';
 import { store } from '../../app';
 import HeaderInput from '../../component/header/header.input';
 import ProductListView from '../../component/product/product.listview';
+import TabsHeader from '../../component/layout/tabs.header';
 
 const cssPrefix = 'product';
 
@@ -97,6 +99,12 @@ class InventoryStock extends Taro.Component<Props, State> {
     return result;
   }
 
+  public onNavToList = () => {
+    Taro.navigateTo({
+      url: `/pages/inventory/inventory.stock.list`
+    });
+  }
+
   public searchData = async () => {
     const { searchValue } = this.state;
     try {
@@ -118,6 +126,10 @@ class InventoryStock extends Taro.Component<Props, State> {
         icon: 'none'
       });
     }
+  }
+  
+  public onTypeChange = (type: ProductInterface.ProductTypeInfo) => {
+    this.onTypeClick(type);
   }
 
   /**
@@ -146,18 +158,41 @@ class InventoryStock extends Taro.Component<Props, State> {
     return (
       <View className={`container ${cssPrefix}`}>
         <HeaderInput
+          className="inventory-input"
           placeholder="请输入商品名称或条码"
           value={searchValue}
           onInput={this.onInput}
           isRenderInputRight={true}
           inputRightClick={() => this.onInput({detail: {value: ''}})}
-        />
+        >
+          <View 
+            className={'inventory-header-item'}
+            onClick={() => this.onNavToList()}
+          >
+            <Image 
+              src="//net.huanmusic.com/weapp/icon_record_inventory.png" 
+              className={`inventory-header-item-stock`} 
+            />
+            <Text className="inventory-header-item-text">盘点记录</Text>
+          </View>
+        </HeaderInput>
         
-        <View className={`${cssPrefix}-list-container`}>
+        {this.renderTabs()}
+        <View className={`${cssPrefix}-list-container ${cssPrefix}-list-container-inventory`}>
           {this.renderList()}
         </View>
         <CartBar sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK} />
       </View>
+    );
+  }
+
+  private renderTabs = () => {
+    const { productTypeList } = this.props;
+    return (
+      <TabsHeader
+        tabs={productTypeList}
+        onChange={(type) => this.onTypeChange(type)}
+      />
     );
   }
 
