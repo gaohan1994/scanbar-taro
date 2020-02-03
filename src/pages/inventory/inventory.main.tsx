@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-14 18:00:32
+ * @Last Modified time: 2020-01-17 09:53:31
  * 
  * @todo 进货
  */
@@ -64,7 +64,11 @@ class InventoryMain extends Taro.Component<Props> {
     loading: false,
   };
   
-  componentDidMount () {
+  componentDidShow () {
+    this.setState({
+      searchValue: ''
+    });
+    ProductAction.productInfoEmptySearchList();
     this.init();
   }
 
@@ -80,9 +84,7 @@ class InventoryMain extends Taro.Component<Props> {
     try {
       const productTypeResult = await ProductAction.productInfoType();
       invariant(productTypeResult.code === ResponseCode.success, productTypeResult.msg || ' ');
-      const { data } = productTypeResult;
-      const firstType = data[0] || {};
-      this.changeCurrentType(firstType);
+      this.fetchData(undefined as any);
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -175,7 +177,7 @@ class InventoryMain extends Taro.Component<Props> {
             onClick={() => this.onNavToList()}
           >
             <Image 
-              src="//net.huanmusic.com/weapp/icon_record_inventory.png" 
+              src="//net.huanmusic.com/weapp/icon_record.png" 
               className={`inventory-header-item-purchase`} 
             />
             <Text className="inventory-header-item-text">进货纪录</Text>

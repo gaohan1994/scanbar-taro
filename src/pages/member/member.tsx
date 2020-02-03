@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-26 16:17:23
+ * @Last Modified time: 2020-01-15 21:22:46
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Input, Image, Text } from '@tarojs/components';
@@ -329,12 +329,18 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
               >
                 {tab.value}
                 {memberQuery === tab.key && memberSelect === 'desc' && (
-                  <Image src="//net.huanmusic.com/weapp/icon_sort.png" className={`${cssPrefix}-tabs-header-item-icon`} />
+                  <Image src="//net.huanmusic.com/weapp/icon_sort2.png" className={`${cssPrefix}-tabs-header-item-icon`} />
                 )}
                 {memberQuery === tab.key && memberSelect === 'asc' && (
                   <Image 
-                    src="//net.huanmusic.com/weapp/icon_sort.png" 
-                    className={`${cssPrefix}-tabs-header-item-icon ${cssPrefix}-tabs-header-item-icon-asc`} 
+                    src="//net.huanmusic.com/weapp/icon_sort1.png" 
+                    className={`${cssPrefix}-tabs-header-item-icon ${cssPrefix}-tabs-header-item-icon`} 
+                  />
+                )}
+                {memberQuery !== tab.key && (
+                  <Image 
+                    src="//net.huanmusic.com/weapp/icon_sort3.png" 
+                    className={`${cssPrefix}-tabs-header-item-icon ${cssPrefix}-tabs-header-item-icon`} 
                   />
                 )}
                 {memberQuery === tab.key && (
@@ -381,12 +387,15 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
                     })}
                     onClick={() => {Taro.navigateTo({url: `/pages/member/member.detail?id=${member.id}`})}}
                   >
-                    <View className={`${cssPrefix}-card-row-detail`}>
-                      <View className={`${cssPrefix}-card-row-detail-name`}>
-                        <Text className={`${cssPrefix}-card-text`}>{member.username}</Text>
-                        <View className={`${cssPrefix}-card-row-detail-icon`}>普通会员</View>
+                    <View className={`${cssPrefix}-card-row-box`}>
+                      <Image src="//net.huanmusic.com/weapp/icon_vip_user.png" className={`${cssPrefix}-card-row-image`} />
+                      <View className={`${cssPrefix}-card-row-detail`}>
+                        <View className={`${cssPrefix}-card-row-detail-name`}>
+                          <Text className={`${cssPrefix}-card-text`}>{member.username}</Text>
+                          <View className={`${cssPrefix}-card-row-detail-icon`}>普通会员</View>
+                        </View>
+                        <Text className={`${cssPrefix}-card-row-margin ${cssPrefix}-card-phone`}>{member.phoneNumber}</Text>
                       </View>
-                      <Text className={`${cssPrefix}-card-row-margin ${cssPrefix}-card-phone`}>{member.phoneNumber}</Text>
                     </View>
                     {memberQuery === 'total_amount' && (
                       <Text className={`${cssPrefix}-card-price`}>{`￥${numeral(member.totalAmount).format('0.00')}`}</Text>

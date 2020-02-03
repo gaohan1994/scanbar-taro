@@ -33,7 +33,7 @@ class InventoryItem extends Taro.Component<Props> {
   }
 
   render () {
-    const { inventory } = this.props;
+    const { inventory, sort } = this.props;
     // 是否大于0
     const absToken: boolean = numeral(inventory.amount).value() > 0;
     return (
@@ -42,7 +42,7 @@ class InventoryItem extends Taro.Component<Props> {
         onClick={() => this.onNavToDetail()}
       >
         <View className={`${cssPrefix}-header`}>
-          <View>
+          <View className={`${cssPrefix}-header-box`}>
             {absToken ? (
               <Image
                 src="//net.huanmusic.com/weapp/icon_order_green.png"
@@ -62,7 +62,7 @@ class InventoryItem extends Taro.Component<Props> {
         <View className={`${cssPrefix}-content`}>
           <View className={`${cssPrefix}-content-item ${cssPrefix}-content-item-bot`}>
             <Text className={`${cssPrefix}-content-item-name`}>种类</Text>
-            <Text className={`${cssPrefix}-content-item-value`}>没有返回该数据</Text>
+            <Text className={`${cssPrefix}-content-item-value`}>{inventory.productNum}</Text>
           </View>
           <View className={`${cssPrefix}-content-item`}>
             <Text className={`${cssPrefix}-content-item-name`}>数量</Text>
@@ -77,10 +77,14 @@ class InventoryItem extends Taro.Component<Props> {
 
           <View 
             className={classnames(`${cssPrefix}-content-item-price`, {
-              [`${cssPrefix}-content-item-red`]: !absToken
+              [`${cssPrefix}-content-item-red`]: sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK && !absToken
             })}
           >
-            {`${absToken ? '+' : '-'}￥${numeral(Math.abs(inventory.amount)).format('0.00')}`}
+            
+            {sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK && (
+              <Text>{absToken ? '' : '-'}</Text>  
+            )}
+            {`￥${numeral(Math.abs(inventory.amount)).format('0.00')}`}
           </View>
         </View>
       </View>

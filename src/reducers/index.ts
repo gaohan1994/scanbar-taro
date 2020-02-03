@@ -5,6 +5,8 @@ import product, { ProductReducer } from './app.product';
 import pay, { PayReducer } from './app.pay';
 import order, { OrderReducer } from './app.order';
 import inventory, { InventoryReducer } from './app.inventory';
+import merchant, { MerchantReducer } from './app.merchant';
+import report, { ReportReducer } from './app.report';
 import productSDK, { ProductSDKReducer } from '../common/sdk/product/product.sdk.reducer';
 
 export declare namespace AppReducer {
@@ -15,6 +17,8 @@ export declare namespace AppReducer {
     pay: PayReducer.State;
     order: OrderReducer.State;
     inventory: InventoryReducer.State;
+    merchant: MerchantReducer.State;
+    report: ReportReducer.State;
   }
 }
 
@@ -26,4 +30,6 @@ export default combineReducers({
   pay,
   order,
   inventory,
+  merchant,
+  report,
 });

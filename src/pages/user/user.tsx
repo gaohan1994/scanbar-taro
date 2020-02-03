@@ -2,13 +2,14 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-09 17:16:01
+ * @Last Modified time: 2020-01-17 11:40:53
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import "../style/user.less";
 import "../../component/card/form.card.less";
 import classnames from 'classnames';
+import merchantAction from '../../actions/merchant.action';
 
 const Rows = [
   {
@@ -44,6 +45,18 @@ class UserMain extends Taro.Component<UserMainProps> {
     navigationBarTitleText: '我的'
   };
 
+  componentDidShow () {
+    this.init();
+  }
+
+  public init = () => {
+    /**
+     * @todo [请求商户详情]
+     */
+    // merchantAction.merchantDetail();
+    merchantAction.profileInfo();
+  }
+
   public onRowClick = (row: any) => {
     Taro.navigateTo({
       url: `${row.url}`
@@ -66,16 +79,21 @@ class UserMain extends Taro.Component<UserMainProps> {
             onClick={() => this.onNavDetail()}
           >
             <Image 
-              src="//net.huanmusic.com/weapp/icon_user.png"
+              src="//net.huanmusic.com/weapp/icon_mine_touxiang.png"
               className={`${cssPrefix}-user-image`}
             />
-            <View className={`${cssPrefix}-user-name`}>黄小姐</View>
-            <View className={`${cssPrefix}-user-text`}>采购专员</View>
+            <View className={`${cssPrefix}-user-box`}>
+              <View className={`${cssPrefix}-user-name`}>
+                黄小姐
+                <View className={`${cssPrefix}-user-level`}>采购专员</View>    
+              </View>
+              <View className={`${cssPrefix}-user-text`}>15659995443</View>
+            </View>
           </View>
 
           <View 
             className={`${cssPrefix}-user-edit`}
-            onClick={() => {}}
+            onClick={() => this.onNavDetail()}
           >
             <Image 
               src="//net.huanmusic.com/weapp/icon_edit.png"

@@ -91,6 +91,7 @@ class InventoryPay extends Taro.Component<Props, State> {
       });
       if (result.data.businessNumber) {
         setTimeout(() => {
+          productSdk.empty(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE);
           Taro.redirectTo({
             url: `/pages/inventory/inventory.purchase.detail?id=${result.data.businessNumber}&entry=inventory`
           });  

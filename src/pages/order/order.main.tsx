@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-12-09 11:01:19 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-27 10:09:37
+ * @Last Modified time: 2020-01-17 10:50:48
  */
 
 import Taro from '@tarojs/taro';
@@ -15,10 +15,14 @@ import "../style/report.less";
 import "../style/order.less";
 import "../style/member.less";
 import "../style/product.less";
+import "../style/inventory.less";
 import OrderItem from '../../component/order/order';
 import dayJs from 'dayjs';
 import { ResponseCode } from '../../constants/index';
 import invariant from 'invariant';
+import ModalLayout from '../../component/layout/modal.layout';
+import classnames from 'classnames';
+import merge from 'lodash.merge';
 
 const cssPrefix = 'order';
 
@@ -32,6 +36,9 @@ interface Props {
 interface State { 
   value: string;
   date: string;
+  visible: boolean;
+  selectStatus: any[];
+  selectTypes: any[];
 }
 
 class OrderMain extends Taro.Component<Props, State> {
@@ -39,13 +46,16 @@ class OrderMain extends Taro.Component<Props, State> {
   state: State = {
     value: '', 
     date: dayJs().format('YYYY-MM-DD'),
+    visible: false,
+    selectStatus: [],
+    selectTypes: [],
   };
 
   componentDidMount() {
     this.init();
   }
 
-  public onChangeValue = (key: string, value: string) => {
+  public onChangeValue = (key: string, value: any) => {
     this.setState(prevState => {
       return {
         ...prevState,
@@ -53,6 +63,36 @@ class OrderMain extends Taro.Component<Props, State> {
       };
     }, () => {
       this.searchOrder();
+    });
+  }
+
+  public changeSelect = (value: number, key: string = 'selectStatus') => {
+    this.setState(prevState => {
+      const prevData: number[] = merge([], prevState[key]);
+      const index = prevData.findIndex(p => p === value);
+      if (index === -1) {
+        prevData.push(value);
+      } else {
+        prevData.splice(index, 1);
+      }
+      return {
+        ...prevState,
+        [`${key}`]: prevData
+      };
+    });
+  }
+
+  public changeAll = (key: string = 'selectStatus') => {
+    this.setState(prevState => {
+      const prevData = merge([], prevState[key]);
+      let nextData: any[] = [];
+      if (prevData.length === 0) {
+        nextData = [0, 1];
+      }
+      return {
+        ...prevState,
+        [key]: nextData
+      };
     });
   }
 
@@ -95,13 +135,20 @@ class OrderMain extends Taro.Component<Props, State> {
 
   public fetchOrder = async (page?: number) => {
     try {
-      const { date } = this.state;
-      const payload: OrderInterface.OrderListFetchFidle = {
+      const { date, selectStatus, selectTypes } = this.state;
+      let payload: OrderInterface.OrderListFetchFidle = {
         pageNum: typeof page === 'number' ? page : pageNum,
         pageSize: 20,
         startTime: date,
         endTime: date,
       };
+      if (selectStatus && selectStatus.length === 1) {
+        payload.transType = selectStatus[0];
+      }
+      if (selectTypes && selectTypes.length === 1) {
+        const fetchType = selectTypes[0];
+        payload.transFlag = fetchType === 0 ? 1 : 0;
+      }
       const result = await OrderAction.orderList(payload);
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       if (typeof page === 'number') {
@@ -117,9 +164,19 @@ class OrderMain extends Taro.Component<Props, State> {
     }
   }
 
+  public reset = () => {
+    this.setState({
+      selectStatus: [],
+      selectTypes: [],
+    }, () => {
+      this.fetchOrder(1);
+    });
+  }
+
   public init = async () => {
     pageNum = 1;
-    OrderAction.orderList({pageNum: pageNum++, pageSize});
+    const today = dayJs().format('YYYY-MM-DD');
+    OrderAction.orderList({pageNum: pageNum++, pageSize, startTime: today, endTime: today});
   }
 
   render () {
@@ -130,6 +187,7 @@ class OrderMain extends Taro.Component<Props, State> {
           {this.renderSearch()}
         </View>
         {this.renderContainer()}
+        {this.renderModal()}
       </View>
     );
   }
@@ -139,7 +197,7 @@ class OrderMain extends Taro.Component<Props, State> {
     const { value } = this.state;
     return (
       <View className={`order-header`}>
-        <View className={`${cssPrefix}-main-header-search order-search order-search`}>
+        <View className={`${cssPrefix}-main-header-search order-search`}>
           <Image src="//net.huanmusic.com/weapp/icon_search.png" className={`${cssPrefix}-main-header-search-icon`} />
           <Input
             className={`${cssPrefix}-main-header-search-input`} 
@@ -149,6 +207,16 @@ class OrderMain extends Taro.Component<Props, State> {
             onInput={({detail: {value}}) => this.onChangeValue('value', value)}
             // onConfirm={() => this.searchMember()}
           />
+        </View>
+        <View 
+          className={'inventory-header-item'}
+          onClick={() => this.onChangeValue('visible', true)}
+        >
+          <Image 
+            src="//net.huanmusic.com/weapp/icon_shaixuan.png" 
+            className={`inventory-header-item-sort`} 
+          />
+          <Text className="inventory-header-item-text">筛选</Text>
         </View>
       </View>
     );
@@ -191,7 +259,7 @@ class OrderMain extends Taro.Component<Props, State> {
       <View className={`${cssPrefix}-time`} >
         <View className={`${cssPrefix}-time-box ${cssPrefix}-time-box-left`} onClick={() => this.prevDate()}>
           <Image 
-            src="//net.huanmusic.com/weapp/icon_time_left.png" 
+            src="//net.huanmusic.com/weapp/v1/icon_time_left.png" 
             className={`${cssPrefix}-time-icon`} 
           />
         </View>
@@ -202,18 +270,102 @@ class OrderMain extends Taro.Component<Props, State> {
           value={date}
         >
           <View className={`${cssPrefix}-time-date`}>
-            <Image src="//net.huanmusic.com/weapp/icon_rili.png" className={`${cssPrefix}-time-rili`} />
+            <Image src="//net.huanmusic.com/weapp/v1/icon_rili.png" className={`${cssPrefix}-time-rili`} />
             <Text>{date}</Text>
           </View>
         </Picker>
         <View className={`${cssPrefix}-time-box ${cssPrefix}-time-box-right`} onClick={() => this.nextDate()}>
           <Image 
-            src="//net.huanmusic.com/weapp/icon_time_right.png" 
+            src="//net.huanmusic.com/weapp/v1/icon_time_right.png" 
             className={`${cssPrefix}-time-icon`} 
           />
         </View>
         
       </View>
+    );
+  }
+
+  private renderModal = () => {
+    const { visible, selectStatus, selectTypes } = this.state;
+    return (
+      <ModalLayout
+        visible={visible}
+        onClose={() => this.onChangeValue('visible', false)}
+        contentClassName={`${cssPrefix}-layout`}
+        title="筛选"
+        buttons={[
+          {title: '重置', type: 'cancel', onPress: () => {
+            this.reset();
+          }},
+          {title: '确定', onPress: () => {
+            this.onChangeValue('visible', false);
+            this.fetchOrder(1);
+          }},
+        ]}
+      >
+        <View className={`inventory-select`}>
+          <View className={`inventory-select-item`}>
+            <View className={`inventory-select-title`}>订单状态</View>
+            <View className={"inventory-select-item-box"}>
+              <View
+                onClick={() => this.changeAll()}
+                className={classnames(
+                  'inventory-select-item-button', 
+                  {'inventory-select-item-button-active': selectStatus.length === 2}
+                )}
+              >
+                全部状态
+              </View>
+              <View
+                onClick={() => this.changeSelect(0, 'selectStatus')}
+                className={classnames("inventory-select-item-button", {
+                  'inventory-select-item-button-active': selectStatus.some((s) => s === 0)
+                })}
+              >
+                支付成功
+              </View>
+              <View
+                onClick={() => this.changeSelect(1, 'selectStatus')}
+                className={classnames("inventory-select-item-button", {
+                  'inventory-select-item-button-active': selectStatus.some((s) => s === 1)
+                })}
+              >
+                支付失败
+              </View>
+            </View>
+          </View>
+          <View className={`inventory-select-item`}>
+            <View className={`inventory-select-title`}>交易类型</View>
+            <View className={"inventory-select-item-box"}>
+              <View
+                onClick={() => this.changeAll('selectTypes')}
+                className={classnames(
+                  'inventory-select-item-button', 
+                  {'inventory-select-item-button-active': selectTypes.length === 2}
+                )}
+              >
+                全部订单
+              </View>
+              <View
+                onClick={() => this.changeSelect(0, 'selectTypes')}
+                className={classnames("inventory-select-item-button", {
+                  'inventory-select-item-button-active': selectTypes.some((t) => t === 0)
+                })}
+              >
+                销售单
+              </View>
+              <View
+                onClick={() => this.changeSelect(1, 'selectTypes')}
+                className={classnames("inventory-select-item-button", {
+                  'inventory-select-item-button-active': selectTypes.some((t) => t === 1)
+                })}
+              >
+                退货单
+              </View>
+            </View>
+          </View>
+        </View>
+      </ModalLayout>
     );
   }
 }

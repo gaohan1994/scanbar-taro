@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-15 11:17:25 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-10 11:50:46
+ * @Last Modified time: 2020-01-17 11:59:33
  * 
  * @todo [商品管理页面]
  */
@@ -23,6 +23,7 @@ import { AtButton } from 'taro-ui';
 import classnames from 'classnames';
 import productSdk from '../../common/sdk/product/product.sdk';
 import merge from 'lodash.merge';
+import ButtonFooter from '../../component/button/button.footer';
 
 const memberPrefix = 'member';
 const cssPrefix = 'product';
@@ -463,27 +464,12 @@ class ProductManage extends Taro.Component<Props, State> {
                 </View>
               </View>
             </View>
-            <View className={`${cssPrefix}-select-content-item-pos`}>
-              <View className={`${cssPrefix}-add-buttons-button`}>
-                <AtButton
-                  type="primary"
-                  onClick={() => this.reset()}
-                  className={`product-manage-select-modal-button-reset`}
-                >
-                  <Text className={`product-manage-select-modal-button-reset-text`}>重置</Text>
-                </AtButton>
-              </View>
-              <View className={`${cssPrefix}-add-buttons-button`}>
-                <AtButton
-                  type="primary"
-                  onClick={() => this.submit()}
-                  className={`product-manage-select-modal-button-submit`}
-                >
-                  <Text className={`product-manage-select-modal-button-submit-text`}>确定</Text>
-                </AtButton>
-              </View>
-             
-            </View>
+            <ButtonFooter 
+              buttons={[
+                {title: '重置', type: 'cancel', onPress: () => this.reset()},
+                {title: '确定', type: 'confirm', onPress: () => this.submit()},
+              ]}
+            />
           </View>
         </View>
       );

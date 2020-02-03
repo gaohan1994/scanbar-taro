@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-20 13:37:23 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-27 10:59:50
+ * @Last Modified time: 2020-01-17 10:27:54
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Picker, Text } from '@tarojs/components';
@@ -209,7 +209,7 @@ class ProductAdd extends Taro.Component<Props, State> {
         that.setState(prevState => {
           return {
             ...prevState,
-            images: data.data[0]
+            images: [data.data[0]]
           };
         });
       } else {

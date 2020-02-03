@@ -55,7 +55,7 @@ class InventoryList extends Taro.Component<Props, State> {
 
   componentDidShow () {
     ProductAction.productInfoSupplier();
-    this.fetchData();
+    this.fetchData(1);
   }
 
   /**
@@ -145,8 +145,8 @@ class InventoryList extends Taro.Component<Props, State> {
       }
       const today = dayJs().format('YYYY-MM-DD');
       if (dateMin !== today || dateMax !== today) {
-        payload.startTime = dateMin;
-        payload.endTime = dateMax;
+        payload.startTime = `${dateMin} 00:00:00`;
+        payload.endTime = `${dateMax} 00:00:00`;
       }
       const result = await InventoryAction.inventoryStockList(payload);
       invariant(result.code === ResponseCode.success, result.msg || ' ');
@@ -182,7 +182,7 @@ class InventoryList extends Taro.Component<Props, State> {
           inputRightClick={() => this.onInput({detail: {value: ''}})}
         >
           <View 
-            className={'inventory-header-item'}
+            className={'inventory-header-item inventory-header-item-pur'}
             onClick={() => this.onChangeValue('visible', true)}
           >
             <Image 
@@ -255,7 +255,7 @@ class InventoryList extends Taro.Component<Props, State> {
           {title: '重置', onPress: () => this.reset(), type: 'cancel'},
           {title: '确定', onPress: () => {
             this.onChangeValue('visible', false);
-            this.fetchData();
+            this.fetchData(1);
           }},
         ]}
       >

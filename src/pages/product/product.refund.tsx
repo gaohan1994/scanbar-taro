@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-13 16:28:29
+ * @Last Modified time: 2020-01-15 20:21:24
  * 
  * @todo 开单页面
  */
@@ -64,12 +64,17 @@ class ProductRefund extends Taro.Component<Props, State> {
   };
   
   componentDidShow () {
+    this.setState({
+      searchValue: ''
+    });
+    ProductAction.productInfoEmptySearchList();
     this.init();
   }
 
   public changeCurrentType = (typeInfo: ProductInterface.ProductTypeInfo, fetchProduct: boolean = true) => {
     this.setState({ currentType: typeInfo }, async () => {
       if (fetchProduct) {
+        console.log('this.state', this.state);
         this.fetchData(typeInfo);
       }
     });
@@ -146,6 +151,7 @@ class ProductRefund extends Taro.Component<Props, State> {
     return (
       <View className={`container ${cssPrefix}`}>
         <HeaderInput
+          className="product-refund-input"
           placeholder="请输入商品名称或条码"
           value={searchValue}
           onInput={this.onInput}

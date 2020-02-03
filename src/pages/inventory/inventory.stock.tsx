@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-14 18:00:54
+ * @Last Modified time: 2020-01-16 17:29:26
  * 
  * @todo 盘点
  */
@@ -66,6 +66,10 @@ class InventoryStock extends Taro.Component<Props, State> {
   };
 
   componentDidShow () {
+    this.setState({
+      searchValue: ''
+    });
+    ProductAction.productInfoEmptySearchList();
     productSdk.setSort(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK);
     this.init();
   }
@@ -82,9 +86,10 @@ class InventoryStock extends Taro.Component<Props, State> {
     try {
       const productTypeResult = await ProductAction.productInfoType();
       invariant(productTypeResult.code === ResponseCode.success, productTypeResult.msg || ' ');
-      const { data } = productTypeResult;
-      const firstType = data[0] || {};
-      this.changeCurrentType(firstType);
+      /**
+       * @todo [刚进入界面显示全部商品]
+       */
+      this.fetchData(undefined as any);
     } catch (error) {
       Taro.showToast({
         title: error.message,

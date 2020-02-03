@@ -41,6 +41,7 @@ export declare namespace InventoryInterface {
     supplierId: number;
     supplierName: number;
     type: number;
+    productNum: number;
     businessNumber: string;
     docMaker: string;
     makeTime: string;

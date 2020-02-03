@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-07 15:36:26
+ * @Last Modified time: 2020-01-17 09:38:18
  * 
  * @todo [商品相关的类型定义]
  */
@@ -36,6 +36,7 @@ export declare namespace ProductInterface {
   interface ProductInfo {
     id: number;
     cost: number;         // 进货价
+    avgCost: number;      // 平均进货价
     limitNum: number;     // 库存下限预警
     memberPrice: number;  // 会员价
     merchantId: number;   // 商户id

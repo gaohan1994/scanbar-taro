@@ -93,7 +93,7 @@ class OrderDetail extends Taro.Component<Props, State> {
     return (
       <View className={`${cssPrefix}-detail-status`}>
         <Image 
-          src="//net.huanmusic.com/weapp/icon_success.png" 
+          src="//net.huanmusic.com/weapp/v1/icon_success.png" 
           className={`${cssPrefix}-detail-status-icon`} 
         />
         {orderDetail.order && (
@@ -158,13 +158,6 @@ class OrderDetail extends Taro.Component<Props, State> {
         extraTextStyle: 'price',
         hasBorder: false
       },
-    ];
-
-    const memberForm: FormRowProps[] = orderDetail.order && [
-      {
-        title: '会员',
-        extraText: '接口没有返回'
-      }
     ];
 
     return (

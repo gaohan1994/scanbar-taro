@@ -58,6 +58,13 @@ class ProductComponent extends Taro.Component<Props, State> {
   }
 
   public onContentClick = () => {
+    const { sort, product } = this.props;
+    if (sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_MANAGE) {
+      Taro.navigateTo({
+        url: `/pages/product/product.detail?id=${product.id}`
+      });
+      return;
+    }
     this.changePriceModal();
   }
 
@@ -125,9 +132,9 @@ class ProductComponent extends Taro.Component<Props, State> {
           ? (
             <View className={classnames(`${cssPrefix}-content-detail-box`)}>
               <Text className={`${cssPrefix}-manage-font`}>进价: ￥{numeral(product.cost).format('0.00')}</Text>
-              {showUnitToken && (
-                <Text className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>{`库存：${product.number}${product.unit}`}</Text>
-              )}
+              <View className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>
+                库存：{` ${product.number || 0}${product.unit || ''}`}
+              </View>
             </View>
           )
           : (

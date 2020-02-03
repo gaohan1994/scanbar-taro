@@ -14,6 +14,7 @@ import numeral from 'numeral';
 import { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import ProductPayListView from '../../component/product/product.pay.listview';
 import ButtonFooter from '../../component/button/button.footer';
+import invariant from 'invariant';
 
 const cssPrefix = 'order';
 
@@ -40,6 +41,20 @@ class InventoryPurchaseDetail extends Taro.Component<Props> {
     Taro.navigateTo({
       url: '/pages/inventory/inventory.main'
     });
+  }
+
+  public onCopy = async () => {
+    try { 
+      const { stockDetail } = this.props;
+      invariant(stockDetail && stockDetail.businessNumber, '请选择要复制的数据');
+      await Taro.setClipboardData({data: stockDetail.businessNumber});
+      Taro.showToast({title: '已复制订单号'}); 
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
   }
 
   public onCopyPurchase = () => {
@@ -101,7 +116,7 @@ class InventoryPurchaseDetail extends Taro.Component<Props> {
         />
         <View className={`${cssPrefix}-detail-status-detail`}>
           <View
-            // onClick={() => this.onCopy()}
+            onClick={() => this.onCopy()}
             className={`${cssPrefix}-detail-status-detail-box`}
           >
             <Text className={`${cssPrefix}-detail-status-result`}>{stockDetail.businessNumber}</Text>

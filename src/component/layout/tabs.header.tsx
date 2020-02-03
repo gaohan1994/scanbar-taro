@@ -9,6 +9,7 @@ type Props = {
   tabs: any[];
   position?: string;
   onChange?: (tab: any) => void;
+  onClose?: () => void;
 };
 
 type State = {
@@ -23,7 +24,8 @@ class TabsHeader extends Taro.Component<Props, State> {
   };
 
   static defaultProps = {
-    tabs: [{id: 1, title: '全部品类'}]
+    tabs: [{id: 1, title: '全部品类'}],
+    onClose: () => {/** */}
   };
 
   readonly state: State = {
@@ -59,7 +61,7 @@ class TabsHeader extends Taro.Component<Props, State> {
   }
 
   render () {
-    const { tabs } = this.props; 
+    const { tabs,  } = this.props; 
     const { current } = this.state;
     return (
       <View className={`${cssPrefix} ${cssPrefix}-pos`}>
@@ -122,6 +124,10 @@ class TabsHeader extends Taro.Component<Props, State> {
               })
             }
           </View>
+          <View 
+            className={`${cssPrefix}-content-mask-touch`} 
+            onClick={() => this.onChangeVisible(false)}
+          />
         </View>
       );
     }

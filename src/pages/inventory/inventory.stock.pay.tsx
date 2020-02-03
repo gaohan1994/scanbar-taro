@@ -35,7 +35,7 @@ class InventoryStockPay extends Taro.Component<Props, State> {
   };
 
   componentDidMount() {
-    productSdk.setSort(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE);
+    productSdk.setSort(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK);
   }
 
   public onStockCheck = async () => {
@@ -59,6 +59,7 @@ class InventoryStockPay extends Taro.Component<Props, State> {
         duration: 1000
       });
       setTimeout(() => {
+        productSdk.empty(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK);
         Taro.redirectTo({
           url: `/pages/inventory/inventory.stock.detail?id=${result.data.businessNumber}&entry=stock`,
         });
@@ -109,19 +110,20 @@ class InventoryStockPay extends Taro.Component<Props, State> {
   }
 
   private renderListDetail = () => {
+    const productNumber = productSdk.getProductNumber();
     const stockPrice = productSdk.getStockPrice();
     const priceForm: FormRowProps[] = [
       {
-        title: '盘盈金额',
-        extraText: stockPrice > 0 ? `￥${this.setNumber(stockPrice)}` : `-￥${Math.abs(stockPrice)}`,
-        extraTextColor: '#333333',
+        title: `盘${productNumber > 0 ? '盈' : '亏'}金额`,
+        extraText: `${productNumber > 0 ? '' : '-'}￥${this.setNumber(Math.abs(stockPrice))}`,
+        extraTextColor: productNumber > 0 ? '#333333' : '#FC4E44',
         extraTextBold: 'bold',
         extraTextSize: '36',
       },
       {
-        title: '盘盈数量',
-        extraText: `${productSdk.getProductNumber()}`,
-        extraTextColor: '#333333',
+        title: `盘${productNumber > 0 ? '盈' : '亏'}数量`,
+        extraText: `${productNumber}`,
+        extraTextColor: productNumber > 0 ? '#333333' : '#FC4E44',
         extraTextBold: 'bold',
         extraTextSize: '36',
         hasBorder: false,

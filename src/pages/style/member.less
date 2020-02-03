@@ -47,8 +47,8 @@
         color: #999999;
         position: relative;
         &-icon {
-          width: 10px;
-          height: 30px;
+          width: 12px;
+          height: 24px;
           .margin(10px, l);
           &-asc {
             transform: rotate(180deg);
@@ -103,6 +103,14 @@
       color: #666666;
       font-size: 26px;
       .flex(center, space-between, row);
+      &-box {
+        .flex(center, center, row);
+      }
+      &-image {
+        width: 80px;
+        height: 80px;
+        .margin(20px, r);
+      }
       &-detail {
         display: flex;
         flex-direction: column;

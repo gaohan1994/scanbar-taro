@@ -31,6 +31,10 @@ class ModalLayout extends Taro.Component<Props> {
       return (
         <View className={`product-pay-member-layout-mask`} >
           <View 
+            className={`${cssPrefix}-select-mask`} 
+            onClick={onClose}
+          />
+          <View 
             className={`product-pay-member-layout-box product-pay-member-layout-container`}
             style="background-color: #ffffff;"
           >
@@ -49,6 +53,7 @@ class ModalLayout extends Taro.Component<Props> {
               })}
             >
               {this.props.children}
+              <View style="height: 20px; width: 100%"  />
             </View>
             {buttons && buttons.length > 0 && (
               <ButtonFooter buttons={buttons} />

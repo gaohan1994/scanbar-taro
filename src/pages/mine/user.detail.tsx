@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-09 17:06:54
+ * @Last Modified time: 2020-01-17 11:49:34
  */
 import Taro from '@tarojs/taro';
 import { View, Image, } from '@tarojs/components';
@@ -11,17 +11,24 @@ import "../../component/card/form.card.less";
 import "../style/product.less";
 import { FormRowProps } from '../../component/card/form.row';
 import FormRow from '../../component/card/form.row';
+import { AppReducer } from '../../reducers';
+import { getMerchantDetail } from '../../reducers/app.merchant';
+import { connect } from '@tarojs/redux';
+import { MerchantInterface } from '../../constants';
 
 const cssPrefix = 'user';
 
-type Props = {};
+type Props = {
+  merchantDetail: MerchantInterface.MerchantDetail;
+};
 
 class UserMerchant extends Taro.Component<Props> {
   render () {
+    const { merchantDetail } = this.props;
     const form: FormRowProps[] = [
       {
         title: '姓名',
-        extraText: '黄可乐',
+        extraText: merchantDetail.contactName,
       },
       {
         title: '角色',
@@ -38,7 +45,7 @@ class UserMerchant extends Taro.Component<Props> {
               arrow="right"
             >
               <Image 
-                src="//net.huanmusic.com/weapp/icon_user.png" 
+                src="//net.huanmusic.com/weapp/icon_vip_user.png" 
                 className={`${cssPrefix}-detail-img`}
               />
             </FormRow>
@@ -52,4 +59,8 @@ class UserMerchant extends Taro.Component<Props> {
   }
 }
 
-export default UserMerchant;
+const select = (state: AppReducer.AppState) => ({
+  merchantDetail:  getMerchantDetail(state),
+});
+
+export default connect(select)(UserMerchant);

@@ -19,6 +19,12 @@ export { OrderInterface, default as OrderInterfaceMap } from './order/order';
 export { default as InventoryService } from './inventory/inventory.service';
 export { InventoryInterface, default as InventoryInterfaceMap } from './inventory/inventory';
 
+export { default as MerchantService } from './merchant/merchant.service';
+export { MerchantInterface, default as MerchantInterfaceMap } from './merchant/merchant';
+
+export { default as ReportService } from './report/report.service';
+export { ReportInterface, default as ReportInterfaceMap } from './report/report';
+
 export const ResponseCode = {
   success: 'response.success',
   error: '服务器开了个小差',

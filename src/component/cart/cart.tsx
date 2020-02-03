@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-14 18:44:44
+ * @Last Modified time: 2020-01-17 11:30:27
  * 
  * @todo [购物车组件]
  */
@@ -79,10 +79,18 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
         weightProductChangePrice: `${nextProps.changeWeightProduct.price}`,
       });
     }
-
+    const { sort } = this.props;
     if (nextProps.changeProduct && nextProps.changeProduct.id) {
+      /**
+       * @todo [进货显示进价]
+       */
+      const nextChangePrice: string = nextProps.changeProduct.changePrice
+        ? `${nextProps.changeProduct.changePrice}`
+        : sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE
+          ? (`${nextProps.changeProduct.cost}` || '')
+          : (`${nextProps.changeProduct.price}` || '');
       this.setState({
-        changePrice: `${nextProps.changeProduct.changePrice || nextProps.changeProduct.price || ''}`,
+        changePrice: nextChangePrice,
         changeSellNum: `${nextProps.changeProduct.sellNum || ''}`,
       });
     }
@@ -363,7 +371,10 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
               [`cart-left-purchase-active`]: productCartList.length > 0
             })}
           >
-            {`${productCartList.length}种，${productSdk.getProductNumber(undefined)}件`}
+            <Text style={productCartList.length > 0 ? "color: #ffffff;" : ''}>{productCartList.length}</Text>
+            种，
+            <Text style={productCartList.length > 0 ? "color: #ffffff;" : ''}>{productSdk.getProductNumber(undefined)}</Text>
+            件
             {
               productCartList.length > 0 && (
                 cartListVisible !== true ? (
@@ -393,7 +404,9 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                 [`cart-left-purchase-active`]: productCartList.length > 0
               })}
             >
-              {` ￥${numeral(productSdk.getProductPrice()).format('0.00')}`}  
+              {sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE
+              ? ` ￥${numeral(productSdk.getProductPrice()).format('0.00')}`
+              : ` ￥${numeral(productSdk.getStockPrice()).format('0.00')}`}
             </Text>
           </View>
         </View>
@@ -467,7 +480,9 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
   private renderContent = () => {
     const { cartListVisible } = this.state;
     const { productCartList, sort } = this.props;
-    const showDeleteToken = sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE;
+    const showDeleteToken = 
+      sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE || 
+      sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK;
     return (
       <CartLayout
         isOpened={cartListVisible}
@@ -494,7 +509,12 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                       />
                     </View>
                   )}
-                  <View className={`${cssPrefix}-product-container `}>
+                  <View 
+                    className={`${cssPrefix}-product-container`}
+                    onClick={sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER || sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND
+                      ? () => {/** */}
+                      : () => this.onChangeProductShow(product)}
+                  >
                     <Text className={`${cssPrefix}-product-container-name`}>
                       {product.name}{product.remark && `（${product.remark}）`}
                     </Text>
@@ -520,10 +540,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                           </View>
                         )
                         : (
-                          <View 
-                            className={`${cssPrefix}-product-stepper ${cssPrefix}-product-stepper-purchase`}
-                            onClick={() => this.onChangeProductShow(product)}
-                          >      
+                          <View className={`${cssPrefix}-product-stepper ${cssPrefix}-product-stepper-purchase`}>      
                             {product.sellNum}
                           </View>
                         )

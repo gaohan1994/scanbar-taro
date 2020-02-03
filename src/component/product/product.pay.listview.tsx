@@ -70,11 +70,11 @@ class ProductPayListView extends Taro.Component<Props> {
                         <View className={`${cssPrefix}-row-stock-item-detail ${cssPrefix}-row-stock-item-name`}>
                           盈亏数量：
                           <Text 
-                            className={classnames(`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base`, {
+                            className={classnames(`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base`, `${cssPrefix}-row-bold`, {
                               [`${cssPrefix}-row-stock-item-red`]: item.cost < 0
                             })}
                           >
-                            {item.changedNumber}
+                            {item.number}
                           </Text>
                         </View>
                       </View>
@@ -82,13 +82,14 @@ class ProductPayListView extends Taro.Component<Props> {
                         <View className={`${cssPrefix}-row-stock-item-detail ${cssPrefix}-row-stock-item-name`}>
                           盘点数量：
                           <Text className={`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base`}>
-                            {item.number}
+                            {item.changedNumber}
                           </Text>
                         </View>
                         <View className={`${cssPrefix}-row-stock-item-detail ${cssPrefix}-row-stock-item-name`}>
                           盈亏金额：
                           <Text 
-                            className={classnames(`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base ${cssPrefix}-row-stock-item-bold`, {
+                            className={classnames(`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base ${cssPrefix}-row-stock-item-bold`, 
+                              `${cssPrefix}-row-bold`, {
                               [`${cssPrefix}-row-stock-item-red`]: item.cost < 0
                             })}
                           >
@@ -118,7 +119,7 @@ class ProductPayListView extends Taro.Component<Props> {
                         <View className={`${cssPrefix}-row-stock-item-detail ${cssPrefix}-row-stock-item-name`}>
                           盈亏数量：
                           <Text 
-                            className={classnames(`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base`, {
+                            className={classnames(`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base`, `${cssPrefix}-row-bold`, {
                               [`${cssPrefix}-row-stock-item-red`]: item.sellNum - item.number < 0
                             })}
                           >
@@ -136,11 +137,12 @@ class ProductPayListView extends Taro.Component<Props> {
                         <View className={`${cssPrefix}-row-stock-item-detail ${cssPrefix}-row-stock-item-name`}>
                           盈亏金额：
                           <Text 
-                            className={classnames(`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base ${cssPrefix}-row-stock-item-bold`, {
+                            className={classnames(`${cssPrefix}-row-stock-item-value ${cssPrefix}-row-stock-item-base ${cssPrefix}-row-stock-item-bold`, 
+                            `${cssPrefix}-row-bold`, {
                               [`${cssPrefix}-row-stock-item-red`]: item.sellNum - item.number < 0
                             })}
                           >
-                            {`${item.sellNum - item.number < 0 ? '-' : ''}￥${numeral(Math.abs((item.sellNum - item.number) * item.cost)).format('0.00')}`}
+                            {`${item.sellNum - item.number < 0 ? '-' : ''}￥${numeral(Math.abs((item.sellNum - item.number) * item.avgCost)).format('0.00')}`}
                           </Text>
                         </View>
                       </View>
@@ -201,7 +203,7 @@ class ProductPayListView extends Taro.Component<Props> {
             <Text className={`${cssPrefix}-row-normal`}>{`￥ ${this.setNumber(item.price)}`}</Text>
           )
         )}
-        <Text className={`${cssPrefix}-row-normal`}>
+        <Text className={`${cssPrefix}-row-normal ${cssPrefix}-row-bold`}>
           {`小计：￥ ${this.setNumber(itemPrice * item.sellNum)}`}
         </Text>
       </View>

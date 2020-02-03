@@ -14,6 +14,7 @@ import numeral from 'numeral';
 import { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import ProductPayListView from '../../component/product/product.pay.listview';
 import ButtonFooter from '../../component/button/button.footer';
+import invariant from 'invariant';
 
 const cssPrefix = 'order';
 
@@ -40,6 +41,20 @@ class InventoryStockDetail extends Taro.Component<Props> {
     Taro.navigateTo({
       url: '/pages/inventory/inventory.stock'
     });
+  }
+
+  public onCopy = async () => {
+    try { 
+      const { stockDetail } = this.props;
+      invariant(stockDetail && stockDetail.businessNumber, '请选择要复制的数据');
+      await Taro.setClipboardData({data: stockDetail.businessNumber});
+      Taro.showToast({title: '已复制订单号'}); 
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
   }
 
   public onCopyPurchase = () => {
@@ -97,7 +112,10 @@ class InventoryStockDetail extends Taro.Component<Props> {
           className={`${cssPrefix}-detail-status-purchase`} 
         />
         <View className={`${cssPrefix}-detail-status-detail`}>
-          <View className={`${cssPrefix}-detail-status-detail-box`}>
+          <View 
+            onClick={() => this.onCopy()}
+            className={`${cssPrefix}-detail-status-detail-box`}
+          >
             <Text className={`${cssPrefix}-detail-status-result`}>{stockDetail.businessNumber}</Text>
             <Image 
               src="//net.huanmusic.com/weapp/icon_copy.png"  
@@ -119,15 +137,16 @@ class InventoryStockDetail extends Taro.Component<Props> {
     const Form2: FormRowProps[] = [
       {
         title: '盘亏金额',
-        extraText: `￥ ${numeral(stockDetail.amount).format('0.00')}`,
+        extraText: `${stockDetail.amount > 0 ? '' : '-'}￥ ${numeral(Math.abs(stockDetail.amount)).format('0.00')}`,
         extraTextStyle: 'title',
-        extraTextColor: 'red',
+        extraTextColor: num > 0 ? '#FC4E44' : '#333333',
         extraTextBold: 'bold',
       },
       {
         title: `盘亏数量`,
         extraText: `${num || 0}`,
         extraTextStyle: 'title',
+        extraTextColor: num > 0 ? '#FC4E44' : '#333333',
         extraTextBold: 'bold',
         hasBorder: false
       },

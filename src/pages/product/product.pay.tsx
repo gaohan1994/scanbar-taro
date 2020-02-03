@@ -25,6 +25,7 @@ import { PayReducer } from '../../reducers/app.pay';
 import { getSelectMember } from '../../reducers/app.member';
 import { ModalInput } from '../../component/modal/modal';
 import ProductPayListView from '../../component/product/product.pay.listview';
+import ButtonFooter from '../../component/button/button.footer';
 
 const cssPrefix = 'product';
 
@@ -310,8 +311,8 @@ class ProductPay extends Taro.Component<Props, State> {
         extraText: selectMember.orderInfo !== undefined ? selectMember.orderInfo.lastPayTime : '暂无消费记录'
       }];
       const buttons = [
-        {title: '取消选择', type: 'cancel', onClick: () => this.cancelMember()},
-        {title: '更换会员', type: 'confirm', onClick: () => this.changeMember()},
+        {title: '取消选择', type: 'cancel', onPress: () => this.cancelMember()},
+        {title: '更换会员', type: 'confirm', onPress: () => this.changeMember()},
       ];
       const form4: FormRowProps[] = [
         {
@@ -397,24 +398,9 @@ class ProductPay extends Taro.Component<Props, State> {
               })}
             </Card>
             <View style="height: 100px; width: 100%" />
-            {buttons && (
-              <View className={`product-add-buttons`}>
-                {buttons.map((button) => {
-                  return (
-                    <View 
-                      key={button.title}
-                      className={classnames(
-                        `cart-buttons-button`, 
-                        `cart-buttons-${button.type || 'confirm'}`, 
-                        {[`cart-buttons-two`]: buttons.length > 1}
-                      )}
-                      onClick={button.onClick}
-                    >
-                      {button.title}
-                    </View>
-                  );
-                })}
-              </View>
+            <ButtonFooter
+              buttons={buttons}
+            />
             )}
           </View>
         </View>

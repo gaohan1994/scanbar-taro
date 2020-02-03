@@ -41,16 +41,13 @@ class ProductRefundPay extends Taro.Component<Props> {
           terminalCd: '-1',
           terminalSn: '-1',
           totalAmount: productSdk.getProductMemberPrice(),
-          // totalNum: productSdk.getProductNumber(),
-          // transAmount: productSdk.getProductTransPrice(),
         },
         productInfoList: productRefundList.map((product) => {
           return {
             changeNumber: product.sellNum,
             productId: product.id,
-            unitPrice: product.unitPrice || 0,
+            unitPrice: productSdk.getProductItemPrice(product),
             remark: product.remark || '',
-            // transAmount: product.sellNum * productSdk.getProductItemPrice(product)
           };
         }),
       };

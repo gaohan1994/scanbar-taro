@@ -1,14 +1,14 @@
 @import "../../styles/theme.less";
 
 @user-prefix: user;
-@user-bg-size: 390px;
+@user-bg-size: 305px;
 
 .@{user-prefix} {
   background-color: #f9f9f9;
   &-bg {
     height: @user-bg-size;
     width: 100%;
-    .background-image('//net.huanmusic.com/weapp/bg_mine.png');
+    .background-image('//net.huanmusic.com/weapp/v1/bg_mine.png');
   }
   &-container {
     .flex(center, flex-start, column);
@@ -18,21 +18,38 @@
   }
   &-user {
     position: relative;
-    .flex(center, center, column);
-    .margin(-(@user-bg-size - 24px), t);
+    .flex(center, flex-start, row);
+    .margin(-140px - 120px, t);
+    // .margin(46px, t);
     width: 100%;
     &-image {
       width: 140px;
       height: 140px;
     }
+    &-box {
+      display: flex;
+      flex-direction: column;
+      .margin(36px, l);
+    }
     &-name {
       .title-text(#ffffff);
-      .margin(26px, t);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+    &-level {
+      background-color: #64A7FE;
+      height: 34px;
+      border-radius: 17px;
+      .flex(center, center);
+      .padding(14px, lr);
+      color: #ffffff;
+      font-size: 24px;
+      .margin(13px, l);
     }
     &-text {
       font-size: 28px;
       color: #ffffff;
-      .margin(15px, t);
     }
     &-edit {
       position: absolute;
@@ -46,6 +63,7 @@
   }
   &-rows {
     width: 100%;
+    margin-top: 60px !important;
   }
   &-row {
     position: relative;

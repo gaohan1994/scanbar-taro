@@ -34,6 +34,7 @@
     }
   }
   &-tabs {
+    position: relative;
     .flex(center, space-between, row);
     height: 100px;
     background-color: @theme-color;
@@ -118,7 +119,24 @@
     height: 126px;
     .padding(24px, lr);
     &-thin {
+      .padding(50px, lr);
       height: 92px !important;
+      .flex(center, space-between, row);
+      position: relative;
+      font-size: 30px;
+      color: #4d4d4d;
+      &-box {
+        display: flex;
+        flex-direction: row;
+      }
+      &::after {
+        .border1px;
+      }
+      &-img {
+        width: 46px;
+        height: 46px;
+        .margin(16px, r);
+      }
     }
     &-icon {
       width: 50px;
@@ -157,6 +175,39 @@
     &-border {
       &::after {
         .border1px;
+      }
+    }
+  }
+
+  &-content {
+    position: absolute;
+    top: 0;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    z-index: 500;
+    &-item {
+      width: 160px;
+      height: 62px;
+      border-radius: 20px;
+      border: 1px solid #e3e3e3;
+      .flex(center, center);
+      color: #999999;
+      .margin(20px, t);
+      .margin(20px, l);
+      font-size: 28px;
+    }
+    &-mask {
+      display: flex;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: 0;
+      &-touch {
+        display: flex;
+        flex: 1;
       }
     }
   }

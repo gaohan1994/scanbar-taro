@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-13 17:34:55
+ * @Last Modified time: 2020-01-17 09:46:34
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -303,7 +303,9 @@ class ProductSDK {
     const productList = products !== undefined 
       ? products 
       : store.getState().productSDK[key];
-    const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.sellNum;
+    const reduceCallback = this.sort !== this.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK
+      ? (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.sellNum
+      : (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + (item.sellNum - item.number);
     const total = productList.reduce(reduceCallback, 0);
     return total;
   }
@@ -344,7 +346,7 @@ class ProductSDK {
     const productList = products !== undefined ? products : store.getState().productSDK[key];
     const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => {
       const costNumber = item.sellNum - item.number;
-      return prevTotal + (costNumber * item.cost);
+      return prevTotal + (costNumber * item.avgCost);
     };
     const total = productList.reduce(reduceCallback, 0);
     return total;
@@ -363,17 +365,22 @@ class ProductSDK {
     const productList = products !== undefined ? products : store.getState().productSDK[key];
     const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => {
       /**
-       * @todo 如果有改价价格，则计算改价价格
-       */
-      if (item.changePrice !== undefined) {
-        return prevTotal + (item.changePrice * item.sellNum); 
-      }
-
-      /**
        * @todo [如果没有改价，但是是进货则返回进价]
        */
       if (key === 'productPurchaseList') {
         return prevTotal + (item.cost * item.sellNum);
+      }
+      /**
+       * @todo [如果是盘点，则用盘盈数量乘上平均进价，这个进价字段后面改成avgCost]
+       */
+      if (this.sort === this.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK) {
+        return prevTotal + ((item.sellNum - item.number) * item.avgCost);
+      }
+      /**
+       * @todo 如果有改价价格，则计算改价价格
+       */
+      if (item.changePrice !== undefined) {
+        return prevTotal + (item.changePrice * item.sellNum); 
       }
       return prevTotal + (item.price * item.sellNum);
     };

@@ -130,7 +130,11 @@ class Home extends Component {
                 onClick={() => Taro.switchTab({url: '/pages/report/report'})}
               >
                 <View className={`normal-text ${cssPrefix}-buttons-button-box`}>
-                  <View>{`今日销售额 >`}</View>
+                  <View>{`今日销售额`}</View>
+                  <Image 
+                    className={`${cssPrefix}-buttons-button-into`}
+                    src="//net.huanmusic.com/weapp/v1/icon_home_into.png" 
+                  />
                 </View>
                 <View className="home-money">100000.00</View>
               </View>
@@ -139,7 +143,11 @@ class Home extends Component {
                 onClick={() => Taro.switchTab({url: '/pages/report/report'})}
               >
                 <View className={`normal-text ${cssPrefix}-buttons-button-box`}>
-                  <View>{`销售笔数 >`}</View>
+                  <View>{`销售笔数`}</View>
+                  <Image 
+                    className={`${cssPrefix}-buttons-button-into`}
+                    src="//net.huanmusic.com/weapp/v1/icon_home_into.png" 
+                  />
                 </View>
                 <View className="home-money">200</View>
               </View>

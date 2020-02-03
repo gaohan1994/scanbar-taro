@@ -2,6 +2,7 @@ import { InventoryService, InventoryInterface, InventoryInterfaceMap } from "../
 import { ResponseCode } from '../constants/index';
 import productSdk, { ProductCartInterface } from '../common/sdk/product/product.sdk';
 import { store } from '../app';
+import numeral from 'numeral';
 
 class InventoryAction {
   public stockAdd = async (params: InventoryInterface.Interfaces.StockAdd, callback?: any, duration: number = 1000) => {
@@ -23,7 +24,7 @@ class InventoryAction {
         amount: amount,
         number: product.sellNum,
         productId: product.id,
-        subtotal: amount * product.sellNum
+        subtotal: numeral(amount * product.sellNum).format('0.00') as any
       };
     });
   }
