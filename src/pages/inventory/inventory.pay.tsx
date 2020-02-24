@@ -1,4 +1,4 @@
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View, Picker, Input, Text, Image } from '@tarojs/components';
 import { getProductPurchaseList } from '../../common/sdk/product/product.sdk.reducer';
 import { connect } from '@tarojs/redux';
@@ -8,7 +8,6 @@ import '../style/product.less';
 import '../style/inventory.less';
 import '../../styles/theme.less';
 import "../../component/cart/cart.less";
-import classnames from 'classnames';
 import FormCard from '../../component/card/form.card';
 import { FormRowProps } from '../../component/card/form.row';
 import invariant from 'invariant';
@@ -40,6 +39,10 @@ class InventoryPay extends Taro.Component<Props, State> {
     supplierValue: 0,
     showRemark: false,
     remark: '',
+  };
+
+  config: Config = {
+    navigationBarTitleText: '进货'
   };
 
   componentDidMount() {

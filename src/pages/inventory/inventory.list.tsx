@@ -1,4 +1,4 @@
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View, Image, Text, ScrollView, Picker } from '@tarojs/components';
 import { AppReducer } from '../../reducers';
 import { getInventoryStockList, getInventoryStockListTotal } from '../../reducers/app.inventory';
@@ -51,6 +51,10 @@ class InventoryList extends Taro.Component<Props, State> {
     selectSupplierId: [],
     dateMin: dayJs().format('YYYY-MM-DD'),
     dateMax: dayJs().format('YYYY-MM-DD'),
+  };
+
+  config: Config = {
+    navigationBarTitleText: '进货记录'
   };
 
   componentDidShow () {

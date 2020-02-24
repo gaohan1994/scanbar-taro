@@ -1,16 +1,17 @@
 /*
  * @Author: Ghan 
  * @Date: 2019-11-01 10:07:05 
- * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-17 11:37:19
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-02-21 14:40:52
  */
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View, Image, Text, Input } from '@tarojs/components';
 import '../style/login.less';
 import classnames from 'classnames';
 import { AtButton } from 'taro-ui';
 import { LoginManager } from '../../common/sdk';
 import invariant from 'invariant';
+import NavBar from '../../component/navbar/navbar';
 
 const cssPrefix = 'sign';
 
@@ -26,6 +27,7 @@ class Login extends Taro.Component<Props, State> {
   
   config: Taro.Config = {
     navigationBarTitleText: '登录',
+    navigationStyle: 'custom'
   };
 
   readonly state: State = {
@@ -72,7 +74,12 @@ class Login extends Taro.Component<Props, State> {
       const { username, password } = this.state;
       const result = await LoginManager.login({phoneNumber: username, password: password});
       invariant(result.success, result.msg || '登录失败');
-      Taro.navigateBack();
+      // Taro.navigateTo({ url: '/pages/home/home' });
+      // Taro.navigateBack();
+      Taro.navigateBack({delta: 10});  
+      Taro.switchTab({
+        url: `/pages/home/home`
+      })
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -94,8 +101,9 @@ class Login extends Taro.Component<Props, State> {
     const { username, password } = this.state;
     return (
       <View className={classnames(['container', 'sign'])} >
+        <NavBar title="登录"/>
         <View className="sign-card">
-          <View className="sign-card-title">欢迎使用进销存产品</View>
+          <View className="sign-card-title">欢迎使用千阳零售</View>
           <View className="sign-card-input">
             <View className={`${cssPrefix}-input-box`} >
               <Image src="http://net.huanmusic.com/weapp/icon_login_user.png" className={`${cssPrefix}-input-box-icon`} />

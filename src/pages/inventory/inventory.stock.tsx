@@ -1,12 +1,12 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-16 17:29:26
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-02-17 17:59:49
  * 
  * @todo 盘点
  */
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import "../style/product.less";
 import "../style/member.less";
@@ -16,11 +16,10 @@ import { ProductAction } from '../../actions';
 import { getProductSearchList, getSelectProduct, getProductType, getProductList } from '../../reducers/app.product';
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
-import { ProductInterface, ProductInterfaceMap } from '../../constants';
+import { ProductInterface } from '../../constants';
 import invariant from 'invariant';
 import { ResponseCode } from '../../constants/index';
 import productSdk from '../../common/sdk/product/product.sdk';
-import { store } from '../../app';
 import HeaderInput from '../../component/header/header.input';
 import ProductListView from '../../component/product/product.listview';
 import TabsHeader from '../../component/layout/tabs.header';
@@ -54,7 +53,10 @@ type State = {
 };
 
 class InventoryStock extends Taro.Component<Props, State> {
-
+  config: Config = {
+    navigationBarTitleText: '盘点'
+  };
+  
   readonly state: State = {
     currentType: {
       name: '',

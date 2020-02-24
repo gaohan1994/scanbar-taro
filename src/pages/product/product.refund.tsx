@@ -6,7 +6,7 @@
  * 
  * @todo 开单页面
  */
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View, ScrollView, Text } from '@tarojs/components';
 import "../style/product.less";
 import "../style/member.less";
@@ -52,6 +52,10 @@ interface State {
 }
 
 class ProductRefund extends Taro.Component<Props, State> {
+  
+  config: Config = {
+    navigationBarTitleText: '退货'
+  };
   
   readonly state: State = {
     currentType: {
@@ -125,6 +129,17 @@ class ProductRefund extends Taro.Component<Props, State> {
     }
   }
 
+  public onNonBarcodeProductClick = () => {
+    const product: any = {
+      id: `${productSdk.nonBarcodeKey}${new Date().getTime()}`,
+      sort: productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND
+    };
+    productSdk.manage({
+      type: productSdk.productCartManageType.ADD,
+      product
+    });
+  }
+
   /**
    * @todo [点击菜单的时候修改当前菜单并跳转至对应商品]
    *
@@ -182,6 +197,12 @@ class ProductRefund extends Taro.Component<Props, State> {
         scrollY={true}
         className={`${cssPrefix}-list-left`}
       >
+        <View 
+          className={classnames(`${cssPrefix}-list-left-item`)}
+          onClick={() => this.onNonBarcodeProductClick()}
+        >
+          无码商品
+        </View>
         {
           productTypeList && productTypeList.length > 0
             ? productTypeList.map((type) => {

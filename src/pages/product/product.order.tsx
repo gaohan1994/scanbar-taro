@@ -6,7 +6,7 @@
  * 
  * @todo 开单页面
  */
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View, ScrollView, Text } from '@tarojs/components';
 import "../style/product.less";
 import "../style/member.less";
@@ -65,7 +65,10 @@ interface State {
 }
 
 class ProductOrder extends Taro.Component<Props, State> {
-  
+  config: Config = {
+    navigationBarTitleText: '开单'
+  };
+
   readonly state: State = {
     currentType: {
       name: '',

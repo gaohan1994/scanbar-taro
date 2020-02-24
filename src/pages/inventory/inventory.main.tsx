@@ -1,12 +1,12 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-17 09:53:31
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-02-12 18:31:46
  * 
  * @todo 进货
  */
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import "../style/product.less";
 import "../style/member.less";
@@ -53,7 +53,10 @@ type State = {
 };
 
 class InventoryMain extends Taro.Component<Props> {
-
+  config: Config = {
+    navigationBarTitleText: '采购进货'
+  };
+  
   readonly state: State = {
     currentType: {
       name: '',
@@ -180,7 +183,7 @@ class InventoryMain extends Taro.Component<Props> {
               src="//net.huanmusic.com/weapp/icon_record.png" 
               className={`inventory-header-item-purchase`} 
             />
-            <Text className="inventory-header-item-text">进货纪录</Text>
+            <Text className="inventory-header-item-text">进货记录</Text>
           </View>
         </HeaderInput>
         {this.renderTabs()}

@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-08 10:01:17 
- * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-25 14:08:19
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-02-17 15:20:20
  * 
  * @todo [会员相关的接口]
  * ```js

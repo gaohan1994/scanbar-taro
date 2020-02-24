@@ -1,4 +1,4 @@
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View, Image } from '@tarojs/components';
 import "../style/pay.less";
 import { AtButton, AtActivityIndicator } from 'taro-ui';
@@ -26,6 +26,10 @@ class PayResult extends Taro.Component<Props, State> {
     status: false,
     loading: true,
     time: 5000,
+  };
+
+  config: Config = {
+    navigationBarTitleText: '收款'
   };
 
   private timer: any;

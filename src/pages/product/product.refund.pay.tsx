@@ -1,4 +1,4 @@
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View } from '@tarojs/components';
 import { getProductRefundList } from '../../common/sdk/product/product.sdk.reducer';
 import { connect } from '@tarojs/redux';
@@ -24,6 +24,10 @@ type Props = {
 
 class ProductRefundPay extends Taro.Component<Props> {
 
+  config: Config = {
+    navigationBarTitleText: '退款'
+  };
+  
   componentDidMount() {
     productSdk.setSort(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND);
   }

@@ -16,6 +16,8 @@
   &::after {
     .border1px;
   }
+  // border-bottom: #E3E3E3 solid 1px;
+
   &-left {
     flex-direction: row;
     display: flex;
@@ -54,16 +56,47 @@
     font-size: 30px;
     line-height: 30px;
     color: #333333;
+    &-refund {
+      font-size: 30px;
+      line-height: 30px;
+      color: #FC4E44;
+    }
+  }
+  &-row {
+    .flex(center, flex-start, row);
+    .margin(17px, t);
   }
   &-time {
     font-size: 26px;
     line-height: 26px;
     color: #999999;
-    .margin(17px, t);
+  }
+  &-flag {
+    width: 96px;
+    height: 30px;
+    .flex(center, center, column);
+    border-radius: 10px;
+    border: #2181FD solid 1px;
+    color: #2181FD;
+    font-size: 18px;
+    margin-left: 15px;
+  }
+  &-flag-orange {
+    color: #F4800E;
+    border-color: #F4800E;
+  }
+  &-flag-red {
+    color: #FC4E44;
+    border-color: #FC4E44;
   }
   &-price {
     font-size: 30px;
     color: #4d4d4d;
     font-weight: bold;
+    &-refund {
+      font-size: 30px;
+      color: #FC4E44;
+      font-weight: bold;
+    }
   }
 }

@@ -1,10 +1,10 @@
 /*
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-15 21:13:36
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-02-13 09:33:49
  */
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import "../style/user.less";
 import "../../component/card/form.card.less";
@@ -15,6 +15,11 @@ const cssPrefix = 'user';
 type Props = {};
 
 class UserAbount extends Taro.Component<Props> {
+
+  config: Config = {
+    navigationBarTitleText: '关于千阳'
+  };
+  
   render () {
     return (
       <View className="container">

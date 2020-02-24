@@ -4,7 +4,7 @@
  * @Last Modified by: Ghan
  * @Last Modified time: 2019-12-24 16:03:35
  */
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View, Image, Text, Input } from '@tarojs/components';
 import "../style/pay.less";
 import '../style/product.less';
@@ -51,7 +51,6 @@ interface State {
 }
 
 class PayReceive extends Taro.Component<Props, State> {
-
   static defaultProps: Props = {
     payDetail: {
       transPayload: undefined,
@@ -62,6 +61,10 @@ class PayReceive extends Taro.Component<Props, State> {
   state: State = {
     tab: 'receive',
     receiveCash: '',
+  };
+
+  config: Config = {
+    navigationBarTitleText: '收款'
   };
 
   componentDidMount() {

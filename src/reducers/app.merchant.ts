@@ -57,3 +57,5 @@ export default function merchant (state: MerchantReducer.State = initState, acti
 }
 
 export const getMerchantDetail = (state: AppReducer.AppState) => state.merchant.merchantDetail;
+
+export const getProfileInfo = (state: AppReducer.AppState) => state.merchant.profileInfo;

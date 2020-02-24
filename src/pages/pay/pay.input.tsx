@@ -1,4 +1,4 @@
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View, Input } from '@tarojs/components';
 import '../../component/card/form.card.less';
 import classnames from 'classnames';
@@ -19,6 +19,10 @@ interface State {
 }
 
 class PayInput extends Taro.Component<Props, State> {
+  config: Config = {
+    navigationBarTitleText: '收款'
+  };
+  
   state = {
     inputValue: ''
   };

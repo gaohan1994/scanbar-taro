@@ -72,18 +72,21 @@ $at-list-item-horizontal-padding: 24px;
     .item-content {
       &__info {
         position: relative;
-        padding-left: 20px;
+        // padding-left: 20px;
         &-title {
           @include line(1);
           font-size: 30px;
           color: #666666;
           line-height: $line-height-zh;
+          display: flex;
+          flex-direction: row;
         }
 
         &-icon {
-          position: absolute;
+          // position: absolute;
           left: 0;
           color: #fc4e44;
+          margin-left: 5px;
         }
 
         &-note {

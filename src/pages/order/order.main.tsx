@@ -1,14 +1,14 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-12-09 11:01:19 
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-17 10:50:48
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-02-17 16:32:41
  */
 
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View, Text, ScrollView, Input, Image, Picker } from '@tarojs/components';
 import { OrderInterface } from '../../constants';
-import { getOrderList } from '../../reducers/app.order';
+import { getOrderList, getOrderListTotal } from '../../reducers/app.order';
 import { connect } from '@tarojs/redux';
 import { OrderAction } from '../../actions';
 import "../style/report.less";
@@ -29,11 +29,12 @@ const cssPrefix = 'order';
 let pageNum: number = 1;
 const pageSize: number = 20;
 
-interface Props { 
+interface Props {
   orderList: OrderInterface.OrderDetail[];
+  orderListTotal: number;
 }
 
-interface State { 
+interface State {
   value: string;
   date: string;
   visible: boolean;
@@ -42,9 +43,12 @@ interface State {
 }
 
 class OrderMain extends Taro.Component<Props, State> {
+  config: Config = {
+    navigationBarTitleText: '订单'
+  };
 
   state: State = {
-    value: '', 
+    value: '',
     date: dayJs().format('YYYY-MM-DD'),
     visible: false,
     selectStatus: [],
@@ -102,7 +106,7 @@ class OrderMain extends Taro.Component<Props, State> {
    * @memberof MemberMain
    */
   public onDateChange = (event: any) => {
-    this.setState({date: event.detail.value}, () => {
+    this.setState({ date: event.detail.value }, () => {
       this.fetchOrder(1);
     });
   }
@@ -143,11 +147,11 @@ class OrderMain extends Taro.Component<Props, State> {
         endTime: date,
       };
       if (selectStatus && selectStatus.length === 1) {
-        payload.transType = selectStatus[0];
+        const fetchType = selectStatus[0];
+        payload.transFlag = fetchType === 0 ? 1 : -1;
       }
       if (selectTypes && selectTypes.length === 1) {
-        const fetchType = selectTypes[0];
-        payload.transFlag = fetchType === 0 ? 1 : 0;
+        payload.transType = selectTypes[0];
       }
       const result = await OrderAction.orderList(payload);
       invariant(result.code === ResponseCode.success, result.msg || ' ');
@@ -176,10 +180,10 @@ class OrderMain extends Taro.Component<Props, State> {
   public init = async () => {
     pageNum = 1;
     const today = dayJs().format('YYYY-MM-DD');
-    OrderAction.orderList({pageNum: pageNum++, pageSize, startTime: today, endTime: today});
+    OrderAction.orderList({ pageNum: pageNum++, pageSize, startTime: today, endTime: today });
   }
 
-  render () {
+  render() {
     return (
       <View className="container container-color">
         <View className={`${cssPrefix}-bg`} />
@@ -200,21 +204,21 @@ class OrderMain extends Taro.Component<Props, State> {
         <View className={`${cssPrefix}-main-header-search order-search`}>
           <Image src="//net.huanmusic.com/weapp/icon_search.png" className={`${cssPrefix}-main-header-search-icon`} />
           <Input
-            className={`${cssPrefix}-main-header-search-input`} 
+            className={`${cssPrefix}-main-header-search-input`}
             placeholder="请输入订单号"
             placeholderClass={`${cssPrefix}-main-header-search-input-holder`}
             value={value}
-            onInput={({detail: {value}}) => this.onChangeValue('value', value)}
-            // onConfirm={() => this.searchMember()}
+            onInput={({ detail: { value } }) => this.onChangeValue('value', value)}
+          // onConfirm={() => this.searchMember()}
           />
         </View>
-        <View 
+        <View
           className={'inventory-header-item'}
           onClick={() => this.onChangeValue('visible', true)}
         >
-          <Image 
-            src="//net.huanmusic.com/weapp/icon_shaixuan.png" 
-            className={`inventory-header-item-sort`} 
+          <Image
+            src="//net.huanmusic.com/weapp/icon_shaixuan.png"
+            className={`inventory-header-item-sort`}
           />
           <Text className="inventory-header-item-text">筛选</Text>
         </View>
@@ -223,31 +227,40 @@ class OrderMain extends Taro.Component<Props, State> {
   }
 
   private renderContainer = () => {
-    const { orderList } = this.props;
+    const { orderList, orderListTotal } = this.props;
+    const hasMore = orderList.length < orderListTotal;
     return (
       <View className={`${cssPrefix}-container`}>
         {this.renderTime()}
         <ScrollView
           scrollY={true}
           className={`${cssPrefix}-list ${cssPrefix}-list-pos`}
+          onScrollToLower={() => {
+            if (hasMore) {
+              this.fetchOrder();
+            }
+          }}
         >
-          {   
+          {
             orderList.length > 0
-            ? orderList.map((orderDetail) => {
-              return (
-                <OrderItem 
-                  key={orderDetail.order.orderNo} 
-                  data={orderDetail} 
-                />
-              );
-            })
-            : (
-              <View className={`product-suspension order-list-empty`}> 
-                <Image src="//net.huanmusic.com/weapp/img_kong.png" className={`product-suspension-image`} />
-                <Text className={`product-suspension-text`}>暂无内容</Text>
-              </View>
-            )
+              ? orderList.map((orderDetail) => {
+                return (
+                  <OrderItem
+                    key={orderDetail.order.orderNo}
+                    data={orderDetail}
+                  />
+                );
+              })
+              : (
+                <View className={`product-suspension order-list-empty`}>
+                  <Image src="//net.huanmusic.com/weapp/img_kong.png" className={`product-suspension-image`} />
+                  <Text className={`product-suspension-text`}>暂无内容</Text>
+                </View>
+              )
           }
+          {!hasMore && orderList.length > 10 && (
+            <View className={`${cssPrefix}-list-bottom`}>已经到底了</View>
+          )}
         </ScrollView>
       </View>
     );
@@ -258,15 +271,15 @@ class OrderMain extends Taro.Component<Props, State> {
     return (
       <View className={`${cssPrefix}-time`} >
         <View className={`${cssPrefix}-time-box ${cssPrefix}-time-box-left`} onClick={() => this.prevDate()}>
-          <Image 
-            src="//net.huanmusic.com/weapp/v1/icon_time_left.png" 
-            className={`${cssPrefix}-time-icon`} 
+          <Image
+            src="//net.huanmusic.com/weapp/v1/icon_time_left.png"
+            className={`${cssPrefix}-time-icon`}
           />
         </View>
-        
+
         <Picker
           mode='date'
-          onChange={this.onDateChange} 
+          onChange={this.onDateChange}
           value={date}
         >
           <View className={`${cssPrefix}-time-date`}>
@@ -275,12 +288,12 @@ class OrderMain extends Taro.Component<Props, State> {
           </View>
         </Picker>
         <View className={`${cssPrefix}-time-box ${cssPrefix}-time-box-right`} onClick={() => this.nextDate()}>
-          <Image 
-            src="//net.huanmusic.com/weapp/v1/icon_time_right.png" 
-            className={`${cssPrefix}-time-icon`} 
+          <Image
+            src="//net.huanmusic.com/weapp/v1/icon_time_right.png"
+            className={`${cssPrefix}-time-icon`}
           />
         </View>
-        
+
       </View>
     );
   }
@@ -294,13 +307,17 @@ class OrderMain extends Taro.Component<Props, State> {
         contentClassName={`${cssPrefix}-layout`}
         title="筛选"
         buttons={[
-          {title: '重置', type: 'cancel', onPress: () => {
-            this.reset();
-          }},
-          {title: '确定', onPress: () => {
-            this.onChangeValue('visible', false);
-            this.fetchOrder(1);
-          }},
+          {
+            title: '重置', type: 'cancel', onPress: () => {
+              this.reset();
+            }
+          },
+          {
+            title: '确定', onPress: () => {
+              this.onChangeValue('visible', false);
+              this.fetchOrder(1);
+            }
+          },
         ]}
       >
         <View className={`inventory-select`}>
@@ -310,8 +327,8 @@ class OrderMain extends Taro.Component<Props, State> {
               <View
                 onClick={() => this.changeAll()}
                 className={classnames(
-                  'inventory-select-item-button', 
-                  {'inventory-select-item-button-active': selectStatus.length === 2}
+                  'inventory-select-item-button',
+                  { 'inventory-select-item-button-active': selectStatus.length === 2 }
                 )}
               >
                 全部状态
@@ -340,8 +357,8 @@ class OrderMain extends Taro.Component<Props, State> {
               <View
                 onClick={() => this.changeAll('selectTypes')}
                 className={classnames(
-                  'inventory-select-item-button', 
-                  {'inventory-select-item-button-active': selectTypes.length === 2}
+                  'inventory-select-item-button',
+                  { 'inventory-select-item-button-active': selectTypes.length === 2 }
                 )}
               >
                 全部订单
@@ -372,6 +389,7 @@ class OrderMain extends Taro.Component<Props, State> {
 
 const select = (state: any) => ({
   orderList: getOrderList(state),
+  orderListTotal: getOrderListTotal(state),
 });
 
 export default connect(select)(OrderMain);

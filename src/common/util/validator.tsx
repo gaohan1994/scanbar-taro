@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-10-04 15:38:23 
- * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-08 11:23:06
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-02-13 19:04:22
  * 
  * @todo [策略模式校验工具]
  * @Usage
@@ -53,6 +53,20 @@ const strategies: any = {
    */
   checkValueLength(value: any, errorMsg: any, elementName: any, args: any) {
     return value.length >= args.validLength ? void 0 : {
+        name    : elementName,
+        msg  : errorMsg,
+    };
+  },
+
+  /**
+   * @todo 长度校验
+   * @param value  
+   * @param errorMsg 
+   * @param elementName 
+   * @param args 
+   */
+  checkValueLengthRange(value: any, errorMsg: any, elementName: any, args: any) {
+    return value.length >= args.minLength &&  value.length <= args.maxLength ? void 0 : {
         name    : elementName,
         msg  : errorMsg,
     };

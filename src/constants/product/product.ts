@@ -64,6 +64,7 @@ export declare namespace ProductInterface {
     updateTime: string;
     supplierId: number;
     supplierName: string; 
+    sort?: string;
   }
 
   interface ProductTypeInfo {

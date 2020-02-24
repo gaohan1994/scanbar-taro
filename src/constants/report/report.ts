@@ -51,6 +51,13 @@ export declare namespace ReportInterface {
     refundStatistics: SaleStatistic[];
   }
 
+  interface ReportTodayData {
+    todaySaleTimes: number;
+    todaySales: number;
+    totalMember: number;
+    todayAddMember: number;
+  }
+
   interface ReportListItem {
     barcode: string;
     brand: string;
@@ -82,8 +89,8 @@ export declare namespace ReportInterface {
 
   interface ReportRankFetchField extends Partial<HTTPInterface.FetchField> {
     num?: number; 
-    beginTime?: string;
-    endTime?: string;
+    beginDate?: string;
+    endDate?: string;
     merchantId?: number;
     merchantName?: string;
     productName?: string;
@@ -92,10 +99,14 @@ export declare namespace ReportInterface {
   }
 
   interface ReportBaseFetchFidle {
-    beginTime?: string;
-    endTime?: string;
+    beginDate?: string;
+    endDate?: string;
     merchantId?: number;
     unit?: number;
+  }
+
+  interface ReportTodayDataFetchFidle {
+    merchantId: string;
   }
 
   namespace PayloadInterface {
@@ -106,6 +117,7 @@ export declare namespace ReportInterface {
     type RECEIVE_REPORT_BASE_INFO = string;
     type RECEIVE_REPORT_LIST = string;
     type RECEIVE_REPORT_RANK = string;
+    type RECEIVE_REPORT_TODAY_SALES = string;
   }
 
   interface ReportInterfaceMap {
@@ -113,6 +125,7 @@ export declare namespace ReportInterface {
       RECEIVE_REPORT_BASE_INFO: ReducerTypes.RECEIVE_REPORT_BASE_INFO;
       RECEIVE_REPORT_LIST: ReducerTypes.RECEIVE_REPORT_LIST;
       RECEIVE_REPORT_RANK: ReducerTypes.RECEIVE_REPORT_RANK;
+      RECEIVE_REPORT_TODAY_SALES: ReducerTypes.RECEIVE_REPORT_TODAY_SALES;
     };
     reportList: string;
     reportProductRank: string;
@@ -125,11 +138,13 @@ class ReportInterfaceMap implements ReportInterface.ReportInterfaceMap {
     RECEIVE_REPORT_BASE_INFO: 'RECEIVE_REPORT_BASE_INFO',
     RECEIVE_REPORT_LIST: 'RECEIVE_REPORT_LIST',
     RECEIVE_REPORT_RANK: 'RECEIVE_REPORT_RANK',
+    RECEIVE_REPORT_TODAY_SALES: 'RECEIVE_REPORT_TODAY_SALES',
   };
 
   public reportList = '/report/list';
   public reportProductRank = '/report/productRank';
   public reportBaseSaleInfo = '/report/baseSaleInfo';
+  public reportTodayData = '/report/getTodayData';
 }
 
 export default new ReportInterfaceMap();

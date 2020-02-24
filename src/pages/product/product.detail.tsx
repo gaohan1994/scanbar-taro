@@ -1,4 +1,4 @@
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View, Image, Picker, Textarea } from '@tarojs/components';
 import { ProductAction } from '../../actions';
 import invariant from 'invariant';
@@ -71,6 +71,10 @@ interface State {
 }
 
 class ProductDetail extends Taro.Component<Props, State> {
+  config: Config = {
+    navigationBarTitleText: '商品详情'
+  };
+
   constructor (props: Props) {
     super(props);
     this.state = {

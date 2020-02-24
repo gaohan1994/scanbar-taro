@@ -1,11 +1,18 @@
-import { ComponentClass } from 'react';
 import Taro, { Component, Config } from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import '../style/home.less';
 import classnames from 'classnames';
 import { Card } from '../../component/common/card/card.common';
-import { LoginManager } from '../../common/sdk';
 import invariant from 'invariant';
+import { ReportAction } from '../../actions';
+import { AppReducer } from '../../reducers';
+import { connect } from '@tarojs/redux';
+import { getReportTodayData } from '../../reducers/app.report';
+import { ReportInterface, MerchantInterface } from '../../constants';
+import numeral from 'numeral';
+import { getProfileInfo } from '../../reducers/app.merchant';
+import merchantAction from '../../actions/merchant.action';
+import { ResponseCode } from '../../constants/index';
 
 const cssPrefix = 'home';
 
@@ -60,14 +67,27 @@ const NavItems = [
   }
 ];
 
-type PageState = {};
-type IProps = {};
+// type PageState = {};
+// type IProps = {};
+// type IState = {
+//   userinfo: LoginInterface.OAuthToken;
+// };
+// interface Home {
+//   props: IProps;
+//   state: IState;
+// }
 
-interface Home {
-  props: IProps;
+interface Props {
+  reportTodayData: ReportInterface.ReportTodayData;
+  userinfo: MerchantInterface.ProfileInfo;
 }
-
-class Home extends Component {
+interface State {
+  userinfo: MerchantInterface.ProfileInfo;
+}
+class Home extends Component<Props, State> {
+  state = {
+    userinfo: {} as any
+  };
 
   /**
    * 指定config的类型声明为: Taro.Config
@@ -80,10 +100,16 @@ class Home extends Component {
     navigationBarTitleText: '首页'
   };
 
-  async componentDidMount () {
+  async componentDidShow() {
     try {
-      const userinfo = await LoginManager.getUserInfo();
-      invariant(userinfo.success, userinfo.msg || ' ');
+      const res = await merchantAction.profileInfo();
+      invariant(res.code === ResponseCode.success, res.msg || ' ');
+      const { userinfo } = this.props;
+      const payload = {
+        merchantId: userinfo.merchantInfoDTO.id
+      };
+      ReportAction.reportTodayData(payload);
+      this.setState({ userinfo });
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -111,49 +137,51 @@ class Home extends Component {
       });
       return;
     }
-    Taro.navigateTo({url: item.url});
+    Taro.navigateTo({ url: item.url });
   }
 
-  render () {
+  render() {
+    const { reportTodayData } = this.props;
+    const { userinfo } = this.state;
     return (
       <View className={classnames(['container', 'home'])}>
         <View className={`${cssPrefix}-bg`} />
         <View className={`${cssPrefix}-container`}>
           <View className="home-name">
             <Image src="//net.huanmusic.com/weapp/icon_shop.png" className={classnames(['home-name-icon', 'home-icon'])} />
-            <Text className="home-name-text">可乐便利店</Text>
+            <Text className="home-name-text">{userinfo.merchantInfoDTO.name || ''}</Text>
           </View>
           <View className="home-card">
             <View className="home-buttons">
-              <View 
+              <View
                 className={`home-buttons-button home-buttons-button-border ${cssPrefix}-buttons-button-start`}
-                onClick={() => Taro.switchTab({url: '/pages/report/report'})}
+                onClick={() => Taro.switchTab({ url: '/pages/report/report' })}
               >
                 <View className={`normal-text ${cssPrefix}-buttons-button-box`}>
                   <View>{`今日销售额`}</View>
-                  <Image 
+                  <Image
                     className={`${cssPrefix}-buttons-button-into`}
-                    src="//net.huanmusic.com/weapp/v1/icon_home_into.png" 
+                    src="//net.huanmusic.com/weapp/v1/icon_home_into.png"
                   />
                 </View>
-                <View className="home-money">100000.00</View>
+                <View className="home-money">{numeral(reportTodayData.todaySales).format('0.00')}</View>
               </View>
-              <View 
+              <View
                 className="home-buttons-button home-buttons-button-end"
-                onClick={() => Taro.switchTab({url: '/pages/report/report'})}
+                onClick={() => Taro.switchTab({ url: '/pages/report/report' })}
               >
                 <View className={`normal-text ${cssPrefix}-buttons-button-box`}>
                   <View>{`销售笔数`}</View>
-                  <Image 
+                  <Image
                     className={`${cssPrefix}-buttons-button-into`}
-                    src="//net.huanmusic.com/weapp/v1/icon_home_into.png" 
+                    src="//net.huanmusic.com/weapp/v1/icon_home_into.png"
                   />
                 </View>
-                <View className="home-money">200</View>
+                <View className="home-money">{reportTodayData.todaySaleTimes || 0}</View>
               </View>
             </View>
           </View>
-          <View onClick={() => Taro.navigateTo({url: '/pages/product/product.order'})}>
+          <View onClick={() => Taro.navigateTo({ url: '/pages/product/product.order' })}>
             <Card card-class="home-order">
               <Image src="//net.huanmusic.com/weapp/icon_home_bill.png" className="home-order-icon" />
               <Text className="home-order-text" >开单</Text>
@@ -163,10 +191,10 @@ class Home extends Component {
             {
               NavItems.map((item, index) => {
                 return (
-                  <Card 
+                  <Card
                     key={item.value}
-                    shadow={false} 
-                    card-class={`home-bar-card ${(index + 1) % 3 !== 0 ? 'home-bar-card-right' : ''}`} 
+                    shadow={false}
+                    card-class={`home-bar-card ${(index + 1) % 3 !== 0 ? 'home-bar-card-right' : ''}`}
                   >
                     <View className="home-bar-card-content" onClick={() => this.onNavHandle(item)}>
                       <Image className="home-icon home-card-icon" src={item.image} />
@@ -191,4 +219,11 @@ class Home extends Component {
 //
 // #endregion
 
-export default Home as ComponentClass<IProps, PageState>;
+const select = (state: AppReducer.AppState) => ({
+  reportTodayData: getReportTodayData(state),
+  userinfo: getProfileInfo(state),
+});
+
+export default connect(select)(Home);
+
+// export default Home as ComponentClass<IProps, PageState>;

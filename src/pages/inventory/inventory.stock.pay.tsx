@@ -1,6 +1,6 @@
-import Taro from '@tarojs/taro';
-import { View, Input, Text, Image } from '@tarojs/components';
-import { getProductPurchaseList, getProductStockList } from '../../common/sdk/product/product.sdk.reducer';
+import Taro, { Config } from '@tarojs/taro';
+import { View } from '@tarojs/components';
+import { getProductStockList } from '../../common/sdk/product/product.sdk.reducer';
 import { connect } from '@tarojs/redux';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import "../../component/card/form.card.less";
@@ -8,14 +8,13 @@ import '../style/product.less';
 import '../style/inventory.less';
 import '../../styles/theme.less';
 import "../../component/cart/cart.less";
-import classnames from 'classnames';
 import FormCard from '../../component/card/form.card';
 import { FormRowProps } from '../../component/card/form.row';
 import invariant from 'invariant';
 import numeral from 'numeral';
 import ProductPayListView from '../../component/product/product.pay.listview';
-import { ResponseCode, InventoryInterface, ProductInterface } from '../../constants';
-import { InventoryAction, ProductAction } from '../../actions';
+import { ResponseCode, InventoryInterface } from '../../constants';
+import { InventoryAction } from '../../actions';
 import ButtonFooter from '../../component/button/button.footer';
 
 const cssPrefix = 'product';
@@ -32,6 +31,10 @@ class InventoryStockPay extends Taro.Component<Props, State> {
 
   readonly state: State = {
 
+  };
+
+  config: Config = {
+    navigationBarTitleText: '盘点'
   };
 
   componentDidMount() {

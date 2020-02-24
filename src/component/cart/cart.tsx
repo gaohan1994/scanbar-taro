@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-17 11:30:27
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-02-21 11:32:43
  * 
  * @todo [购物车组件]
  */
@@ -372,9 +372,9 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
             })}
           >
             <Text style={productCartList.length > 0 ? "color: #ffffff;" : ''}>{productCartList.length}</Text>
-            种，
+            <Text style={"color: #8c8c8c"}>种</Text>，
             <Text style={productCartList.length > 0 ? "color: #ffffff;" : ''}>{productSdk.getProductNumber(undefined)}</Text>
-            件
+            <Text style={"color: #8c8c8c"}>件</Text>
             {
               productCartList.length > 0 && (
                 cartListVisible !== true ? (
@@ -594,6 +594,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       const { nonBarcodeProduct } = this.props;
       invariant(nonBarcodePrice !== '', '请输入商品价格');
       invariant(numeral(nonBarcodePrice).value() > 0, '商品价格必须大于0');
+      const { sort } = nonBarcodeProduct;
       let nonBarcodeCartProduct: Partial<ProductCartInterface.ProductCartInfo> = {
         ...nonBarcodeProduct,
         name: '无码商品',
@@ -605,7 +606,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       if (nonBarcodeRemark !== '') {
         nonBarcodeCartProduct.remark = nonBarcodeRemark;
       }
-      productSdk.add(nonBarcodeCartProduct as any);
+      productSdk.add(nonBarcodeCartProduct as any, undefined, undefined, sort);
 
       this.setState({
         nonBarcodePrice: '',
@@ -683,12 +684,13 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
   private renderChangeProductModal = () => {
     const { changePrice, changeSellNum } = this.state;
     const { changeProductVisible, sort, changeProduct } = this.props;
+    const unit = changeProduct && changeProduct.unit && changeProduct.unit.length > 0 ? changeProduct.unit : '个';
     let inputs: ModalInput[] = [];
     switch (sort) {
       case productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK: {
         inputs = [
           {
-            title: '盘点数量',
+            title: '盘点数量（${unit}',
             value: changeSellNum,
             type: "digit",
             onInput: ({detail: {value}}) => this.onChangeValue('changeSellNum', value),
@@ -700,14 +702,14 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       default: {
         inputs = [
           {
-            title: '数量',
+            title: `数量（${unit}）`,
             value: changeSellNum,
             placeholder: '请输入数量',
             type: "digit",
             onInput: ({detail: {value}}) => this.onChangeValue('changeSellNum', value)
           },
           {
-            title: '价格',
+            title: '价格（¥）',
             value: changePrice || `0`,
             type: 'digit',
             onInput: ({detail: {value}}) => this.onChangeValue('changePrice', value)
@@ -732,8 +734,9 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       <Modal
         header={sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE ||
           sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK || 
-          sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND
-          ? `${changeProduct && changeProduct.name || ''}`
+          sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND ||
+          sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
+          ? `${(changeProduct && changeProduct.name) || ''}`
           : "商品改价"}
         isOpened={changeProductVisible}
         onClose={() => this.onChangeProductClose()}

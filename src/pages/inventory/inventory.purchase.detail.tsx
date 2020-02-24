@@ -1,4 +1,4 @@
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import { AppReducer } from '../../reducers';
 import { getInventoryStockDetail } from '../../reducers/app.inventory';
@@ -23,6 +23,10 @@ type Props = {
 };
 
 class InventoryPurchaseDetail extends Taro.Component<Props> {
+
+  config: Config = {
+    navigationBarTitleText: '进货详情'
+  };
 
   componentWillMount() {
     const { id } = this.$router.params;

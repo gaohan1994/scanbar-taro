@@ -3,7 +3,6 @@ import { View, Text, Input } from '@tarojs/components';
 import { AtButton } from 'taro-ui';
 import "../style/user.less";
 import merchantAction from '../../actions/merchant.action';
-import { LoginManager } from '../../common/sdk';
 
 const cssPrefix = 'user';
 
@@ -17,13 +16,13 @@ class UserMerchantEdit extends Taro.Component<any, State> {
   };
 
   config: Taro.Config = {
-    navigationBarTitleText: '更改负责人'
+    navigationBarTitleText: '更改手机号'
   };
 
   componentDidMount() {
-    const { owner } = this.$router.params;
+    const { phone } = this.$router.params;
     this.setState({
-      value: owner
+      value: phone
     });
   }
 
@@ -37,12 +36,10 @@ class UserMerchantEdit extends Taro.Component<any, State> {
   }
 
   public onSave = async () => {
-    const { id } = this.$router.params;
     const params = {
-      id: id,
-      contactName: this.state.value
+      phone: this.state.value
     };
-    const res = await merchantAction.merchantInfoEdit(params);
+    const res = await merchantAction.profileEdit(params);
     if (res.success) {
       await merchantAction.profileInfo();
       Taro.showToast({
@@ -59,18 +56,22 @@ class UserMerchantEdit extends Taro.Component<any, State> {
     }
   }
 
-  render() {
+  render () {
     const { value } = this.state;
+    const { phone } = this.$router.params;
     return (
       <View className="container container-color">
         <View className={`${cssPrefix}-merchant`}>
           <View className={`${cssPrefix}-merchant-input`}>
             <Input
               value={value}
-              onInput={({ detail: { value } }) => this.onChangeValue('value', value)}
+              onInput={({detail: {value}}) => this.onChangeValue('value', value)}
             />
           </View>
-
+          <View className={`${cssPrefix}-merchant-phone`}>
+            当前手机号 {phone}
+          </View>
+          
           <View className={`product-add-buttons-one ${cssPrefix}-merchant-button`}>
             <AtButton
               className="theme-button"

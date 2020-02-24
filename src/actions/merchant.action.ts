@@ -30,6 +30,51 @@ class MerchantAction {
     }
     return result;
   }
+
+  public profileEdit = async (params: any) => {
+    const result = await MerchantService.profileEdit(params);
+    if (result.code === ResponseCode.success) {
+      return {
+        success: true,
+        result: result.msg,
+      };
+    } else {
+      return {
+        success: false,
+        result: result.msg
+      };
+    }
+  }
+
+  public profileResetPwd = async (params: any) => {
+    const result = await MerchantService.profileResetPwd(params);
+    if (result.code === ResponseCode.success) {
+      return {
+        success: true,
+        result: result.msg,
+      };
+    } else {
+      return {
+        success: false,
+        result: result.msg
+      };
+    }
+  }
+
+  public merchantInfoEdit = async (params: any) => {
+    const result = await MerchantService.merchantInfoEdit(params);
+    if (result.code === ResponseCode.success) {
+      return {
+        success: true,
+        result: result.msg,
+      };
+    } else {
+      return {
+        success: false,
+        result: result.msg
+      };
+    }
+  }
 }
 
 export default new MerchantAction();

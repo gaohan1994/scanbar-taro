@@ -1,14 +1,15 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-08 17:10:29 
- * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-03 14:12:38
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-02-17 16:40:46
  */
 
 import Taro from '@tarojs/taro';
 import md5 from 'blueimp-md5';
 import requestHttp from '../../request/request.http';
-import { ResponseCode, ActionsInterface } from '../../../constants/index';
+import { ResponseCode, ActionsInterface, MerchantInterfaceMap } from '../../../constants/index';
+import { store } from '../../../app';
 
 export const CentermOAuthKey: string = 'CentermOAuthToken';
 
@@ -42,6 +43,22 @@ export declare namespace LoginInterface {
     loginId: string;
     name: string;
     menus: AuthMenu[];
+    merchantInfoDTO: MerchantInfoDTO;
+    roleIds: any[];
+    roleNames: string;
+  }
+
+  interface MerchantInfoDTO {
+    name: string;
+    address: string;
+    contactName: string;
+    id: string;
+    institutionCode: string;
+    logo: string;
+    parentId: string;
+    phoneNumber: string;
+    type: string;
+    userId: string;
   }
 
   interface LoginManagerConfig {
@@ -84,23 +101,26 @@ class LoginManager {
       password: md5(params.password)
     };
     const { success, result } = await this.autoToken(payload);
-
+    store.dispatch({
+      type: MerchantInterfaceMap.reducerInterface.RECEIVE_USER_INFO,
+      payload: {data: result}
+    });
     if (success === true) {
       return new Promise((resolve) => {
         Taro
           .setStorage({ key: CentermOAuthKey, data: JSON.stringify(result) })
           .then(() => {
-            resolve({success: true, result, msg: ''});
+            resolve({ success: true, result, msg: '' });
           })
-          .catch(error => resolve({success: false, result: {} as any, msg: error.message || '登录失败'}));
+          .catch(error => resolve({ success: false, result: {} as any, msg: error.message || '登录失败' }));
       });
     } else {
       return new Promise((resolve) => {
-        resolve({success: false, result: {} as any, msg: result || '登录失败'});
+        resolve({ success: false, result: {} as any, msg: result || '登录失败' });
       });
     }
   }
-  
+
   /**
    * @todo [退出登陆]
    *
@@ -127,18 +147,54 @@ class LoginManager {
   public getUserInfo = (): Promise<LoginInterface.LoginMangerInfo<LoginInterface.OAuthToken>> => {
     return new Promise((resolve) => {
       Taro
-        .getStorage({key: CentermOAuthKey})
+        .getStorage({ key: CentermOAuthKey })
         .then(data => {
           if (data.data !== '') {
-            resolve({success: true, result: JSON.parse(data.data), msg: ''});
+            store.dispatch({
+              type: MerchantInterfaceMap.reducerInterface.RECEIVE_USER_INFO,
+              payload: {data: JSON.parse(data.data)}
+            });
+            resolve({ success: true, result: JSON.parse(data.data), msg: '' });
           } else {
-            resolve({success: false, result: {} as any, msg: '请先登录'});
+            resolve({ success: false, result: {} as any, msg: '请先登录' });
           }
         })
         .catch(error => {
-          resolve({success: false, result: {} as any, msg: error.message});
+          resolve({ success: false, result: {} as any, msg: error.message });
         });
     });
+  }
+
+  public setUserInfo = async (params: any, isMerchant: boolean) => {
+    const res = await this.getUserInfo();
+    let userinfo = {};
+    if (isMerchant) {
+      userinfo = {...res.result, merchantInfoDTO: {...res.result.merchantInfoDTO, ...params}};
+    } else {
+      userinfo = {...res.result, ...params};
+    }
+    console.log('test hhh', userinfo);
+    
+    store.dispatch({
+      type: MerchantInterfaceMap.reducerInterface.RECEIVE_USER_INFO,
+      payload: {data: userinfo}
+    });
+    if (res.success) {
+      return new Promise((resolve, reject) => {
+        Taro
+          .setStorage({ key: CentermOAuthKey, data: JSON.stringify(userinfo) })
+          .then(() => {
+            resolve({ success: true, result: '' });
+          })
+          .catch(error => {
+            reject({ success: false, result: error.message });
+          });
+      });
+    } else {
+      return {
+        success: false, result: '获取用户信息失败'
+      };
+    }
   }
 
   public getUserToken = (): ActionsInterface.ActionBase<string> => {

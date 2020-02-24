@@ -7,6 +7,7 @@ import order, { OrderReducer } from './app.order';
 import inventory, { InventoryReducer } from './app.inventory';
 import merchant, { MerchantReducer } from './app.merchant';
 import report, { ReportReducer } from './app.report';
+import user, {UserReducer} from './app.user';
 import productSDK, { ProductSDKReducer } from '../common/sdk/product/product.sdk.reducer';
 
 export declare namespace AppReducer {
@@ -19,6 +20,7 @@ export declare namespace AppReducer {
     inventory: InventoryReducer.State;
     merchant: MerchantReducer.State;
     report: ReportReducer.State;
+    user: UserReducer.State;
   }
 }
 
@@ -32,4 +34,5 @@ export default combineReducers({
   inventory,
   merchant,
   report,
+  user
 });

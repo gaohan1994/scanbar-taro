@@ -1,15 +1,18 @@
 /*
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-17 11:40:53
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-02-21 14:36:05
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import "../style/user.less";
 import "../../component/card/form.card.less";
-import classnames from 'classnames';
 import merchantAction from '../../actions/merchant.action';
+import { AppReducer } from '../../reducers';
+import { connect } from '@tarojs/redux';
+import { getProfileInfo } from '../../reducers/app.merchant';
+import { MerchantInterface } from 'src/constants';
 
 const Rows = [
   {
@@ -31,9 +34,18 @@ const Rows = [
 
 const cssPrefix = 'user';
 
-interface UserMainProps { }
+interface UserMainProps {
+  userinfo: MerchantInterface.ProfileInfo;
+}
+interface UserMainState {
+  userinfo: MerchantInterface.ProfileInfo;
+}
 
-class UserMain extends Taro.Component<UserMainProps> {
+class UserMain extends Taro.Component<UserMainProps, UserMainState> {
+  state = {
+    userinfo: {} as any
+  };
+
   /**
    * 指定config的类型声明为: Taro.Config
    *
@@ -45,16 +57,18 @@ class UserMain extends Taro.Component<UserMainProps> {
     navigationBarTitleText: '我的'
   };
 
-  componentDidShow () {
-    this.init();
+  async componentDidShow() {
+    await this.init();
   }
 
-  public init = () => {
+  public init = async () => {
     /**
      * @todo [请求商户详情]
      */
     // merchantAction.merchantDetail();
-    merchantAction.profileInfo();
+    await merchantAction.profileInfo();
+    const { userinfo } = this.props;
+    this.setState({ userinfo });
   }
 
   public onRowClick = (row: any) => {
@@ -69,33 +83,76 @@ class UserMain extends Taro.Component<UserMainProps> {
     });
   }
 
-  render () {
+  public getRoles = (): string => {
+    const { userinfo } = this.props;
+    const { roleNames } = userinfo;
+    if (!roleNames || (roleNames && roleNames.length === 0)) {
+      return '';
+    }
+    const arr = roleNames.split(/[,，]/);
+    let str = '';
+    if (arr.length > 0) {
+      const index = arr.length > 3 ? 3 : arr.length;
+      for (let i = 0; i < index; i++) {
+        str += arr[i];
+        if (i !== (index - 1)) {
+          str += '/';
+        }
+      }
+      if (arr.length > 3) {
+        str += '/...';
+      }
+      return str;
+    } else {
+      return '';
+    }
+  }
+
+  render() {
+    const { userinfo } = this.state;
+    const { roleNames } = userinfo;
     return (
       <View className="container container-color">
         <View className={`${cssPrefix}-bg`} />
         <View className={`${cssPrefix}-container`}>
-          <View 
+          <View
             className={`${cssPrefix}-user`}
             onClick={() => this.onNavDetail()}
           >
-            <Image 
-              src="//net.huanmusic.com/weapp/icon_mine_touxiang.png"
-              className={`${cssPrefix}-user-image`}
-            />
-            <View className={`${cssPrefix}-user-box`}>
-              <View className={`${cssPrefix}-user-name`}>
-                黄小姐
-                <View className={`${cssPrefix}-user-level`}>采购专员</View>    
-              </View>
-              <View className={`${cssPrefix}-user-text`}>15659995443</View>
-            </View>
+            {
+              userinfo.avatar && userinfo.avatar.length > 0
+                ? (
+                  <Image
+                    src={userinfo.avatar}
+                    className={`${cssPrefix}-user-image`}
+                  />
+                )
+                : (
+                  <Image
+                    src="//net.huanmusic.com/weapp/icon_mine_touxiang.png"
+                    className={`${cssPrefix}-user-image`}
+                  />
+                )
+            }
+
+            {
+              roleNames && roleNames.length > 0 && (
+                <View className={`${cssPrefix}-user-box`}>
+                  <View className={`${cssPrefix}-user-name`}>
+                    {userinfo.userName}
+                    <View className={`${cssPrefix}-user-level`}>{this.getRoles()}</View>
+                  </View>
+                  <View className={`${cssPrefix}-user-text`}>{userinfo.phone}</View>
+                </View>
+              )
+            }
           </View>
 
-          <View 
+          <View
             className={`${cssPrefix}-user-edit`}
             onClick={() => this.onNavDetail()}
           >
-            <Image 
+            <Image
               src="//net.huanmusic.com/weapp/icon_edit.png"
               className={`${cssPrefix}-user-edit-img`}
             />
@@ -104,7 +161,7 @@ class UserMain extends Taro.Component<UserMainProps> {
             {
               Rows.map((row) => {
                 return (
-                  <View 
+                  <View
                     key={row.title}
                     onClick={() => this.onRowClick(row)}
                   >
@@ -121,12 +178,12 @@ class UserMain extends Taro.Component<UserMainProps> {
 
   private renderRow = (row: any) => {
     return (
-      <View 
+      <View
         className={`${cssPrefix}-row`}
       >
         <View className={`${cssPrefix}-row-left`}>
           {row.icon && (
-            <Image src={row.icon}  className={`${cssPrefix}-row-left-icon`} />
+            <Image src={row.icon} className={`${cssPrefix}-row-left-icon`} />
           )}
           <Text className={`${cssPrefix}-row-title`}>{row.title}</Text>
         </View>
@@ -138,4 +195,8 @@ class UserMain extends Taro.Component<UserMainProps> {
   }
 }
 
-export default UserMain;
+const select = (state: AppReducer.AppState) => ({
+  userinfo: getProfileInfo(state),
+});
+
+export default connect(select)(UserMain);

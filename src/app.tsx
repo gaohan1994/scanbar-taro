@@ -44,8 +44,9 @@ class App extends Component {
           'user.merchant.name',
           'user.merchant.address',
           'user.merchant.owner',
-          'user.merchant.password',
           'user.merchant.phone',
+          'user.detail.phone',
+          'user.password',
         ],
       },
       {

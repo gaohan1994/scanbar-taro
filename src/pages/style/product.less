@@ -18,6 +18,7 @@
   display: flex;
   flex-direction: column;
   position: relative;
+
   &-header {
     z-index: @product-header-zindex;
     position: fixed;
@@ -27,6 +28,7 @@
     top: 0;
     left: 0;
     right: 0;
+
     &-button {
       color: @theme-color;
       background-color: #ffffff;
@@ -37,6 +39,7 @@
       position: relative;
       font-size: @normal-text-fontsize;
     }
+
     &-suspension {
       position: absolute;
       right: 10px;
@@ -49,45 +52,55 @@
       color: #ffffff;
       top: -18px;
     }
+
     &-search {
-      width: @product-search-width !important;
+      width: @product-search-width  !important;
     }
+
     &-item {
       .flex(center, center, column);
+
       &-icon {
         width: 34px;
         height: 34px;
+
         &-select {
           .margin(2px, t);
           width: 40px;
           height: 26px;
         }
       }
+
       &-text {
         font-size: 24px;
         color: #ffffff;
+
         &-select {
           .margin(6px, t);
         }
       }
     }
   }
+
   &-suspension {
     display: flex;
     flex-direction: column;
     align-items: center;
     .padding(247px, t);
+
     &-image {
       width: 323px;
       height: 213px;
       .margin(41px, b);
     }
+
     &-text {
       font-size: 34px;
       font-weight: bold;
       color: #9a9fb4;
     }
   }
+
   &-list {
     &-container {
       position: absolute;
@@ -96,29 +109,36 @@
       width: 100%;
       display: flex;
       flex-direction: row;
+
       &-suspension {
         top: 0px;
       }
+
       &-inventory {
-        top: @product-header-height + 80px; 
+        top: @product-header-height + 80px;
       }
     }
+
     &-left {
       width: 150px;
       display: flex;
       flex-direction: column;
       background-color: @product-list-left-bg-color;
+
       &-item {
         .flex(center, center, row);
         position: relative;
         height: @product-list-type-height;
         color: @base-font-color;
         font-size: @normal-text-fontsize;
+
         &-suspension {
           flex-direction: column;
         }
+
         &-active {
           background-color: #ffffff;
+
           &-bge {
             position: absolute;
             height: @product-list-type-height;
@@ -131,43 +151,51 @@
         }
       }
     }
+
     &-right {
       position: relative;
       display: flex;
       flex-direction: column;
       flex: 1;
+
       &-container {
         position: absolute;
         top: 70px;
         bottom: 0px;
+
         &-search {
           position: absolute;
           top: 0px;
           bottom: 0px;
         }
+
         &-inventory {
           top: 0 !important;
         }
       }
+
       &-header {
         border-bottom: 1px solid #f9f9f9;
         .padding(20px);
         display: flex;
         flex-direction: row;
         align-items: center;
+
         &-bge {
           background-color: @theme-color;
           width: 6px;
           height: 28px;
           .margin(10px, r);
         }
+
         &-text {
           font-size: @product-list-type-header-font;
           color: @base-font-color;
-          font-weight: bold;         
+          font-weight: bold;
         }
       }
     }
+
     &-bottom {
       width: 100%;
       .flex(center, center, row);
@@ -176,17 +204,20 @@
       color: #b2b2b2;
       .margin(44px, t);
     }
+
     &-section {
       background-color: @product-section-color;
       .padding(16px, tb);
       .padding(25px, lr);
       .flex(center, flex-start, row);
+
       &-icon {
         height: 28px;
         width: 6px;
         background-color: @theme-color;
         .margin(12px, r);
       }
+
       &-title {
         font-size: 32px;
         color: @base-font-color;
@@ -194,6 +225,7 @@
       }
     }
   }
+
   &-select {
     &-header {
       position: relative;
@@ -204,31 +236,37 @@
       .padding(40px, t);
       .margin(20px, b);
       .flex(center, center, row);
+
       &-close {
         position: absolute;
         left: 56px;
         top: 44px;
         width: 24px;
         height: 24px;
+
         &-image {
           width: 100%;
           height: 100%;
         }
       }
     }
+
     &-mask {
       display: flex;
       flex: 1;
     }
+
     &-content {
       display: flex;
       flex-direction: column;
       width: 100%;
       .padding(34px, lr);
       .padding(135px + 20px, b);
+
       &-nonfooter {
         .padding(0, b) !important;
       }
+
       &-button {
         .margin(0px, l) !important;
         .margin(18px, r) !important;
@@ -236,20 +274,24 @@
         .padding(18px, tb) !important;
         .padding(40px, lr) !important;
       }
+
       &-item {
         display: flex;
         flex-direction: column;
         .padding(25px, tb);
+
         &-title {
           font-size: @product-select-title-font;
           color: #4d4d4d;
           font-weight: bold;
         }
+
         &-buttons {
           display: flex;
           flex-direction: row;
           flex-wrap: wrap;
         }
+
         &-pos {
           position: fixed;
           bottom: 0;
@@ -262,9 +304,11 @@
         }
       }
     }
+
     &-border {
       border-bottom: 1px solid #e3e3e3;
     }
+
     &-form {
       .flex(center, space-around, row);
       .margin(35px, t);
@@ -273,18 +317,22 @@
 
   &-detail {
     background-color: #f2f2f2;
+
     &-cover {
       width: 100%;
       height: 388px;
       background-color: #ffffff;
       .flex(center, center);
+
       &-empty {
         width: 200px;
         height: 200px;
       }
+
       &-image {
         width: 100%;
         height: 100%;
+
         &-background {
           background-repeat: no-repeat;
           background-size: contain;
@@ -292,48 +340,59 @@
         }
       }
     }
+
     &-list {
       width: 100%;
       .padding(30px, lr);
       .padding(6rpx, t);
     }
+
     &-textarea {
       width: 450rpx;
     }
+
     &-submit {
       width: 100%;
     }
+
     &-modal {
       position: relative;
       display: flex;
       flex-direction: column;
       flex: 1;
+
       &-tip {
         .margin(28px, b);
         font-size: 26px;
         color: #666666;
         .padding(10px, l);
       }
+
       &-text {
         font-size: 26px;
         color: @base-font-color;
         .margin(26px, b);
       }
+
       &-close {
         position: absolute;
-        left: 60px;
-        top: 50px;
-        width: 24px;
-        height: 24px;
+        left: 10px;
+        top: 0px;
+        width: 100px;
+        height: 100px;
+        .flex(center, center, row);
+
         &-image {
-          width: 100%;
-          height: 100%;
+          width: 24px;
+          height: 24px;
         }
       }
+
       &-change {
         position: absolute;
         right: 47px;
         top: 50px;
+
         &-text {
           background-color: @theme-color;
           color: #ffffff;
@@ -345,8 +404,10 @@
       }
     }
   }
+
   &-add {
     .padding(200px, b);
+
     &-buttons {
       position: fixed;
       bottom: 0;
@@ -358,13 +419,16 @@
       .padding(50px, b);
       .padding(30px, lr);
       .flex(center, space-between, row);
+
       &-button {
         width: 320px;
       }
+
       &-one {
         width: 100%;
       }
     }
+
     &-more {
       display: flex;
       flex-direction: row;
@@ -373,6 +437,7 @@
       color: #333333;
       .margin(38px, tb);
       .padding(36px, lr);
+
       &-image {
         width: 24px;
         height: 13px;
@@ -380,11 +445,13 @@
       }
     }
   }
+
   &-manage {
     &-list {
       position: absolute;
       top: @product-header-height;
       width: 100%;
+
       &-container {
         display: flex;
         flex-direction: column;
@@ -392,34 +459,40 @@
       }
     }
   }
-  
+
   &-pay {
     height: 100%;
     background-color: #f2f2f2;
     .padding(20px, tb);
     .padding(6px, t);
+
     &-card {
       .margin(20px, t);
     }
+
     &-container {
       .padding(@cart-height + 50px, b);
     }
+
     &-pos {
       .padding(20px, lr);
       background-color: #f2f2f2;
     }
+
     &-list {
       .padding(20px);
       // display: flex;
       // flex: 1;
       // .padding(30px, lr);
     }
+
     &-footer {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
       z-index: 999;
+
       &-bg {
         position: relative;
         .padding(@product-pay-footer-right, r);
@@ -427,6 +500,7 @@
         height: @cart-height;
         .background-image('//net.huanmusic.com/weapp/bmg_bottom_close.png');
       }
+
       &-right {
         font-weight: bold;
         position: absolute;
@@ -437,30 +511,37 @@
         .flex(center, center, column);
         color: #ffffff;
         font-size: @cart-button-font;
+
         &-disabled {
           .background-image('//net.huanmusic.com/weapp/bt_put_bottom_close_und.png');
         }
+
         &-active {
           .background-image('//net.huanmusic.com/weapp/bt_put_bottom_close_pitch.png');
         }
       }
+
       &-left {
         display: flex;
         flex-direction: row;
         align-items: center;
         height: 100%;
         .padding(50px, lr);
+
         &-item {
           .flex(center, center, column);
           flex: 1;
+
           &-icon {
             width: 37px;
             height: 32px;
           }
+
           &-erase {
             width: 32px;
             height: 34px;
           }
+
           &-font {
             font-size: 26px;
             color: #ffffff;
@@ -469,31 +550,38 @@
         }
       }
     }
+
     &-member {
       &-input {
         .padding(30px);
         .flex(center, space-between, row);
         background-color: #F8F8FA;
         border-radius: 20px;
+
         &-icon {
           width: 40px;
           height: 40px;
+
           &-img {
             width: 100%;
             height: 100%;
           }
         }
+
         &-place {
           font-size: 30px;
           color: #cccccc;
         }
+
         &-box {
           width: 100%;
           font-size: 30px;
         }
       }
+
       &-layout {
         z-index: 1200;
+
         &-mask {
           display: flex;
           position: fixed;
@@ -504,6 +592,11 @@
           z-index: 1000;
           background-color: rgba(0, 0, 0, 0.7)
         }
+
+        &-transparent {
+          background-color: transparent;
+        }
+
         &-box {
           z-index: 1200;
           position: absolute;
@@ -512,22 +605,27 @@
           right: 0;
           background-color: #f2f2f2;
         }
+
         &-container {
           display: flex;
           flex-direction: column;
           align-items: center;
         }
+
         &-card {
           .margin(150px, t);
+
           &-row {
             .padding(24px);
             color: #666666;
             display: flex;
             font-size: 26px;
             flex-direction: column;
+
             &-text {
               .margin(24px, b);
             }
+
             &-icons {
               max-width: 600px !important;
             }
@@ -536,10 +634,12 @@
       }
     }
   }
+
   &-row {
     position: relative;
     .padding(24px, tb);
     .padding(40px, lr);
+
     &-icon {
       .margin(16px, lr);
       .padding(17px, lr);
@@ -548,23 +648,29 @@
       color: #ffffff;
       font-size: 20px;
       border-radius: 14px;
+
       &-member {
         background-color: #CCAE80;
       }
+
       &-refund {
         background-color: #20BBB9;
       }
     }
+
     &-line {
       text-decoration: line-through;
     }
+
     &-border {
       border-bottom: 1PX solid #e3e3e3;
     }
+
     &-normal {
       font-size: 28px;
       color: @base-font-color;
     }
+
     &-name {
       font-size: 30px;
       color: #444444;
@@ -576,60 +682,76 @@
       -webkit-line-clamp: 1;
       -webkit-box-orient: vertical;
     }
+
     &-bold {
       font-weight: bold;
     }
+
     &-price {
       font-size: 28px;
       color: #fc4e44;
     }
+
     &-content {
       display: flex;
       flex-direction: column;
+
       &-item {
         .flex(center, space-between, row);
       }
+
       &-items {
         .flex(center, center, row);
       }
+
       &-top {
         .margin(20px, t);
       }
     }
+
     &-stock {
       display: flex;
       flex-direction: column;
+
       &-mar {
         .margin(20px, t);
       }
+
       &-item {
         display: flex;
         flex-direction: row;
+
         &-detail {
           display: flex;
           flex: 1;
           align-items: flex-end;
         }
+
         &-name {
           font-size: 24px;
           color: #999999;
         }
+
         &-red {
           color: #FC4E44 !important;
         }
+
         &-base {
           font-size: 28px;
         }
+
         &-value {
           font-size: 28px;
           color: #4d4d4d;
         }
+
         &-bold {
           font-weight: bold;
         }
       }
     }
   }
+
   &-refund {
     &-input {
       width: 710px !important;

@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
- * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-23 14:47:39
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-02-12 18:17:27
  * 
  */
 import Taro from '@tarojs/taro';
@@ -33,11 +33,15 @@ interface State {
 
 class ProductSuspension extends Taro.Component<Props, State> {
 
+  config: Taro.Config = {
+    navigationBarTitleText: '挂单'
+  };
+
   state = {
     currentSuspension: -1
   };
 
-  public componentDidShow () {
+  public componentDidShow() {
     const { suspensionCartList } = this.props;
     if (suspensionCartList.length > 0) {
       this.setState({ currentSuspension: suspensionCartList[0].suspension.date });
@@ -50,7 +54,7 @@ class ProductSuspension extends Taro.Component<Props, State> {
 
   public manageProduct = (product: any, type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce, suspension: number) => {
     // 这里要判断一下，是否是最后一个商品如果是，那么可能要删除该挂单
-    productSdk.manage({type, product, suspension});
+    productSdk.manage({ type, product, suspension });
   }
 
   /**
@@ -72,7 +76,7 @@ class ProductSuspension extends Taro.Component<Props, State> {
       Taro.navigateBack();
     } catch (error) {
       Taro.hideLoading();
-      Taro.showToast({title: error.message, icon: 'none'});
+      Taro.showToast({ title: error.message, icon: 'none' });
     }
   }
 
@@ -108,34 +112,34 @@ class ProductSuspension extends Taro.Component<Props, State> {
     });
   }
 
-  render () {
+  render() {
     const { suspensionCartList } = this.props;
     return (
       <View className={`container ${cssPrefix}`}>
         {
           suspensionCartList && suspensionCartList.length > 0 ? (
-            <View className={`${cssPrefix}-list-container ${cssPrefix}-list-container-suspension`}> 
-              {this.renderLeft()}  
+            <View className={`${cssPrefix}-list-container ${cssPrefix}-list-container-suspension`}>
+              {this.renderLeft()}
               {this.renderRight()}
             </View>
           ) : (
-            <View className={`${cssPrefix}-suspension`}> 
-              <Image src="//net.huanmusic.com/weapp/img_kong.png" className={`${cssPrefix}-suspension-image`} />
-              <Text className={`${cssPrefix}-suspension-text`}>暂无内容</Text>
-            </View>
-          )
+              <View className={`${cssPrefix}-suspension`}>
+                <Image src="//net.huanmusic.com/weapp/img_kong.png" className={`${cssPrefix}-suspension-image`} />
+                <Text className={`${cssPrefix}-suspension-text`}>暂无内容</Text>
+              </View>
+            )
         }
-        
+
         {this.renderFooter()}
       </View>
     );
   }
-  
+
   private renderLeft = () => {
     const { currentSuspension } = this.state;
     const { suspensionCartList } = this.props;
     return (
-      <ScrollView 
+      <ScrollView
         scrollY={true}
         className={`${cssPrefix}-list-left`}
       >
@@ -143,7 +147,7 @@ class ProductSuspension extends Taro.Component<Props, State> {
           suspensionCartList && suspensionCartList.length > 0
             ? suspensionCartList.map((suspension) => {
               return (
-                <View 
+                <View
                   key={suspension.suspension.date}
                   className={classnames(`${cssPrefix}-list-left-item`, {
                     [`${cssPrefix}-list-left-item-active`]: currentSuspension === suspension.suspension.date,
@@ -173,15 +177,15 @@ class ProductSuspension extends Taro.Component<Props, State> {
     const { productCartList } = currentSuspensionList as ProductSDKReducer.SuspensionCartBase;
     return (
       <View className={`${cssPrefix}-list-right`}>
-        <ScrollView 
+        <ScrollView
           scrollY={true}
           className={`${cssPrefix}-list-right ${cssPrefix}-list-right-container`}
         >
           {
             productCartList && productCartList.length > 0 && productCartList.map((product, index) => {
               return (
-                <View 
-                  key={`${product.id}-${index}`} 
+                <View
+                  key={`${product.id}-${index}`}
                   className={`${cssPrefixComponent} ${cssPrefixComponent}-border`}
                 >
                   <View className={`${cssPrefixComponent}-content`}>
@@ -189,8 +193,8 @@ class ProductSuspension extends Taro.Component<Props, State> {
                       {product.pictures && product.pictures !== '' ? (
                         <Image src={product.pictures} className={`${cssPrefixComponent}-content-cover-image`} />
                       ) : (
-                        <Image src="//net.huanmusic.com/weapp/img_nolist.png" className={`${cssPrefixComponent}-content-cover-image`} />
-                      )}
+                          <Image src="//net.huanmusic.com/weapp/img_nolist.png" className={`${cssPrefixComponent}-content-cover-image`} />
+                        )}
                     </View>
                     <View className={`${cssPrefixComponent}-content-detail`}>
                       <View className={`${cssPrefixComponent}-title`}>{product.name}</View>
@@ -201,17 +205,17 @@ class ProductSuspension extends Taro.Component<Props, State> {
                       </Text>
                     </View>
                     <View className={`${cssPrefixComponent}-stepper`}>
-                      <View className={`${cssPrefixComponent}-stepper-container`}>    
-                        <View 
+                      <View className={`${cssPrefixComponent}-stepper-container`}>
+                        <View
                           className={classnames(`${cssPrefixComponent}-stepper-button`, `${cssPrefixComponent}-stepper-button-reduce`)}
                           onClick={() => this.manageProduct(product, productSdk.productCartManageType.REDUCE, currentSuspension)}
                         />
                         <Text className={`${cssPrefixComponent}-stepper-text`}>{product.sellNum}</Text>
                         {!productSdk.isWeighProduct(product) && (
-                          <View 
+                          <View
                             className={classnames(`${cssPrefixComponent}-stepper-button`, `${cssPrefixComponent}-stepper-button-add`)}
                             onClick={() => this.manageProduct(product, productSdk.productCartManageType.ADD, currentSuspension)}
-                          />  
+                          />
                         )}
                       </View>
                     </View>
@@ -220,8 +224,8 @@ class ProductSuspension extends Taro.Component<Props, State> {
               );
             })
           }
-        </ScrollView>  
-      </View> 
+        </ScrollView>
+      </View>
     );
   }
 
@@ -232,28 +236,63 @@ class ProductSuspension extends Taro.Component<Props, State> {
         <View className="cart">
           <View className="cart-bg cart-bg-suspension">
             <View className="cart-suspension-left">
-              <View 
+              <View
                 className="cart-suspension-left-item"
                 onClick={() => this.onDeleteSuspension()}
               >
-                <Image 
-                  src="//net.huanmusic.com/weapp/icon_orders_empty.png" 
-                  className="cart-suspension-left-item-empty"
-                />
-                <Text className="cart-suspension-left-item-text">清空</Text>
+                {
+                  currentSuspension !== -1
+                    ? (
+                      <Image
+                        src="//net.huanmusic.com/weapp/icon_orders_empty.png"
+                        className="cart-suspension-left-item-empty"
+                      />
+                    )
+                    : (
+                      <Image
+                        src="//net.huanmusic.com/weapp/icon_orders_empty_none.png"
+                        className="cart-suspension-left-item-empty"
+                      />
+                    )
+                }
+
+                <Text
+                  className={classnames(`cart-suspension-left-item-text`, {
+                    [`cart-suspension-left-item-gray`]: currentSuspension === -1,
+                  })}
+                >
+                  清空
+                </Text>
               </View>
-              <View 
+              <View
                 className="cart-suspension-left-item"
                 onClick={() => this.onDeleteSuspension(currentSuspension)}
               >
-                <Image 
-                  src="//net.huanmusic.com/weapp/icon_orders_del.png" 
-                  className="cart-suspension-left-item-delete"
-                />
-                <Text className="cart-suspension-left-item-text">删除</Text>
+                {
+                  currentSuspension !== -1
+                    ? (
+                      <Image
+                        src="//net.huanmusic.com/weapp/icon_orders_del.png"
+                        className="cart-suspension-left-item-delete"
+                      />
+                    )
+                    : (
+                      <Image
+                        src="//net.huanmusic.com/weapp/icon_orders_del_none.png"
+                        className="cart-suspension-left-item-delete"
+                      />
+                    )
+                }
+                <Text
+                  className={classnames(`cart-suspension-left-item-text`, {
+                    [`cart-suspension-left-item-gray`]: currentSuspension === -1,
+                  })}
+                >
+                  删除
+                </Text>
               </View>
             </View>
-            <View 
+            <View
               className={classnames(`cart-right`, {
                 [`cart-right-suspension`]: true,
                 [`cart-right-suspension-active`]: currentSuspension !== -1,
@@ -261,10 +300,21 @@ class ProductSuspension extends Taro.Component<Props, State> {
               })}
               onClick={() => this.onOrder()}
             >
-              <Image 
-                src="//net.huanmusic.com/weapp/icon_xiadan.png" 
-                className="cart-right-suspension-icon"
-              />
+              {
+                currentSuspension !== -1
+                  ? (
+                    <Image
+                      src="//net.huanmusic.com/weapp/icon_xiadan.png"
+                      className="cart-right-suspension-icon"
+                    />
+                  )
+                  : (
+                    <Image
+                      src="//net.huanmusic.com/weapp/icon_xiadan_none.png"
+                      className="cart-right-suspension-icon"
+                    />
+                  )
+              }
               <Text className={`cart-right-suspension-text`}>下单</Text>
             </View>
           </View>

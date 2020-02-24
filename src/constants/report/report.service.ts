@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-08 10:01:17 
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-21 11:41:49
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-02-13 15:01:06
  * 
  * @todo [盘点相关的接口]
  * ```js
@@ -28,6 +28,10 @@ class ReportService {
   }
   public reportBaseSaleInfo = async (params?: ReportInterface.ReportBaseFetchFidle): Promise<HTTPInterface.ResponseResultBase<any>> => {
     const result = await requestHttp.get(`${ReportInterfaceMap.reportBaseSaleInfo}${jsonToQueryString(params)}`);
+    return result;
+  }
+  public reportTodayData = async (params?: ReportInterface.ReportTodayDataFetchFidle): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.get(`${ReportInterfaceMap.reportTodayData}${jsonToQueryString(params)}`);
     return result;
   }
 }

@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-05 14:41:35 
- * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-27 10:59:16
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-02-17 17:26:54
  * 
  * @todo [fockedTaroUiListItem,增加以及修改了一些属性]
  */
@@ -41,7 +41,7 @@ export interface FormRowProps {
   inputOnChange?: (params: any) => any; // 输入改变函数
   infoColor?: '333333' | '666666';
   inputType?: 'text' | 'number' | 'password' | 'phone' | 'digit'; // 输入框类型
-  extraTextStyle?: 'price' | 'black' | 'gray' | 'title';      // 右边文字颜色
+  extraTextStyle?: 'price' | 'black' | 'gray' | 'title' | 'maxWidth';      // 右边文字颜色
   extraTextColor?: string;      // 右边字体颜色
   extraTextSize?: string;       // 右边字体大小
   extraTextBold?: 'bold';       // 是否加粗
@@ -138,11 +138,11 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
 
           <View className='at-list__item-content item-content'>
             <View className='item-content__info'>
-              {main && <View className="item-content__info-icon">*</View>}
+              
               <View 
                 className={classnames('item-content__info-title', `component-form-info-${infoColor}`)}
               >
-                {title}
+                {title}{main ? <View className="item-content__info-icon">*</View> : null}
               </View>
               {note && <View className='item-content__info-note'>{note}</View>}
             </View>

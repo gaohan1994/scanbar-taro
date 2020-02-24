@@ -1,6 +1,6 @@
 import dayJs from 'dayjs';
 
-export function dateHelper (date: number): string {
+export function dateHelper(date: number): string {
   return dayJs(date).format('YYYY-MM-DD');
 }
 
@@ -8,10 +8,10 @@ export function dateHelper (date: number): string {
  * @todo [计算一年的周]
  * @Author: Ghan 
  * @Date: 2020-01-15 15:41:35 
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-21 13:46:01
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-02-21 15:28:41
  */
-export function createWeeks (year: number = 2020) {
+export function createWeeks(year: number = 2020) {
   let weeks: string[][] = [];
   /**
    * @param {ONE_DAY} number 一天的时间
@@ -50,10 +50,14 @@ export function createWeeks (year: number = 2020) {
   return weeks;
 }
 
-export function getMonthEndDate (month: number) {
+export function getMonthEndDate(month: number, year: number) {
   switch (month + 1) {
     case 2: {
-      return 28;
+      if (year % 4 === 0 && year % 100 !== 0 || year % 400 === 0) {
+        return 29;
+      } else {
+        return 28;
+      }
     }
     case 1:
     case 3:

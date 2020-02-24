@@ -1,10 +1,10 @@
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
 import "../style/order.less";
 import "../style/product.less";
-import { OrderAction } from '../../actions';
+import { OrderAction, ProductAction } from '../../actions';
 import invariant from 'invariant';
 import { ResponseCode, OrderInterface } from '../../constants/index';
 import { getOrderDetail } from '../../reducers/app.order';
@@ -25,6 +25,10 @@ type State = {};
 
 class OrderDetail extends Taro.Component<Props, State> {
 
+  config: Config = {
+    navigationBarTitleText: '订单详情'
+  };
+
   componentWillMount() {
     try {
       const { params: { id } } = this.$router;
@@ -40,7 +44,7 @@ class OrderDetail extends Taro.Component<Props, State> {
 
   public init = async (id: string) => {
     try {
-      const result = await OrderAction.orderDetail({orderNo: id});
+      const result = await OrderAction.orderDetail({ orderNo: id });
       invariant(result.code === ResponseCode.success, result.msg || ' ');
     } catch (error) {
       Taro.showToast({
@@ -51,11 +55,11 @@ class OrderDetail extends Taro.Component<Props, State> {
   }
 
   public onCopy = async () => {
-    try { 
+    try {
       const { orderDetail } = this.props;
       invariant(orderDetail && orderDetail.order && orderDetail.order.orderNo, '请选择要复制的数据');
-      await Taro.setClipboardData({data: orderDetail.order.orderNo});
-      Taro.showToast({title: '已复制订单号'}); 
+      await Taro.setClipboardData({ data: orderDetail.order.orderNo });
+      Taro.showToast({ title: '已复制订单号' });
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -64,7 +68,8 @@ class OrderDetail extends Taro.Component<Props, State> {
     }
   }
 
-  render () {
+
+  render() {
     return (
       <View className={`container ${cssPrefix}`}>
         <View className={`${cssPrefix}-detail-bg`} />
@@ -72,7 +77,7 @@ class OrderDetail extends Taro.Component<Props, State> {
           {this.renderStatus()}
           {this.renderCards()}
         </View>
-        {this.renderButtons()}
+        {/*this.renderButtons()*/}
       </View>
     );
   }
@@ -82,7 +87,7 @@ class OrderDetail extends Taro.Component<Props, State> {
       <ButtonFooter
         buttons={[{
           title: "退货",
-          onPress: () => {},
+          onPress: () => {  },
         }]}
       />
     );
@@ -90,12 +95,26 @@ class OrderDetail extends Taro.Component<Props, State> {
 
   private renderStatus = () => {
     const { orderDetail } = this.props;
+    const { order } = orderDetail;
+    const { transFlag } = order;
     return (
       <View className={`${cssPrefix}-detail-status`}>
-        <Image 
-          src="//net.huanmusic.com/weapp/v1/icon_success.png" 
-          className={`${cssPrefix}-detail-status-icon`} 
-        />
+        {
+          transFlag === -1
+            ? (
+              <Image
+                src="//net.huanmusic.com/weapp/v1/icon_fail.png"
+                className={`${cssPrefix}-detail-status-icon`}
+              />
+            )
+            : (
+              <Image
+                src="//net.huanmusic.com/weapp/v1/icon_success.png"
+                className={`${cssPrefix}-detail-status-icon`}
+              />
+            )
+        }
+
         {orderDetail.order && (
           <View className={`${cssPrefix}-detail-status-detail`}>
             <View
@@ -103,8 +122,8 @@ class OrderDetail extends Taro.Component<Props, State> {
               className={`${cssPrefix}-detail-status-detail-box`}
             >
               <Text className={`${cssPrefix}-detail-status-result`}>{orderDetail.order.orderNo}</Text>
-              <Image 
-                src="//net.huanmusic.com/weapp/icon_copy.png"  
+              <Image
+                src="//net.huanmusic.com/weapp/icon_copy.png"
                 className={`${cssPrefix}-detail-status-copy`}
               />
             </View>
@@ -118,20 +137,24 @@ class OrderDetail extends Taro.Component<Props, State> {
 
   private renderCards = () => {
     const { orderDetail } = this.props;
+    const extraTextColor: any = orderDetail.order.transType === 1 ? '#FC4E44' : '#333333';
+    const symbol = orderDetail.order.transType === 1 ? '-' : '';
 
     const Form2: FormRowProps[] = orderDetail.order && [
       {
         title: '应收金额',
-        extraText: `￥ ${numeral(orderDetail.order.totalAmount).format('0.00')}`,
+        extraText: `${symbol}￥ ${numeral(orderDetail.order.totalAmount).format('0.00')}`,
         extraTextStyle: 'title',
+        extraTextColor: extraTextColor,
         extraTextBold: 'bold',
       },
       {
         title: `${OrderAction.orderPayType(orderDetail)}收款`,
-        extraText: `￥ ${numeral(orderDetail.order.transAmount).format('0.00')}`,
+        extraText: orderDetail.order.transFlag === -1 ? '收款失败' : `${symbol}￥ ${numeral(orderDetail.order.transAmount).format('0.00')}`,
         extraTextStyle: 'title',
+        extraTextColor: extraTextColor,
         extraTextBold: 'bold',
-        hasBorder: false
+        hasBorder: false,
       },
     ];
 
@@ -200,7 +223,7 @@ class OrderDetail extends Taro.Component<Props, State> {
 }
 
 const select = (state: AppReducer.AppState) => ({
-  orderDetail: getOrderDetail(state),  
+  orderDetail: getOrderDetail(state),
 });
 
 export default connect(select)(OrderDetail);

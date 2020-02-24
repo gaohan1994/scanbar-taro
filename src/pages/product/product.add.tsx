@@ -1,10 +1,10 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-20 13:37:23 
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-17 10:27:54
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-02-13 09:38:14
  */
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View, Image, Picker, Text } from '@tarojs/components';
 import { ProductAction } from '../../actions';
 import invariant from 'invariant';
@@ -26,14 +26,14 @@ import { store } from '../../app';
 
 const cssPrefix = 'product';
 
-interface Props { 
+interface Props {
   productType: ProductInterface.ProductType[];
   productTypeSelector: string[];
   productSupplier: ProductInterface.ProductSupplier[];
   productSupplierSelector: string[];
 }
 
-interface State { 
+interface State {
   tempFilePaths: string[];
   cost: string;           // 进价
   price: string;          // 售价
@@ -56,7 +56,12 @@ interface State {
 }
 
 class ProductAdd extends Taro.Component<Props, State> {
-  constructor (props: Props) {
+
+  config: Config = {
+    navigationBarTitleText: '新增商品'
+  };
+  
+  constructor(props: Props) {
     super(props);
     this.state = {
       barcode: '',
@@ -81,14 +86,14 @@ class ProductAdd extends Taro.Component<Props, State> {
     };
   }
 
-  async componentWillMount () {
+  async componentWillMount() {
     try {
       /**
        * @todo 初始化typepicker的位置
        */
       const { productType, productSupplier } = this.props;
       if (productType.length === 0) {
-        const typeResult = await ProductAction.productInfoType();  
+        const typeResult = await ProductAction.productInfoType();
         invariant(typeResult.code === ResponseCode.success, typeResult.msg || ResponseCode.error);
       }
 
@@ -104,7 +109,7 @@ class ProductAdd extends Taro.Component<Props, State> {
           this.setState({ needCallback });
         }
         if (scan !== undefined) {
-          Taro.showLoading(); 
+          Taro.showLoading();
           this.setState({
             barcode: scan.barcode || '',
             name: scan.name,
@@ -142,43 +147,43 @@ class ProductAdd extends Taro.Component<Props, State> {
        * @todo [如果不存在则扫描商品条码后，自动获取并填写条码、名称、售价、规格、单位、品类、品牌、图片等信息，填充进之前没有写的部分]
        */
       Taro
-      .scanCode()
-      .then(async (barcode) => {
-        Taro.showLoading();
-        const result = await ProductService.productInfoScanGet({barcode: barcode.result});
-        if (result.code === ResponseCode.success) {
-          // 如果扫码出的商品已经存在本地商品库则提示商品已经存在了
-          Taro.hideLoading();
-          Taro.showModal({
-            title: '提示',
-            content: '商品已经存在',
-            showCancel: false,
-          });
-          return;
-        }
-        const thirdResult = await ProductService.productInfoScan({barcode: barcode.result});
-        
-        if (thirdResult.code === ResponseCode.success) {
-          // 扫描商品条码后，自动获取并填写条码、名称、售价、规格、单位、品类、品牌、图片等信息，填充进之前没有写的部分
-          const { data }: { data: ProductInterface.ProductScan } = thirdResult;
-          this.setState(prevState => {
-            return {
-              ...prevState,
-              barcode: barcode.result,
-              name: prevState.name === '' ? data.name : prevState.name,
-              tempFilePaths: prevState.tempFilePaths.length === 0 ? [data.img] : prevState.tempFilePaths,
-              images: prevState.tempFilePaths.length === 0 ? [data.img] : prevState.tempFilePaths,
-              price: prevState.price === '' ? data.price : prevState.price,
-              standard: prevState.standard === '' ? data.standard : prevState.standard,
-              brand: prevState.brand === '' ? data.brand : prevState.brand,
-              supplier: prevState.supplier === '' ? data.supplier : prevState.supplier,
-            };
-          });
-          Taro.hideLoading();
-          return;
-        }
-        throw new Error(thirdResult.msg || '没有找到该商品');
-      });
+        .scanCode()
+        .then(async (barcode) => {
+          Taro.showLoading();
+          const result = await ProductService.productInfoScanGet({ barcode: barcode.result });
+          if (result.code === ResponseCode.success) {
+            // 如果扫码出的商品已经存在本地商品库则提示商品已经存在了
+            Taro.hideLoading();
+            Taro.showModal({
+              title: '提示',
+              content: '商品已经存在',
+              showCancel: false,
+            });
+            return;
+          }
+          const thirdResult = await ProductService.productInfoScan({ barcode: barcode.result });
+
+          if (thirdResult.code === ResponseCode.success) {
+            // 扫描商品条码后，自动获取并填写条码、名称、售价、规格、单位、品类、品牌、图片等信息，填充进之前没有写的部分
+            const { data }: { data: ProductInterface.ProductScan } = thirdResult;
+            this.setState(prevState => {
+              return {
+                ...prevState,
+                barcode: barcode.result,
+                name: prevState.name === '' ? data.name : prevState.name,
+                tempFilePaths: prevState.tempFilePaths.length === 0 ? [data.img] : prevState.tempFilePaths,
+                images: prevState.tempFilePaths.length === 0 ? [data.img] : prevState.tempFilePaths,
+                price: prevState.price === '' ? data.price : prevState.price,
+                standard: prevState.standard === '' ? data.standard : prevState.standard,
+                brand: prevState.brand === '' ? data.brand : prevState.brand,
+                supplier: prevState.supplier === '' ? data.supplier : prevState.supplier,
+              };
+            });
+            Taro.hideLoading();
+            return;
+          }
+          throw new Error(thirdResult.msg || '没有找到该商品');
+        });
     } catch (error) {
       Taro.hideLoading();
       Taro.showToast({
@@ -197,31 +202,31 @@ class ProductAdd extends Taro.Component<Props, State> {
     const that = this;
 
     Taro
-    .uploadFile({
-      url: `${getBaseUrl('')}/product/productInfo/upload`,
-      filePath: paths[0],
-      name: 'files',
-      header: {Authorization: result}
-    })
-    .then(res => {
-      const data = JSON.parse(res.data);
-      if (data.code === ResponseCode.success) {
-        that.setState(prevState => {
-          return {
-            ...prevState,
-            images: [data.data[0]]
-          };
+      .uploadFile({
+        url: `${getBaseUrl('')}/product/productInfo/upload`,
+        filePath: paths[0],
+        name: 'files',
+        header: { Authorization: result }
+      })
+      .then(res => {
+        const data = JSON.parse(res.data);
+        if (data.code === ResponseCode.success) {
+          that.setState(prevState => {
+            return {
+              ...prevState,
+              images: [data.data[0]]
+            };
+          });
+        } else {
+          throw new Error(data.msg || '上传图片失败');
+        }
+      })
+      .catch(error => {
+        Taro.showToast({
+          title: error.message,
+          icon: 'none'
         });
-      } else {
-        throw new Error(data.msg || '上传图片失败');
-      }
-    })
-    .catch(error => {
-      Taro.showToast({
-        title: error.message,
-        icon: 'none'
       });
-    });
   }
 
   public onChangeValue = (key: string, value: string) => {
@@ -241,14 +246,14 @@ class ProductAdd extends Taro.Component<Props, State> {
   public onChoiceImage = () => {
     try {
       Taro
-      .chooseImage({
-        sourceType: ['album'],
-        count: 1,
-      })
-      .then(res => {
-        const { tempFilePaths } = res;
-        this.onChooseImages(tempFilePaths);
-      });
+        .chooseImage({
+          sourceType: ['album'],
+          count: 1,
+        })
+        .then(res => {
+          const { tempFilePaths } = res;
+          this.onChooseImages(tempFilePaths);
+        });
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -259,17 +264,17 @@ class ProductAdd extends Taro.Component<Props, State> {
 
   public changeProductType = (event: any) => {
     const typeValue: number = event.detail.value;
-    this.setState({typeValue});
+    this.setState({ typeValue });
   }
 
   public changeProductSupplier = (event: any) => {
     const value: number = event.detail.value;
-    this.setState({supplierValue: value});
+    this.setState({ supplierValue: value });
   }
 
   public getBarcode = async (): Promise<void> => {
     try {
-      const result = await ProductService.productInfoGetBarcode();  
+      const result = await ProductService.productInfoGetBarcode();
       invariant(result.code === ResponseCode.success, result.msg || ResponseCode.error);
       this.setState({ barcode: result.data });
     } catch (error) {
@@ -300,7 +305,7 @@ class ProductAdd extends Taro.Component<Props, State> {
   }
 
   public validate = (): { success: boolean, result: any } => {
-    
+
     const helper = new Validator();
     const { barcode, name } = this.state;
     helper.add(barcode, [{
@@ -323,26 +328,26 @@ class ProductAdd extends Taro.Component<Props, State> {
   public addProduct = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return new Promise(async (resolve, reject) => {
       const { productType, productSupplier } = this.props;
-      const { 
-        name, 
-        barcode, 
-        saleType, 
+      const {
+        name,
+        barcode,
+        saleType,
         status,
         cost,
-        price, 
-        memberPrice, 
-        typeValue, 
-        standard, 
-        unit, brand, 
-        number, 
-        limitNum, 
-        images, 
-        supplierValue 
+        price,
+        memberPrice,
+        typeValue,
+        standard,
+        unit, brand,
+        number,
+        limitNum,
+        images,
+        supplierValue
       } = this.state;
-      let payload: ProductInterface.ProductInfoAdd = { 
-        barcode, 
-        name, 
-        saleType, 
+      let payload: ProductInterface.ProductInfoAdd = {
+        barcode,
+        name,
+        saleType,
         status,
         type: productType[typeValue].id,
         supplierId: productSupplier[supplierValue].id
@@ -379,7 +384,7 @@ class ProductAdd extends Taro.Component<Props, State> {
       if (addResult.code === ResponseCode.success) {
         resolve(addResult);
       } else {
-        reject({message: addResult.msg});
+        reject({ message: addResult.msg });
       }
     });
   }
@@ -395,9 +400,9 @@ class ProductAdd extends Taro.Component<Props, State> {
       const { success, result } = this.validate();
       invariant(success, result || ' ');
 
-      const addResult = await this.addProduct(); 
+      const addResult = await this.addProduct();
       invariant(addResult.code === ResponseCode.success, addResult.msg || ResponseCode.error);
-      
+
       Taro.showToast({
         title: '新增成功',
         icon: 'success',
@@ -448,7 +453,7 @@ class ProductAdd extends Taro.Component<Props, State> {
     }
   }
 
-  render () {
+  render() {
     const { cost, price, barcode, name } = this.state;
     const formName: FormRowProps[] = [
       {
@@ -512,13 +517,13 @@ class ProductAdd extends Taro.Component<Props, State> {
     const { showMore } = this.state;
     return (
       <View>
-        <View 
+        <View
           onClick={() => this.onChangeShowMore()}
           className={`${cssPrefix}-add-more`}
         >
-          更多信息 
-          {showMore 
-            ? <Image src="//net.huanmusic.com/weapp/icon_packup_gray.png" className={`${cssPrefix}-add-more-image`} /> 
+          更多信息
+          {showMore
+            ? <Image src="//net.huanmusic.com/weapp/icon_packup_gray.png" className={`${cssPrefix}-add-more-image`} />
             : <Image src="//net.huanmusic.com/weapp/icon_expand_gray.png" className={`${cssPrefix}-add-more-image`} />}
         </View>
         {showMore && (
@@ -553,21 +558,21 @@ class ProductAdd extends Taro.Component<Props, State> {
   private renderImage = () => {
     const { tempFilePaths } = this.state;
     return (
-      <View 
+      <View
         className={`${cssPrefix}-detail-cover`}
         onClick={() => this.onChoiceImage()}
       >
         {
           tempFilePaths && tempFilePaths[0] ? (
             <View
-              className={`${cssPrefix}-detail-cover-image ${cssPrefix}-detail-cover-image-background`} 
+              className={`${cssPrefix}-detail-cover-image ${cssPrefix}-detail-cover-image-background`}
               style={`background-image: url(${tempFilePaths[0]})`}
             />
           ) : (
-            <View className={`${cssPrefix}-detail-cover`}  >
-              <Image className={`${cssPrefix}-detail-cover-empty`} src="//net.huanmusic.com/weapp/pic_default.png"/>
-            </View>
-          )
+              <View className={`${cssPrefix}-detail-cover`}  >
+                <Image className={`${cssPrefix}-detail-cover-empty`} src="//net.huanmusic.com/weapp/pic_default.png" />
+              </View>
+            )
         }
       </View>
     );
@@ -601,18 +606,18 @@ class ProductAdd extends Taro.Component<Props, State> {
       }
     ];
     return (
-      <View 
+      <View
         className={classnames('component-form', {
           'component-form-shadow': true
         })}
       >
-        <Picker 
+        <Picker
           mode="selector"
           range={productTypeSelector}
           onChange={this.changeProductType}
           value={typeValue}
         >
-          <FormRow 
+          <FormRow
             title="类别"
             extraText={productType[typeValue] && productType[typeValue].name || ''}
             arrow="right"
@@ -657,18 +662,18 @@ class ProductAdd extends Taro.Component<Props, State> {
     const { supplierValue } = this.state;
     const { productSupplierSelector, productSupplier } = this.props;
     return (
-      <View 
+      <View
         className={classnames('component-form', {
           'component-form-shadow': true
         })}
       >
-        <Picker 
+        <Picker
           mode="selector"
           range={productSupplierSelector}
           onChange={this.changeProductSupplier}
           value={supplierValue}
         >
-          <FormRow 
+          <FormRow
             title="供应商"
             extraText={productSupplier[supplierValue] && productSupplier[supplierValue].name || ''}
             arrow="right"
@@ -724,7 +729,7 @@ class ProductAdd extends Taro.Component<Props, State> {
     return (
       <View className={`${cssPrefix}-add-buttons`}>
         <View className={`${cssPrefix}-add-buttons-button`}>
-          <AtButton 
+          <AtButton
             className="theme-button"
             onClick={this.onSave}
           >
@@ -732,7 +737,7 @@ class ProductAdd extends Taro.Component<Props, State> {
           </AtButton>
         </View>
         <View className={`${cssPrefix}-add-buttons-button`}>
-          <AtButton 
+          <AtButton
             className="theme-button"
             onClick={this.onAdd}
           >

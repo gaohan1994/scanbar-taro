@@ -1,4 +1,4 @@
-import Taro from '@tarojs/taro';
+import Taro, { Config } from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import { AppReducer } from '../../reducers';
 import { getMerchantStockDetail } from '../../reducers/app.inventory';
@@ -11,7 +11,6 @@ import "../style/product.less";
 import { FormRowProps } from '../../component/card/form.row';
 import FormCard from '../../component/card/form.card';
 import numeral from 'numeral';
-import { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import ProductPayListView from '../../component/product/product.pay.listview';
 import ButtonFooter from '../../component/button/button.footer';
 import invariant from 'invariant';
@@ -23,6 +22,10 @@ type Props = {
 };
 
 class InventoryStockDetail extends Taro.Component<Props> {
+
+  config: Config = {
+    navigationBarTitleText: '盘点详情'
+  };
 
   componentWillMount() {
     const { id } = this.$router.params;
@@ -130,7 +133,6 @@ class InventoryStockDetail extends Taro.Component<Props> {
 
   private renderCards = () => {
     const { stockDetail } = this.props;
-
     const num = stockDetail.detailList && stockDetail.detailList.reduce((prevNumber, nextItem) => {
       return prevNumber += nextItem.number;
     }, 0);
@@ -139,14 +141,14 @@ class InventoryStockDetail extends Taro.Component<Props> {
         title: '盘亏金额',
         extraText: `${stockDetail.amount > 0 ? '' : '-'}￥ ${numeral(Math.abs(stockDetail.amount)).format('0.00')}`,
         extraTextStyle: 'title',
-        extraTextColor: num > 0 ? '#FC4E44' : '#333333',
+        extraTextColor: num > 0 ? '#333333' : '#FC4E44',
         extraTextBold: 'bold',
       },
       {
         title: `盘亏数量`,
         extraText: `${num || 0}`,
         extraTextStyle: 'title',
-        extraTextColor: num > 0 ? '#FC4E44' : '#333333',
+        extraTextColor: num > 0 ? '#333333' : '#FC4E44',
         extraTextBold: 'bold',
         hasBorder: false
       },

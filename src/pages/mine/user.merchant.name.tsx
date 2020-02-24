@@ -2,6 +2,8 @@ import Taro from '@tarojs/taro';
 import { View, Text, Input } from '@tarojs/components';
 import { AtButton } from 'taro-ui';
 import "../style/user.less";
+import merchantAction from '../../actions/merchant.action';
+import { LoginManager } from '../../common/sdk';
 
 const cssPrefix = 'user';
 
@@ -14,6 +16,17 @@ class UserMerchantEdit extends Taro.Component<any, State> {
     value: ''
   };
 
+  config: Taro.Config = {
+    navigationBarTitleText: '更改门店名称'
+  };
+
+  componentDidMount() {
+    const { name } = this.$router.params;
+    this.setState({
+      value: name
+    });
+  }
+
   public onChangeValue = (key: string, value: any) => {
     this.setState(prevState => {
       return {
@@ -23,16 +36,30 @@ class UserMerchantEdit extends Taro.Component<any, State> {
     });
   }
 
-  public onSave = () => {
-    Taro.showToast({
-      title: '保存成功！'
-    });
-    setTimeout(() => {
-      Taro.navigateBack();
-    }, 1000);
+  public onSave = async () => {
+    const { id } = this.$router.params;
+    const params = {
+      id: id,
+      name: this.state.value
+    };
+    const res = await merchantAction.merchantInfoEdit(params);
+    if (res.success) {
+      await merchantAction.profileInfo();
+      Taro.showToast({
+        title: '保存成功！'
+      });
+      setTimeout(() => {
+        Taro.navigateBack();
+      }, 1000);
+    } else {
+      Taro.showToast({
+        title: '保存失败！',
+        icon: 'none'
+      });
+    }
   }
 
-  render () {
+  render() {
     const { value } = this.state;
     return (
       <View className="container container-color">
@@ -40,10 +67,10 @@ class UserMerchantEdit extends Taro.Component<any, State> {
           <View className={`${cssPrefix}-merchant-input`}>
             <Input
               value={value}
-              onInput={({detail: {value}}) => this.onChangeValue('value', value)}
+              onInput={({ detail: { value } }) => this.onChangeValue('value', value)}
             />
           </View>
-          
+
           <View className={`product-add-buttons-one ${cssPrefix}-merchant-button`}>
             <AtButton
               className="theme-button"

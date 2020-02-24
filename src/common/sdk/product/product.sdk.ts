@@ -29,6 +29,7 @@ export declare namespace ProductCartInterface {
   interface ProductCartInfo extends ProductInterface.ProductInfo {
     sellNum: number;
     changePrice?: number; // 称重商品修改的价格
+    sort?: string;
   }
 
   interface ProductOrderPayload {

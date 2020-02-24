@@ -9,7 +9,7 @@ import { View, ScrollView, Input, Image, Text } from '@tarojs/components';
 import MemberAction from '../../actions/member.action';
 import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
-import { MemberInterface } from '../../constants';
+import { MemberInterface, ReportInterface } from '../../constants';
 import '../../component/card/form.card.less';
 import '../style/member.less';
 import '../style/home.less';
@@ -19,15 +19,17 @@ import classnames from 'classnames';
 import "../style/product.less";
 import { getMemberList } from '../../reducers/app.member';
 import numeral from 'numeral';
+import { getReportTodayData } from '../../reducers/app.report';
 
 const cssPrefix = 'member';
 
 let pageNum: number = 1;
 const pageSize: number = 20;
 
-interface MemberMainProps { 
+interface MemberMainProps {
   // memberListByDate: MemberInterface.MemberListByDate[];
   memberList: MemberInterface.MemberInfo[];
+  reportTodayData: ReportInterface.ReportTodayData;
 }
 
 type MemberQuery = 'total_amount' | 'last_pay_time' | 'create_time';
@@ -63,8 +65,8 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
     memberQuery: 'total_amount' as MemberQuery,
     memberSelect: 'desc' as MemberSelect,
   };
-  
-  componentDidShow () {
+
+  componentDidShow() {
     if (this.state.lastIsSearch === false && this.state.searchValue === '') {
       this.fetchMember(1);
     }
@@ -82,7 +84,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
   public onTabClick = (type: MemberQuery) => {
     const { memberQuery } = this.state;
     if (memberQuery === type) {
-      
+
       this.setState(prevState => {
         return {
           ...prevState,
@@ -109,7 +111,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
    * @memberof MemberMain
    */
   public changeLoading = (loading: boolean) => {
-    this.setState({loading});
+    this.setState({ loading });
   }
 
   /**
@@ -118,7 +120,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
    * @memberof MemberMain
    */
   public changeRefreshing = (refreshing: boolean) => {
-    this.setState({refreshing});
+    this.setState({ refreshing });
   }
 
   /**
@@ -262,14 +264,15 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
     }
   }
 
-  render () {
+  render() {
+    const { reportTodayData } = this.props;
     return (
       <View className={`container ${cssPrefix}-main container-color`}>
         <View className={`${cssPrefix}-main-header`}>
           <View className={`${cssPrefix}-main-header-search`}>
             <Image src="//net.huanmusic.com/weapp/icon_search.png" className={`${cssPrefix}-main-header-search-icon`} />
             <Input
-              className={`${cssPrefix}-main-header-search-input`} 
+              className={`${cssPrefix}-main-header-search-input`}
               placeholder="请输入手机号/姓名"
               placeholderClass={`${cssPrefix}-main-header-search-input-holder`}
               value={this.state.searchValue}
@@ -277,24 +280,24 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
               onConfirm={() => this.searchMember()}
             />
           </View>
-          <View 
+          <View
             className={`${cssPrefix}-main-header-add`}
-            onClick={() => Taro.navigateTo({url: '/pages/member/member.add'})}
+            onClick={() => Taro.navigateTo({ url: '/pages/member/member.add' })}
           >
             <Text className={`${cssPrefix}-main-header-add-text`}>添加</Text>
           </View>
         </View>
-        
+
         <View className={`product-manage-list`}>
           <View className={`${cssPrefix}-main-card`}>
             <View className="home-card">
               <View className="home-buttons member-card-buttons">
                 <View className={`home-buttons-button home-buttons-button-border ${cssPrefix}-main-button`}>
-                  <View className="home-money">2000</View>
+                  <View className="home-money">{reportTodayData.totalMember || 0}</View>
                   <View className={`normal-text home-buttons-button-box home-buttons-button-mar`}>会员总数</View>
                 </View>
                 <View className={`home-buttons-button  ${cssPrefix}-main-button`}>
-                  <View className="home-money">200</View>
+                  <View className="home-money">{reportTodayData.todayAddMember || 0}</View>
                   <View className={`normal-text home-buttons-button-box home-buttons-button-mar`}>今日新增</View>
                 </View>
               </View>
@@ -310,17 +313,17 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
   private renderTabsHeader = () => {
     const { memberQuery, memberSelect } = this.state;
 
-    const tabs: {key: MemberQuery, value: string}[] = [
-      {key: 'total_amount', value: '累计消费'},
-      {key: 'last_pay_time', value: '上次消费时间'},
-      {key: 'create_time', value: '注册时间'},
+    const tabs: { key: MemberQuery, value: string }[] = [
+      { key: 'total_amount', value: '累计消费' },
+      { key: 'last_pay_time', value: '上次消费时间' },
+      { key: 'create_time', value: '注册时间' },
     ];
     return (
       <View className={`${cssPrefix}-tabs-header`}>
         {
           tabs.map((tab) => {
             return (
-              <View 
+              <View
                 key={tab.key}
                 className={classnames(`${cssPrefix}-tabs-header-item`, {
                   [`${cssPrefix}-tabs-header-item-active`]: memberQuery === tab.key
@@ -332,15 +335,15 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
                   <Image src="//net.huanmusic.com/weapp/icon_sort2.png" className={`${cssPrefix}-tabs-header-item-icon`} />
                 )}
                 {memberQuery === tab.key && memberSelect === 'asc' && (
-                  <Image 
-                    src="//net.huanmusic.com/weapp/icon_sort1.png" 
-                    className={`${cssPrefix}-tabs-header-item-icon ${cssPrefix}-tabs-header-item-icon`} 
+                  <Image
+                    src="//net.huanmusic.com/weapp/icon_sort1.png"
+                    className={`${cssPrefix}-tabs-header-item-icon ${cssPrefix}-tabs-header-item-icon`}
                   />
                 )}
                 {memberQuery !== tab.key && (
-                  <Image 
-                    src="//net.huanmusic.com/weapp/icon_sort3.png" 
-                    className={`${cssPrefix}-tabs-header-item-icon ${cssPrefix}-tabs-header-item-icon`} 
+                  <Image
+                    src="//net.huanmusic.com/weapp/icon_sort3.png"
+                    className={`${cssPrefix}-tabs-header-item-icon ${cssPrefix}-tabs-header-item-icon`}
                   />
                 )}
                 {memberQuery === tab.key && (
@@ -360,7 +363,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
     return (
       <View className={`${cssPrefix}-tabs`}>
         {this.renderTabsHeader()}
-        <ScrollView 
+        <ScrollView
           scrollY={true}
           className={`${cssPrefix}-tabs-list`}
           onScrollToUpper={this.refresh}
@@ -372,7 +375,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
             </View>
           )}
           {memberList.length > 0 ? (
-            <View 
+            <View
               className={classnames('component-form', {
                 'component-form-shadow': true,
                 [`${cssPrefix}-list-pos`]: true
@@ -385,7 +388,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
                     className={classnames(`${cssPrefix}-card-row`, {
                       [`${cssPrefix}-card-row-border`]: true
                     })}
-                    onClick={() => {Taro.navigateTo({url: `/pages/member/member.detail?id=${member.id}`})}}
+                    onClick={() => { Taro.navigateTo({ url: `/pages/member/member.detail?id=${member.id}` }) }}
                   >
                     <View className={`${cssPrefix}-card-row-box`}>
                       <Image src="//net.huanmusic.com/weapp/icon_vip_user.png" className={`${cssPrefix}-card-row-image`} />
@@ -411,17 +414,17 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
               })}
             </View>
           ) : (
-            <View className={`product-suspension`}> 
-              <Image src="//net.huanmusic.com/weapp/img_kong.png" className={`product-suspension-image`} />
-              <Text className={`product-suspension-text`}>会员不存在</Text>
-            </View>
-          )}
+              <View className={`product-suspension`}>
+                <Image src="//net.huanmusic.com/weapp/img_kong.png" className={`product-suspension-image`} />
+                <Text className={`product-suspension-text`}>会员不存在</Text>
+              </View>
+            )}
           {loading && (
             <View className={`${cssPrefix}-loading`}>
               <AtActivityIndicator mode='center' />
             </View>
           )}
-          
+
         </ScrollView>
       </View>
     );
@@ -431,6 +434,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
 const mapState = (state: AppReducer.AppState) => {
   return {
     memberList: getMemberList(state).data || [],
+    reportTodayData: getReportTodayData(state),
   };
 };
 
