@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-21 11:32:43
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-02-25 10:18:07
  * 
  * @todo [购物车组件]
  */
@@ -690,7 +690,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       case productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK: {
         inputs = [
           {
-            title: '盘点数量（${unit}',
+            title: `盘点数量（${unit})`,
             value: changeSellNum,
             type: "digit",
             onInput: ({detail: {value}}) => this.onChangeValue('changeSellNum', value),

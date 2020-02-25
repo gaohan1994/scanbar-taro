@@ -1,8 +1,8 @@
 /*
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-21 16:12:17
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-02-25 11:07:28
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text, Picker } from '@tarojs/components';
@@ -307,7 +307,7 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
 
     const tabs = [
       {
-        title: '所有门店',
+        title: ' ',
         visible: 'merchantVisible',
         emphasis: false,
         more: false,

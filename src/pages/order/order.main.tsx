@@ -1,14 +1,14 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-12-09 11:01:19 
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-17 16:32:41
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-02-25 11:38:27
  */
 
 import Taro, { Config } from '@tarojs/taro';
 import { View, Text, ScrollView, Input, Image, Picker } from '@tarojs/components';
 import { OrderInterface } from '../../constants';
-import { getOrderList, getOrderListTotal } from '../../reducers/app.order';
+import { getOrderList, getOrderListTotal, getOrderSearchList } from '../../reducers/app.order';
 import { connect } from '@tarojs/redux';
 import { OrderAction } from '../../actions';
 import "../style/report.less";
@@ -23,14 +23,19 @@ import invariant from 'invariant';
 import ModalLayout from '../../component/layout/modal.layout';
 import classnames from 'classnames';
 import merge from 'lodash.merge';
+import { ConsoleUtil } from '../../common/util/common';
+const cu = new ConsoleUtil({title: 'OrderMain'});
 
 const cssPrefix = 'order';
 
 let pageNum: number = 1;
 const pageSize: number = 20;
 
+let searchPage: number = 1;
+
 interface Props {
   orderList: OrderInterface.OrderDetail[];
+  orderSearchList: OrderInterface.OrderDetail[];
   orderListTotal: number;
 }
 
@@ -66,7 +71,9 @@ class OrderMain extends Taro.Component<Props, State> {
         [key]: value
       };
     }, () => {
-      this.searchOrder();
+      if (key === 'value') {
+        this.searchOrder(1);
+      }
     });
   }
 
@@ -133,13 +140,45 @@ class OrderMain extends Taro.Component<Props, State> {
     });
   }
 
-  public searchOrder = () => {
-    const { value } = this.state;
+  public searchOrder = async (page?: number) => {
+    try {
+      const { value } = this.state;
+
+      if (value === '') {
+        OrderAction.emptyOrderSearchList();
+        return;
+      }
+      const payload = {
+        orderNo: value,
+        pageNum: typeof page === 'number' ? page : searchPage,
+        pageSize: 20,
+      };
+      const result = await OrderAction.orderListSearch(payload as any);
+      // console.log('result', result);
+      invariant(result.code === ResponseCode.success, result.msg || ' ');
+      cu.console(`result`, result);
+      if (typeof page === 'number') {
+        searchPage = page;
+      } else {
+        searchPage += 1;
+      }
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
   }
 
   public fetchOrder = async (page?: number) => {
     try {
       const { date, selectStatus, selectTypes } = this.state;
+
+      /**
+       * @todo [如果正常查询订单则取消搜索]
+       */
+      this.onChangeValue('value', '');
+
       let payload: OrderInterface.OrderListFetchFidle = {
         pageNum: typeof page === 'number' ? page : pageNum,
         pageSize: 20,
@@ -227,22 +266,39 @@ class OrderMain extends Taro.Component<Props, State> {
   }
 
   private renderContainer = () => {
-    const { orderList, orderListTotal } = this.props;
+    const { value } = this.state;
+    const { orderList, orderListTotal, orderSearchList } = this.props;
     const hasMore = orderList.length < orderListTotal;
     return (
       <View className={`${cssPrefix}-container`}>
-        {this.renderTime()}
+        {value === '' && (
+          <View>{this.renderTime()}</View>
+        )}
         <ScrollView
           scrollY={true}
-          className={`${cssPrefix}-list ${cssPrefix}-list-pos`}
+          className={`${classnames(`${cssPrefix}-list`, {
+            [`${cssPrefix}-list-pos`]: value === '',
+            [`${cssPrefix}-list-pos-search`]: value !== '',
+          })}`}
           onScrollToLower={() => {
+            if (!!value) {
+              this.searchOrder();
+              return;
+            }
             if (hasMore) {
               this.fetchOrder();
+              return;
             }
           }}
         >
-          {
-            orderList.length > 0
+          {orderSearchList.length > 0 ? orderSearchList.map((orderDetail) => {
+            return (
+              <OrderItem
+                key={orderDetail.order.orderNo}
+                data={orderDetail}
+              />
+            );
+          }) : orderList.length > 0
               ? orderList.map((orderDetail) => {
                 return (
                   <OrderItem
@@ -390,6 +446,7 @@ class OrderMain extends Taro.Component<Props, State> {
 const select = (state: any) => ({
   orderList: getOrderList(state),
   orderListTotal: getOrderListTotal(state),
+  orderSearchList: getOrderSearchList(state),
 });
 
 export default connect(select)(OrderMain);

@@ -116,8 +116,9 @@ class InventoryAction {
         cost: item.itemCost,
         sellNum: item.number,
         name: item.productName,
-        pictures: item.itemPrice,
+        // pictures: item.,
         unit: item.unit,
+        price: item.itemPrice
       } as any;
       if (item.perCost !== item.itemCost) {
         product.changePrice = item.perCost;

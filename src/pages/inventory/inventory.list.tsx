@@ -273,7 +273,8 @@ class InventoryList extends Taro.Component<Props, State> {
                 value={dateMin}
               >
                 <View className="inventory-select-item-button inventory-select-item-button-time">
-                  {dateMin}
+                  {/* {dateMin} */}
+                  开始日期
                 </View>
               </Picker>
               <View className="inventory-select-item-bor"/>
@@ -283,7 +284,8 @@ class InventoryList extends Taro.Component<Props, State> {
                 value={dateMax}
               >
                 <View className="inventory-select-item-button inventory-select-item-button-time">
-                  {dateMax}
+                  {/* {dateMax} */}
+                  结束日期
                 </View>
               </Picker>
             </View>
@@ -311,7 +313,7 @@ class InventoryList extends Taro.Component<Props, State> {
                         'inventory-select-item-button-active': selectSupplierId.some((t) => t === item.id),
                       })}
                     >
-                      {item.contactName}
+                      {item.name}
                     </View>
                   );
                 })

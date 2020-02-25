@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-17 09:46:34
+ * @Last Modified time: 2020-02-25 11:08:56
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -24,6 +24,9 @@ import { ProductSDKReducer, getSuspensionCartList } from './product.sdk.reducer'
 import numeral from 'numeral';
 import merge from 'lodash.merge';
 import productService from '../../../constants/product/product.service';
+import { ConsoleUtil } from '../../../common/util/common';
+
+const cu = new ConsoleUtil({title: 'ProductSdk', env: 'production'});
 
 export declare namespace ProductCartInterface {
   interface ProductCartInfo extends ProductInterface.ProductInfo {
@@ -334,6 +337,7 @@ class ProductSDK {
       return prevTotal + (item.price * item.sellNum);
     };
     const total = productList.reduce(reduceCallback, 0);
+    cu.console('getProductsOriginPrice', total);
     return total;
   }
 
@@ -410,8 +414,10 @@ class ProductSDK {
         return prevTotal + (item.memberPrice * item.sellNum);
       };
       const total = productList.reduce(reduceCallback, 0);
+      cu.console('getProductMemberPrice', total);
       return total;
     } else {
+      cu.console('getProductMemberPrice', this.getProductPrice());
       return this.getProductPrice();
     }
   }
@@ -421,6 +427,7 @@ class ProductSDK {
    * 
    * ```ts
    * import productSdk from 'xxx';
+import { ConsoleUtil } from '../../util/common';
    * 
    * const total = productSdk
    * .setErase(1)

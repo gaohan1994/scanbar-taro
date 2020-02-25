@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-25 16:08:28
+ * @Last Modified time: 2020-02-25 11:13:10
  * 
  * @todo [商品相关的类型定义]
  */
@@ -101,6 +101,7 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
   public reducerInterfaces = {
     RECEIVE_ORDER_LIST: 'RECEIVE_ORDER_LIST',
     RECEIVE_ORDER_DETAIL: 'RECEIVE_ORDER_DETAIL',
+    RECEIVE_ORDER_SEARCH_LIST: 'RECEIVE_ORDER_SEARCH_LIST'
   };
 
   public orderList = (params?: OrderInterface.OrderListFetchFidle) => {

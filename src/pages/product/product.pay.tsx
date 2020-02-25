@@ -290,6 +290,8 @@ class ProductPay extends Taro.Component<Props, State> {
     }
   }
 
+  // public get
+
   render() {
     return (
       <View className='container'>
@@ -540,12 +542,12 @@ class ProductPay extends Taro.Component<Props, State> {
       },
       {
         title: '原价金额',
-        extraText: `￥${this.setNumber(numeral(productSdk.getProductPrice()).value())}`
+        extraText: `￥${this.setNumber(numeral(productSdk.getProductsOriginPrice()).value())}`
       },
       {
         title: '商品优惠',
-        extraText: `${selectMember !== undefined
-          ? `- ￥${this.setNumber(Math.abs(productSdk.getProductPrice() - productSdk.getProductMemberPrice()))}`
+        extraText: `${productSdk.getProductsOriginPrice() - productSdk.getProductMemberPrice() !== 0
+          ? `- ￥${this.setNumber(Math.abs(productSdk.getProductsOriginPrice() - productSdk.getProductMemberPrice()))}`
           : '￥0.00'}`,
         extraTextStyle: 'price'
       },

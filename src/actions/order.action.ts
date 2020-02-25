@@ -3,13 +3,42 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:28:21 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-18 13:45:44
+ * @Last Modified time: 2020-02-25 11:33:22
  */
 import { ResponseCode, OrderService, OrderInterface, OrderInterfaceMap } from '../constants/index';
 import { store } from '../app';
 import { OrderReducer } from '../reducers/app.order';
 
 class OrderAction {
+
+  public emptyOrderSearchList = () => {
+    const reducer: OrderReducer.Reducers.OrderListReducer = {
+      type: OrderInterfaceMap.reducerInterfaces.RECEIVE_ORDER_SEARCH_LIST,
+      payload: {
+        fetchFidle: {
+          pageNum: 1
+        },
+        rows: []
+      } as any
+    };
+    store.dispatch(reducer);
+  }
+
+  public orderListSearch = async (params: OrderInterface.OrderListFetchFidle) => {
+    const result = await OrderService.orderList(params);
+
+    if (result.code === ResponseCode.success) {
+      const reducer: OrderReducer.Reducers.OrderListReducer = {
+        type: OrderInterfaceMap.reducerInterfaces.RECEIVE_ORDER_SEARCH_LIST,
+        payload: {
+          fetchFidle: params,
+          ...result.data as any
+        }
+      };
+      store.dispatch(reducer);
+    }
+    return result;
+  }
 
   public orderList = async (params: OrderInterface.OrderListFetchFidle) => {
     const result = await OrderService.orderList(params);

@@ -4,12 +4,39 @@ export function dateHelper(date: number): string {
   return dayJs(date).format('YYYY-MM-DD');
 }
 
+interface ConsoleUtilConfig {
+  title: string;
+  env?: string;
+}
+
+export class ConsoleUtil {
+  private title: string;
+  private env: string;
+  constructor (options: ConsoleUtilConfig) {
+    this.init(options);
+  }
+
+  public console = (...arg: any[]) => {
+    if (this.env !== 'production') {
+      console.log(`---- ${this.title} ----`);
+      console.log(arg);
+    }
+  }
+  
+  private init = (options: ConsoleUtilConfig) => {
+    const { title, env } = options;
+    this.title = title;
+    this.env = env || 'development';
+  }
+
+}
+
 /**
  * @todo [计算一年的周]
  * @Author: Ghan 
  * @Date: 2020-01-15 15:41:35 
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-21 15:28:41
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-02-25 11:09:09
  */
 export function createWeeks(year: number = 2020) {
   let weeks: string[][] = [];

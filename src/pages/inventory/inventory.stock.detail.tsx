@@ -138,14 +138,14 @@ class InventoryStockDetail extends Taro.Component<Props> {
     }, 0);
     const Form2: FormRowProps[] = [
       {
-        title: '盘亏金额',
+        title: '盈亏金额',
         extraText: `${stockDetail.amount > 0 ? '' : '-'}￥ ${numeral(Math.abs(stockDetail.amount)).format('0.00')}`,
         extraTextStyle: 'title',
         extraTextColor: num > 0 ? '#333333' : '#FC4E44',
         extraTextBold: 'bold',
       },
       {
-        title: `盘亏数量`,
+        title: `盈亏数量`,
         extraText: `${num || 0}`,
         extraTextStyle: 'title',
         extraTextColor: num > 0 ? '#333333' : '#FC4E44',

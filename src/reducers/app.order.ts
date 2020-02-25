@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-12-09 13:51:19 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-18 11:48:34
+ * @Last Modified time: 2020-02-25 11:33:41
  */
 
 import merge from 'lodash.merge';
@@ -31,6 +31,7 @@ export declare namespace OrderReducer {
 
   interface State {
     orderList: Array<OrderInterface.OrderDetail>;
+    orderSearchList: Array<OrderInterface.OrderDetail>;
     orderListTotal: number;
     orderDetail: OrderInterface.OrderDetail;
   }
@@ -42,6 +43,7 @@ export declare namespace OrderReducer {
 
 const initState: OrderReducer.State = {
   orderList: [],
+  orderSearchList: [],
   orderListTotal: -1,
   orderDetail: {} as any,
 };
@@ -59,6 +61,23 @@ export default function orderReducer (
       return {
         ...state,
         orderDetail: data
+      };
+    }
+
+    case OrderInterfaceMap.reducerInterfaces.RECEIVE_ORDER_SEARCH_LIST: {
+      const { payload } = action as OrderReducer.Reducers.OrderListReducer;
+
+      let nextOrderList: OrderInterface.OrderDetail[] = [];
+      if (payload.fetchFidle.pageNum === 1) {
+        nextOrderList = payload.rows;
+      } else {
+        const prevOrderList: OrderInterface.OrderDetail[] = merge([], state.orderSearchList);
+        nextOrderList = prevOrderList.concat(payload.rows);
+      }
+
+      return {
+        ...state,
+        orderSearchList: nextOrderList
       };
     }
 
@@ -92,3 +111,5 @@ export const getOrderList = (state: AppReducer.AppState) => state.order.orderLis
 export const getOrderListTotal = (state: AppReducer.AppState) => state.order.orderListTotal;
 
 export const getOrderDetail = (state: AppReducer.AppState) => state.order.orderDetail;
+
+export const getOrderSearchList = (state: AppReducer.AppState) => state.order.orderSearchList;
