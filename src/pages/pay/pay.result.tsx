@@ -76,9 +76,14 @@ class PayResult extends Taro.Component<Props, State> {
   }
 
   public reReceive = () => {
-    const {  } = this.props;
-    Taro.showToast({
-      title: 'rereceive'
+    const { params } = this.$router.params;
+    const { entry } = JSON.parse(params);
+    if (entry === 'pay.receive') {
+      Taro.navigateBack({});
+      return;
+    }
+    Taro.redirectTo({
+      url: `/pages/product/product.pay`
     });
   }
 
@@ -132,7 +137,6 @@ class PayResult extends Taro.Component<Props, State> {
                 </View>
               </View>
             )
-            
         }
       </View>
     );

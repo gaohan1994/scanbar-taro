@@ -40,6 +40,8 @@ type State = {
   selectSupplierId: any[];
   dateMin: string;
   dateMax: string;
+  selectDateMin: string;
+  selectDateMax: string;
 };
 
 class InventoryList extends Taro.Component<Props, State> {
@@ -51,6 +53,8 @@ class InventoryList extends Taro.Component<Props, State> {
     selectSupplierId: [],
     dateMin: dayJs().format('YYYY-MM-DD'),
     dateMax: dayJs().format('YYYY-MM-DD'),
+    selectDateMin: '',
+    selectDateMax: '',
   };
 
   config: Config = {
@@ -79,6 +83,8 @@ class InventoryList extends Taro.Component<Props, State> {
       selectSupplierId: [],
       dateMin: today,
       dateMax: today,
+      selectDateMin: '',
+      selectDateMax: '',
     });
   }
 
@@ -119,10 +125,10 @@ class InventoryList extends Taro.Component<Props, State> {
    * @memberof MemberMain
    */
   public onDateMinChange = (event: any) => {
-    this.setState({dateMin: event.detail.value});
+    this.setState({dateMin: event.detail.value, selectDateMin: event.detail.value});
   }
   public onDateMaxChange = (event: any) => {
-    this.setState({dateMax: event.detail.value});
+    this.setState({dateMax: event.detail.value, selectDateMax: event.detail.value});
   }
 
   public onChangeValue = (key: string, value: any) => {
@@ -247,7 +253,7 @@ class InventoryList extends Taro.Component<Props, State> {
   }
 
   private renderModal = () => {
-    const { visible, selectSupplierId, dateMax, dateMin } = this.state;
+    const { visible, selectSupplierId, selectDateMin, selectDateMax } = this.state;
     const { supplier } = this.props;
     return (
       <ModalLayout
@@ -270,22 +276,20 @@ class InventoryList extends Taro.Component<Props, State> {
               <Picker
                 mode='date'
                 onChange={this.onDateMinChange} 
-                value={dateMin}
+                value={selectDateMin}
               >
                 <View className="inventory-select-item-button inventory-select-item-button-time">
-                  {/* {dateMin} */}
-                  开始日期
+                  {!selectDateMin ? '开始日期' : selectDateMin}
                 </View>
               </Picker>
               <View className="inventory-select-item-bor"/>
               <Picker
                 mode='date'
                 onChange={this.onDateMaxChange} 
-                value={dateMax}
+                value={selectDateMax}
               >
                 <View className="inventory-select-item-button inventory-select-item-button-time">
-                  {/* {dateMax} */}
-                  结束日期
+                  {!selectDateMax ? '结束日期' : selectDateMax}
                 </View>
               </Picker>
             </View>

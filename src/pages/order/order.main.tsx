@@ -291,31 +291,42 @@ class OrderMain extends Taro.Component<Props, State> {
             }
           }}
         >
-          {orderSearchList.length > 0 ? orderSearchList.map((orderDetail) => {
-            return (
-              <OrderItem
-                key={orderDetail.order.orderNo}
-                data={orderDetail}
-              />
-            );
-          }) : orderList.length > 0
-              ? orderList.map((orderDetail) => {
-                return (
-                  <OrderItem
-                    key={orderDetail.order.orderNo}
-                    data={orderDetail}
-                  />
-                );
-              })
-              : (
-                <View className={`product-suspension order-list-empty`}>
-                  <Image src="//net.huanmusic.com/weapp/img_kong.png" className={`product-suspension-image`} />
-                  <Text className={`product-suspension-text`}>暂无内容</Text>
-                </View>
-              )
-          }
-          {!hasMore && orderList.length > 10 && (
-            <View className={`${cssPrefix}-list-bottom`}>已经到底了</View>
+          {!!value && (
+            orderSearchList.length > 0 ? orderSearchList.map((orderDetail) => {
+              return (
+                <OrderItem
+                  key={orderDetail.order.orderNo}
+                  data={orderDetail}
+                />
+              );
+            }) : (
+              <View className={`product-suspension order-list-empty`}>
+                <Image src="//net.huanmusic.com/weapp/img_kong.png" className={`product-suspension-image`} />
+                <Text className={`product-suspension-text`}>暂无内容</Text>
+              </View>
+            )
+          )}
+          {!value && (
+            orderList.length > 0
+            ? orderList.map((orderDetail) => {
+              return (
+                <OrderItem
+                  key={orderDetail.order.orderNo}
+                  data={orderDetail}
+                />
+              );
+            })
+            : (
+              <View className={`product-suspension order-list-empty`}>
+                <Image src="//net.huanmusic.com/weapp/img_kong.png" className={`product-suspension-image`} />
+                <Text className={`product-suspension-text`}>暂无内容</Text>
+              </View>
+            )
+          )}
+          {!value && (
+            !hasMore && orderList.length > 10 && (
+              <View className={`${cssPrefix}-list-bottom`}>已经到底了</View>
+            )
           )}
         </ScrollView>
       </View>

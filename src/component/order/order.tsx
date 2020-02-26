@@ -44,7 +44,7 @@ class OrderItem extends Taro.Component<Props, State> {
                 : data.order.payType === 0
                   ? (
                     <Image
-                      src="//net.huanmusic.com/weapp/icon_bank.png"
+                      src="//net.huanmusic.com/weapp/icon_cash.png"
                       className={imageClassName}
                     />
                   )
@@ -62,7 +62,7 @@ class OrderItem extends Taro.Component<Props, State> {
                     )
                       : data.order.payType === 3 ? (
                         <Image
-                          src="//net.huanmusic.com/weapp/icon_cash.png"
+                          src="//net.huanmusic.com/weapp/icon_bank.png"
                           className={imageClassName}
                         />
                       )

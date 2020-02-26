@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-12 14:01:28 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-24 16:03:35
+ * @Last Modified time: 2020-02-25 15:54:35
  */
 import Taro, { Config } from '@tarojs/taro';
 import { View, Image, Text, Input } from '@tarojs/components';
@@ -144,7 +144,7 @@ class PayReceive extends Taro.Component<Props, State> {
             const scanPayResult = await productSdk.cashierPay(payload);
             Taro.hideLoading();
             invariant(scanPayResult.code === ResponseCode.success, scanPayResult.msg || ResponseCode.error);
-            this.receiveCallback(scanPayResult.data.status);
+            this.receiveCallback(scanPayResult.data.status, payload);
           })
           .catch(error => {
             Taro.hideLoading();
@@ -174,8 +174,8 @@ class PayReceive extends Taro.Component<Props, State> {
    *
    * @memberof PayReceive
    */
-  public receiveCallback = (success: boolean) => {
-    const params = { status: success };
+  public receiveCallback = (success: boolean, payload: ProductCartInterface.ProductPayPayload) => {
+    const params = { status: success, orderNo: payload.order.orderNo, entry: 'pay.receive' };
     if (success === true) {
       // 清空购物车
       store.dispatch({
@@ -186,8 +186,8 @@ class PayReceive extends Taro.Component<Props, State> {
       Taro.redirectTo({ url: `/pages/pay/pay.result?params=${JSON.stringify(params)}` });
     } else {
       // 收款失败
-      // Taro.showToast({ title: `收款失败` });
-      // Taro.redirectTo({ url: `/pages/pay/pay.result?params=${JSON.stringify(params)}` });
+      Taro.showToast({ title: `收款失败` });
+      Taro.navigateTo({ url: `/pages/pay/pay.result?params=${JSON.stringify(params)}` });
     }
   }
 

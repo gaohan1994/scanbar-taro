@@ -163,7 +163,7 @@ class App extends Component {
       color: "#ACACAC",
       selectedColor: "#2EAAF8",
       backgroundColor: "#ffffff",
-      borderStyle: 'black',
+      borderStyle: 'white',
       list: [{
         pagePath: "pages/home/home",
         iconPath: "./assets/tab-bar/icon_nav_home.png",

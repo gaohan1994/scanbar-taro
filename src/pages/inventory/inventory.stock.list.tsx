@@ -87,15 +87,26 @@ class InventoryMerchantList extends Taro.Component<Props, State> {
 
   public fetchData = async (page?: number) => {
     try {
-      const {  dateMin, dateMax, } = this.state;
+      const { searchValue, dateMin, dateMax, } = this.state;
       const payload: InventoryInterface.InventoryStockListFetchField = {
         pageNum: typeof page === 'number' ? page : pageNum,
         pageSize: 20,
       };
       const today = dayJs().format('YYYY-MM-DD');
-      if (dateMin !== today || dateMax !== today) {
-        payload.startTime = `${dateMin} 00:00:00`;
-        payload.endTime = `${dateMax} 00:00:00`;
+      if (searchValue !== '') {
+        /**
+         * @todo 如果是搜索搜索全局
+         */
+        payload.businessNumber = searchValue as any;
+      } else {
+
+        /**
+         * @todo 如果不是搜索则按日期搜索
+         */
+        if (dateMin !== today || dateMax !== today) {
+          payload.startTime = `${dateMin} 00:00:00`;
+          payload.endTime = `${dateMax} 00:00:00`;
+        }
       }
       const result = await InventoryAction.merchantStockList(payload);
       invariant(result.code === ResponseCode.success, result.msg || ' ');
