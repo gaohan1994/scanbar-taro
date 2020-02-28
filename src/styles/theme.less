@@ -26,6 +26,15 @@
 // primary-button-size: 按钮大小 
 @primary-button-size: 80px;
 
+.clamp (@line: 1) {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-clamp: @line;
+  -webkit-line-clamp: @line;
+  -webkit-box-orient: vertical;
+}
+
 .title-text (@color: @title-text-color) {
   font-size: @title-text-fontsize;
   color: @color;
@@ -54,13 +63,26 @@
   transform-origin: center;
   box-sizing: border-box;
   pointer-events: none;
-  
   top: auto;
   left: 0;
   right: 0;
   bottom: 0;
   transform: scaleY(0.5);
-  border-bottom: 1px solid #e3e3e3;
+  border-bottom: 1px solid #d6d6d6;
+}
+
+.bordertop {
+  content: '';
+  position: absolute;
+  transform-origin: center;
+  box-sizing: border-box;
+  pointer-events: none;
+  top: auto;
+  left: 0;
+  right: 0;
+  top: 0;
+  transform: scaleY(0.5);
+  border-top: 1px solid #e3e3e3;
 }
 
 .container {

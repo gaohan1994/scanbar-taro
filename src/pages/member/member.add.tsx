@@ -257,7 +257,7 @@ class MemberMain extends Taro.Component<Props, State> {
       {
         title: '卡号',
         isInput: true,
-        inputType: 'phone',
+        inputType: 'number',
         inputValue: cardNo,
         inputOnChange: this.onChangeCardNo,
         inputPlaceHolder: '请输入会员卡号',

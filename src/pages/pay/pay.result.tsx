@@ -105,7 +105,7 @@ class PayResult extends Taro.Component<Props, State> {
                 <View className={`${cssPrefix}-result-container-title`}>
                   {payDetail && payDetail.transPayload && payDetail.transPayload.flag ? '现金' : '微信'}收款成功
                 </View>
-                <View className={`${cssPrefix}-result-container-title`}>
+                <View className={`${cssPrefix}-result-container-title ${cssPrefix}-result-container-title-bold`}>
                   {`￥ ${(payDetail.transPayload as ProductCartInterface.ProductPayPayload).order.transAmount}`}
                 </View>
                 <View className={`${cssPrefix}-result-container-button`}>
@@ -124,7 +124,7 @@ class PayResult extends Taro.Component<Props, State> {
                   className={`${cssPrefix}-result-container-image`} 
                 />
                 <View className={`${cssPrefix}-result-container-title`}>Sorry ~</View>
-                <View className={`${cssPrefix}-result-container-title`}>
+                <View className={`${cssPrefix}-result-container-title ${cssPrefix}-result-container-title-bold`}>
                   {payDetail && payDetail.transPayload && payDetail.transPayload.flag ? '现金' : '微信'}收款失败
                 </View>
                 <View className={`${cssPrefix}-result-container-button`}>

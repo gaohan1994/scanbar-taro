@@ -483,7 +483,8 @@ class ProductAdd extends Taro.Component<Props, State> {
     ];
     const formPrice: FormRowProps[] = [
       {
-        title: '售价（￥）',
+        title: '售价(￥)',
+        main: true,
         isInput: true,
         inputValue: price,
         inputType: 'digit',
@@ -491,7 +492,7 @@ class ProductAdd extends Taro.Component<Props, State> {
         inputOnChange: (value) => this.onChangeValue('price', value),
       },
       {
-        title: '进价（￥）',
+        title: '进价(￥)',
         isInput: true,
         hasBorder: false,
         inputValue: cost,
@@ -542,7 +543,7 @@ class ProductAdd extends Taro.Component<Props, State> {
   private renderMemberPrice = () => {
     const { memberPrice } = this.state;
     const memberForm: FormRowProps[] = [{
-      title: '会员价（￥）',
+      title: '会员价(￥)',
       isInput: true,
       inputValue: memberPrice,
       inputType: 'digit',
@@ -570,7 +571,7 @@ class ProductAdd extends Taro.Component<Props, State> {
             />
           ) : (
               <View className={`${cssPrefix}-detail-cover`}  >
-                <Image className={`${cssPrefix}-detail-cover-empty`} src="//net.huanmusic.com/weapp/pic_default.png" />
+                <Image className={`${cssPrefix}-detail-cover-empty`} src="//net.huanmusic.com/weapp/empty.png" />
               </View>
             )
         }

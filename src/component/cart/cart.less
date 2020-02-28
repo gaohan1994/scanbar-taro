@@ -47,6 +47,7 @@
     .flex(center, center, column);
     color: #ffffff;
     font-size: @cart-button-font;
+    font-weight: 600;
     &-suspension {
       width: 414px;
       flex-direction: row;
@@ -180,7 +181,7 @@
       background-color: #f8f8f8;
       .flex(center, space-between, row);
       color: @cart-list-header-font-color;
-      font-size: 26px;
+      font-size: 32px;
       &-empty {
         .flex(center, center, row);
         &-icon {
@@ -212,18 +213,20 @@
       .flex(center, space-between, row);
       &-name {
         width: 300px;
-        height: 27px;
-        line-height: 27px;
+        height: @normal-text-fontsize + 3px;
+        line-height: @normal-text-fontsize + 3px;
         overflow: hidden;
-        font-size: @normal-text-fontsize;
+        font-weight: bold;
+        font-size: @normal-text-fontsize + 3px;
         color: @product-name-color;
       }
       &-price {
-        font-size: @product-price-font;
+        font-size: @product-price-font + 1px;
         color: @product-price-color;
+        font-weight: bold;
       }
       &-normal {
-        font-size: @normal-text-fontsize;
+        font-size: @normal-text-fontsize - 2px;
         color: @product-normal-color;
       }
     }

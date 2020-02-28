@@ -20,6 +20,7 @@ import "../style/product.less";
 import { getMemberList } from '../../reducers/app.member';
 import numeral from 'numeral';
 import { getReportTodayData } from '../../reducers/app.report';
+import dayjs from 'dayjs';
 
 const cssPrefix = 'member';
 
@@ -404,10 +405,10 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
                       <Text className={`${cssPrefix}-card-price`}>{`￥${numeral(member.totalAmount).format('0.00')}`}</Text>
                     )}
                     {memberQuery === 'create_time' && (
-                      <Text className={`${cssPrefix}-card-price`}>{member.createTime}</Text>
+                      <Text className={`${cssPrefix}-card-price`}>{dayjs(member.createTime).format('YYYY/MM/DD HH:mm')}</Text>
                     )}
                     {memberQuery === 'last_pay_time' && (
-                      <Text className={`${cssPrefix}-card-price`}>{member.lastPayTime}</Text>
+                      <Text className={`${cssPrefix}-card-price`}>{dayjs(member.lastPayTime).format('YYYY/MM/DD HH:mm')}</Text>
                     )}
                   </View>
                 );

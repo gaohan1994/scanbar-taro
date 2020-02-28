@@ -18,6 +18,11 @@ import ReportInterfaceMap, { ReportInterface } from "./report";
 
 class ReportService {
 
+  public reportWeeksData = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.get(`/report/getWeekDays`);
+    return result;
+  }
+
   public reportList = async (params: ReportInterface.ReportListFetchField): Promise<HTTPInterface.ResponseResultBase<any>> => {
     const result = await requestHttp.get(`${ReportInterfaceMap.reportList}${jsonToQueryString(params)}`);
     return result;

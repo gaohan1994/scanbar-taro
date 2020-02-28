@@ -84,7 +84,7 @@ class PayReceive extends Taro.Component<Props, State> {
       
       if (result.code === ResponseCode.success) {
         const { data } = result;
-        this.receiveCallback(data.status);
+        this.receiveCallback(data.status, payDetail.transPayload as any);
       }
     } catch (error) {
       Taro.showToast({
@@ -233,7 +233,7 @@ class PayReceive extends Taro.Component<Props, State> {
         const result = await productSdk.cashierPay(payload);
         Taro.hideLoading();
         invariant(result.code === ResponseCode.success, result.msg || ResponseCode.error);
-        this.receiveCallback(true);
+        this.receiveCallback(true, payload);
       }
     } catch (error) {
       Taro.hideLoading();
@@ -329,7 +329,7 @@ class PayReceive extends Taro.Component<Props, State> {
           <View className={`${cssPrefix}-receive-content-cash`}>
             <FormCard items={cashForm} shadow={false} />
             <View className={`${cssPrefix}-input-box ${cssPrefix}-receive-content-cash-box`}>
-              <View className={`${cssPrefix}-input-box-title`}>收款金额</View>
+              <View className={`product-row-normal-title`}>收款金额</View>
               <View className={`${cssPrefix}-input-box-input`}>
                 <View className={`${cssPrefix}-input-box-input-money`}>￥</View>
                 <Input 
@@ -345,14 +345,22 @@ class PayReceive extends Taro.Component<Props, State> {
               </View>
             </View>
 
-            <View className={`${cssPrefix}-receive-content-cash-button`}>
+            <View 
+              className={classnames(`${cssPrefix}-cash-button`, {
+                [`${cssPrefix}-cash-button-disable`]: !receiveCash
+              })}
+              onClick={this.onCashReceive}
+            >
+              确定
+            </View>
+            {/* <View className={`${cssPrefix}-receive-content-cash-button`}>
               <AtButton 
                 className="theme-pay-button"
                 onClick={this.onCashReceive}
               >
                 确定
               </AtButton>
-            </View>
+            </View> */}
           </View>
         );
       }

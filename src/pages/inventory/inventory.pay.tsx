@@ -85,6 +85,9 @@ class InventoryPay extends Taro.Component<Props, State> {
         productList: products,
         supplierId: productSupplier[supplierValue].id,
       };
+      if (!!remark) {
+        payload.remark = remark;
+      }
       const result = await InventoryAction.stockAdd(payload);
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       Taro.showToast({ 

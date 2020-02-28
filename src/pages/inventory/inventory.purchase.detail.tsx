@@ -8,6 +8,7 @@ import { InventoryAction } from '../../actions';
 import productSdk from '../../common/sdk/product/product.sdk';
 import "../style/order.less";
 import "../style/product.less";
+import "../style/inventory.less"
 import { FormRowProps } from '../../component/card/form.row';
 import FormCard from '../../component/card/form.card';
 import numeral from 'numeral';
@@ -163,6 +164,7 @@ class InventoryPurchaseDetail extends Taro.Component<Props> {
         title: '供应商',
         extraText: `${stockDetail.supplierName || '暂无供应商信息'}`,
         extraTextColor: '#4d4d4d',
+        hasBorder: !!stockDetail.remark
       }
     ];
 
@@ -173,7 +175,16 @@ class InventoryPurchaseDetail extends Taro.Component<Props> {
         )}
         {Form3 && (
           <FormCard items={Form3} >
-            
+            {!!stockDetail.remark ? (
+              <View className={`inventory-remark`}>
+                <View  className={`inventory-remark-row`} >
+                  <Text className="inventory-remark-title">备注</Text>
+                </View>
+                <View className="inventory-remark-input inventory-remark-input-text">{stockDetail.remark}</View>
+              </View>
+            ) : (
+              <View/>
+            )}
           </FormCard>
         )}
         {this.renderList()}

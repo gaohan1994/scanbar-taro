@@ -72,7 +72,6 @@ class OrderAction {
   }
 
   public orderPayType = (params: number | OrderInterface.OrderDetail): string => {
-    // 支付方式 0=现金,1=支付宝主扫,2=微信主扫,3=支付宝被扫,4微信被扫,5=银行卡,6=刷脸
     // 支付方式 0=现金,1=支付宝,2=微信,3=银行卡,4=刷脸
     const type = typeof params === 'number' ? params : params.order.payType;
     switch (type) {
@@ -86,15 +85,9 @@ class OrderAction {
         return '微信';
       }
       case 3: {
-        return '支付宝';
-      }
-      case 4: {
-        return '微信';
-      }
-      case 5: {
         return '银行卡';
       }
-      case 6: {
+      case 4: {
         return '刷脸';
       }
       default: {

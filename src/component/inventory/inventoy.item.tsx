@@ -45,7 +45,7 @@ class InventoryItem extends Taro.Component<Props> {
           <View className={`${cssPrefix}-header-box`}>
             {absToken ? (
               <Image
-                src="//net.huanmusic.com/weapp/icon_order_green.png"
+                src="//net.huanmusic.com/weapp/v2/icon_order_green.png"
                 className={`${cssPrefix}-header-img`}
               />
             ) : (
@@ -71,7 +71,7 @@ class InventoryItem extends Taro.Component<Props> {
                 [`${cssPrefix}-content-item-red`]: inventory.number < 0
               })}
             >
-              {inventory.number > 0 ? '+' : ''}{inventory.number}
+              {inventory.number}
             </Text>
           </View>
 
@@ -87,6 +87,12 @@ class InventoryItem extends Taro.Component<Props> {
             {`￥${numeral(Math.abs(inventory.amount)).format('0.00')}`}
           </View>
         </View>
+
+        {!!inventory.remark && (
+          <View className={`${cssPrefix}-remark`}>
+            <View className={`${cssPrefix}-remark-text`}>{inventory.remark}</View>
+          </View>
+        )}
       </View>
     );
   }

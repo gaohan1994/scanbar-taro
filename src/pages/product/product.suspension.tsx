@@ -179,7 +179,7 @@ class ProductSuspension extends Taro.Component<Props, State> {
       <View className={`${cssPrefix}-list-right`}>
         <ScrollView
           scrollY={true}
-          className={`${cssPrefix}-list-right ${cssPrefix}-list-right-container`}
+          className={`${cssPrefix}-list-right ${cssPrefix}-list-right-container-search`}
         >
           {
             productCartList && productCartList.length > 0 && productCartList.map((product, index) => {
@@ -193,7 +193,7 @@ class ProductSuspension extends Taro.Component<Props, State> {
                       {product.pictures && product.pictures !== '' ? (
                         <Image src={product.pictures} className={`${cssPrefixComponent}-content-cover-image`} />
                       ) : (
-                          <Image src="//net.huanmusic.com/weapp/img_nolist.png" className={`${cssPrefixComponent}-content-cover-image`} />
+                          <Image src="//net.huanmusic.com/weapp/empty.png" className={`${cssPrefixComponent}-content-cover-image`} />
                         )}
                     </View>
                     <View className={`${cssPrefixComponent}-content-detail`}>

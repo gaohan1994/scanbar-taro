@@ -81,6 +81,18 @@ class OrderMain extends Taro.Component<Props, State> {
     this.setState(prevState => {
       const prevData: number[] = merge([], prevState[key]);
       const index = prevData.findIndex(p => p === value);
+      /**
+       * @time 02.29
+       * @todo 修改订单筛选功能
+       * @todo 当全部选择的时候，再点成功/失败，则重置为点击的状态
+       */
+      if (prevData.length === 2) {
+        return {
+          ...prevState,
+          [`${key}`]: [value]
+        }
+      }
+
       if (index === -1) {
         prevData.push(value);
       } else {
@@ -187,7 +199,11 @@ class OrderMain extends Taro.Component<Props, State> {
       };
       if (selectStatus && selectStatus.length === 1) {
         const fetchType = selectStatus[0];
-        payload.transFlag = fetchType === 0 ? 1 : -1;
+        if (fetchType === 0) {
+          (payload as any).transFlags = '1, 7'
+        } else {
+          payload.transFlag = -1
+        }
       }
       if (selectTypes && selectTypes.length === 1) {
         payload.transType = selectTypes[0];
@@ -403,18 +419,18 @@ class OrderMain extends Taro.Component<Props, State> {
               <View
                 onClick={() => this.changeSelect(0, 'selectStatus')}
                 className={classnames("inventory-select-item-button", {
-                  'inventory-select-item-button-active': selectStatus.some((s) => s === 0)
+                  'inventory-select-item-button-active': selectStatus.length === 1 && selectStatus.some((s) => s === 0)
                 })}
               >
-                支付成功
+                交易成功
               </View>
               <View
                 onClick={() => this.changeSelect(1, 'selectStatus')}
                 className={classnames("inventory-select-item-button", {
-                  'inventory-select-item-button-active': selectStatus.some((s) => s === 1)
+                  'inventory-select-item-button-active': selectStatus.length === 1 && selectStatus.some((s) => s === 1)
                 })}
               >
-                支付失败
+                交易失败
               </View>
             </View>
           </View>
@@ -433,7 +449,7 @@ class OrderMain extends Taro.Component<Props, State> {
               <View
                 onClick={() => this.changeSelect(0, 'selectTypes')}
                 className={classnames("inventory-select-item-button", {
-                  'inventory-select-item-button-active': selectTypes.some((t) => t === 0)
+                  'inventory-select-item-button-active': selectTypes.length === 1 && selectTypes.some((t) => t === 0)
                 })}
               >
                 销售单
@@ -441,7 +457,7 @@ class OrderMain extends Taro.Component<Props, State> {
               <View
                 onClick={() => this.changeSelect(1, 'selectTypes')}
                 className={classnames("inventory-select-item-button", {
-                  'inventory-select-item-button-active': selectTypes.some((t) => t === 1)
+                  'inventory-select-item-button-active': selectTypes.length === 1 && selectTypes.some((t) => t === 1)
                 })}
               >
                 退货单

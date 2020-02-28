@@ -101,8 +101,9 @@ class Modal extends Taro.Component<Props, State> {
                       className={`${ModalCssPrefix}-content-item`}
                     >
                       <View 
-                        className={classnames(`${ModalCssPrefix}-content-item-title`, {
-                          [`${ModalCssPrefix}-content-item-title-short`]: !(inputs.some(i => i.title.length > 2))
+                        className={classnames(`${ModalCssPrefix}-content-item-title`, `${ModalCssPrefix}-content-item-title-nor`, {
+                          [`${ModalCssPrefix}-content-item-title-len`]: inputs.some(i => i.title.length > 5),
+                          [`${ModalCssPrefix}-content-item-title-short`]: inputs.every(i => i.title.length <= 2)
                         })}
                       >
                         {main && (

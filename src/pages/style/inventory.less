@@ -76,6 +76,11 @@
       &::after {
         .border1px;
       }
+      &-nobor {
+        &::after {
+          border-bottom: 0px !important;
+        }
+      }
       &-time {
         .flex(center, space-between, row);
         .margin(20px, t);
@@ -119,7 +124,7 @@
   &-remark {
     display: flex;
     flex-direction: column;
-    .padding(40px, lr);
+    .padding(24px, lr);
     .padding(30px, tb);
     &-row {
       display: flex;
@@ -133,6 +138,11 @@
     &-input {
       .margin(30px, t);
       font-size: 30px;
+      &-text {
+        font-size:30px;
+        font-weight:500;
+        color:rgba(153,153,153,1);
+      }
       &-place {
         font-size: 30px;
         color: #999999;

@@ -43,6 +43,7 @@ export declare namespace ProductInterface {
     number: number;       // 库存
     price: number;        // 售价
     unitPrice?: number;   // 单价 无码商品要穿
+    originPrice?: number;
     saleType: number;     // 销售类型（0：按件卖[默认]；1称重）
     status: number;       // 状态(0：启用;1：停用)
     type: number;         // 品类

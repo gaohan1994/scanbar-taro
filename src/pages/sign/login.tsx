@@ -27,7 +27,7 @@ class Login extends Taro.Component<Props, State> {
   
   config: Taro.Config = {
     navigationBarTitleText: '登录',
-    navigationStyle: 'custom'
+    // navigationStyle: 'custom'
   };
 
   readonly state: State = {
@@ -76,7 +76,6 @@ class Login extends Taro.Component<Props, State> {
       invariant(result.success, result.msg || '登录失败');
       // Taro.navigateTo({ url: '/pages/home/home' });
       // Taro.navigateBack();
-      Taro.navigateBack({delta: 10});  
       Taro.switchTab({
         url: `/pages/home/home`
       })
@@ -101,7 +100,7 @@ class Login extends Taro.Component<Props, State> {
     const { username, password } = this.state;
     return (
       <View className={classnames(['container', 'sign'])} >
-        <NavBar title="登录"/>
+        {/* <NavBar title="登录"/> */}
         <View className="sign-card">
           <View className="sign-card-title">欢迎使用千阳零售</View>
           <View className="sign-card-input">

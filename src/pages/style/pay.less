@@ -97,7 +97,8 @@
     &-box {
       display: flex;
       flex-direction: column;
-      .padding(40px);
+      .padding(40px, tb);
+      .padding(24px, lr);
       &-title {
         font-size: 30px;
         color: #666666;
@@ -160,6 +161,9 @@
       &-title {
         font-size: 36px;
         color: #666666;
+        &-bold {
+          font-weight: bold;
+        }
       }
       &-price {
         font-size: 50px;
@@ -170,6 +174,26 @@
       &-button {
         width: 670px;
         .margin(90px, t);
+      }
+    }
+  }
+
+  &-cash {
+    &-button {
+      .margin(30px, t);
+      width:670px;
+      height:80px;
+      background: #ffffff;
+      border-radius:40px;
+      .flex(center, center);
+      font-size:30px;
+      font-weight:500;
+      color: @theme-color;
+
+      &-disable {
+        opacity: 0.54;
+        background:rgba(204,204,204,1);
+        color: #ffffff;
       }
     }
   }

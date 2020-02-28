@@ -38,6 +38,7 @@ export declare namespace InventoryInterface {
     merchantId: number;
     status: number;
     number: number;
+    remark: string;
     supplierId: number;
     supplierName: number;
     type: number;
@@ -66,6 +67,7 @@ export declare namespace InventoryInterface {
       productList: InventoryProduct[];
       planNumber?: number;
       supplierId: number;
+      remark?: string;
     }
 
     interface StockCheck {

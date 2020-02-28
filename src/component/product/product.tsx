@@ -88,7 +88,7 @@ class ProductComponent extends Taro.Component<Props, State> {
             {product.pictures && product.pictures !== '' ? (
               <Image src={product.pictures[0]} className={`${cssPrefix}-content-cover-image`} />
             ) : (
-              <Image src="//net.huanmusic.com/weapp/img_nolist.png" className={`${cssPrefix}-content-cover-image`} />
+              <Image src="//net.huanmusic.com/weapp/empty.png" className={`${cssPrefix}-content-cover-image`} />
             )}
           </View>
           {this.renderDetail()}
@@ -114,15 +114,32 @@ class ProductComponent extends Taro.Component<Props, State> {
         {showManageDetailToken
         ? (
           <View className={classnames(`${cssPrefix}-content-detail-box`)}>
-            <Text className={`${cssPrefix}-manage-font`}>进价: ￥{product.cost}</Text>
+            {sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE
+            ? <Text className={`${cssPrefix}-manage-font-title`}>进价: ￥{product.cost}</Text>
+            : (
+              <Text 
+                className={classnames(`${cssPrefix}-manage-font ${cssPrefix}-manage-font-bor`, {
+                  [`${cssPrefix}-manage-font-theme`]: product.number > 0,
+                  [`${cssPrefix}-manage-font-price`]: product.number <= 0,
+                })}
+              >
+                库存：{`${product.number < 0 ? '-' : ''}${product.number || 0}${product.unit || ''}`}
+              </Text>
+            )}
+           
             {sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE
             ? (
-              <Text className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>
-                库存: {product.number}
+              <Text 
+                className={classnames(`${cssPrefix}-manage-font ${cssPrefix}-manage-font-bor`, {
+                  [`${cssPrefix}-manage-font-theme`]: product.number > 0,
+                  [`${cssPrefix}-manage-font-price`]: product.number <= 0,
+                })}
+              >
+                库存：{`${product.number < 0 ? '-' : ''}${product.number || 0}${product.unit || ''}`}
               </Text>
             )
             : (
-              <Text className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>
+              <Text className={`${cssPrefix}-manage-font-small`}>
                 售价: ￥{product.price}
               </Text>
             )}
@@ -131,8 +148,8 @@ class ProductComponent extends Taro.Component<Props, State> {
         : sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK
           ? (
             <View className={classnames(`${cssPrefix}-content-detail-box`)}>
-              <Text className={`${cssPrefix}-manage-font`}>进价: ￥{numeral(product.cost).format('0.00')}</Text>
-              <View className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>
+              <Text className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-bor`}>进价: ￥{numeral(product.cost).format('0.00')}</Text>
+              <View className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-bor ${cssPrefix}-manage-font-theme`}>
                 库存：{` ${product.number || 0}${product.unit || ''}`}
               </View>
             </View>
@@ -142,7 +159,7 @@ class ProductComponent extends Taro.Component<Props, State> {
               <Text className={`${cssPrefix}-price-bge`}>￥</Text>
               <Text className={`${cssPrefix}-price`}>{product.price}</Text>
               {showUnitToken && (
-                <Text>{` /${product.unit}`}</Text>
+                <Text className={`${cssPrefix}-price-unit`}>{`/${product.unit}`}</Text>
               )}
             </View>
           )}
@@ -156,7 +173,7 @@ class ProductComponent extends Taro.Component<Props, State> {
     if (sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_MANAGE) {
       return (
         <View className={`${cssPrefix}-manage-corner`}>
-          <Text className={`${cssPrefix}-manage-font`}>库存: {product.number}{product.unit}</Text>
+          <Text className={`${cssPrefix}-manage-font-small`}>进价: {numeral(product.cost).format('0.00')}</Text>
         </View>
       );
     }

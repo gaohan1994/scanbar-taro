@@ -423,10 +423,11 @@ class ProductDetail extends Taro.Component<Props, State> {
       Taro.showToast({
         title: '保存成功!',
         icon: 'success',
-        success: () => {
-          Taro.navigateBack();
-        }
+        duration: 500,
       });
+      setTimeout(() => {
+        Taro.navigateBack();
+      }, 500);
     } catch (error) {
       Taro.hideLoading();
       Taro.showToast({
@@ -502,18 +503,22 @@ class ProductDetail extends Taro.Component<Props, State> {
     ];
     const formPrice: FormRowProps[] = [
       {
-        title: '进价（￥）',
-        extraText: `${numeral(productChangeDetail.cost || productDetail.cost).format('0.00')}`,
+        title: '进价',
+        extraText: `￥${numeral(productChangeDetail.cost || productDetail.cost).format('0.00')}`,
         onClick: () => this.changeModalVisible('costModalVisible', true)
       },
       {
-        title: '售价（￥）',
-        extraText: `${numeral(productChangeDetail.price || productDetail.price).format('0.00')}`,
+        title: '售价',
+        extraText: `￥${numeral(productChangeDetail.price || productDetail.price).format('0.00')}`,
         onClick: () => this.changeModalVisible('priceModalVisible', true)
       },
       {
-        title: '会员价（￥）',
-        extraText: `${numeral(productChangeDetail.memberPrice || productDetail.memberPrice).format('0.00')}`,
+        title: '会员价',
+        extraText: `${!!productChangeDetail.memberPrice 
+          ? `￥${numeral(productChangeDetail.memberPrice).format('0.00')}`
+          : !!productDetail.memberPrice 
+            ? `￥${numeral(productDetail.memberPrice).format('0.00')}`
+            : ''}`,
         onClick: () => this.changeModalVisible('memberPriceModalVisible', true),
         hasBorder: false
       },

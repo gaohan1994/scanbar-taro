@@ -46,7 +46,7 @@ class ProductPayListView extends Taro.Component<Props> {
           })}
         >
           <View className={`${cssPrefix}-row ${cssPrefix}-row-border`}>
-            <Text className={`${cssPrefix}-row-normal`}>商品详情</Text>
+            <Text className={`${cssPrefix}-row-normal-title`}>商品详情</Text>
           </View>
           {
             productList && productList.length > 0 && productList.map((item, index) => {
@@ -187,7 +187,10 @@ class ProductPayListView extends Taro.Component<Props> {
             <Text className={`${cssPrefix}-row-normal`}>{`￥ ${this.setNumber(itemPrice)}`}</Text>
           )
         ) : (
-          item.changePrice !== undefined ? (
+          item.changePrice !== undefined && item.changePrice !== item.price ? (
+            /**
+             * @todo 2.26修改 当改价和员价相同时不显示改价图标
+             */
             <View className={`${cssPrefix}-row-content-items`}>
               <Text className={`${cssPrefix}-row-normal ${cssPrefix}-row-line`}>{`￥ ${this.setNumber(item.price)}`}</Text>
               <View className={`${cssPrefix}-row-icon ${cssPrefix}-row-icon-member`}>改价</View>

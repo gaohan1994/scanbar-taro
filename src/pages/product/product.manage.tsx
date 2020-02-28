@@ -19,7 +19,6 @@ import { AppReducer } from '../../reducers';
 import { getProductManageList, getProductManageListIndexes, getProductType, getProductSupplier } from '../../reducers/app.product';
 // import ProductManageComponent from '../../component/product/product.manage';
 import ProductComponent from '../../component/product/product';
-import { AtButton } from 'taro-ui';
 import classnames from 'classnames';
 import productSdk from '../../common/sdk/product/product.sdk';
 import merge from 'lodash.merge';
@@ -347,7 +346,7 @@ class ProductManage extends Taro.Component<Props, State> {
             style="background-color: #ffffff;"
           >
             <Image 
-              src="//net.huanmusic.com/weapp/icon_del.png" 
+              src="//net.huanmusic.com/weapp/icon_del_1.png" 
               className={`${cssPrefix}-select-header-close`}
               onClick={() => this.changeSelectVisible(false)}
             />

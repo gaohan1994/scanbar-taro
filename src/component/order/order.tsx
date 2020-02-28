@@ -44,7 +44,7 @@ class OrderItem extends Taro.Component<Props, State> {
                 : data.order.payType === 0
                   ? (
                     <Image
-                      src="//net.huanmusic.com/weapp/icon_cash.png"
+                      src="//net.huanmusic.com/weapp/v1/icon_cash.png"
                       className={imageClassName}
                     />
                   )
@@ -81,11 +81,11 @@ class OrderItem extends Taro.Component<Props, State> {
             }
 
             <View className={`${cssPrefix}-left-detail`}>
-              {
-                data.order.transType === 1
-                  ? <View className={`${cssPrefix}-no-refund`}>{`${data.order.orderNo}`}</View>
-                  : <View className={`${cssPrefix}-no`}>{`${data.order.orderNo}`}</View>
-              }
+              {/**
+               * 02 27
+               * @todo 修改 退货订单爷显示成黑色
+               */}
+              <View className={`${cssPrefix}-no`}>{`${data.order.orderNo}`}</View>
               <View className={`${cssPrefix}-row`}>
                 <View className={`${cssPrefix}-time`}>{`${dayJs(data.order.transTime).format('HH:mm:ss')}`}</View>
                 {

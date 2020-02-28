@@ -17,12 +17,14 @@ import { ReportAction } from '../../actions';
 import { AppReducer } from '../../reducers';
 import { getReportBaseInfo } from '../../reducers/app.report';
 import { connect } from '@tarojs/redux';
-import { ReportInterface } from '../../constants';
+import { ReportInterface, ResponseCode } from '../../constants';
 import numeral from 'numeral';
 import TabsMenu from '../../component/layout/menu';
 import dayJs from 'dayjs';
-import { getMonthEndDate } from '../../common/util/common';
+import { getMonthEndDate, createMonth } from '../../common/util/common';
 import classnames from 'classnames';
+import loginManager from '../../common/sdk/sign/login.manager';
+import invariant from 'invariant'
 
 const cssPrefix = 'report';
 
@@ -41,22 +43,32 @@ type State = {
   maxDate: string;
   currentReportType: string;
   currentChartType: number;
+  monthData: any[];
+  weeksData: ReportInterface.WeekItem[];
+  weekValue: number;
 };
 
 class ReportMain extends Taro.Component<ReportMainProps, State> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      saleVisible: false,
+      refundVisible: false,
+      merchantVisible: false,
+      reportVisible: false,
+      dateVisible: false,
+      currentDate: '今日',
+      minDate: `${dayJs().format('YYYY-MM-DD HH:mm:ss')}`,
+      maxDate: `${dayJs().format('YYYY-MM-DD HH:mm:ss')}`,
+      currentReportType: '经营报表',
+      currentChartType: 0,
+      monthData: [],
+      weeksData: [],
+      weekValue: 0,
+    };
+  }
 
-  readonly state: State = {
-    saleVisible: false,
-    refundVisible: false,
-    merchantVisible: false,
-    reportVisible: false,
-    dateVisible: false,
-    currentDate: '今日',
-    minDate: `${dayJs().format('YYYY-MM-DD HH:mm:ss')}`,
-    maxDate: `${dayJs().format('YYYY-MM-DD HH:mm:ss')}`,
-    currentReportType: '经营报表',
-    currentChartType: 0
-  };
+  
   /**
    * 指定config的类型声明为: Taro.Config
    *
@@ -73,13 +85,29 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
   }
 
   public init = async () => {
-    this.setState({
-      currentDate: '今日',
-      minDate: `${dayJs().format('YYYY-MM-DD HH:mm:ss')}`,
-      maxDate: `${dayJs().add(24, 'hour').format('YYYY-MM-DD HH:mm:ss')}`,
-    }, () => {
-      this.fetchData();
-    });
+    try {
+      Taro.showLoading()
+      const currentMonth = dayJs().month();
+      const cmonth = createMonth(2020);
+      const weeks = await ReportAction.reportWeekData();
+      invariant(weeks.code === ResponseCode.success, weeks.msg || ' ')
+      this.setState({
+        currentDate: '今日',
+        monthData: cmonth.slice(0, currentMonth + 1),
+        weeksData: (weeks.data as any[]).reverse(),
+        minDate: `${dayJs().format('YYYY-MM-DD HH:mm:ss')}`,
+        maxDate: `${dayJs().add(24, 'hour').format('YYYY-MM-DD HH:mm:ss')}`,
+      }, () => {
+        this.fetchData();
+      });
+      Taro.hideLoading()
+    } catch (error) {
+      Taro.hideLoading()
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      })
+    }
   }
 
   public onDatePress = (date: any) => {
@@ -87,8 +115,23 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
       let newMinDate = '';
       let newMaxDate = '';
       if (date.title === '今日') {
+        /**
+         * @todo 当min和max为同一天时返回空数据
+         */
         newMinDate = dayJs().format('YYYY-MM-DD HH:mm:ss');
-        newMaxDate = dayJs().format('YYYY-MM-DD HH:mm:ss');
+        newMaxDate = dayJs().add(1, 'day').format('YYYY-MM-DD HH:mm:ss');
+      } else if (date.title === '本周') {
+        /**
+         * @time 02.29
+         * @todo 加入本周数据，点击本周则自动选择当前周为起始和开始日期
+         * @todo 用户点击日期弹出picker选择具体周
+         */
+        const { weeksData } = this.state;
+        const currentWeek = weeksData[0];
+        console.log('currentWeek: ', currentWeek);
+        newMinDate = dayJs(currentWeek.beginDateStr).format('YYYY-MM-DD HH:mm:ss');
+        newMaxDate = dayJs(currentWeek.endDateStr).format('YYYY-MM-DD HH:mm:ss');
+
       } else if (date.title === '本月') {
         const month = dayJs().month();
         const year = dayJs().year();
@@ -101,7 +144,6 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
         maxDate: newMaxDate,
       };
     }, () => {
-      console.log('this.state: ', this.state);
       this.fetchData();
     });
   }
@@ -113,30 +155,32 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
   }
 
   public prevDate = () => {
-    const { currentDate, minDate } = this.state;
-    const year = dayJs(minDate).year();
-    // if (currentDate === '今日' && dayJs(minDate).isSame(dayJs(new Date(year, 0, 1)))) {
-    //   // 已经是第一天了
-    //   Taro.showToast({
-    //     title: '只能选择1月1日以后的日期',
-    //     icon: 'none'
-    //   });
-    //   return;
-    // }
-
-    // if (currentDate === '本月' && dayJs(minDate).month() === 0) {
-    //   // 已经是最后一月了
-    //   Taro.showToast({
-    //     title: '只能选择1月以后的日期',
-    //     icon: 'none'
-    //   });
-    //   return;
-    // }
-
+    const { currentDate, minDate, weeksData, weekValue } = this.state;
     if (currentDate === '今日') {
       this.setState({
         minDate: dayJs(minDate).subtract(24, 'hour').format('YYYY-MM-DD HH:mm:ss'),
         maxDate: dayJs(minDate).format('YYYY-MM-DD HH:mm:ss'),
+      }, () => {
+        this.fetchData();
+      });
+    }
+
+    if (currentDate === '本周') {
+      if (weekValue === 0) {
+        Taro.showToast({
+          title: '已经是本年第一周了',
+          icon: 'none'
+        });
+        return;
+      }
+      const prevWeek = weeksData[weekValue - 1];
+      const newMinDate = dayJs(prevWeek.beginDateStr).format('YYYY-MM-DD HH:mm:ss');
+      const newMaxDate = dayJs(prevWeek.endDateStr).format('YYYY-MM-DD HH:mm:ss');
+     
+      this.setState({
+        minDate: newMinDate,
+        maxDate: newMaxDate,
+        weekValue: weekValue - 1
       }, () => {
         this.fetchData();
       });
@@ -151,9 +195,7 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
       }
       const newMinDate = dayJs(new Date(currentYear, currentMonth - 1, 1)).format('YYYY-MM-DD HH:mm:ss');
       const newMaxDate = dayJs(new Date(currentYear, currentMonth - 1, getMonthEndDate(currentMonth - 1, currentYear))).format('YYYY-MM-DD HH:mm:ss');
-      // console.log('newMinDate: ', newMinDate);
-      // console.log('newMaxDate: ', newMaxDate);
-
+     
       this.setState({
         minDate: newMinDate,
         maxDate: newMaxDate,
@@ -164,7 +206,7 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
   }
 
   public nextDate = () => {
-    const { currentDate, maxDate, minDate } = this.state;
+    const { currentDate, maxDate, weekValue, weeksData, minDate } = this.state;
     if (currentDate === '今日' && dayJs(dayJs(minDate).format('YYYY-MM-DD')).isSame(dayJs().format('YYYY-MM-DD'))) {
       // 已经是最后一天了
       Taro.showToast({
@@ -173,6 +215,28 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
       });
       return;
     }
+
+    if (currentDate === '本周') {
+      if (weekValue === weeksData.length - 1) {
+        Taro.showToast({
+          title: '已经是本年最后一周了',
+          icon: 'none'
+        });
+        return;
+      }
+      const nextWeek = weeksData[weekValue + 1];
+      const newMinDate = dayJs(nextWeek.beginDateStr).format('YYYY-MM-DD HH:mm:ss');
+      const newMaxDate = dayJs(nextWeek.endDateStr).format('YYYY-MM-DD HH:mm:ss');
+     
+      this.setState({
+        minDate: newMinDate,
+        maxDate: newMaxDate,
+        weekValue: weekValue + 1
+      }, () => {
+        this.fetchData();
+      });
+    }
+
     if (currentDate === '本月' && dayJs(dayJs(maxDate).format('YYYY-MM')).isSame(dayJs().format('YYYY-MM'))) {
       // 已经是最后一月了
       Taro.showToast({
@@ -196,9 +260,7 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
       const currentYear = dayJs(minDate).year();
       const newMinDate = dayJs(new Date(currentYear, currentMonth + 1, 1)).format('YYYY-MM-DD HH:mm:ss');
       const newMaxDate = dayJs(new Date(currentYear, currentMonth + 1, getMonthEndDate(currentMonth + 1, currentYear))).format('YYYY-MM-DD HH:mm:ss');
-      // console.log('newMinDate: ', newMinDate);
-      // console.log('newMaxDate: ', newMaxDate);
-
+     
       this.setState({
         minDate: newMinDate,
         maxDate: newMaxDate,
@@ -247,27 +309,40 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
       }, () => {
         this.fetchData();
       });
-    } else {
-      if (dayJs(dayJs().format('YYYY-MM')).valueOf() < dayJs(dayJs(value).format('YYYY-MM')).valueOf()) {
-        // 已经是最后一月了
-        Taro.showToast({
-          title: '只能选择本月以前的日期',
-          icon: 'none'
-        });
-        return;
-      }
-      const currentYear = dayJs(value).year();
-      const currentMonth = dayJs(value).month();
-      const newMinDate = dayJs(new Date(currentYear, currentMonth, 1)).format('YYYY-MM-DD HH:mm:ss');
-      const newMaxDate = dayJs(new Date(currentYear, currentMonth, getMonthEndDate(currentMonth, currentYear))).format('YYYY-MM-DD HH:mm:ss');
+
+      return;
+    } 
+
+    if (currentDate === '本周') {
+      /**
+       * @time 02.29
+       * @todo 加入本周选择点击本周picker的时候把点击的数据赋值到state中
+       */
+      const { weeksData } = this.state;
+      const currentWeek = weeksData[value];
+
       this.setState({
-        minDate: newMinDate,
-        maxDate: newMaxDate,
+        minDate: dayJs(currentWeek.beginDateStr).format('YYYY-MM-DD HH:mm:ss'),
+        maxDate: dayJs(currentWeek.endDateStr).format('YYYY-MM-DD HH:mm:ss'),
+        weekValue: value
       }, () => {
         this.fetchData();
       });
+      return;
     }
 
+    if (currentDate === '本月') {
+      const { monthData } = this.state;
+      const selectMonth = monthData[value]
+      console.log('selectMonth: ', selectMonth);
+      this.setState({
+        minDate: dayJs(selectMonth.startDate).format('YYYY-MM-DD HH:mm:ss'),
+        maxDate: dayJs(selectMonth.endDate).format('YYYY-MM-DD HH:mm:ss'),
+      }, () => {
+        this.fetchData();
+      });
+      return;
+    }
   }
 
   public onChangeValue = (key: string, value: any) => {
@@ -330,6 +405,9 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
         title: '今日',
       },
       {
+        title: '本周'
+      },
+      {
         title: '本月',
       }
     ];
@@ -352,7 +430,9 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
                   className={`${cssPrefix}-tab`}
                   key={tab.title}
                   onClick={() => {
-                    this.onChangeValue(tab.visible, true);
+                    loginManager.checkAuth(() => {
+                      this.onChangeValue(tab.visible, true);
+                    })
                   }}
                 >
                   {this.renderTab(tab)}
@@ -556,45 +636,98 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
     );
   }
 
+  private renderPicker = () => {
+    const { currentDate, minDate, maxDate, monthData, weeksData, weekValue } = this.state;
+
+    const month = monthData 
+      ? monthData.map((item) => item.monthStr)
+      : []
+
+    const weeks = weeksData
+      ? weeksData.map((item) => item.weekStr)
+      : []
+
+    return (
+      <View className={`${cssPrefix}-time-box`}>
+        {currentDate === '今日'
+          ? (
+            <Picker
+              mode='date'
+              onChange={this.onDateChange}
+              value={dayJs(minDate).format('YYYY.MM.DD')}
+            >
+              <View className={`${cssPrefix}-time-date`}>
+                <Image
+                  src="//net.huanmusic.com/weapp/v1/icon_rili.png"
+                  className={`${cssPrefix}-time-cal`}
+                />
+                <Text className={`${cssPrefix}-time-text`}>{dayJs(minDate).format('YYYY.MM.DD')}</Text>
+              </View>
+            </Picker>
+          ) : currentDate === '本周'
+            ? (
+              <Picker
+                mode='selector'
+                range={weeks}
+                onChange={this.onDateChange}
+                value={weekValue}
+              >
+                <View className={`${cssPrefix}-time-date`}>
+                  <Image
+                    src="//net.huanmusic.com/weapp/v1/icon_rili.png"
+                    className={`${cssPrefix}-time-cal`}
+                  />
+                  <Text className={`${cssPrefix}-time-text`}>
+                    {`${dayJs(minDate).format('YYYY.MM.DD')} - ${dayJs(maxDate).format('YYYY.MM.DD')}`}
+                  </Text>
+                </View>
+              </Picker>
+            ) 
+            : (
+            <Picker
+              mode='selector'
+              range={month}
+              onChange={this.onDateChange}
+              value={0}
+            >
+              <View className={`${cssPrefix}-time-date`}>
+                <Image
+                  src="//net.huanmusic.com/weapp/v1/icon_rili.png"
+                  className={`${cssPrefix}-time-cal`}
+                />
+                <Text className={`${cssPrefix}-time-text`}>
+                  {`${dayJs(minDate).format('YYYY.MM.DD')} - ${dayJs(maxDate).format('YYYY.MM.DD')}`}
+                </Text>
+              </View>
+            </Picker>
+          )}
+        
+      </View>
+    )
+  }
+
   private renderTime = () => {
-    const { currentDate, minDate, maxDate } = this.state;
+    
     return (
       <View className={`${cssPrefix}-time`}>
         <View
           className={`${cssPrefix}-time-item`}
-          onClick={() => this.prevDate()}
+          onClick={() => loginManager.checkAuth(() => {
+            this.prevDate()
+          })}
         >
           <Image
             src="//net.huanmusic.com/weapp/v1/icon_time_left.png"
             className={`${cssPrefix}-time-icon`}
           />
         </View>
-
-        <View className={`${cssPrefix}-time-box`}>
-          <Picker
-            mode='date'
-            onChange={this.onDateChange}
-            value={dayJs(minDate).format('YYYY.MM.DD')}
-          >
-            <View className={`${cssPrefix}-time-date`}>
-              <Image
-                src="//net.huanmusic.com/weapp/v1/icon_rili.png"
-                className={`${cssPrefix}-time-cal`}
-              />
-              {currentDate === '今日' && (
-                <Text className={`${cssPrefix}-time-text`}>{dayJs(minDate).format('YYYY.MM.DD')}</Text>
-              )}
-              {currentDate === '本月' && (
-                <Text className={`${cssPrefix}-time-text`}>
-                  {`${dayJs(minDate).format('YYYY.MM.DD')} - ${dayJs(maxDate).format('YYYY.MM.DD')}`}
-                </Text>
-              )}
-            </View>
-          </Picker>
-        </View>
+        {this.renderPicker()}
+        
         <View
           className={`${cssPrefix}-time-item`}
-          onClick={() => this.nextDate()}
+          onClick={() => loginManager.checkAuth(() => {
+            this.nextDate()
+          })}
         >
           <Image
             src="//net.huanmusic.com/weapp/v1/icon_time_right.png"
@@ -612,7 +745,9 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
         icon: '//net.huanmusic.com/weapp/icon_sale.png',
         title: 'saleVisible',
         id: 'saleVisible',
-        onClick: () => this.onChangeValue('saleVisible', true),
+        onClick: () => loginManager.checkAuth(() => {
+          this.onChangeValue('saleVisible', true)
+        }),
         items: [
           {
             title: '销售额',
@@ -629,7 +764,9 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
         icon: '//net.huanmusic.com/weapp/icon_refound.png',
         id: 'refundVisible',
         title: 'refundVisible',
-        onClick: () => this.onChangeValue('refundVisible', true),
+        onClick: () => loginManager.checkAuth(() => {
+          this.onChangeValue('refundVisible', true)
+        }),
         items: [
           {
             title: '退货额',
@@ -653,7 +790,7 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
           },
           {
             title: '利润率',
-            value: `${numeral(reportBaseInfo.profitRate || 0).value()}%`
+            value: `${numeral(numeral(reportBaseInfo.profitRate || 0).value() * 100).format('0.00')}%`
           }
         ],
         arrow: false,

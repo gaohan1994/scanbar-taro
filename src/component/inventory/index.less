@@ -69,4 +69,20 @@
       }
     }
   }
+
+  &-remark {
+    position: relative;
+    &::before {
+      .bordertop; 
+    }
+    .padding(25px, tb);
+    .padding(30px, lr);
+    &-text {
+      .clamp(1);
+      width:621px;
+      font-size:24px;
+      font-weight:500;
+      color:rgba(153,153,153,1);
+    }
+  }
 }

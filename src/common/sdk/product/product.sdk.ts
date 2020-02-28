@@ -370,13 +370,7 @@ class ProductSDK {
     const productList = products !== undefined ? products : store.getState().productSDK[key];
     const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => {
       /**
-       * @todo [如果没有改价，但是是进货则返回进价]
-       */
-      if (key === 'productPurchaseList') {
-        return prevTotal + (item.cost * item.sellNum);
-      }
-      /**
-       * @todo [如果是盘点，则用盘盈数量乘上平均进价，这个进价字段后面改成avgCost]
+       * @todo [如果是盘点，则用盘盈数量乘上平均进价]
        */
       if (this.sort === this.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK) {
         return prevTotal + ((item.sellNum - item.number) * item.avgCost);
@@ -386,6 +380,12 @@ class ProductSDK {
        */
       if (item.changePrice !== undefined) {
         return prevTotal + (item.changePrice * item.sellNum); 
+      }
+      /**
+       * @todo [如果没有改价，但是是进货则返回进价]
+       */
+      if (key === 'productPurchaseList') {
+        return prevTotal + (item.cost * item.sellNum);
       }
       return prevTotal + (item.price * item.sellNum);
     };

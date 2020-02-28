@@ -77,6 +77,22 @@ export function createWeeks(year: number = 2020) {
   return weeks;
 }
 
+/**
+ * @todo [返回该年份的所有月份]
+ */
+export function createMonth (year: number = 2020) {
+  const month = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((item) => {
+    return {
+      month: item + 1,
+      monthStr: `${year}年${item + 1}月`,
+      startDate: new Date(year, item, 1),
+      endDate: new Date(year, item, getMonthEndDate(item, year)),
+    };
+  });
+  console.log('month', month);
+  return month;
+}
+
 export function getMonthEndDate(month: number, year: number) {
   switch (month + 1) {
     case 2: {

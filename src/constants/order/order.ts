@@ -31,6 +31,7 @@ export declare namespace OrderInterface {
     barcode: string;
     brand: string;
     orderNo: string;
+    originPrice?: number;
   }
 
   interface OrderInfo {

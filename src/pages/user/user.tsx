@@ -13,6 +13,7 @@ import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
 import { getProfileInfo } from '../../reducers/app.merchant';
 import { MerchantInterface } from 'src/constants';
+import loginManager from '../../common/sdk/sign/login.manager';
 
 const Rows = [
   {
@@ -117,7 +118,9 @@ class UserMain extends Taro.Component<UserMainProps, UserMainState> {
         <View className={`${cssPrefix}-container`}>
           <View
             className={`${cssPrefix}-user`}
-            onClick={() => this.onNavDetail()}
+            onClick={() => loginManager.checkAuth(() => {
+              this.onNavDetail()
+            })}
           >
             {
               userinfo.avatar && userinfo.avatar.length > 0
@@ -150,7 +153,9 @@ class UserMain extends Taro.Component<UserMainProps, UserMainState> {
 
           <View
             className={`${cssPrefix}-user-edit`}
-            onClick={() => this.onNavDetail()}
+            onClick={() => loginManager.checkAuth(() => {
+              this.onNavDetail()
+            })}
           >
             <Image
               src="//net.huanmusic.com/weapp/icon_edit.png"
@@ -163,7 +168,9 @@ class UserMain extends Taro.Component<UserMainProps, UserMainState> {
                 return (
                   <View
                     key={row.title}
-                    onClick={() => this.onRowClick(row)}
+                    onClick={() => loginManager.checkAuth(() => {
+                      this.onRowClick(row)
+                    })}
                   >
                     {this.renderRow(row)}
                   </View>

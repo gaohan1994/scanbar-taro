@@ -39,7 +39,7 @@ class ModalLayout extends Taro.Component<Props> {
             style="background-color: #ffffff;"
           >
             <Image 
-              src="//net.huanmusic.com/weapp/icon_del.png" 
+              src="//net.huanmusic.com/weapp/icon_del_1.png" 
               className={`${cssPrefix}-select-header-close`}
               onClick={onClose}
             />

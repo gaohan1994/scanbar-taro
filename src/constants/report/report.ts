@@ -80,6 +80,12 @@ export declare namespace ReportInterface {
     unitPrice: number;
   }
 
+  interface WeekItem {
+    weekStr: string;
+    beginDateStr: string;
+    endDateStr: string;
+  }
+
   interface ReportListFetchField extends Partial<HTTPInterface.FetchField> {
     beginDate?: string;
     endDate?: string;

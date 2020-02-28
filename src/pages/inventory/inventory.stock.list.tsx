@@ -230,7 +230,7 @@ class InventoryMerchantList extends Taro.Component<Props, State> {
         ]}
       >
        <View className={`inventory-select`}>
-          <View className={`inventory-select-item`}>
+          <View className={`inventory-select-item inventory-select-item-nobor`}>
             <View className={`inventory-select-title`}>日期</View>
             <View className={"inventory-select-item-time"}>
               <Picker

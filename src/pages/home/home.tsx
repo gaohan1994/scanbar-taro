@@ -13,6 +13,7 @@ import numeral from 'numeral';
 import { getProfileInfo } from '../../reducers/app.merchant';
 import merchantAction from '../../actions/merchant.action';
 import { ResponseCode } from '../../constants/index';
+import loginManager from '../../common/sdk/sign/login.manager';
 
 const cssPrefix = 'home';
 
@@ -59,12 +60,6 @@ const NavItems = [
     subTitle: 'Procurement',
     url: '/pages/inventory/inventory.stock',
   },
-  {
-    image: '//net.huanmusic.com/weapp/icon_menu_more.png',
-    value: '测试主页',
-    subTitle: 'Even more',
-    url: '/pages/test/test',
-  }
 ];
 
 // type PageState = {};
@@ -115,11 +110,44 @@ class Home extends Component<Props, State> {
         title: error.message,
         icon: 'none',
         duration: 500,
-        success: () => {
-          Taro.navigateTo({ url: '/pages/sign/login' });
-        }
+        // success: () => {
+        //   Taro.navigateTo({ url: '/pages/sign/login' });
+        // }
       });
     }
+  }
+
+  /**
+   * @todo 修改 没有登录过的用户则跳转到登录才能使用
+   *
+   * @memberof Home
+   */
+  public nav = (url: string, tab = false) => {
+    if (!loginManager.getUserToken().success) {
+      Taro.showModal({
+        title: '提示',
+        content: '请先登录',
+        success: (result) => {
+          if (result.confirm) {
+            Taro.redirectTo({
+              url: `/pages/sign/login`
+            })
+          }
+        }
+      })
+      return;
+    }
+
+    if (!!tab) {
+      Taro.switchTab({
+        url: url
+      });
+      return;
+    }
+
+    Taro.navigateTo({
+      url
+    })
   }
 
   /**
@@ -137,6 +165,22 @@ class Home extends Component<Props, State> {
       });
       return;
     }
+
+    if (!loginManager.getUserToken().success) {
+      Taro.showModal({
+        title: '提示',
+        content: '请先登录',
+        success: (result) => {
+          if (result.confirm) {
+            Taro.redirectTo({
+              url: `/pages/sign/login`
+            })
+          }
+        }
+      })
+      return;
+    }
+
     Taro.navigateTo({ url: item.url });
   }
 
@@ -155,9 +199,9 @@ class Home extends Component<Props, State> {
             <View className="home-buttons">
               <View
                 className={`home-buttons-button home-buttons-button-border ${cssPrefix}-buttons-button-start`}
-                onClick={() => Taro.switchTab({ url: '/pages/report/report' })}
+                onClick={() => this.nav('/pages/report/report', true)}
               >
-                <View className={`normal-text ${cssPrefix}-buttons-button-box`}>
+                <View className={`home-normal-text ${cssPrefix}-buttons-button-box`}>
                   <View>{`今日销售额`}</View>
                   <Image
                     className={`${cssPrefix}-buttons-button-into`}
@@ -168,9 +212,9 @@ class Home extends Component<Props, State> {
               </View>
               <View
                 className="home-buttons-button home-buttons-button-end"
-                onClick={() => Taro.switchTab({ url: '/pages/report/report' })}
+                onClick={() => this.nav('/pages/report/report', true)}
               >
-                <View className={`normal-text ${cssPrefix}-buttons-button-box`}>
+                <View className={`home-normal-text ${cssPrefix}-buttons-button-box`}>
                   <View>{`销售笔数`}</View>
                   <Image
                     className={`${cssPrefix}-buttons-button-into`}
@@ -181,7 +225,7 @@ class Home extends Component<Props, State> {
               </View>
             </View>
           </View>
-          <View onClick={() => Taro.navigateTo({ url: '/pages/product/product.order' })}>
+          <View onClick={() => this.nav('/pages/product/product.order')}>
             <Card card-class="home-order">
               <Image src="//net.huanmusic.com/weapp/icon_home_bill.png" className="home-order-icon" />
               <Text className="home-order-text" >开单</Text>
@@ -198,7 +242,7 @@ class Home extends Component<Props, State> {
                   >
                     <View className="home-bar-card-content" onClick={() => this.onNavHandle(item)}>
                       <Image className="home-icon home-card-icon" src={item.image} />
-                      <Text className="normal-text">{item.value}</Text>
+                      <Text className="home-normal-text">{item.value}</Text>
                       <Text className="home-small-text">{item.subTitle}</Text>
                     </View>
                   </Card>

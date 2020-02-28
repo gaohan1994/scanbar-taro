@@ -81,6 +81,25 @@ class LoginManager {
     oatuhToken: '/oauth/token',
   };
 
+  public checkAuth = (callback?: any) => {
+    if (!this.getUserToken().success) {
+      Taro.showModal({
+        title: '提示',
+        content: '请先登录',
+        success: (result) => {
+          if (result.confirm) {
+            Taro.redirectTo({
+              url: `/pages/sign/login`
+            })
+          }
+        }
+      })
+      return;
+    }
+
+    callback()
+  }
+
   public autoToken = async (params: LoginInterface.OAuthTokenParams): Promise<any> => {
     const result = await requestHttp.post(this.LoginManagerConfig.oatuhToken, params);
     if (result.code === ResponseCode.success) {

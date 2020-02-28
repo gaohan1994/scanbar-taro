@@ -4,7 +4,7 @@ import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
 import "../style/order.less";
 import "../style/product.less";
-import { OrderAction, ProductAction } from '../../actions';
+import { OrderAction } from '../../actions';
 import invariant from 'invariant';
 import { ResponseCode, OrderInterface } from '../../constants/index';
 import { getOrderDetail } from '../../reducers/app.order';
@@ -12,9 +12,7 @@ import { FormRowProps } from '../../component/card/form.row';
 import FormCard from '../../component/card/form.card';
 import numeral from 'numeral';
 import ProductPayListView from '../../component/product/product.pay.listview';
-import { ProductCartInterface } from 'src/common/sdk/product/product.sdk';
-import ButtonFooter from '../../component/button/button.footer';
-
+import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 const cssPrefix = 'order';
 
 type Props = {
@@ -77,19 +75,7 @@ class OrderDetail extends Taro.Component<Props, State> {
           {this.renderStatus()}
           {this.renderCards()}
         </View>
-        {/*this.renderButtons()*/}
       </View>
-    );
-  }
-
-  private renderButtons = () => {
-    return (
-      <ButtonFooter
-        buttons={[{
-          title: "退货",
-          onPress: () => {  },
-        }]}
-      />
     );
   }
 
@@ -142,15 +128,15 @@ class OrderDetail extends Taro.Component<Props, State> {
 
     const Form2: FormRowProps[] = orderDetail.order && [
       {
-        title: '应收金额',
+        title: `${orderDetail.order.transType !== 1 ? '应收金额' : '应退金额'}`,
         extraText: `${symbol}￥ ${numeral(orderDetail.order.totalAmount).format('0.00')}`,
         extraTextStyle: 'title',
         extraTextColor: extraTextColor,
         extraTextBold: 'bold',
       },
       {
-        title: `${OrderAction.orderPayType(orderDetail)}收款`,
-        extraText: orderDetail.order.transFlag === -1 ? '收款失败' : `${symbol}￥ ${numeral(orderDetail.order.transAmount).format('0.00')}`,
+        title: `${OrderAction.orderPayType(orderDetail)}${orderDetail.order.transType !== 1 ? '收款' : '退款'}`,
+        extraText: orderDetail.order.transFlag === -1 ? `${orderDetail.order.transType !== 1 ? '收款' : '退款'}失败` : `${symbol}￥ ${numeral(orderDetail.order.transAmount).format('0.00')}`,
         extraTextStyle: 'title',
         extraTextColor: extraTextColor,
         extraTextBold: 'bold',
@@ -170,18 +156,15 @@ class OrderDetail extends Taro.Component<Props, State> {
         extraText: `￥ ${numeral(orderDetail.order.totalAmount).format('0.00')}`,
         extraTextColor: '#4d4d4d'
       },
-      {
-        title: '商品优惠',
-        extraText: `-￥ ${numeral(orderDetail.order.discount).format('0.00')}`,
-        extraTextStyle: 'price',
-      },
-      {
-        title: '整单优惠',
-        extraText: `-￥ ${numeral(orderDetail.order.erase).format('0.00')}`,
-        extraTextStyle: 'price',
-        hasBorder: false
-      },
     ];
+
+    /**
+     * @time 02.27
+     * @todo [退货订单不显示这两项]
+     * 
+     * @time 02.28
+     * @todo 不再显示 商品优惠 整单优惠
+     */
 
     return (
       <View className={`${cssPrefix}-detail-cards`}>
@@ -204,16 +187,24 @@ class OrderDetail extends Taro.Component<Props, State> {
     const { orderDetail } = this.props;
     if (orderDetail.orderDetailList) {
       const productList: ProductCartInterface.ProductCartInfo[] = orderDetail.orderDetailList.map((item) => {
-        return {
+        const formartItem: any = {
           id: item.productId,
           name: item.productName,
           price: item.transAmount / item.num,
           sellNum: item.num,
-        } as any;
+        }
+
+        if (item.originPrice) {
+          formartItem.changePrice = item.originPrice
+        }
+        return formartItem
       });
       return (
         <ProductPayListView
           padding={false}
+          sort={orderDetail.order && orderDetail.order.transType === 1
+            ? productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND
+            : productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER}
           productList={productList}
         />
       );

@@ -347,7 +347,7 @@ class ProductPay extends Taro.Component<Props, State> {
             >
               <Image
                 className={`product-detail-modal-close-image`}
-                src="//net.huanmusic.com/weapp/icon_del.png"
+                src="//net.huanmusic.com/weapp/icon_del_1.png"
               />
             </View>
             <Card card-class="home-card member-card product-pay-member-layout-card">
@@ -485,14 +485,14 @@ class ProductPay extends Taro.Component<Props, State> {
     ];
     const eraseInputs: ModalInput[] = [
       {
-        title: '应收金额（¥）',
+        title: '应收金额(¥)',
         value: receiveValue,
         onInput: ({ detail: { value } }) => this.onChangeReceive('receiveValue', value),
         placeholder: `￥${this.setNumber(receivePrice)}`,
         // focus: true,
       },
       {
-        title: '整单折扣（%）',
+        title: '整单折扣(%)',
         value: receiveDiscount,
         onInput: ({ detail: { value } }) => this.onChangeReceive('receiveDiscount', value),
         placeholder: '100%',

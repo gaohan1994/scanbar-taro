@@ -9,6 +9,12 @@
     width: 100%;
     height: 260px;
   }
+  &-normal {
+    &-text {
+      font-size: @normal-text-fontsize + 2px;
+      color: @normal-text-color;
+    }
+  }
   &-container {
     .flex(center, flex-start, column);
     .padding(30px, lr);
@@ -80,7 +86,7 @@
     }
   }
   &-money {
-    font-size: 45px;
+    font-size: 47px;
     color: #333333;
     font-weight: bold;
   }

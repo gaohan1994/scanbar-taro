@@ -494,7 +494,6 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       >
         {
           productCartList.length > 0 && productCartList.map((product) => {
-            const showUnitToken = !!product.unit && product.unit.length > 0;
             return (
               <View key={product.id} >
                 <View className={`${cssPrefix}-product ${cssPrefix}-product-border`}>
@@ -515,14 +514,11 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                       ? () => {/** */}
                       : () => this.onChangeProductShow(product)}
                   >
-                    <Text className={`${cssPrefix}-product-container-name`}>
+                    <View className={`${cssPrefix}-product-container-name`}>
                       {product.name}{product.remark && `（${product.remark}）`}
-                    </Text>
+                    </View>
                     <View className={`${cssPrefix}-product-container-normal`}>
-                      <Text className={`${cssPrefix}-product-container-price`}>{`￥ ${product.changePrice || product.price}`}</Text>
-                      {showUnitToken && (
-                        <Text>{` /${product.unit}`}</Text>
-                      )}
+                      <Text className={`${cssPrefix}-product-container-price`}>{`￥${product.changePrice || product.price}`}</Text>
                     </View>
                     {
                       (sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER || sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND)
@@ -532,7 +528,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                               className={classnames(`component-product-stepper-button`, `component-product-stepper-button-reduce`)}
                               onClick={() => this.manageProduct(productSdk.productCartManageType.REDUCE, product)}
                             />
-                            <Text className={`component-product-stepper-text`}>{product.sellNum}</Text>
+                            <Text className={`component-product-stepper-text component-product-stepper-text-cart`}>{product.sellNum}</Text>
                             <View 
                               className={classnames(`component-product-stepper-button`, `component-product-stepper-button-add`)}
                               onClick={() => this.manageProduct(productSdk.productCartManageType.ADD, product)}
@@ -702,14 +698,14 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       default: {
         inputs = [
           {
-            title: `数量（${unit}）`,
+            title: `${!!changeProduct ? !productSdk.isWeighProduct(changeProduct as any) ? '数量' : '重量' : '数量'}`,
             value: changeSellNum,
             placeholder: '请输入数量',
             type: "digit",
             onInput: ({detail: {value}}) => this.onChangeValue('changeSellNum', value)
           },
           {
-            title: '价格（¥）',
+            title: '价格',
             value: changePrice || `0`,
             type: 'digit',
             onInput: ({detail: {value}}) => this.onChangeValue('changePrice', value)
@@ -751,7 +747,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     const { changeWeightProduct } = this.props;
     const weightInputs: ModalInput[] = [
       {
-        title: '重量',
+        title: `重量`,
         type: 'digit',
         // focus: true,
         main: true,

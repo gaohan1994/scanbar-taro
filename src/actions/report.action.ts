@@ -4,6 +4,11 @@ import { store } from '../app';
 import { ReportReducer } from "src/reducers/app.report";
 
 class MerchantAction {
+
+  public reportWeekData = async () => {
+    const result = await ReportService.reportWeeksData();
+    return result;
+  }
   public reportList = async (params: ReportInterface.ReportListFetchField) => {
     const result = await ReportService.reportList(params);
     if (result.code === ResponseCode.success) {

@@ -1,30 +1,30 @@
 Arguments: 
-  /usr/local/bin/node /Users/Gao/.yarn/bin/yarn.js add src/component/layout/menu --silent --no-progress
+  E:\node\node.exe C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add src/common/sdk/sign/login.manager --silent --no-progress
 
 PATH: 
-  /usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/Gao/Desktop/macdesktop/scanbar/node_modules/.bin:/usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/Gao/Desktop/macdesktop/scanbar/node_modules/.bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bind:/usr/local/mongodb/bind:/usr/local/mongodb/bin:/Users/Gao/.yarn/bin:/Users/Gao/.config/yarn/global/node_modules/.bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Tomcat/bin:/Users/Gao/Library/Android/sdk/tools:/Users/Gao/Library/Android/sdk/platform-tools:
+  E:\node\node_modules\npm\node_modules\npm-lifecycle\node-gyp-bin;E:\scanbar-taro\node_modules\.bin;E:\node\node_modules\npm\node_modules\npm-lifecycle\node-gyp-bin;E:\scanbar-taro\node_modules\.bin;E:\cmder_mini\vendor\bin;E:\cmder_mini\vendor\conemu-maximus5\ConEmu\Scripts;E:\cmder_mini\vendor\conemu-maximus5;E:\cmder_mini\vendor\conemu-maximus5\ConEmu;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA NGX;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;E:\node\;E:\git\Git\cmd;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;E:\cmder_mini\bin;C:\Users\Administrator\AppData\Roaming\npm;E:\Microsoft VS Code\bin;C:\Users\Administrator\AppData\Local\GitHubDesktop\bin;E:\git\Git\mingw64\bin;E:\git\Git\usr\bin;E:\cmder_mini
 
 Yarn version: 
-  1.15.2
+  1.22.0
 
 Node version: 
-  12.4.0
+  12.15.0
 
 Platform: 
-  darwin x64
+  win32 x64
 
 Trace: 
-  Error: https://registry.npmjs.org/src%2fcomponent/layout/menu: Request "https://registry.npmjs.org/src%2fcomponent/layout/menu" returned a 405
-      at Request.params.callback [as _callback] (/Users/Gao/.yarn/lib/cli.js:66067:18)
-      at Request.self.callback (/Users/Gao/.yarn/lib/cli.js:129541:22)
-      at Request.emit (events.js:200:13)
-      at Request.<anonymous> (/Users/Gao/.yarn/lib/cli.js:130513:10)
-      at Request.emit (events.js:200:13)
-      at IncomingMessage.<anonymous> (/Users/Gao/.yarn/lib/cli.js:130435:12)
-      at Object.onceWrapper (events.js:288:20)
-      at IncomingMessage.emit (events.js:205:15)
-      at endReadableNT (_stream_readable.js:1154:12)
-      at processTicksAndRejections (internal/process/task_queues.js:84:9)
+  Error: https://registry.npm.taobao.org/src%2fcommon/sdk/sign/login.manager: [not_found] document not found
+      at Request.params.callback [as _callback] (C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:66975:18)
+      at Request.self.callback (C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:140727:22)
+      at Request.emit (events.js:223:5)
+      at Request.<anonymous> (C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141699:10)
+      at Request.emit (events.js:223:5)
+      at Gunzip.<anonymous> (C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141621:12)
+      at Object.onceWrapper (events.js:312:28)
+      at Gunzip.emit (events.js:228:7)
+      at endReadableNT (_stream_readable.js:1185:12)
+      at processTicksAndRejections (internal/process/task_queues.js:81:21)
 
 npm manifest: 
   {

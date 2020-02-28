@@ -7,11 +7,11 @@
 @product-content-width: 390px;
 @product-content-size: 150px;
 // @product-content-size: 64PX;
-@product-title-font: 32px;
+@product-title-font: 30px;
 @product-title-color: #525252;
 @product-price-font: 30px;
 @product-price-color: #FC4E44;
-@product-normal-color: #999999;
+@product-normal-color: #cccccc;
 
 @product-padding: 10px;
 @product-manage-padding: 25px;
@@ -27,6 +27,7 @@
     position: relative;
     .flex(center, flex-start, row);
     .padding(10px, tb);
+    .padding(10px, r);
     &-cover {
       width: @product-image-size;
       height: @product-image-size;
@@ -39,7 +40,7 @@
       }
     }
     &-detail {
-      .margin(10px, l);
+      .margin(20px, l);
       display: flex;
       flex: 1;
       min-height: 150px;
@@ -67,7 +68,7 @@
 
   &-title {
     // width: @product-content-width;
-    font-size: @product-title-font;
+    font-size: @product-title-font - 2px;
     // line-height: @product-title-font + 4px;
     color: @product-title-color;
     display: -webkit-box;
@@ -76,23 +77,29 @@
     line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    line-height: 1.2;
+    font-weight: 600;
     &-manage {
       width: 100%;
     }
   }
   
   &-price {
-    font-size: @product-price-font + 14px;
+    font-size: @product-price-font + 10px;
     color: @product-price-color;
     font-weight: bold;
     .margin(6px, r);
     &-bge {
-      font-size: @product-price-font;
       color: @product-price-color;
       font-weight: bold;
     }
+    &-unit {
+      font-size: 26px;
+      color: #cccccc;
+    }
   }
   &-normal {
+    line-height: 40px;
     font-size: @product-price-font;
     color: @product-normal-color;
   }
@@ -100,30 +107,43 @@
   &-manage {
     width: 100%;
     .padding(@product-manage-padding);
+    .padding(0px, r) !important;
     &-detail {
       display: flex;
       flex-direction: column;
     }
     &-corner {
       position: absolute;
-      right: 0px;
+      right: 14px;
       bottom: 10px;
     }
     &-font {
-      font-size: 28px;
+      font-size: 28px - 2px;
       color: @base-font-color;
+      &-title {
+        font-size:26px;
+        font-weight:bold;
+        color:rgba(77,77,77,1);
+      }
+      &-small {
+        font-size: 22px;
+        color: @base-font-color;
+      }
       &-theme {
         color: @theme-color;
       }
       &-price {
         color: @product-price-color;
       }
+      &-bor {
+        font-weight: bold;
+      }
     }
   }
 
   &-stepper {
     position: absolute;
-    right: 24rpx;
+    right: 14px;
     bottom: 0;
     &-purchase {
       bottom: 20px;
@@ -141,6 +161,9 @@
       .margin(14px, b);
     }
     &-text {
+      &-cart {
+        min-width: 50px !important;
+      }
       min-width: 60px;
       .flex(center, center);
       font-size: 30px;

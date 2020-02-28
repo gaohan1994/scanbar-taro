@@ -46,7 +46,7 @@ class HeaderInput extends Taro.Component<Props> {
               onClick={inputRightClick}  
             >
               <Image 
-                src="//net.huanmusic.com/weapp/icon_del.png" 
+                src="//net.huanmusic.com/weapp/icon_del_1.png" 
                 className={`${memberPrefix}-main-header-search-del`} 
               />
             </View>

@@ -1,11 +1,12 @@
 
 import Taro from '@tarojs/taro'; 
-import { View } from '@tarojs/components';
+import { View, Text } from '@tarojs/components';
 import "../../pages/style/member.less";
 import "../../pages/style/product.less";
 import { ViewProps } from '@tarojs/components/types/View';
 
 const cssPrefix = 'product';
+const memberPrefix = 'member'
 
 type Props = { 
   badge?: number | string;
@@ -22,13 +23,13 @@ class ButtonCostom extends Taro.Component<Props> {
     const { title, badge, onClick } = this.props;
     return (
       <View 
-        className={`${cssPrefix}-header-button`}
+        className={`${memberPrefix}-main-header-add`}
         onClick={onClick}
       >
         {badge !== undefined && badge !== 0 && (
           <View className={`${cssPrefix}-header-suspension`}>{badge}</View>
         )}
-        {title}
+        <Text className={`${memberPrefix}-main-header-add-text`}>{title}</Text>
       </View>
     );
   }
