@@ -148,9 +148,14 @@
       .padding(30px, b);
       .margin(30px, l);
       &-icon {
-        width: @order-status-icon;
-        height: @order-status-icon;
+        width:55px;
+        height:55px;
         .margin(30px, r);
+      }
+      &-title {
+        font-size:44px;
+        font-weight:800;
+        color:rgba(255,255,255,1);
       }
       &-purchase {
         width: 92px;
@@ -180,8 +185,10 @@
       }
     }
     &-cards {
-      .margin(30px, l);
-      width: 690px;
+      width: 100%;
+    }
+    &-card {
+      .padding(30px, lr);
     }
   }
 }

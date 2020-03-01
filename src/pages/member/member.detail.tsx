@@ -165,10 +165,10 @@ class MemberMain extends Taro.Component<MemberMainProps> {
                       memberPerference.map((perference) => {
                         return (
                           <View 
-                            key={perference.barcode} 
+                            key={perference.typeId} 
                             className={`${cssPrefix}-detail-row-icons`}
                           >
-                            <View  className={`${cssPrefix}-detail-row-icon`}>{perference.productName}</View>
+                            <View  className={`${cssPrefix}-detail-row-icon`}>{perference.typeName}</View>
                           </View>
                         );
                       })

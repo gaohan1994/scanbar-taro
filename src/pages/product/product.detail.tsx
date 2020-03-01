@@ -665,6 +665,8 @@ class ProductDetail extends Taro.Component<Props, State> {
       productChangeDetail
     } = this.state;
 
+    console.log('productChangeDetail.cost: ', productChangeDetail.cost);
+
     const costInputs: ModalInput[] = [
       {
         title: '进价',
@@ -675,7 +677,7 @@ class ProductDetail extends Taro.Component<Props, State> {
       },
       {
         title: '进价差额',
-        value: `${productChangeDetail.cost !== undefined && String(productChangeDetail.cost) !== '' 
+        value: `${!!productChangeDetail.cost && String(productChangeDetail.cost) !== '' 
         ? numeral(numeral(productChangeDetail.cost).value() - numeral(productDetail.cost).value() ).format('0.00')
         : ''}`,
         disabled: true,
@@ -691,7 +693,7 @@ class ProductDetail extends Taro.Component<Props, State> {
       },
       {
         title: '售价差额',
-        value: `${productChangeDetail.price !== undefined && String(productChangeDetail.price) !== '' 
+        value: `${!!productChangeDetail.price && String(productChangeDetail.price) !== '' 
         ? numeral(numeral(productChangeDetail.price).value() - numeral(productDetail.price).value()).format('0.00')
         : ''}`,
         disabled: true,
@@ -708,7 +710,7 @@ class ProductDetail extends Taro.Component<Props, State> {
       },
       {
         title: '价格差额',
-        value: `${productChangeDetail.memberPrice !== undefined && String(productChangeDetail.memberPrice) !== '' 
+        value: `${!!productChangeDetail.memberPrice && String(productChangeDetail.memberPrice) !== '' 
         ? numeral(numeral(productChangeDetail.memberPrice).value() - numeral(productDetail.memberPrice).value()).format('0.00')
         : ''}`,
         disabled: true,
@@ -725,7 +727,7 @@ class ProductDetail extends Taro.Component<Props, State> {
       },
       {
         title: '库存差额',
-        value: `${productChangeDetail.number !== undefined && String(productChangeDetail.number) !== '' 
+        value: `${!!productChangeDetail.number && String(productChangeDetail.number) !== '' 
         ? numeral(numeral(productChangeDetail.number).value() - numeral(productDetail.number).value()).format('0.00') 
         : ''}`,
         disabled: true,
@@ -742,7 +744,7 @@ class ProductDetail extends Taro.Component<Props, State> {
       },
       {
         title: '预警差额',
-        value: `${productChangeDetail.limitNum !== undefined && String(productChangeDetail.limitNum) !== '' 
+        value: `${!!productChangeDetail.limitNum && String(productChangeDetail.limitNum) !== '' 
         ? numeral(numeral(productChangeDetail.limitNum).value() - numeral(productDetail.limitNum).value()).format('0.00') 
         : ''}`,
         disabled: true,

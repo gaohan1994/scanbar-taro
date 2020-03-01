@@ -70,6 +70,7 @@ class TabsMenu extends Taro.Component<Props, State> {
                 );
               })
             }
+            {this.props.children}
           </View>
           <View 
             className={`${cssPrefix}-content-mask-touch`} 

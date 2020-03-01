@@ -627,7 +627,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     const nonBarcodeInputs: ModalInput[] = [
       {
         title: '价格',
-        main: true,
+        prefix: '￥',
         value: nonBarcodePrice,
         onInput: ({detail: {value}}) => this.onChangeValue('nonBarcodePrice', value),
         placeholder: '请输入商品价格',
@@ -691,6 +691,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
             type: "digit",
             onInput: ({detail: {value}}) => this.onChangeValue('changeSellNum', value),
             placeholder: '请输入盘点数量',
+            endfix: changeProduct && changeProduct.unit
           },
         ];
         break;
@@ -702,10 +703,12 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
             value: changeSellNum,
             placeholder: '请输入数量',
             type: "digit",
+            endfix: changeProduct && changeProduct.unit,
             onInput: ({detail: {value}}) => this.onChangeValue('changeSellNum', value)
           },
           {
             title: '价格',
+            prefix: '￥',
             value: changePrice || `0`,
             type: 'digit',
             onInput: ({detail: {value}}) => this.onChangeValue('changePrice', value)
@@ -749,15 +752,14 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       {
         title: `重量`,
         type: 'digit',
-        // focus: true,
-        main: true,
         value: weightProductSellNum,
+        endfix: changeWeightProduct && changeWeightProduct.unit,
         onInput: ({detail: {value}}) => this.onChangeValue('weightProductSellNum', value),
         placeholder: '请输入重量',
       },
       {
         title: '价格',
-        main: true,
+        prefix: '￥',
         value: weightProductChangePrice,
         onInput: ({detail: {value}}) => this.onChangeValue('weightProductChangePrice', value),
         placeholder: '请输入商品价格',

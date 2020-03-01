@@ -24,7 +24,7 @@ export declare namespace AppReducer {
   }
 }
 
-export default combineReducers({ 
+const appReducer = combineReducers({ 
   permission,
   member,
   product,
@@ -36,3 +36,13 @@ export default combineReducers({
   report,
   user
 });
+
+const rootReducer = (state, action) => {
+  if (action.type === 'USER_LOGOUT') {
+    state = undefined
+  }
+
+  return appReducer(state, action)
+}
+
+export default rootReducer;

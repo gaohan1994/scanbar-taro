@@ -200,7 +200,7 @@ class OrderMain extends Taro.Component<Props, State> {
       if (selectStatus && selectStatus.length === 1) {
         const fetchType = selectStatus[0];
         if (fetchType === 0) {
-          (payload as any).transFlags = '1, 7'
+          (payload as any).transFlags = '1,7'
         } else {
           payload.transFlag = -1
         }

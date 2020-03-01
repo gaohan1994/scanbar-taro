@@ -38,8 +38,8 @@ export declare namespace MemberInterface {
    * @interface MemberPerference
    */
   interface MemberPerference {
-    barcode: string;
-    productName: string;
+    typeId: string;
+    typeName: string;
     purchaseNum: number;
     purchaseTotalNum: number;
   }

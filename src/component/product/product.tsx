@@ -5,6 +5,7 @@ import { ProductInterface } from '../../constants';
 import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
+import PriceComponent from '../layout/price'
 import classnames from 'classnames';
 import numeral from 'numeral';
 
@@ -105,7 +106,6 @@ class ProductComponent extends Taro.Component<Props, State> {
       sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE ||
       sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_MANAGE;
 
-    const showUnitToken = !!product.unit && product.unit.length > 0;
     return (
       <View className={classnames(`${cssPrefix}-content-detail`)}>
         <View className={`${cssPrefix}-title`} >
@@ -123,7 +123,7 @@ class ProductComponent extends Taro.Component<Props, State> {
                   [`${cssPrefix}-manage-font-price`]: product.number <= 0,
                 })}
               >
-                库存：{`${product.number < 0 ? '-' : ''}${product.number || 0}${product.unit || ''}`}
+                库存：{`${product.number || 0}${product.unit || ''}`}
               </Text>
             )}
            
@@ -135,7 +135,7 @@ class ProductComponent extends Taro.Component<Props, State> {
                   [`${cssPrefix}-manage-font-price`]: product.number <= 0,
                 })}
               >
-                库存：{`${product.number < 0 ? '-' : ''}${product.number || 0}${product.unit || ''}`}
+                库存：{`${product.number || 0}${product.unit || ''}`}
               </Text>
             )
             : (
@@ -155,13 +155,9 @@ class ProductComponent extends Taro.Component<Props, State> {
             </View>
           )
           : (
-            <View className={`${cssPrefix}-normal`}>
-              <Text className={`${cssPrefix}-price-bge`}>￥</Text>
-              <Text className={`${cssPrefix}-price`}>{product.price}</Text>
-              {showUnitToken && (
-                <Text className={`${cssPrefix}-price-unit`}>{`/${product.unit}`}</Text>
-              )}
-            </View>
+            <PriceComponent
+              price={product.price}
+            />
           )}
       </View>
     );

@@ -171,23 +171,29 @@ class InventoryPurchaseDetail extends Taro.Component<Props> {
     return (
       <View className={`${cssPrefix}-detail-cards`}>
         {Form2 && (
-          <FormCard items={Form2} />
+          <View className={`${cssPrefix}-detail-card`}>
+            <FormCard items={Form2} />
+          </View>
         )}
         {Form3 && (
-          <FormCard items={Form3} >
-            {!!stockDetail.remark ? (
-              <View className={`inventory-remark`}>
-                <View  className={`inventory-remark-row`} >
-                  <Text className="inventory-remark-title">备注</Text>
+          <View className={`${cssPrefix}-detail-card`}>
+            <FormCard items={Form3} >
+              {!!stockDetail.remark ? (
+                <View className={`inventory-remark`}>
+                  <View  className={`inventory-remark-row`} >
+                    <Text className="inventory-remark-title">备注</Text>
+                  </View>
+                  <View className="inventory-remark-input inventory-remark-input-text">{stockDetail.remark}</View>
                 </View>
-                <View className="inventory-remark-input inventory-remark-input-text">{stockDetail.remark}</View>
-              </View>
-            ) : (
-              <View/>
-            )}
-          </FormCard>
+              ) : (
+                <View/>
+              )}
+            </FormCard>
+          </View>
         )}
-        {this.renderList()}
+        <View className={`${cssPrefix}-detail-card`}>
+          {this.renderList()}
+        </View>
         <View className={`${cssPrefix}-area`} />
       </View>
     );

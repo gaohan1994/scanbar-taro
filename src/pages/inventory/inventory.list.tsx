@@ -104,8 +104,17 @@ class InventoryList extends Taro.Component<Props, State> {
   }
 
   public changeSelectSupplier = (supplier: ProductInterface.ProductSupplier) => {
+    const { supplier: suppliers } = this.props;
     this.setState(prevState => {
       const prevIds = merge([], prevState.selectSupplierId);
+
+      if (prevIds.length === suppliers.length) {
+        return {
+          ...prevState,
+          selectSupplierId: [supplier.id]
+        }
+      }
+
       const index = prevIds.findIndex(p => p === supplier.id);
       if (index === -1) {
         prevIds.push(supplier.id);
@@ -314,7 +323,7 @@ class InventoryList extends Taro.Component<Props, State> {
                       key={item.id}
                       onClick={() => this.changeSelectSupplier(item)}
                       className={classnames("inventory-select-item-button", {
-                        'inventory-select-item-button-active': selectSupplierId.some((t) => t === item.id),
+                        'inventory-select-item-button-active': selectSupplierId.length !== supplier.length && selectSupplierId.some((t) => t === item.id),
                       })}
                     >
                       {item.name}

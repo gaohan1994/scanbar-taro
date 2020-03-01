@@ -143,10 +143,17 @@ class LoginManager {
   /**
    * @todo [退出登陆]
    *
+   * @time 03.01
+   * @todo 修改登录之后重置redux至初始状态
    * @memberof LoginManager
    */
   public logout = async (): Promise<ActionsInterface.ActionBase<string>> => {
     return new Promise((resolve, reject) => {
+
+      store.dispatch({
+        type: 'USER_LOGOUT'
+      })
+
       Taro
         .setStorage({ key: CentermOAuthKey, data: '' })
         .then(() => {

@@ -6,6 +6,7 @@ import merchantAction from '../../actions/merchant.action';
 import Validator from '../../common/util/validator';
 import invariant from 'invariant';
 import md5 from 'blueimp-md5';
+import Item from './component/item'
 
 const cssPrefix = 'user';
 
@@ -125,35 +126,35 @@ class UserMerchantEdit extends Taro.Component<any, State> {
     return (
       <View className="container container-color">
         <View className={`${cssPrefix}-merchant`}>
-          <View className={`${cssPrefix}-merchant-input`}>
-            <View className={`${cssPrefix}-merchant-input-title`}>旧密码</View>
-            <Input
-              value={oldPassword}
-              onInput={({ detail: { value } }) => this.onChangeValue('oldPassword', value)}
-              placeholder="请输入旧密码"
-              password={true}
-            />
-          </View>
+          <View className={`${cssPrefix}-merchant-box`}>
+            <View className={`${cssPrefix}-merchant-input`}>
+              <Input
+                value={oldPassword}
+                onInput={({ detail: { value } }) => this.onChangeValue('oldPassword', value)}
+                placeholder="请输入旧密码"
+                password={true}
+              />
+            </View>
 
-          <View className={`${cssPrefix}-merchant-input`}>
-            <View className={`${cssPrefix}-merchant-input-title`}>新密码</View>
-            <Input
-              value={newPassword}
-              onInput={({ detail: { value } }) => this.onChangeValue('newPassword', value)}
-              placeholder="请输入新密码"
-              password={true}
-            />
-          </View>
+            <View className={`${cssPrefix}-merchant-input`}>
+              <Input
+                value={newPassword}
+                onInput={({ detail: { value } }) => this.onChangeValue('newPassword', value)}
+                placeholder="请输入新密码"
+                password={true}
+              />
+            </View>
 
-          <View className={`${cssPrefix}-merchant-input`}>
-            <View className={`${cssPrefix}-merchant-input-title`}>确认密码</View>
-            <Input
-              value={newPasswordConfirm}
-              onInput={({ detail: { value } }) => this.onChangeValue('newPasswordConfirm', value)}
-              placeholder="请再次填写新密码"
-              password={true}
-            />
+            <View className={`${cssPrefix}-merchant-input ${cssPrefix}-merchant-input-nobar`}>
+              <Input
+                value={newPasswordConfirm}
+                onInput={({ detail: { value } }) => this.onChangeValue('newPasswordConfirm', value)}
+                placeholder="请再次填写新密码"
+                password={true}
+              />
+            </View>
           </View>
+          
 
           <View className={`product-add-buttons-one ${cssPrefix}-merchant-button`}>
             <AtButton

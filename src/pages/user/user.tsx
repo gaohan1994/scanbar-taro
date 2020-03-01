@@ -143,7 +143,9 @@ class UserMain extends Taro.Component<UserMainProps, UserMainState> {
                 <View className={`${cssPrefix}-user-box`}>
                   <View className={`${cssPrefix}-user-name`}>
                     {userinfo.userName}
-                    <View className={`${cssPrefix}-user-level`}>{this.getRoles()}</View>
+                    {userinfo.roleNames && (
+                      <View className={`${cssPrefix}-user-level`}>{this.getRoles()}</View>
+                    )}
                   </View>
                   <View className={`${cssPrefix}-user-text`}>{userinfo.phone}</View>
                 </View>

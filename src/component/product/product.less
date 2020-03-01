@@ -84,18 +84,44 @@
     }
   }
   
+  // &-price {
+  //   font-size: @product-price-font + 10px;
+  //   color: @product-price-color;
+  //   font-weight: bold;
+  //   .margin(6px, r);
+  //   &-bge {
+  //     color: @product-price-color;
+  //     font-weight: bold;
+  //   }
+  //   &-unit {
+  //     font-size: 26px;
+  //     color: #cccccc;
+  //   }
+  // }
   &-price {
-    font-size: @product-price-font + 10px;
+    font-size: 34px;
     color: @product-price-color;
     font-weight: bold;
     .margin(6px, r);
+    &-pre {
+      font-size:25px;
+      font-weight:500;
+      color:rgba(51,51,51,1);
+    }
     &-bge {
+      // font-size: 24px;
       color: @product-price-color;
       font-weight: bold;
     }
-    &-unit {
-      font-size: 26px;
-      color: #cccccc;
+    &-pos {
+      .margin(-4px, l)
+    }
+    &-origin {
+      .margin(9px, l);
+      font-size: 18px;
+      font-weight: 500;
+      text-decoration: line-through;
+      color:rgba(179,179,179,1);
     }
   }
   &-normal {

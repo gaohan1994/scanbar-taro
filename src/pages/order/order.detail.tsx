@@ -102,19 +102,10 @@ class OrderDetail extends Taro.Component<Props, State> {
         }
 
         {orderDetail.order && (
-          <View className={`${cssPrefix}-detail-status-detail`}>
-            <View
-              onClick={() => this.onCopy()}
-              className={`${cssPrefix}-detail-status-detail-box`}
-            >
-              <Text className={`${cssPrefix}-detail-status-result`}>{orderDetail.order.orderNo}</Text>
-              <Image
-                src="//net.huanmusic.com/weapp/icon_copy.png"
-                className={`${cssPrefix}-detail-status-copy`}
-              />
-            </View>
-            <Text className={`${cssPrefix}-detail-status-time`}>{orderDetail.order.transTime}</Text>
-            <Text className={`${cssPrefix}-detail-status-time`}>{orderDetail.order.username}</Text>
+          <View className={`${cssPrefix}-detail-status-title`}>
+            {transFlag === -1
+              ? '交易失败'
+              : '交易成功'}
           </View>
         )}
       </View>
@@ -156,6 +147,17 @@ class OrderDetail extends Taro.Component<Props, State> {
         extraText: `￥ ${numeral(orderDetail.order.totalAmount).format('0.00')}`,
         extraTextColor: '#4d4d4d'
       },
+      {
+        title: '商品优惠',
+        extraText: `-￥ ${numeral(orderDetail.order.discount).format('0.00')}`,
+        extraTextStyle: 'price',
+      },
+      {
+        title: '整单优惠',
+        extraText: `-￥ ${numeral(orderDetail.order.erase).format('0.00')}`,
+        extraTextStyle: 'price',
+        hasBorder: false
+      },
     ];
 
     /**
@@ -169,15 +171,21 @@ class OrderDetail extends Taro.Component<Props, State> {
     return (
       <View className={`${cssPrefix}-detail-cards`}>
         {Form2 && (
-          <FormCard items={Form2} />
+          <View className={`${cssPrefix}-detail-card`}>
+            <FormCard items={Form2} />
+          </View>
         )}
         {Form3 && (
-          <FormCard items={Form3} />
+          <View className={`${cssPrefix}-detail-card`}>
+            <FormCard items={Form3} />
+          </View>
         )}
         {/* {memberForm && (
           <FormCard items={memberForm} />
         )} */}
-        {this.renderList()}
+        <View className={`${cssPrefix}-detail-card container-color`}>
+          {this.renderList()}
+        </View>
         <View className={`${cssPrefix}-area`} />
       </View>
     );

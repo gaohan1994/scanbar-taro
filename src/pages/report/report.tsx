@@ -20,6 +20,7 @@ import { connect } from '@tarojs/redux';
 import { ReportInterface, ResponseCode } from '../../constants';
 import numeral from 'numeral';
 import TabsMenu from '../../component/layout/menu';
+import '../../component/layout/header.layout.less';
 import dayJs from 'dayjs';
 import { getMonthEndDate, createMonth } from '../../common/util/common';
 import classnames from 'classnames';
@@ -46,6 +47,8 @@ type State = {
   monthData: any[];
   weeksData: ReportInterface.WeekItem[];
   weekValue: number;
+  costomMinDate: string;
+  costomMaxDate: string;
 };
 
 class ReportMain extends Taro.Component<ReportMainProps, State> {
@@ -65,6 +68,8 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
       monthData: [],
       weeksData: [],
       weekValue: 0,
+      costomMinDate: ``,
+      costomMaxDate: ``,
     };
   }
 
@@ -94,7 +99,8 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
       this.setState({
         currentDate: '今日',
         monthData: cmonth.slice(0, currentMonth + 1),
-        weeksData: (weeks.data as any[]).reverse(),
+        weeksData: weeks.data,
+        weekValue: weeks.data.length - 1,
         minDate: `${dayJs().format('YYYY-MM-DD HH:mm:ss')}`,
         maxDate: `${dayJs().add(24, 'hour').format('YYYY-MM-DD HH:mm:ss')}`,
       }, () => {
@@ -111,7 +117,20 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
   }
 
   public onDatePress = (date: any) => {
-    this.setState(() => {
+    this.setState((prevState: State) => {
+
+      /**
+       * @time 03.01 增加自定义
+       */
+      if (date.title === '自定义') {
+        return {
+          ...prevState,
+          currentDate: '自定义',
+          costomMinDate: '',
+          costomMaxDate: '',
+        }
+      }
+
       let newMinDate = '';
       let newMaxDate = '';
       if (date.title === '今日') {
@@ -126,9 +145,8 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
          * @todo 加入本周数据，点击本周则自动选择当前周为起始和开始日期
          * @todo 用户点击日期弹出picker选择具体周
          */
-        const { weeksData } = this.state;
-        const currentWeek = weeksData[0];
-        console.log('currentWeek: ', currentWeek);
+        const { weeksData, weekValue } = this.state;
+        const currentWeek = weeksData[weekValue];
         newMinDate = dayJs(currentWeek.beginDateStr).format('YYYY-MM-DD HH:mm:ss');
         newMaxDate = dayJs(currentWeek.endDateStr).format('YYYY-MM-DD HH:mm:ss');
 
@@ -137,7 +155,7 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
         const year = dayJs().year();
         newMinDate = dayJs(new Date(year, month, 1)).format('YYYY-MM-DD HH:mm:ss');
         newMaxDate = dayJs(new Date(year, month, getMonthEndDate(month, year))).format('YYYY-MM-DD HH:mm:ss');
-      }
+      } 
       return {
         currentDate: date.title,
         minDate: newMinDate,
@@ -271,18 +289,52 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
   }
 
   public fetchData = () => {
-    const { minDate, maxDate, currentDate } = this.state;
-    let payload: ReportInterface.ReportBaseFetchFidle = {
-      beginDate: dayJs(minDate).format('YYYY-MM-DD 00:00:00'),
-      endDate: dayJs(maxDate).format('YYYY-MM-DD 00:00:00'),
-    };
-    if (currentDate === '本月') {
-      payload = {
+    try {
+      const { minDate, maxDate, currentDate, costomMinDate, costomMaxDate } = this.state;
+      let payload: ReportInterface.ReportBaseFetchFidle = {
         beginDate: dayJs(minDate).format('YYYY-MM-DD 00:00:00'),
-        endDate: dayJs(maxDate).add(24, 'hour').format('YYYY-MM-DD 00:00:00'),
+        endDate: dayJs(maxDate).format('YYYY-MM-DD 00:00:00'),
       };
+      if (currentDate === '本月') {
+        payload = {
+          beginDate: dayJs(minDate).format('YYYY-MM-DD 00:00:00'),
+          endDate: dayJs(maxDate).add(24, 'hour').format('YYYY-MM-DD 00:00:00'),
+        };
+      }
+      if (currentDate === '自定义') {
+        invariant(!!costomMinDate, '请选择开始日期')
+        invariant(!!costomMaxDate, '请选择结束日期')
+
+        payload = {
+          beginDate: dayJs(costomMinDate).format('YYYY-MM-DD 00:00:00'),
+          endDate: dayJs(costomMaxDate).add(24, 'hour').format('YYYY-MM-DD 00:00:00'),
+        };
+      }
+      ReportAction.reportBaseSaleInfo(payload);
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      })
     }
-    ReportAction.reportBaseSaleInfo(payload);
+  }
+
+  public onCostomMinChange = (event: any) => {
+    const { value } = event.detail;
+    this.setState({
+      costomMinDate: dayJs(value).format('YYYY-MM-DD HH:mm:ss'),
+    }, () => {
+      this.fetchData();
+    });
+  }
+
+  public onCostomMaxChange = (event: any) => {
+    const { value } = event.detail;
+    this.setState({
+      costomMaxDate: dayJs(value).format('YYYY-MM-DD HH:mm:ss'),
+    }, () => {
+      this.fetchData();
+    });
   }
 
   /**
@@ -448,20 +500,9 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
               ? this.renderCard()
               : this.renderChartCard()
           }
-          {/*this.renderCard()*/}
-          {/*this.renderChartCard()*/}
-
         </View>
         {this.renderModal()}
         {this.renderRefundModal()}
-        {/* <TabsMenu
-          current={currentReportType}
-          visible={reportVisible}
-          position="center"
-          menus={reportTypes}
-          onPress={(type) => this.onReportTypePress(type)}
-          onClose={() => this.onChangeValue('reportVisible', false)}
-        /> */}
         <TabsMenu
           current={currentDate}
           visible={dateVisible}
@@ -469,7 +510,25 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
           menus={dateData}
           onPress={(date) => this.onDatePress(date)}
           onClose={() => this.onChangeValue('dateVisible', false)}
-        />
+        >
+          <Picker
+            mode='date'
+            onChange={this.onCostomMinChange}
+            value={dayJs(this.state.costomMinDate).format('YYYY.MM.DD')}
+          >
+            <View 
+              className={classnames(`tabs-header-content-menu`, {
+                [`tabs-header-content-menu-active`]: currentDate === '自定义'
+              })}
+              onClick={() => {
+                this.onDatePress({title: '自定义'})
+                this.onChangeValue('dateVisible', false);
+              }}
+            >
+              {'自定义'}
+            </View>
+          </Picker>
+        </TabsMenu>
       </View>
     );
   }
@@ -637,7 +696,7 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
   }
 
   private renderPicker = () => {
-    const { currentDate, minDate, maxDate, monthData, weeksData, weekValue } = this.state;
+    const { currentDate, minDate, maxDate, monthData, weeksData, weekValue, costomMinDate, costomMaxDate } = this.state;
 
     const month = monthData 
       ? monthData.map((item) => item.monthStr)
@@ -649,7 +708,35 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
 
     return (
       <View className={`${cssPrefix}-time-box`}>
-        {currentDate === '今日'
+        {currentDate === '自定义' 
+          ? (
+            <View className={`${cssPrefix}-time-costom`}>
+              <Image
+                src="//net.huanmusic.com/weapp/v1/icon_rili.png"
+                className={`${cssPrefix}-time-cal`}
+              />
+              <Picker
+                mode='date'
+                onChange={this.onCostomMinChange}
+                value={dayJs(costomMinDate).format('YYYY.MM.DD')}
+              >
+                <Text className={`${cssPrefix}-time-text`}>
+                  {!!costomMinDate ? dayJs(costomMinDate).format('YYYY.MM.DD') : '开始日期'}
+                </Text>
+              </Picker>
+              -
+              <Picker
+                mode='date'
+                onChange={this.onCostomMaxChange}
+                value={dayJs(costomMaxDate).format('YYYY.MM.DD')}
+              >
+                <Text className={`${cssPrefix}-time-text`}>
+                  {!!costomMaxDate ? dayJs(costomMaxDate).format('YYYY.MM.DD') : '结束日期'}
+                </Text>
+              </Picker>
+            </View>
+          )
+          : currentDate === '今日'
           ? (
             <Picker
               mode='date'
@@ -707,33 +794,37 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
   }
 
   private renderTime = () => {
+    const { currentDate } = this.state;
     
     return (
       <View className={`${cssPrefix}-time`}>
-        <View
-          className={`${cssPrefix}-time-item`}
-          onClick={() => loginManager.checkAuth(() => {
-            this.prevDate()
-          })}
-        >
-          <Image
-            src="//net.huanmusic.com/weapp/v1/icon_time_left.png"
-            className={`${cssPrefix}-time-icon`}
-          />
-        </View>
+        {currentDate !== '自定义' && (
+          <View
+            className={`${cssPrefix}-time-item`}
+            onClick={() => loginManager.checkAuth(() => {
+              this.prevDate()
+            })}
+          >
+            <Image
+              src="//net.huanmusic.com/weapp/v1/icon_time_left.png"
+              className={`${cssPrefix}-time-icon`}
+            />
+          </View>
+        )}
         {this.renderPicker()}
-        
-        <View
-          className={`${cssPrefix}-time-item`}
-          onClick={() => loginManager.checkAuth(() => {
-            this.nextDate()
-          })}
-        >
-          <Image
-            src="//net.huanmusic.com/weapp/v1/icon_time_right.png"
-            className={`${cssPrefix}-time-icon`}
-          />
-        </View>
+        {currentDate !== '自定义' && (
+          <View
+            className={`${cssPrefix}-time-item`}
+            onClick={() => loginManager.checkAuth(() => {
+              this.nextDate()
+            })}
+          >
+            <Image
+              src="//net.huanmusic.com/weapp/v1/icon_time_right.png"
+              className={`${cssPrefix}-time-icon`}
+            />
+          </View>
+        )}
       </View>
     );
   }

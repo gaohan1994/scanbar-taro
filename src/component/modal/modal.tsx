@@ -35,6 +35,8 @@ const ModalCssPrefix = 'component-modal';
 
 export type ModalInput = {
   title: string;
+  prefix?: string;
+  endfix?: string;
   main?: boolean;
 } & Partial<InputProps>;
 
@@ -94,7 +96,7 @@ class Modal extends Taro.Component<Props, State> {
             {inputs && (
               <View>
                 {inputs.map((item) => {
-                  const { title, main } = item;
+                  const { title, main, prefix, endfix } = item;
                   return (
                     <View 
                       key={title}
@@ -111,16 +113,29 @@ class Modal extends Taro.Component<Props, State> {
                         )}
                         {title}
                       </View>
-                      <Input 
-                        value={item.value} 
-                        onInput={item.onInput}
-                        type={item.type}
-                        disabled={item.disabled}
-                        placeholder={item.placeholder}
-                        focus={item.focus}
-                        className={`${ModalCssPrefix}-content-item-input`}
-                        placeholderClass={`${ModalCssPrefix}-content-item-input-place`}
-                      />
+                      <View className={`${ModalCssPrefix}-content-item-box`} >
+                        {!!prefix && (
+                          <View className={`${ModalCssPrefix}-content-prefix`} >{prefix}</View>
+                        )}
+                        
+                        <Input 
+                          value={item.value} 
+                          onInput={item.onInput}
+                          type={item.type}
+                          disabled={item.disabled}
+                          placeholder={item.placeholder}
+                          focus={item.focus}
+                          className={classnames(`${ModalCssPrefix}-content-item-input`, {
+                            [`${ModalCssPrefix}-content-item-input-left`]: !!prefix,
+                            [`${ModalCssPrefix}-content-item-input-right`]: !!endfix,
+                          })}
+                          placeholderClass={`${ModalCssPrefix}-content-item-input-place`}
+                        />
+                        {!!endfix && (
+                          <View className={`${ModalCssPrefix}-content-endfix`} >{endfix}</View>
+                        )}
+                      </View>
+                      
                     </View>
                   );
                 })}

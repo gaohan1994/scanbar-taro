@@ -390,10 +390,10 @@ class ProductPay extends Taro.Component<Props, State> {
                     selectMember.perference.map((perference) => {
                       return (
                         <View
-                          key={perference.barcode}
+                          key={perference.typeId}
                           className={`member-detail-row-icons`}
                         >
-                          <View className={`member-detail-row-icon`}>{perference.productName}</View>
+                          <View className={`member-detail-row-icon`}>{perference.typeName}</View>
                         </View>
                       );
                     })
@@ -485,14 +485,16 @@ class ProductPay extends Taro.Component<Props, State> {
     ];
     const eraseInputs: ModalInput[] = [
       {
-        title: '应收金额(¥)',
+        title: '应收金额',
         value: receiveValue,
+        prefix: '￥',
         onInput: ({ detail: { value } }) => this.onChangeReceive('receiveValue', value),
         placeholder: `￥${this.setNumber(receivePrice)}`,
         // focus: true,
       },
       {
-        title: '整单折扣(%)',
+        title: '整单折扣',
+        endfix: '%',
         value: receiveDiscount,
         onInput: ({ detail: { value } }) => this.onChangeReceive('receiveDiscount', value),
         placeholder: '100%',
@@ -547,7 +549,7 @@ class ProductPay extends Taro.Component<Props, State> {
       {
         title: '商品优惠',
         extraText: `${productSdk.getProductsOriginPrice() - productSdk.getProductMemberPrice() !== 0
-          ? `- ￥${this.setNumber(Math.abs(productSdk.getProductsOriginPrice() - productSdk.getProductMemberPrice()))}`
+          ? `${productSdk.getProductsOriginPrice() - productSdk.getProductMemberPrice() > 0 ? '-' : '+'} ￥${this.setNumber(Math.abs(productSdk.getProductsOriginPrice() - productSdk.getProductMemberPrice()))}`
           : '￥0.00'}`,
         extraTextStyle: 'price'
       },

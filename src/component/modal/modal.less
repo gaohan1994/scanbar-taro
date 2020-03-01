@@ -49,6 +49,18 @@
       color: #777777;
       .margin(27px, b);
     }
+    &-prefix {
+      position: absolute;
+      top: 50%;
+      left: 30px;
+      transform: translateY(-50%);
+    }
+    &-endfix {
+      position: absolute;
+      top: 50%;
+      right: 30px;
+      transform: translateY(-50%);
+    }
     &-item {
       width: 100%;
       display: flex;
@@ -77,17 +89,30 @@
           font-size: 32px;
         }
       }
-      &-input {
+      &-box {
+        position: relative;
         background-color: #F8F8FA;
         border-radius: 20px;
-        // width: 360px;
         flex: 1;
         height: 74px;
+        line-height: 30px;
         font-size: 30px;
         .padding(30px, lr);
+      }
+      &-input {
+        width: 100%;
+        height: 100%;
+        font-size: 30px;
+        box-sizing: border-box;
         &-place {
           font-size: 30px;
           color: #cccccc;
+        }
+        &-left {
+          .margin(30px, l);
+        }
+        &-right {
+          .padding(30px, r);
         }
       }
     }

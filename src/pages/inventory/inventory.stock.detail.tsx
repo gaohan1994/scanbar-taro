@@ -156,10 +156,12 @@ class InventoryStockDetail extends Taro.Component<Props> {
 
     return (
       <View className={`${cssPrefix}-detail-cards`}>
-        {Form2 && (
-          <FormCard items={Form2} />
-        )}
-        {this.renderList()}
+        <View className={`${cssPrefix}-detail-card`}>
+          {Form2 && (
+            <FormCard items={Form2} />
+          )}
+          {this.renderList()}
+        </View>
         <View className={`${cssPrefix}-area`} />
       </View>
     );

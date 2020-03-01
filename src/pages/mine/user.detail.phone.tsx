@@ -3,6 +3,7 @@ import { View, Text, Input } from '@tarojs/components';
 import { AtButton } from 'taro-ui';
 import "../style/user.less";
 import merchantAction from '../../actions/merchant.action';
+import Item from './component/item'
 
 const cssPrefix = 'user';
 
@@ -62,12 +63,14 @@ class UserMerchantEdit extends Taro.Component<any, State> {
     return (
       <View className="container container-color">
         <View className={`${cssPrefix}-merchant`}>
-          <View className={`${cssPrefix}-merchant-input`}>
+          
+          <Item>
             <Input
               value={value}
+              className={`${cssPrefix}-merchant-area`}
               onInput={({detail: {value}}) => this.onChangeValue('value', value)}
             />
-          </View>
+          </Item>
           <View className={`${cssPrefix}-merchant-phone`}>
             当前手机号 {phone}
           </View>
