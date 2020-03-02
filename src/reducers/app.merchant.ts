@@ -9,6 +9,11 @@ export declare namespace MerchantReducer {
       payload: MerchantInterface.MerchantDetail;
     }
 
+    interface ReceiveMerchantSubList {
+      type: string;
+      payload: {rows: MerchantInterface.MerchantDetail[]};
+    }
+
     interface ReceiveUserProfileInfo {
       type: MerchantInterface.ReducerTypes.RECEIVE_PROFILE_INFO;
       payload: MerchantInterface.ProfileInfo;
@@ -18,20 +23,32 @@ export declare namespace MerchantReducer {
   interface State {
     merchantDetail: MerchantInterface.MerchantDetail;
     profileInfo: MerchantInterface.ProfileInfo;
+    merchantSubList: MerchantInterface.MerchantDetail[];
   }
 
   type Action = 
     Reducers.ReceiveMerchantDetail |
-    Reducers.ReceiveUserProfileInfo;
+    Reducers.ReceiveUserProfileInfo |
+    Reducers.ReceiveMerchantSubList;
 }
 
 export const initState: MerchantReducer.State = {
   merchantDetail: {} as any,
   profileInfo: {} as any,
+  merchantSubList: [],
 };
 
 export default function merchant (state: MerchantReducer.State = initState, action: MerchantReducer.Action): MerchantReducer.State {
   switch (action.type) {
+
+    case MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_SUB_LIST: {
+      const { payload } = action as MerchantReducer.Reducers.ReceiveMerchantSubList;
+      return {
+        ...state,
+        merchantSubList: payload.rows
+      };
+    }
+
     case MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_DETAIL: {
       const { payload } = action as MerchantReducer.Reducers.ReceiveMerchantDetail;
       return {
@@ -59,3 +76,5 @@ export default function merchant (state: MerchantReducer.State = initState, acti
 export const getMerchantDetail = (state: AppReducer.AppState) => state.merchant.merchantDetail;
 
 export const getProfileInfo = (state: AppReducer.AppState) => state.merchant.profileInfo;
+
+export const getMerchantSubList = (state: AppReducer.AppState) => state.merchant.merchantSubList;

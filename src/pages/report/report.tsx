@@ -25,12 +25,17 @@ import dayJs from 'dayjs';
 import { getMonthEndDate, createMonth } from '../../common/util/common';
 import classnames from 'classnames';
 import loginManager from '../../common/sdk/sign/login.manager';
-import invariant from 'invariant'
+import invariant from 'invariant';
+import merchantAction from '../../actions/merchant.action';
+import { getProfileInfo, getMerchantSubList } from '../../reducers/app.merchant';
+import { MerchantInterface } from '../../constants';
 
 const cssPrefix = 'report';
 
 interface ReportMainProps {
   reportBaseInfo: ReportInterface.ReportBaseInfo;
+  userinfo: MerchantInterface.ProfileInfo;
+  merchantSubList: MerchantInterface.MerchantDetail[];
 }
 
 type State = {
@@ -49,9 +54,21 @@ type State = {
   weekValue: number;
   costomMinDate: string;
   costomMaxDate: string;
+  currentMerchant?: MerchantInterface.MerchantDetail;
 };
 
 class ReportMain extends Taro.Component<ReportMainProps, State> {
+  /**
+   * 指定config的类型声明为: Taro.Config
+   *
+   * 由于 typescript 对于 object 类型推导只能推出 Key 的基本类型
+   * 对于像 navigationBarTextStyle: 'black' 这样的推导出的类型是 string
+   * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
+   */
+  config: Taro.Config = {
+    navigationBarTitleText: '数据'
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -70,20 +87,9 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
       weekValue: 0,
       costomMinDate: ``,
       costomMaxDate: ``,
+      currentMerchant: undefined,
     };
   }
-
-  
-  /**
-   * 指定config的类型声明为: Taro.Config
-   *
-   * 由于 typescript 对于 object 类型推导只能推出 Key 的基本类型
-   * 对于像 navigationBarTextStyle: 'black' 这样的推导出的类型是 string
-   * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
-   */
-  config: Taro.Config = {
-    navigationBarTitleText: '数据'
-  };
 
   componentDidShow() {
     this.init();
@@ -91,29 +97,50 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
 
   public init = async () => {
     try {
-      Taro.showLoading()
+      Taro.showLoading();
       const currentMonth = dayJs().month();
       const cmonth = createMonth(2020);
       const weeks = await ReportAction.reportWeekData();
-      invariant(weeks.code === ResponseCode.success, weeks.msg || ' ')
+      invariant(weeks.code === ResponseCode.success, weeks.msg || ' ');
       this.setState({
         currentDate: '今日',
         monthData: cmonth.slice(0, currentMonth + 1),
         weeksData: weeks.data,
         weekValue: weeks.data.length - 1,
         minDate: `${dayJs().format('YYYY-MM-DD HH:mm:ss')}`,
-        maxDate: `${dayJs().add(24, 'hour').format('YYYY-MM-DD HH:mm:ss')}`,
+        maxDate: `${dayJs().format('YYYY-MM-DD HH:mm:ss')}`,
       }, () => {
         this.fetchData();
       });
-      Taro.hideLoading()
+      Taro.hideLoading();
+
+      /**
+       * @time 03.02
+       * @todo 如果是总店店员那么加入
+       */
+      const result = await merchantAction.profileInfo();
+      invariant(result.code === ResponseCode.success, result.msg || ' ');
+      if (result.data.roleNames === '总店管理员') {
+        merchantAction.merchantSubList();
+      }
+
     } catch (error) {
-      Taro.hideLoading()
+      Taro.hideLoading();
       Taro.showToast({
         title: error.message,
         icon: 'none'
-      })
+      });
     }
+  }
+
+  /**
+   * @todo 总店管理员可以查看分店
+   */
+  public onMerchantPress = (merchant: MerchantInterface.MerchantDetail) => {
+    console.log('merchant', merchant);
+    this.setState({currentMerchant: merchant}, () => {
+      this.fetchData();
+    });
   }
 
   public onDatePress = (date: any) => {
@@ -138,7 +165,7 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
          * @todo 当min和max为同一天时返回空数据
          */
         newMinDate = dayJs().format('YYYY-MM-DD HH:mm:ss');
-        newMaxDate = dayJs().add(1, 'day').format('YYYY-MM-DD HH:mm:ss');
+        newMaxDate = dayJs().format('YYYY-MM-DD HH:mm:ss');
       } else if (date.title === '本周') {
         /**
          * @time 02.29
@@ -290,15 +317,15 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
 
   public fetchData = () => {
     try {
-      const { minDate, maxDate, currentDate, costomMinDate, costomMaxDate } = this.state;
+      const { minDate, maxDate, currentDate, costomMinDate, costomMaxDate, currentMerchant } = this.state;
       let payload: ReportInterface.ReportBaseFetchFidle = {
         beginDate: dayJs(minDate).format('YYYY-MM-DD 00:00:00'),
-        endDate: dayJs(maxDate).format('YYYY-MM-DD 00:00:00'),
+        endDate: dayJs(maxDate).format('YYYY-MM-DD 23:59:59'),
       };
       if (currentDate === '本月') {
         payload = {
           beginDate: dayJs(minDate).format('YYYY-MM-DD 00:00:00'),
-          endDate: dayJs(maxDate).add(24, 'hour').format('YYYY-MM-DD 00:00:00'),
+          endDate: dayJs(maxDate).format('YYYY-MM-DD 23:59:59'),
         };
       }
       if (currentDate === '自定义') {
@@ -307,15 +334,23 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
 
         payload = {
           beginDate: dayJs(costomMinDate).format('YYYY-MM-DD 00:00:00'),
-          endDate: dayJs(costomMaxDate).add(24, 'hour').format('YYYY-MM-DD 00:00:00'),
+          endDate: dayJs(costomMaxDate).format('YYYY-MM-DD 23:59:59'),
         };
       }
+
+      /**
+       * @todo 加入总店管理员可以查看分店
+       */
+      if (!!currentMerchant && currentMerchant.id) {
+        payload.merchantId = currentMerchant.id;
+      }
+
       ReportAction.reportBaseSaleInfo(payload);
     } catch (error) {
       Taro.showToast({
         title: error.message,
         icon: 'none'
-      })
+      });
     }
   }
 
@@ -357,7 +392,7 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
       }
       this.setState({
         minDate: dayJs(value).format('YYYY-MM-DD HH:mm:ss'),
-        maxDate: dayJs(value).add(24, 'hour').format('YYYY-MM-DD HH:mm:ss'),
+        maxDate: dayJs(value).format('YYYY-MM-DD 23:59:59'),
       }, () => {
         this.fetchData();
       });
@@ -430,7 +465,8 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
   }
 
   render() {
-    const { dateVisible, currentDate, currentReportType, reportVisible } = this.state;
+    const { userinfo, merchantSubList } = this.props;
+    const { dateVisible, currentDate, currentReportType, merchantVisible } = this.state;
 
     const tabs = [
       {
@@ -452,6 +488,24 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
         more: true,
       }
     ];
+
+    /**
+     * @todo 加入管理员可以查看门店列表
+     */
+    if (userinfo.roleNames === '总店管理员') {
+      tabs[0].title = '门店';
+      tabs[0].more = true;
+    }
+
+    const merchantListData = merchantSubList && merchantSubList.length > 0
+      ? merchantSubList.map((item) => {
+        return {
+          ...item,
+          title: item.name
+        };
+      })
+      : [];
+
     const dateData = [
       {
         title: '今日',
@@ -503,6 +557,14 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
         </View>
         {this.renderModal()}
         {this.renderRefundModal()}
+        <TabsMenu
+          current={currentDate}
+          visible={merchantVisible}
+          position='left'
+          menus={merchantListData}
+          onPress={(item) => this.onMerchantPress(item)}
+          onClose={() => this.onChangeValue('merchantVisible', false)}
+        />
         <TabsMenu
           current={currentDate}
           visible={dateVisible}
@@ -910,9 +972,7 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
 
   private renderTab = (tab: any) => {
     return (
-      <View
-        className={`${cssPrefix}-tab`}
-      >
+      <View className={`${cssPrefix}-tab`} >
         {
           tab.emphasis
             ? <Text className={`${cssPrefix}-tab-text-emphasis`}>{tab.title}</Text>
@@ -969,6 +1029,8 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
 
 const select = (state: AppReducer.AppState) => ({
   reportBaseInfo: getReportBaseInfo(state),
+  userinfo: getProfileInfo(state),
+  merchantSubList: getMerchantSubList(state),
 });
 
 export default connect(select)(ReportMain);

@@ -56,7 +56,8 @@ export declare namespace MerchantInterface {
     reducerInterface: {
       RECEIVE_MERCHANT_DETAIL: ReducerTypes.RECEIVE_MERCHANT_DETAIL;
       RECEIVE_PROFILE_INFO: ReducerTypes.RECEIVE_PROFILE_INFO;
-      RECEIVE_USER_INFO: ReducerTypes.RECEIVE_USER_INFO
+      RECEIVE_USER_INFO: ReducerTypes.RECEIVE_USER_INFO;
+      RECEIVE_MERCHANT_SUB_LIST: string;
     };
     
     merchantInfoAdd: string;
@@ -72,6 +73,7 @@ class MerchantInterfaceMap implements MerchantInterface.MerchantInterfaceMap {
     RECEIVE_MERCHANT_DETAIL: 'RECEIVE_MERCHANT_DETAIL',
     RECEIVE_PROFILE_INFO: 'RECEIVE_PROFILE_INFO',
     RECEIVE_USER_INFO: 'RECEIVE_USER_INFO',
+    RECEIVE_MERCHANT_SUB_LIST: 'RECEIVE_MERCHANT_SUB_LIST',
   };
   public merchantInfoAdd = '/merchantInfo/add';
   public merchantInfoDetail = '/merchantInfo/detail';

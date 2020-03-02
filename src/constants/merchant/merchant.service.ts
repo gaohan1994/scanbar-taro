@@ -18,6 +18,11 @@ import MerchantInterfaceMap, { MerchantInterface } from "./merchant";
 
 class MerchantService {
 
+  public merchantSubList = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.get(`/merchantInfo/listSubMerchant`);
+    return result;
+  }
+
   public merchantInfoDetail = async (): Promise<HTTPInterface.ResponseResultBase<MerchantInterface.MerchantDetail>> => {
     const result = await requestHttp.get(`${MerchantInterfaceMap.merchantInfoDetail}`);
     return result;

@@ -4,6 +4,17 @@ import { store } from '../app';
 
 class MerchantAction {
 
+  public merchantSubList = async () => {
+    const result = await MerchantService.merchantSubList();
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_SUB_LIST,
+        payload: result.data
+      });
+    }
+    return result;
+  }
+
   public merchantDetail = async () => {
     const result = await MerchantService.merchantInfoDetail();
     if (result.code === ResponseCode.success) {
