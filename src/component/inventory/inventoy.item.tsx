@@ -90,7 +90,7 @@ class InventoryItem extends Taro.Component<Props> {
 
         {!!inventory.remark && (
           <View className={`${cssPrefix}-remark`}>
-            <View className={`${cssPrefix}-remark-text`}>{inventory.remark}</View>
+            <View className={`${cssPrefix}-remark-text`}>备注：{inventory.remark}</View>
           </View>
         )}
       </View>

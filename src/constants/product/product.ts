@@ -13,6 +13,16 @@ import { HTTPInterface } from '..';
 
 export declare namespace ProductInterface {
 
+  interface ProductActivity {
+    discountAmount: number;
+    discountPrice: number;
+    limitNum: number;
+    type: number;
+    giftFlag: boolean;
+    name: string;
+    rule: string;
+  }
+
   /**
    * 
    * @param {cost} 进货价
@@ -35,6 +45,7 @@ export declare namespace ProductInterface {
    */
   interface ProductInfo {
     id: number;
+    activityInfos: ProductActivity[]; // 活动信息
     cost: number;         // 进货价
     avgCost: number;      // 平均进货价
     limitNum: number;     // 库存下限预警

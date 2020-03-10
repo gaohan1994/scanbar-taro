@@ -23,14 +23,6 @@ class ReportService {
     return result;
   }
 
-  public reportList = async (params: ReportInterface.ReportListFetchField): Promise<HTTPInterface.ResponseResultBase<any>> => {
-    const result = await requestHttp.get(`${ReportInterfaceMap.reportList}${jsonToQueryString(params)}`);
-    return result;
-  }
-  public reportProductRank = async (params: ReportInterface.ReportRankFetchField): Promise<HTTPInterface.ResponseResultBase<any>> => {
-    const result = await requestHttp.get(`${ReportInterfaceMap.reportProductRank}${jsonToQueryString(params)}`);
-    return result;
-  }
   public reportBaseSaleInfo = async (params?: ReportInterface.ReportBaseFetchFidle): Promise<HTTPInterface.ResponseResultBase<any>> => {
     const result = await requestHttp.get(`${ReportInterfaceMap.reportBaseSaleInfo}${jsonToQueryString(params)}`);
     return result;

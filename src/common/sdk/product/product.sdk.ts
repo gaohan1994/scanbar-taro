@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-02-25 11:08:56
+ * @Last Modified time: 2020-03-03 14:30:01
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -70,6 +70,7 @@ export declare namespace ProductCartInterface {
   }
 
   interface ProductInfoPayload {
+    priceChangeFlag: boolean;
     activities: Array<Partial<ProductOrderActivity>>;
     barcode: string;
     brand: string;
@@ -315,14 +316,57 @@ class ProductSDK {
   }
 
   /**
-   * @todo [拿到单个商品的价格，有改价返回改价，有会员价返回会员价，没有就原价]
+   * @time 03.02
+   * @todo [拿到单个商品的价格，改价>活动价=会员价>原价]
    */
-  public getProductItemPrice = (product: ProductCartInterface.ProductCartInfo) => {
+  public getProductItemPriceType = (product: ProductCartInterface.ProductCartInfo, member?: MemberInterface.MemberInfo) => {
+    if (product.changePrice !== undefined) {
+      return '改价'
+    }
+
+    if (!!member || !!this.member) {
+      if (product.activityInfos && product.activityInfos.length > 0) {
+        const activity = product.activityInfos.find(a => a.type === 2);
+        if (activity && activity.discountPrice < product.memberPrice) {
+          return '活动价'
+        }
+      }
+      return '会员价'
+    }
+
+    if (product.activityInfos && product.activityInfos.length > 0) {
+      const activity = product.activityInfos.find(a => a.type === 2);
+      if (!!activity) {
+        return '活动价'
+      }
+    }
+    return '原价'
+  }
+
+  /**
+   * @time 03.02
+   * @todo [拿到单个商品的价格，改价>活动价=会员价>原价]
+   */
+  public getProductItemPrice = (product: ProductCartInterface.ProductCartInfo, member?: MemberInterface.MemberInfo) => {
     if (product.changePrice !== undefined) {
       return product.changePrice;
     }
-    if (this.member !== undefined) {
+
+    if (!!member || !!this.member) {
+      if (product.activityInfos && product.activityInfos.length > 0) {
+        const activity = product.activityInfos.find(a => a.type === 2);
+        if (activity && activity.discountPrice < product.memberPrice) {
+          return activity.discountPrice;
+        }
+      }
       return product.memberPrice || product.price;
+    }
+
+    if (product.activityInfos && product.activityInfos.length > 0) {
+      const activity = product.activityInfos.find(a => a.type === 2);
+      if (!!activity) {
+        return activity.discountPrice;
+      }
     }
     return product.price;
   }
@@ -382,11 +426,14 @@ class ProductSDK {
         return prevTotal + (item.changePrice * item.sellNum); 
       }
       /**
-       * @todo [如果没有改价，但是是进货则返回进价]
+       * @todo [如果是进货，则用进价]
        */
       if (key === 'productPurchaseList') {
         return prevTotal + (item.cost * item.sellNum);
       }
+      /**
+       * @todo [如果没有改价，但是是进货则返回进价]
+       */
       return prevTotal + (item.price * item.sellNum);
     };
     const total = productList.reduce(reduceCallback, 0);
@@ -398,36 +445,27 @@ class ProductSDK {
    *
    * @memberof ProductSDK
    */
-  public getProductMemberPrice = (products?: ProductCartInterface.ProductCartInfo[], force?: boolean): number => {
-    const hasMember = force ? force : this.member !== undefined;
-    if (hasMember) {
-      const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
-      const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => {
+  public getProductMemberPrice = (products?: ProductCartInterface.ProductCartInfo[]): number => {
+    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+    const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => {
+      const itemPrice = this.getProductItemPrice(item);
+      // /**
+      //  * @todo 如果有改价价格，则计算改价价格
+      //  */
+      // if (item.changePrice !== undefined) {
+      //   return prevTotal + (item.changePrice * item.sellNum); 
+      // }
 
-        /**
-         * @todo 如果有改价价格，则计算改价价格
-         */
-        if (item.changePrice !== undefined) {
-          return prevTotal + (item.changePrice * item.sellNum); 
-        }
-
-        return prevTotal + (item.memberPrice * item.sellNum);
-      };
-      const total = productList.reduce(reduceCallback, 0);
-      cu.console('getProductMemberPrice', total);
-      return total;
-    } else {
-      cu.console('getProductMemberPrice', this.getProductPrice());
-      return this.getProductPrice();
-    }
+      return prevTotal + (itemPrice * item.sellNum);
+    };
+    const total = productList.reduce(reduceCallback, 0);
+    return total;
   }
 
   /**
    * @todo 计算交易价格
    * 
    * ```ts
-   * import productSdk from 'xxx';
-import { ConsoleUtil } from '../../util/common';
    * 
    * const total = productSdk
    * .setErase(1)
@@ -480,12 +518,9 @@ import { ConsoleUtil } from '../../util/common';
       productInfoList: productList.map((item) => {
         if (!this.isNonBarcodeProduct(item)) {
           // 如果是称重商品和普通商品，则 改价价格 > 会员价格 > 普通价格
-          const itemPrice: number = item.changePrice !== undefined
-            ? numeral(item.changePrice).value()
-            : this.member !== undefined 
-              ? item.memberPrice
-              : item.price;
+          const itemPrice: number = this.getProductItemPrice(item);
           return {
+            priceChangeFlag: !!item.changePrice,
             activities: [],
             barcode: item.barcode,
             brand: item.brand,

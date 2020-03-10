@@ -10,6 +10,7 @@ import numeral from 'numeral';
 import { SelectMember } from '../../pages/product/product.pay';
 import { InventoryInterface } from '../../constants';
 import { isInventoryProduct } from '../../constants/inventory/inventory';
+import PayPriceComponent from './component/price';
 
 const cssPrefix = 'product';
 
@@ -158,58 +159,16 @@ class ProductPayListView extends Taro.Component<Props> {
     );
   }
 
-  private setNumber = (num: number | string): string => {
-    return numeral(num).format('0.00');
-  }
-
   private renderProductDetail = (item: ProductCartInterface.ProductCartInfo) => {
     const { selectMember, sort } = this.props;
     // 如果称重商品有改价 则优先计算改价，如果没有优先计算会员价
-    const itemPrice: number = item.changePrice !== undefined
-      ? numeral(item.changePrice).value()
-      : selectMember !== undefined 
-        ? item.memberPrice
-        : item.price;
-
     return (
-      <View className={`${cssPrefix}-row-content-item ${cssPrefix}-row-content-top`}>
-        {sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE ? (
-          <Text className={`${cssPrefix}-row-normal`}>{`￥ ${this.setNumber(itemPrice)}`}</Text>
-        )
-        : sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND ? (
-          numeral(itemPrice).value() !== numeral(item.price).value() ? (
-            <View className={`${cssPrefix}-row-content-items`}>
-              <Text className={`${cssPrefix}-row-normal ${cssPrefix}-row-line`}>{`￥ ${this.setNumber(item.price)}`}</Text>
-              <View className={`${cssPrefix}-row-icon ${cssPrefix}-row-icon-refund`}>退货价</View>
-              <Text className={`${cssPrefix}-row-normal`}>{`￥ ${numeral(item.changePrice).format('0.00')}`}</Text>
-            </View>
-          ) : (
-            <Text className={`${cssPrefix}-row-normal`}>{`￥ ${this.setNumber(itemPrice)}`}</Text>
-          )
-        ) : (
-          item.changePrice !== undefined && item.changePrice !== item.price ? (
-            /**
-             * @todo 2.26修改 当改价和员价相同时不显示改价图标
-             */
-            <View className={`${cssPrefix}-row-content-items`}>
-              <Text className={`${cssPrefix}-row-normal ${cssPrefix}-row-line`}>{`￥ ${this.setNumber(item.price)}`}</Text>
-              <View className={`${cssPrefix}-row-icon ${cssPrefix}-row-icon-member`}>改价</View>
-              <Text className={`${cssPrefix}-row-normal`}>{`￥ ${numeral(item.changePrice).format('0.00')}`}</Text>
-            </View>
-          ) : selectMember !== undefined ? (
-            <View className={`${cssPrefix}-row-content-items`}>
-              <Text className={`${cssPrefix}-row-normal ${cssPrefix}-row-line`}>{`￥ ${this.setNumber(item.price)}`}</Text>
-              <View className={`${cssPrefix}-row-icon ${cssPrefix}-row-icon-member`}>会员价</View>
-              <Text className={`${cssPrefix}-row-normal`}>{`￥ ${this.setNumber(item.memberPrice)}`}</Text>
-            </View>
-          ) : (
-            <Text className={`${cssPrefix}-row-normal`}>{`￥ ${this.setNumber(item.price)}`}</Text>
-          )
-        )}
-        <Text className={`${cssPrefix}-row-normal ${cssPrefix}-row-bold`}>
-          {`小计：￥ ${this.setNumber(itemPrice * item.sellNum)}`}
-        </Text>
-      </View>
+      <PayPriceComponent
+        sort={sort}
+        product={item}
+        selectMember={selectMember}
+        numeral={numeral}
+      />
     );
   }
 }

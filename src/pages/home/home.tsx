@@ -9,7 +9,6 @@ import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
 import { getReportTodayData } from '../../reducers/app.report';
 import { ReportInterface, MerchantInterface } from '../../constants';
-import numeral from 'numeral';
 import { getProfileInfo } from '../../reducers/app.merchant';
 import merchantAction from '../../actions/merchant.action';
 import { ResponseCode } from '../../constants/index';
@@ -110,9 +109,6 @@ class Home extends Component<Props, State> {
         title: error.message,
         icon: 'none',
         duration: 500,
-        // success: () => {
-        //   Taro.navigateTo({ url: '/pages/sign/login' });
-        // }
       });
     }
   }
@@ -208,7 +204,7 @@ class Home extends Component<Props, State> {
                     src="//net.huanmusic.com/weapp/v1/icon_home_into.png"
                   />
                 </View>
-                <View className="home-money">{numeral(reportTodayData.todaySales).format('0.00')}</View>
+                <View className="home-money">{reportTodayData.todaySales}</View>
               </View>
               <View
                 className="home-buttons-button home-buttons-button-end"

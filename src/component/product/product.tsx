@@ -5,7 +5,8 @@ import { ProductInterface } from '../../constants';
 import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
-import PriceComponent from '../layout/price'
+import PriceComponent from '../layout/price';
+import AcitivityComponent from '../layout/activity';
 import classnames from 'classnames';
 import numeral from 'numeral';
 
@@ -111,6 +112,7 @@ class ProductComponent extends Taro.Component<Props, State> {
         <View className={`${cssPrefix}-title`} >
           {product.name}
         </View>
+        <AcitivityComponent product={product} />
         {showManageDetailToken
         ? (
           <View className={classnames(`${cssPrefix}-content-detail-box`)}>
@@ -139,7 +141,7 @@ class ProductComponent extends Taro.Component<Props, State> {
               </Text>
             )
             : (
-              <Text className={`${cssPrefix}-manage-font-small`}>
+              <Text className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-bor`}>
                 售价: ￥{product.price}
               </Text>
             )}
@@ -156,7 +158,9 @@ class ProductComponent extends Taro.Component<Props, State> {
           )
           : (
             <PriceComponent
-              price={product.price}
+              product={product}
+              numeral={numeral}
+              // price={product.price}
             />
           )}
       </View>
@@ -169,7 +173,7 @@ class ProductComponent extends Taro.Component<Props, State> {
     if (sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_MANAGE) {
       return (
         <View className={`${cssPrefix}-manage-corner`}>
-          <Text className={`${cssPrefix}-manage-font-small`}>进价: {numeral(product.cost).format('0.00')}</Text>
+          <Text className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-bor`}>进价: ￥{numeral(product.cost).format('0.00')}</Text>
         </View>
       );
     }

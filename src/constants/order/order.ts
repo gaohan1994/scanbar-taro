@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-02-25 11:13:10
+ * @Last Modified time: 2020-03-10 09:46:11
  * 
  * @todo [商品相关的类型定义]
  */
@@ -13,12 +13,34 @@ import { HTTPInterface } from '..';
 
 export declare namespace OrderInterface {
 
+  interface RefundByOrderPayloadOrder {
+    orderNo: string;
+    terminalCd: string;
+    terminalSn: string;
+    orderSource: number;
+    payType: number;
+    transAmount: number;
+  }
+  interface RefundByOrderItem {
+    isDamaged: boolean;
+    priceChangeFlag: boolean;
+    remark: string;
+    changeNumber: number;
+    orderDetailId: number;
+    unitPrice: number;
+  }
+  interface RefundByOrderPayload {
+    order: RefundByOrderPayloadOrder;
+    productInfoList: RefundByOrderItem[];
+  }
+
   interface OrderDetailItem {
     costAmount: number;
     discountAmount: number;
     discountType: number;
     merchantId: number;
     num: number;
+    picUrl: string;
     productId: number;
     profit: number;
     totalAmount: number;
@@ -59,6 +81,7 @@ export declare namespace OrderInterface {
 
   interface OrderDetail {
     order: OrderInfo;
+    orderNo: string;
     orderDetailList?: Array<OrderDetailItem>;
   }
 

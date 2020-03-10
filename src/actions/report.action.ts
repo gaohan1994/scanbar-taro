@@ -9,21 +9,6 @@ class MerchantAction {
     const result = await ReportService.reportWeeksData();
     return result;
   }
-  public reportList = async (params: ReportInterface.ReportListFetchField) => {
-    const result = await ReportService.reportList(params);
-    if (result.code === ResponseCode.success) {
-      console.log('success');
-    }
-    return result;
-  }
-
-  public reportProductRank = async (params: ReportInterface.ReportRankFetchField) => {
-    const result = await ReportService.reportProductRank(params);
-    if (result.code === ResponseCode.success) {
-      console.log('success');
-    }
-    return result;
-  }
 
   public reportBaseSaleInfo = async (params?: ReportInterface.ReportBaseFetchFidle) => {
     const result = await ReportService.reportBaseSaleInfo(params);

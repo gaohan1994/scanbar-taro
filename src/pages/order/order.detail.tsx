@@ -13,6 +13,8 @@ import FormCard from '../../component/card/form.card';
 import numeral from 'numeral';
 import ProductPayListView from '../../component/product/product.pay.listview';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
+import ButtonFooter from '../../component/button/button.footer';
+
 const cssPrefix = 'order';
 
 type Props = {
@@ -27,7 +29,7 @@ class OrderDetail extends Taro.Component<Props, State> {
     navigationBarTitleText: '订单详情'
   };
 
-  componentWillMount() {
+  componentDidShow() {
     try {
       const { params: { id } } = this.$router;
       invariant(!!id, '请传入订单id');
@@ -66,6 +68,18 @@ class OrderDetail extends Taro.Component<Props, State> {
     }
   }
 
+  public onRefund = async () => {
+    try {
+      Taro.navigateTo({
+        url: `/pages/order/order.refund`
+      });
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
 
   render() {
     return (
@@ -187,6 +201,13 @@ class OrderDetail extends Taro.Component<Props, State> {
           {this.renderList()}
         </View>
         <View className={`${cssPrefix}-area`} />
+
+        <ButtonFooter
+          buttons={[{
+            title: '退货',
+            onPress: () => this.onRefund()
+          }]}
+        />
       </View>
     );
   }

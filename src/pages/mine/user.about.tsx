@@ -1,8 +1,8 @@
 /*
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-13 09:33:49
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-03-02 11:26:13
  */
 import Taro, { Config } from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
@@ -25,7 +25,7 @@ class UserAbount extends Taro.Component<Props> {
       <View className="container">
         <View className={`${cssPrefix}-about-box`}>
           <Image 
-            src="//net.huanmusic.com/weapp/pic_logo.png" 
+            src="//net.huanmusic.com/weapp/v2/logo.png" 
             className={`${cssPrefix}-about-box-img`}
           />
           <Text className={`${cssPrefix}-about-box-title`}>千阳</Text>

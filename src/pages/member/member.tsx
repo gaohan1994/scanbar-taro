@@ -405,10 +405,10 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
                       <Text className={`${cssPrefix}-card-price`}>{`￥${numeral(member.totalAmount).format('0.00')}`}</Text>
                     )}
                     {memberQuery === 'create_time' && (
-                      <Text className={`${cssPrefix}-card-price`}>{dayjs(member.createTime).format('YYYY/MM/DD HH:mm')}</Text>
+                      <Text className={`${cssPrefix}-card-price`}>{dayjs(member.createTime).format('  YY/MM/DD HH:mm')}</Text>
                     )}
                     {memberQuery === 'last_pay_time' && (
-                      <Text className={`${cssPrefix}-card-price`}>{dayjs(member.lastPayTime).format('YYYY/MM/DD HH:mm')}</Text>
+                      <Text className={`${cssPrefix}-card-price`}>{dayjs(member.lastPayTime).format('  YY/MM/DD HH:mm')}</Text>
                     )}
                   </View>
                 );

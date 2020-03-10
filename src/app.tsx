@@ -1,8 +1,9 @@
 import '@tarojs/async-await';
 import Taro, { Component, Config } from '@tarojs/taro';
 import { Provider } from '@tarojs/redux';
-import Home from './pages/home/home';
+// import Home from './pages/home/home';
 import configStore from './store';
+import { View } from '@tarojs/components';
 import 'taro-ui/dist/style/index.scss';
 // import './styles/style/index.sass';
 import "./styles/reset.less";
@@ -77,6 +78,7 @@ class App extends Component {
         pages: [
           'order.main',
           'order.detail',
+          'order.refund',
         ],
       },
       {
@@ -133,24 +135,6 @@ class App extends Component {
           'product.refund',
           'product.refund.pay',
         ],
-      },
-      {
-        /**
-         * @todo [测试页面]
-         */
-        root: 'pages/test/',
-        pages: [
-          'test',
-          'test.date.picker',
-          'test.notice',
-          'test.accordion',
-          'test.control',
-          'test.listview',
-          'test.cart',
-          'test.modal',
-          'test.form',
-          'test.echarts',
-        ],
       }
     ], 
     window: {
@@ -190,7 +174,8 @@ class App extends Component {
   render () {
     return (
       <Provider store={store}>
-        <Home />
+        {/* <Home /> */}
+        <View />
       </Provider>
     );
   }

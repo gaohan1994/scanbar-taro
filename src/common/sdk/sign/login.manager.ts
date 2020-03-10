@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-08 17:10:29 
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-17 16:40:46
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-03-03 11:40:07
  */
 
 import Taro from '@tarojs/taro';
@@ -191,38 +191,6 @@ class LoginManager {
     });
   }
 
-  public setUserInfo = async (params: any, isMerchant: boolean) => {
-    const res = await this.getUserInfo();
-    let userinfo = {};
-    if (isMerchant) {
-      userinfo = {...res.result, merchantInfoDTO: {...res.result.merchantInfoDTO, ...params}};
-    } else {
-      userinfo = {...res.result, ...params};
-    }
-    console.log('test hhh', userinfo);
-    
-    store.dispatch({
-      type: MerchantInterfaceMap.reducerInterface.RECEIVE_USER_INFO,
-      payload: {data: userinfo}
-    });
-    if (res.success) {
-      return new Promise((resolve, reject) => {
-        Taro
-          .setStorage({ key: CentermOAuthKey, data: JSON.stringify(userinfo) })
-          .then(() => {
-            resolve({ success: true, result: '' });
-          })
-          .catch(error => {
-            reject({ success: false, result: error.message });
-          });
-      });
-    } else {
-      return {
-        success: false, result: '获取用户信息失败'
-      };
-    }
-  }
-
   public getUserToken = (): ActionsInterface.ActionBase<string> => {
     const userinfo = Taro.getStorageSync(CentermOAuthKey);
     if (userinfo) {
@@ -230,25 +198,6 @@ class LoginManager {
     } else {
       return { success: false, result: '' };
     }
-  }
-
-  /**
-   * @todo [获取用户权限]
-   *
-   * @memberof LoginManager
-   */
-  public getUserPermissions = async (): Promise<Array<any>> => {
-    return [];
-  }
-
-  /**
-   * @todo [校验用户是否开放权限]
-   *
-   * @memberof LoginManager
-   */
-  public checkUserPermissions = async (permissions: Array<string>): Promise<LoginInterface.CheckPermissionsResult> => {
-    // console.log('permissions: ', permissions);
-    return { success: true, grantedPermissions: [], declinedPermissions: [] };
   }
 }
 

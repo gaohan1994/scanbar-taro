@@ -1,8 +1,8 @@
 /*
  * @Author: Ghan 
  * @Date: 2019-11-01 10:07:05 
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-21 14:40:52
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-03-03 11:45:17
  */
 import Taro, { Config } from '@tarojs/taro';
 import { View, Image, Text, Input } from '@tarojs/components';
@@ -11,7 +11,6 @@ import classnames from 'classnames';
 import { AtButton } from 'taro-ui';
 import { LoginManager } from '../../common/sdk';
 import invariant from 'invariant';
-import NavBar from '../../component/navbar/navbar';
 
 const cssPrefix = 'sign';
 
@@ -100,7 +99,6 @@ class Login extends Taro.Component<Props, State> {
     const { username, password } = this.state;
     return (
       <View className={classnames(['container', 'sign'])} >
-        {/* <NavBar title="登录"/> */}
         <View className="sign-card">
           <View className="sign-card-title">欢迎使用千阳零售</View>
           <View className="sign-card-input">

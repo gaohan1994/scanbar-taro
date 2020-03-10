@@ -130,11 +130,9 @@ export declare namespace ReportInterface {
     reducerInterface: {
       RECEIVE_REPORT_BASE_INFO: ReducerTypes.RECEIVE_REPORT_BASE_INFO;
       RECEIVE_REPORT_LIST: ReducerTypes.RECEIVE_REPORT_LIST;
-      RECEIVE_REPORT_RANK: ReducerTypes.RECEIVE_REPORT_RANK;
       RECEIVE_REPORT_TODAY_SALES: ReducerTypes.RECEIVE_REPORT_TODAY_SALES;
     };
     reportList: string;
-    reportProductRank: string;
     reportBaseSaleInfo: string;
   }
 }
@@ -143,12 +141,10 @@ class ReportInterfaceMap implements ReportInterface.ReportInterfaceMap {
   public reducerInterface = {
     RECEIVE_REPORT_BASE_INFO: 'RECEIVE_REPORT_BASE_INFO',
     RECEIVE_REPORT_LIST: 'RECEIVE_REPORT_LIST',
-    RECEIVE_REPORT_RANK: 'RECEIVE_REPORT_RANK',
     RECEIVE_REPORT_TODAY_SALES: 'RECEIVE_REPORT_TODAY_SALES',
   };
 
   public reportList = '/report/list';
-  public reportProductRank = '/report/productRank';
   public reportBaseSaleInfo = '/report/baseSaleInfo';
   public reportTodayData = '/report/getTodayData';
 }

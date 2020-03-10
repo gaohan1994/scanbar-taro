@@ -1,12 +1,13 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-20 13:37:23 
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-13 09:38:14
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-03-02 10:36:44
  */
 import Taro, { Config } from '@tarojs/taro';
 import { View, Image, Picker, Text } from '@tarojs/components';
 import { ProductAction } from '../../actions';
+import { AtActionSheet, AtActionSheetItem, AtButton } from "taro-ui";
 import invariant from 'invariant';
 import { ResponseCode, ProductInterface, ProductService, HTTPInterface, ProductInterfaceMap } from '../../constants/index';
 import '../style/product.less';
@@ -15,7 +16,6 @@ import { getProductType, getProductSupplier } from '../../reducers/app.product';
 import { connect } from '@tarojs/redux';
 import { FormRowProps } from '../../component/card/form.row';
 import FormCard from '../../component/card/form.card';
-import { AtButton } from 'taro-ui';
 import classnames from 'classnames';
 import FormRow from '../../component/card/form.row';
 import "../../component/card/form.card.less";
@@ -53,6 +53,7 @@ interface State {
   supplier: string;       // 供应商
   supplierValue: number;  // 供应商pickerValue
   showMore: boolean;      // 是否显示更多
+  showSheet: boolean;
 }
 
 class ProductAdd extends Taro.Component<Props, State> {
@@ -83,6 +84,7 @@ class ProductAdd extends Taro.Component<Props, State> {
       supplier: '',
       supplierValue: 0,
       showMore: false,
+      showSheet: false,
     };
   }
 
@@ -195,6 +197,8 @@ class ProductAdd extends Taro.Component<Props, State> {
 
   public onChooseImages = (paths: string[]) => {
     const { result } = LoginManager.getUserToken();
+
+    console.log('paths ', paths);
     this.setState({
       tempFilePaths: paths
     });
@@ -238,19 +242,33 @@ class ProductAdd extends Taro.Component<Props, State> {
     });
   }
 
+  public onPictureImage = () => {
+    try {
+      // Taro
+
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
+
   /**
    * @todo 选择图片组件
    *
    * @memberof ProductAdd
    */
-  public onChoiceImage = () => {
+  public onChoiceImage = (type: string = 'album') => {
     try {
       Taro
         .chooseImage({
-          sourceType: ['album'],
+          sizeType: ['compressed'],
+          sourceType: [type],
           count: 1,
         })
         .then(res => {
+          console.log('res: ', res);
           const { tempFilePaths } = res;
           this.onChooseImages(tempFilePaths);
         });
@@ -510,7 +528,41 @@ class ProductAdd extends Taro.Component<Props, State> {
           {this.renderMore()}
         </View>
         {this.renderButtons()}
+        {this.renderActionSheet()}
       </View>
+    );
+  }
+
+  private renderActionSheet = () => {
+    const { showSheet } = this.state;
+    return (
+      <AtActionSheet 
+        isOpened={showSheet}
+        cancelText='取消' 
+        onCancel={() => {
+          this.setState({showSheet: false});
+        }}
+        onClose={() => {
+          this.setState({showSheet: false});
+        }}
+      >
+        <AtActionSheetItem
+          onClick={() => {
+            this.setState({showSheet: false});
+            this.onChoiceImage('camera');
+          }}
+        >
+          拍照
+        </AtActionSheetItem>
+        <AtActionSheetItem
+          onClick={() => {
+            this.setState({showSheet: false});
+            this.onChoiceImage();
+          }}
+        >
+          从相册中选择
+        </AtActionSheetItem>
+      </AtActionSheet>
     );
   }
 
@@ -561,7 +613,9 @@ class ProductAdd extends Taro.Component<Props, State> {
     return (
       <View
         className={`${cssPrefix}-detail-cover`}
-        onClick={() => this.onChoiceImage()}
+        onClick={() => {
+          this.setState({showSheet: true});
+        }}
       >
         {
           tempFilePaths && tempFilePaths[0] ? (

@@ -2,13 +2,10 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-02-25 11:07:28
+ * @Last Modified time: 2020-03-03 14:49:11
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text, Picker } from '@tarojs/components';
-import "../style/user.less";
-import "../style/member.less";
-import "../style/home.less";
 import "../style/report.less";
 import "../../component/card/form.card.less";
 import ModalLayout from '../../component/layout/modal.layout';
@@ -420,8 +417,7 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
 
     if (currentDate === '本月') {
       const { monthData } = this.state;
-      const selectMonth = monthData[value]
-      console.log('selectMonth: ', selectMonth);
+      const selectMonth = monthData[value];
       this.setState({
         minDate: dayJs(selectMonth.startDate).format('YYYY-MM-DD HH:mm:ss'),
         maxDate: dayJs(selectMonth.endDate).format('YYYY-MM-DD HH:mm:ss'),
@@ -517,14 +513,6 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
         title: '本月',
       }
     ];
-    const reportTypes = [
-      {
-        title: '经营报表',
-      },
-      {
-        title: '产品销量分析',
-      }
-    ];
 
     return (
       <View className="container container-color">
@@ -573,7 +561,7 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
           onPress={(date) => this.onDatePress(date)}
           onClose={() => this.onChangeValue('dateVisible', false)}
         >
-          <Picker
+          {/* <Picker
             mode='date'
             onChange={this.onCostomMinChange}
             value={dayJs(this.state.costomMinDate).format('YYYY.MM.DD')}
@@ -589,7 +577,7 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
             >
               {'自定义'}
             </View>
-          </Picker>
+          </Picker> */}
         </TabsMenu>
       </View>
     );
@@ -770,7 +758,8 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
 
     return (
       <View className={`${cssPrefix}-time-box`}>
-        {currentDate === '自定义' 
+        {/* 
+        currentDate === '自定义' 
           ? (
             <View className={`${cssPrefix}-time-costom`}>
               <Image
@@ -798,7 +787,8 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
               </Picker>
             </View>
           )
-          : currentDate === '今日'
+          :  */}
+        {currentDate === '今日'
           ? (
             <Picker
               mode='date'

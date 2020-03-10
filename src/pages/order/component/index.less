@@ -1,0 +1,66 @@
+@import "../../../styles/theme.less";
+
+@prefix: component-order-product;
+
+.@{prefix} {
+  background-color: #fff;
+
+  &-box {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &-tip {
+    font-size:24px;
+    font-family:PingFang SC;
+    font-weight:500;
+    color:rgba(153,153,153,1);
+    line-height: 24px;
+  }
+
+  &-extra {
+    .margin(20px, tb);
+    .margin(150px + 20px, l);
+    .flex(center, flex-start, row);
+
+    &-icon {
+      width:28px;
+      height:28px;
+      .bg;
+      .margin(10px, r);
+    }
+  }
+
+  &-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    .padding(30px, lr);
+    .flex(center, space-between, row);
+    
+    &-button {
+      width:240px;
+      height:80px;
+      background:rgba(42,134,252,1);
+      border-radius:40px;
+      .flex(center, center);
+      font-size:32px;
+      font-weight:500;
+      color:rgba(255,255,255,1);
+    }
+
+    &-normal {
+      font-weight: bold;
+      font-size: 38px;
+      color: #FC4E44;
+    }
+    &-bge {
+      .margin(10px, r);
+    }
+    &-price {
+      font-size: 50px;
+    }
+  }
+}
