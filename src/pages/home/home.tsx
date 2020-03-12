@@ -59,6 +59,12 @@ const NavItems = [
     subTitle: 'Procurement',
     url: '/pages/inventory/inventory.stock',
   },
+  {
+    image: '//net.huanmusic.com/weapp/-icon_menu_proceeds.png',
+    value: '线上订单',
+    subTitle: 'Gathering',
+    url: '/pages/order/order.online.list',
+  },
 ];
 
 // type PageState = {};

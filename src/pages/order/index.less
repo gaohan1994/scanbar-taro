@@ -1,0 +1,250 @@
+@import "../../styles/theme.less";
+
+@order: order;
+
+.@{order} {
+  width: 100%;
+  height: 100%;
+  background-color: #F2F2F2;
+
+  &-tabs {
+    width: 100%;
+    height: 90px;
+  }
+
+  &-scrollview {
+    display: flex;
+    background-color: #F2F2F2;
+    height: calc(100% - 90px);
+
+    &-bottom {
+      width: 100%;
+      .padding(50px, tb);
+      .flex(center, center, row);
+      font-size: 26px;
+      color: #999999;
+    }
+
+    &-item {
+      display: flex;
+      justify-content: center;
+    }
+  }
+
+  &-detail {
+    &-bg {
+      height: 235px;
+      width: 100%;
+      .background-image('//net.huanmusic.com/weapp/bg_order.png');
+    }
+
+    &-container {
+      .flex(center, flex-start, column);
+      .padding(30px, lr);
+      height: 100%;
+      width: 100%;
+      margin-top: 124px - 369px;
+    }
+
+    &-price {
+      color: #333333;
+      font-size: 30px;
+      // font-weight: bold;
+
+      &-integer {
+        font-size: 30px;
+      }
+    }
+
+    &-card {
+      border-radius: 10px;
+      width: 690px;
+      background-color: #fff;
+      display: flex;
+      flex-direction: column;
+      margin-top: 22px;
+
+      &-status {
+        height: 256px;
+        padding-left: 32px;
+        position: relative;
+
+        &-img1 {
+          position: absolute;
+          bottom: 5px;
+          right: 21px;
+          width: 261px;
+          height: 206px;
+        }
+
+        &-img2 {
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 121px;
+          height: 128px;
+        }
+
+        &-title {
+          color: #333333;
+          font-size: 52px;
+          font-weight: bold;
+          margin-top: 24px;
+        }
+
+        &-detail {
+          color: #333333;
+          font-size: 28px;
+          margin-top: 10px;
+        }
+
+        &-red {
+          color: #FC4E44;
+        }
+
+        &-button {
+          width: 168px;
+          .flex(center, flex-start, row);
+
+          &-common {
+            width: 168px;
+            height: 52px;
+            .flex(center, center, column);
+            font-size: 26px;
+            border-radius: 22.5px;
+            margin-top: 24px;
+            margin-right: 23px;
+          }
+
+          &-again {
+            color: #2A86FC;
+            border: #2A86FC solid 2px;
+          }
+
+          &-cancle {
+            color: #666666;
+            border: #999999 solid 2px;
+          }
+        }
+      }
+
+      &-logistics {
+        // height: 292px;
+        padding: 37px 42px 36px 30px;
+
+        &-item {
+          display: flex;
+          flex-direction: row;
+
+          &-margin {
+            margin-top: 24px;
+          }
+
+          &-img {
+            width: 50px;
+            height: 50px;
+            margin-top: 10px;
+          }
+
+          &-info {
+            display: flex;
+            flex-direction: column;
+            margin-left: 24px;
+
+            &-title {
+              color: #999999;
+              font-size: 22px;
+            }
+
+            &-content {
+              color: #333333;
+              font-size: 30px;
+              width: 544px;
+            }
+          }
+        }
+      }
+
+      &-order {
+        margin-bottom: 40px;
+        .margin(30px, l);
+        &-item {
+          width: 100%;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          padding: 34px 31px;
+
+          &-border {
+            border-bottom: #E3E3E3 solid 1px;
+          }
+
+          &-title {
+            color: #666666;
+            font-size: 30px;
+          }
+
+          &-content {
+            color: #333333;
+            font-size: 28px;
+            width: 388px;
+            display: flex;
+            justify-content: flex-end;
+          }
+        }
+      }
+    }
+  }
+
+  &-remark {
+    background-color: #fff;
+    .padding(30px);
+    &-input {
+      width:690px;
+      height:350px;
+      .padding(30px);
+      background:rgba(247,247,247,1);
+      border:1px solid #cccccc;
+      border-radius:10px;
+      position: relative;
+      &-text {
+        width: 100%;
+        // height: 100%;
+        height: 270px;
+      }
+      &-corner {
+        display: flex;
+        justify-content: flex-end;
+        font-size: 24px;
+        color: #999999;
+      }
+    }
+    &-title {
+      font-size:28px;
+      font-weight:500;
+      color:rgba(153,153,153,1);
+      .margin(30px, tb);
+    }
+    &-buttons {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+    &-button {
+      .padding(36px, lr);
+      height: 60px;
+      .flex(center, center, row);
+      border:1px solid #cccccc;
+      border-radius:20px;
+      font-size:28px;
+      font-weight:500;
+      color:#808080;
+      line-height: 60px;
+      .margin(20px, b);
+      .margin(16px, r);
+    }
+    &-box {
+      .margin(50px, t);
+    }
+  }
+}

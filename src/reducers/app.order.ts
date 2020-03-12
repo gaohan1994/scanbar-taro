@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-12-09 13:51:19 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-02-25 11:33:41
+ * @Last Modified time: 2020-03-11 14:28:57
  */
 
 import merge from 'lodash.merge';
@@ -31,6 +31,8 @@ export declare namespace OrderReducer {
 
   interface State {
     orderList: Array<OrderInterface.OrderDetail>;
+    orderListOnline: Array<OrderInterface.OrderDetail>;
+    orderListOnlineTotal: number;
     orderSearchList: Array<OrderInterface.OrderDetail>;
     orderListTotal: number;
     orderDetail: OrderInterface.OrderDetail;
@@ -46,6 +48,8 @@ const initState: OrderReducer.State = {
   orderSearchList: [],
   orderListTotal: -1,
   orderDetail: {} as any,
+  orderListOnline: [],
+  orderListOnlineTotal: -1,
 };
 
 export default function orderReducer (
@@ -84,6 +88,24 @@ export default function orderReducer (
     case OrderInterfaceMap.reducerInterfaces.RECEIVE_ORDER_LIST: {
       const { payload } = action as OrderReducer.Reducers.OrderListReducer;
 
+      /**
+       * @todo 如果是线上订单则单独处理
+       */
+      if (payload.fetchFidle.orderSource === 3) {
+        let nextOrderList: OrderInterface.OrderDetail[] = [];
+        if (payload.fetchFidle.pageNum === 1) {
+          nextOrderList = payload.rows;
+        } else {
+          const prevOrderList: OrderInterface.OrderDetail[] = merge([], state.orderListOnline);
+          nextOrderList = prevOrderList.concat(payload.rows);
+        }
+        return {
+          ...state,
+          orderListOnlineTotal: payload.total,
+          orderListOnline: nextOrderList
+        };
+      }
+
       let nextOrderList: OrderInterface.OrderDetail[] = [];
       if (payload.fetchFidle.pageNum === 1) {
         nextOrderList = payload.rows;
@@ -109,6 +131,10 @@ export default function orderReducer (
 export const getOrderList = (state: AppReducer.AppState) => state.order.orderList;
 
 export const getOrderListTotal = (state: AppReducer.AppState) => state.order.orderListTotal;
+
+export const getOrderListOnlineTotal = (state: AppReducer.AppState) => state.order.orderListOnlineTotal;
+
+export const getOrderListOnline = (state: AppReducer.AppState) => state.order.orderListOnline;
 
 export const getOrderDetail = (state: AppReducer.AppState) => state.order.orderDetail;
 

@@ -58,6 +58,12 @@ export declare namespace OrderInterface {
 
   interface OrderInfo {
     detail: string;
+    remark: string;
+    createTime: string;
+    address: string;
+    planDeliveryTime: string;
+    receiver: string;
+    receiverPhone: string;
     merchantName: string;
     orderNo: string;
     platformNo: string;

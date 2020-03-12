@@ -79,6 +79,8 @@ class App extends Component {
           'order.main',
           'order.detail',
           'order.refund',
+          'order.online',
+          'order.online.list',
         ],
       },
       {
