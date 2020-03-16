@@ -31,7 +31,8 @@ class ButtonFooter extends Taro.Component<Props> {
               <View 
                 key={button.title}
                 className={classnames({
-                  [`product-add-buttons-button`]: buttons.length > 1,
+                  [`product-add-buttons-three`]: buttons.length >= 3,
+                  [`product-add-buttons-button`]: buttons.length > 1 && buttons.length < 3,
                   [`product-add-buttons-one`]: buttons.length === 1,
                 })}
               >

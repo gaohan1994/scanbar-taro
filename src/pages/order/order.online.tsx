@@ -4,27 +4,22 @@
  * @Author: Ghan 
  * @Date: 2020-03-10 15:29:23 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-11 17:18:39
+ * @Last Modified time: 2020-03-16 11:12:38
  */
 import Taro, { Config } from '@tarojs/taro';
-import { View } from '@tarojs/components';
+import { View, ScrollView } from '@tarojs/components';
 import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
 import "../style/order.less";
 import "../style/product.less";
 import { OrderAction } from '../../actions';
 import invariant from 'invariant';
-import { ResponseCode, OrderInterface } from '../../constants/index';
+import { ResponseCode, OrderInterface, OrderService } from '../../constants/index';
 import { getOrderDetail } from '../../reducers/app.order';
-import { FormRowProps } from '../../component/card/form.row';
-import FormCard from '../../component/card/form.card';
-import numeral from 'numeral';
-import ProductPayListView from '../../component/product/product.pay.listview';
-import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
+import ProductPayListView from './component/list';
 import ButtonFooter from '../../component/button/button.footer';
 import OrderStatus from './component/status';
 import OrderDetail from './component/detail';
-import OrderList from './component/list';
 import OrderContent from './component/content';
 
 const cssPrefix = 'order';
@@ -51,6 +46,104 @@ class OrderOnline extends Taro.Component<Props> {
     }
   }
 
+  public orderConfirmRefund = async () => {
+    try {
+      const { orderDetail } = this.props;
+      const { orderNo } = orderDetail;
+      invariant(!!orderNo, '请传入订单id');
+      const result = await OrderAction.orderConfirmRefund(orderNo);
+      invariant(result.code === ResponseCode.success, result.msg || ' ');
+      Taro.showToast({
+        title: '同意退货'
+      });
+      this.init(orderNo);
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
+
+  public orderRefuseRefund = async () => {
+    try {
+      const { orderDetail } = this.props;
+      const { orderNo } = orderDetail;
+      invariant(!!orderNo, '请传入订单id');
+      const result = await OrderAction.orderRefuseRefund(orderNo);
+      invariant(result.code === ResponseCode.success, result.msg || ' ');
+      Taro.showToast({
+        title: '拒绝退货'
+      });
+      this.init(orderNo);
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
+
+  public orderReceive = async (message = '已送达') => {
+    try {
+      const { orderDetail } = this.props;
+      const { orderNo } = orderDetail;
+      invariant(!!orderNo, '请传入订单id');
+      const result = await OrderAction.orderReceive(orderNo);
+      invariant(result.code === ResponseCode.success, result.msg || ' ');
+      Taro.showToast({
+        title: message
+      });
+      this.init(orderNo);
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
+
+  public orderRefund = async () => {
+    try {
+      const { orderDetail } = this.props;
+
+      const payload: OrderInterface.RefundByOrderPayload = {
+        order: {
+          orderNo: orderDetail.orderNo,
+          refundByPreOrder: true,
+          orderSource: 0,
+          payType: 0,
+          terminalCd: "",
+          terminalSn: "",
+          transAmount: orderDetail.order.transAmount,
+        },
+        productInfoList: orderDetail.orderDetailList ? orderDetail.orderDetailList.map((item) => {
+          return {
+            changeNumber: item.num,
+            isDamaged: false,
+            orderDetailId: item.id,
+            remark: "",
+            unitPrice: item.unitPrice,
+            priceChangeFlag: false
+          };
+        }) : []
+      };
+      console.log('payload: ', payload);
+      const result = await OrderService.orderRefund(payload);
+      invariant(result.code === ResponseCode.success, result.msg || ' ');
+      Taro.showToast({
+        title: '退款成功',
+        duration: 1000
+      });
+      this.init(orderDetail.orderNo);
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
+
   public init = async (id: string) => {
     try {
       const result = await OrderAction.orderDetail({ orderNo: id });
@@ -62,26 +155,119 @@ class OrderOnline extends Taro.Component<Props> {
       });
     }
   }
+
+  public getButtons = () => {
+    const { orderDetail } = this.props;
+    const status = OrderAction.orderStatus([], orderDetail as any);
+
+    if (status.id === 0) {
+      return [{
+        title: '取消订单',
+        onPress: () => {
+          Taro.showModal({
+            title: '提示',
+            content: '取消后买家无法付款，确定取消?',
+            success: (result) => {
+              if (result.confirm) {
+                this.orderRefund();
+              }
+            }
+          });
+        }
+      }];
+    }
+
+    if (status.id === 11) {
+      return [{
+        title: '取消并退款',
+        type: 'cancel',
+        onPress: () => {
+          Taro.showModal({
+            title: '提示',
+            content: '确认取消并退款吗?',
+            success: (result) => {
+              if (result.confirm) {
+                this.orderRefund();
+              }
+            }
+          });
+        }
+      }, {
+        title: '已自提',
+        onPress: () => this.orderReceive('已自提')
+      }];
+    }
+
+    if (status.id === 12) {
+      return [{
+        title: '已送达',
+        onPress: () => this.orderReceive()
+      }];
+    }
+
+    // 申请取消订单
+    if (status.id === 13) {
+      return [{
+        title: '拒绝',
+        type: 'cancel',
+        onPress: () => this.orderRefuseRefund(),
+      }, {
+        title: '同意并退款',
+        onPress: () => this.orderConfirmRefund(),
+      }];
+    }
+
+    // 申请退货
+    if (status.id === 8) {
+      return [{
+        title: '拒绝',
+        type: 'cancel',
+        onPress: () => this.orderRefuseRefund(),
+      }, {
+        title: '同意',
+        onPress: () => this.orderConfirmRefund(),
+      }, {
+        title: '查看原订单',
+        onPress: () => Taro.navigateTo({
+          url: `/pages/order/order.online?id=${orderDetail.order.originOrderNo}`
+        })
+      }];
+    }
+
+    return [{
+      title: '查看原订单',
+      onPress: () => {
+        Taro.navigateTo({
+          url: `/pages/order/order.online?id=${orderDetail.order.originOrderNo}`
+        });
+      }
+    }];
+  }
+
   render () {
     const { orderDetail } = this.props;
+    const status = OrderAction.orderStatus([], orderDetail as any);
     return (
       <View className={`container ${cssPrefix}`}>
-        <OrderStatus orderDetail={orderDetail} />
-        <OrderDetail orderDetail={orderDetail} />
-
-        <OrderList>
-          asd
-        </OrderList>
-        <OrderContent orderDetail={orderDetail} />
-
-        <ButtonFooter
-          buttons={[{
-            title: '查看原订单',
-            onPress: () => {
-              //
-            }
-          }]}
-        />
+        <ScrollView
+          scrollY={true}
+          className={`${cssPrefix}-list-online`}
+        >
+          <OrderStatus orderDetail={orderDetail} />
+          <OrderDetail orderDetail={orderDetail} />
+          <ProductPayListView
+            productList={orderDetail.orderDetailList}
+            type={1}
+          />
+          <OrderContent orderDetail={orderDetail} />
+          <View style='width: 100%;height: 100px; background: #f2f2f2' />
+        </ScrollView>
+        
+        {status.id !== -1 && status.id !== 2 && status.id !== 1 && (
+          <ButtonFooter
+            buttons={this.getButtons()}
+          />
+        )}
       </View>
     );
   }

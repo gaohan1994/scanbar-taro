@@ -31,6 +31,39 @@
     }
   }
 
+  &-search {
+    width: 690px;
+    .margin(30px, l);
+    .margin(24px, t);
+    .flex(center);
+
+    &-box {
+      width:610px;
+      height:60px;
+      background:rgba(255,255,255,1);
+      border-radius:30px;
+      .padding(30px, lr);
+      .flex(center);
+
+      &-icon {
+        width: 28px;
+        height: 28px;
+        .margin(12px, r);
+      }
+      &-input {
+        width: 100%;
+        height: 100%;
+      }
+    }
+    &-select {
+      width: 40px;
+      height: 26px + 23px;
+      .margin(24px, l);
+      .bg;
+      background-image: url('//net.huanmusic.com/weapp/icon_shaixuan_grey.png');
+    }
+  }
+
   &-detail {
     &-bg {
       height: 235px;
@@ -184,12 +217,33 @@
             font-size: 30px;
           }
 
+          &-box {
+            display: flex;
+            flex-direction: column;
+          }
+          &-refund {
+            font-size:30px;
+            color:rgba(51,51,51,1);
+          }
+          &-time {
+            font-size:26px;
+            color:rgba(102,102,102,1);
+          }
+
           &-content {
             color: #333333;
             font-size: 28px;
             width: 388px;
             display: flex;
             justify-content: flex-end;
+            align-items: center;
+            &-arrow {
+              width:13px;
+              height:24px;
+              .bg;
+              .background-image('//net.huanmusic.com/weapp/icon_into.png');
+              .margin(17px, l);
+            }
           }
         }
       }

@@ -173,7 +173,7 @@ export declare namespace ProductInterface {
     payType: number;
     totalAmount: number;
     // totalNum: number;
-    // transAmount: number;
+    transAmount: number;
     orderNo: string;
     terminalCd: string;
     terminalSn: string;

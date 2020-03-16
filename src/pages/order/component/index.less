@@ -120,11 +120,42 @@
       .flex(center, flex-start, row);
       .padding(30px, lr);
       .padding(20px, tb);
+      position: relative;
+    }
+    &-bor {
+      &::after {
+        .border1px;
+      }
+    }
+    &-arror {
+      width:13px;
+      height:24px;
+      .margin(30px, l);
+      .bg;
+      background-image: url('//net.huanmusic.com/weapp/icon_commodity_into.png')
+    }
+    &-vip {
+      .padding(16px, lr);
+      line-height: 1;
+      height:30px;
+      border:1px solid rgba(216,174,109,1);
+      border-radius:10px;
+      font-size:18px;
+      font-weight:500;
+      color:rgba(216,174,109,1);
+      .margin(10px, l);
+      .flex(center, center);
     }
     &-icon {
       width: 50px;
       height: 50px;
       .margin(26px, r);
+      .bg;
+    }
+    &-avator {
+      width: 66px;
+      height: 66px;
+      .margin(18px, r);
       .bg;
     }
     &-box {
@@ -138,14 +169,16 @@
     }
     &-title { 
       font-size:26px;
+      line-height: 1;
       color:rgba(51,51,51,1);
     }
     &-text {
       font-size:26px;
+      line-height: 1;
       color:rgba(153,153,153,1);
     }
     &-mar {
-      .margin(18px, t);
+      .margin(13px, t);
       &-l {
         .margin(40px, l);
       }

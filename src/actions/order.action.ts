@@ -3,13 +3,28 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:28:21 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-11 16:50:49
+ * @Last Modified time: 2020-03-16 10:10:34
  */
 import { ResponseCode, OrderService, OrderInterface, OrderInterfaceMap } from '../constants/index';
 import { store } from '../app';
 import { OrderReducer } from '../reducers/app.order';
 
 class OrderAction {
+
+  public orderConfirmRefund = async (orderNo: string) => {
+    const result = await OrderService.orderConfirmRefund(orderNo);
+    return result;
+  }
+
+  public orderRefuseRefund = async (orderNo: string) => {
+    const result = await OrderService.orderRefuseRefund(orderNo);
+    return result;
+  }
+
+  public orderReceive = async (orderNo: string) => {
+    const result = await OrderService.orderReceive(orderNo);
+    return result;
+  }
 
   public emptyOrderSearchList = () => {
     const reducer: OrderReducer.Reducers.OrderListReducer = {
@@ -43,18 +58,20 @@ class OrderAction {
   public getFetchType = (currentType: any) => {
     switch (currentType) {
       case 0:
-        return {};
+        return {
+          transFlags: 10
+        };
       case 1:
         return {
-          transFlags: 0
+          transFlags: 12
         };
       case 2:
         return {
-          transFlags: '10,12,3,4'
+          transFlags: 11
         };
       case 3:
         return {
-          transFlags: 11
+          transFlags: '5,8,13'
         };
       default:
         return {};
@@ -147,7 +164,7 @@ class OrderAction {
         case 9: {
           return {
             id: 9,
-            title: '买家取消退货	',
+            title: '买家取消退货',
             detail: '',
           }
         }
@@ -194,6 +211,26 @@ class OrderAction {
       title: '',
       detail: ''
     };
+  }
+
+  /**
+   * @todo 获取各个状态的订单数量
+   *
+   * @memberof OrderAction
+   */
+  public orderCount = async () => {
+    const result = await OrderService.orderCount();
+
+    if (result.code === ResponseCode.success) {
+      const reducer: OrderReducer.Reducers.OrderDetailReducer = {
+        type: OrderInterfaceMap.reducerInterfaces.RECEIVE_ORDER_COUNT,
+        payload: {
+          data: result.data
+        }
+      };
+      store.dispatch(reducer);
+    }
+    return result;
   }
 
   public orderList = async (params: OrderInterface.OrderListFetchFidle) => {
@@ -255,3 +292,65 @@ class OrderAction {
 }
 
 export default new OrderAction();
+
+export const ORDER_STATUS = [{
+  id: -1,
+  title: '支付失败',
+  detail: '请重新下单'
+}, {
+  id: 0,
+  title: '待支付',
+  detail: ''
+}, {
+  id: 1,
+  title: '已完成',
+  detail: '订单已完成，感谢您的信任'
+}, {
+  id: 2,
+  title: '已取消',
+  detail: '超时未支付或您已取消，订单已取消'
+}, {
+  id: 3,
+  title: '待邮寄',
+  detail: ''
+}, {
+  id: 4,
+  title: '邮寄中',
+  detail: '',
+}, {
+  id: 6,
+  title: '拒绝退货',
+  detail: '',
+}, {
+  id: 5,
+  title: '退货中	',
+  detail: '',
+}, {
+  id: 7,
+  title: '已退货',
+  detail: '',
+}, {
+  id: 8,
+  title: '申请退货',
+  detail: '',
+}, {
+  id: 9,
+  title: '买家取消退货',
+  detail: '',
+}, {
+  id: 10,
+  title: '待发货',
+  detail: '',
+}, {
+  id: 13,
+  title: '申请取消订单',
+  detail: '',
+}, {
+  id: 12,
+  title: '待收货',
+  detail: '商品待商家配送，请耐心等待'
+}, {
+  id: 11,
+  title: '待自提',
+  detail: '请去门店自提商品'
+}]

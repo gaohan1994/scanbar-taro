@@ -1,7 +1,7 @@
-@import "../../styles/theme.less";
-@import "../../component/cart/cart.less";
-@import "./member.less";
-@import "./home.less";
+@import "../../../styles/theme.less";
+@import "../../../component/cart/cart.less";
+@import "../../style/member.less";
+@import "../../style/home.less";
 
 @product-prefix: product;
 @product-search-width: 550px;
@@ -24,11 +24,10 @@
     position: fixed;
     background-color: @theme-color;
     .flex(center, space-between, row);
-    .padding(20px, lr);
+    .padding(20px);
     top: 0;
     left: 0;
     right: 0;
-    height: 100px;
 
     &-button {
       color: @theme-color;
@@ -46,7 +45,7 @@
       right: 10px;
       border-radius: 50%;
       background-color: #FC4E44;
-      font-size: 24px;
+      font-size: 22px;
       .flex(center, center);
       height: 37px;
       min-width: 37px;
@@ -118,10 +117,20 @@
       &-inventory {
         top: @product-header-height + 80px;
       }
+
+      &-costom {
+        position: absolute;
+        top: 140px;
+        bottom: 0;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+      }
     }
 
     &-left {
-      width: 154px;
+      width: 162px;
+      height: 100%;
       display: flex;
       flex-direction: column;
       background-color: @product-list-left-bg-color;
@@ -134,10 +143,7 @@
         font-size: @normal-text-fontsize;
 
         &-suspension {
-          display: flex;
-          .padding(24px, l);
           flex-direction: column;
-          align-items: flex-start;
         }
 
         &-active {
@@ -380,15 +386,14 @@
 
       &-close {
         position: absolute;
-        left: 10px;
-        top: 0px;
-        width: 100px;
-        height: 100px;
-        .flex(center, center, row);
+        left: 60px;
+        top: 50px;
+        width: 24px;
+        height: 24px;
 
         &-image {
-          width: 24px;
-          height: 24px;
+          width: 100%;
+          height: 100%;
         }
       }
 
@@ -418,7 +423,8 @@
       left: 0;
       right: 0;
       z-index: 100;
-      background-color: #ffffff;
+      border-top: 1px solid rgba(227, 227, 227, 1);
+      background-color: #fff;
       .padding(40px, t);
       .padding(50px, b);
       .padding(30px, lr);
@@ -426,10 +432,6 @@
 
       &-button {
         width: 320px;
-      }
-
-      &-three {
-        width: 200px;
       }
 
       &-one {
@@ -483,7 +485,8 @@
     }
 
     &-pos {
-      .padding(20px, lr);
+      .padding(30px, lr);
+      .margin(6px, t);
       background-color: #f2f2f2;
     }
 
@@ -601,10 +604,6 @@
           background-color: rgba(0, 0, 0, 0.7)
         }
 
-        &-transparent {
-          background-color: transparent;
-        }
-
         &-box {
           z-index: 1200;
           position: absolute;
@@ -645,7 +644,71 @@
 
   &-row {
     position: relative;
-    .padding(24px);
+    .padding(24px, tb);
+    .padding(40px, lr);
+
+    &-items {
+      position: relative;
+      background-color: #fff;
+      border-radius:10px;
+      .margin(20px, t);
+
+      &::after {
+        .border1px;
+      }
+    }
+
+    &-header {
+      width: 100%;
+      height: 92px;
+      .flex(center, space-between, row);
+      border-bottom: #E3E3E3 1px solid;
+      padding: 0 32px;
+      
+      &-item {
+        .flex(center, center, row);
+      }
+
+      &-shop {
+        color: #333333;
+        font-size: 30px;
+      }
+
+      &-green {
+        color: #2CA43A;
+        font-size: 26px;
+      }
+
+      &-next {
+        width: 13px;
+        height: 24px;
+        margin-left: 17px;
+      }
+
+      &-phone {
+        width: 30px;
+        height: 30px;
+        margin-right: 13px;
+      }
+    }
+
+    &-totals {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &-box {
+      display: flex;
+      flex-direction: row;
+    }
+
+    &-cover {
+      width: 120px;
+      height: 120px;
+      border: 1px solid rgba(229, 229, 229, 1);
+      border-radius: 10px;
+      .bg;
+    }
 
     &-icon {
       .margin(16px, lr);
@@ -676,23 +739,63 @@
     &-normal {
       font-size: 28px;
       color: @base-font-color;
-      &-title {
-        font-size: 30px;
-        color: #333333;
-      }
     }
 
     &-name {
       font-size: 30px;
-      font-weight: bold;
-      color: #444444;
-      width: 400px;
+      width: 464px;
       display: -webkit-box;
       overflow: hidden;
       text-overflow: ellipsis;
       line-clamp: 1;
       -webkit-line-clamp: 1;
       -webkit-box-orient: vertical;
+      font-weight: 500;
+      color: rgba(51, 51, 51, 1);
+    }
+
+    &-corner {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+
+      &-origin {
+        font-size: 18px;
+        font-weight: 500;
+        text-decoration: line-through;
+        color: rgba(179, 179, 179, 1);
+      }
+
+      &-price {
+        font-size: 30px;
+        // font-weight: bold;
+        color: #333333;
+      }
+
+      &-big {
+        font-size: 30px;
+      }
+    }
+
+    &-tran {
+      font-size: 25px;
+      color: #333333;
+
+      &-price {
+        font-size: 40px;
+        font-weight: bold;
+      }
+
+      &-big {
+        font-size: 40px;
+      }
+
+      &-margin {
+        .margin(26px, l)
+      }
     }
 
     &-bold {
@@ -704,12 +807,83 @@
       color: #fc4e44;
     }
 
+    &-discount {
+      width: 56px;
+      height: 26px;
+      .flex(center, center, row);
+      font-size: 20px;
+
+      &-title {
+        color: #333333;
+        font-size: 24px;
+        margin-left: 20px;
+      }
+
+      &-full {
+        background-color: #FFEBEB;
+        color: #FC4E44;
+      }
+
+      &-first {
+        background-color: #FFF0E2;
+        color: #FF893B;
+      }
+    }
+
+    &-voucher {
+      color: #333333;
+      font-size: 30px;
+    }
+
+    &-total {
+      color: #333333;
+      font-size: 24px;
+    }
+
     &-content {
       display: flex;
       flex-direction: column;
+      flex: 1;
+      position: relative;
+
+      &-box {
+        justify-content: space-between;
+        .margin(20px, l);
+        position: relative;
+      }
 
       &-item {
         .flex(center, space-between, row);
+        .padding(30px, lr);
+        .padding(35px, tb);
+        border-top: #E3E3E3 1px solid;
+      }
+
+      &-price {
+        color: #FC4E44;
+        font-size: 30px;
+
+        &-black {
+          color: #333333;
+        }
+      }
+
+      &-column {
+        .flex(center, center, column);
+
+        &-item {
+          width: 100%;
+          height: 100%;
+          .flex(center, space-between, row);
+        }
+      }
+
+      &-row {
+        .flex(center, center, row);
+
+        &-top {
+          margin-bottom: 22px;
+        }
       }
 
       &-items {

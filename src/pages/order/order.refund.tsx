@@ -56,6 +56,7 @@ class OrderDetail extends Taro.Component<Props, State> {
       const payload: OrderInterface.RefundByOrderPayload = {
         order: {
           orderNo: orderDetail.orderNo,
+          refundByPreOrder: true,
           orderSource: 0,
           payType: 0,
           terminalCd: "",
@@ -68,7 +69,7 @@ class OrderDetail extends Taro.Component<Props, State> {
           return {
             changeNumber: item.sellNum,
             isDamaged: damageToken !== -1,
-            orderDetailId: 0,
+            orderDetailId: item.id,
             priceChangeFlag: !!item.changePrice,
             remark: "",
             unitPrice: itemPrice,

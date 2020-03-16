@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-12-09 13:51:19 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-11 14:28:57
+ * @Last Modified time: 2020-03-16 10:26:16
  */
 
 import merge from 'lodash.merge';
@@ -21,6 +21,13 @@ export declare namespace OrderReducer {
       };
     }
 
+    interface OrderCountReducer {
+      type: OrderInterface.RECEIVE_ORDER_COUNT;
+      payload: {
+        data: OrderInterface.OrderCount;
+      };
+    }
+
     interface OrderDetailReducer {
       type: OrderInterface.RECEIVE_ORDER_DETAIL;
       payload: {
@@ -36,6 +43,7 @@ export declare namespace OrderReducer {
     orderSearchList: Array<OrderInterface.OrderDetail>;
     orderListTotal: number;
     orderDetail: OrderInterface.OrderDetail;
+    orderCount: OrderInterface.OrderCount;
   }
 
   type Action = 
@@ -50,6 +58,7 @@ const initState: OrderReducer.State = {
   orderDetail: {} as any,
   orderListOnline: [],
   orderListOnlineTotal: -1,
+  orderCount: {} as any,
 };
 
 export default function orderReducer (
@@ -58,6 +67,14 @@ export default function orderReducer (
 ): OrderReducer.State {
 
   switch (action.type) {
+
+    case OrderInterfaceMap.reducerInterfaces.RECEIVE_ORDER_COUNT: {
+      const { payload } = action as OrderReducer.Reducers.OrderCountReducer;
+      return {
+        ...state,
+        orderCount: payload.data
+      };
+    }
 
     case OrderInterfaceMap.reducerInterfaces.RECEIVE_ORDER_DETAIL: {
       const { payload } = action as OrderReducer.Reducers.OrderDetailReducer;
@@ -139,3 +156,5 @@ export const getOrderListOnline = (state: AppReducer.AppState) => state.order.or
 export const getOrderDetail = (state: AppReducer.AppState) => state.order.orderDetail;
 
 export const getOrderSearchList = (state: AppReducer.AppState) => state.order.orderSearchList;
+
+export const getOrderCount = (state: AppReducer.AppState) => state.order.orderCount;

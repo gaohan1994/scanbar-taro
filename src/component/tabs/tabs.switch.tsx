@@ -30,7 +30,11 @@ class TabsSwitch extends Taro.Component<Props, State> {
         {
           tabs && tabs.length && tabs.map((tab: any, index: number) => {
             return (
-              <View className={`${cssPrefix}-tab`} style={`width: ${750 / tabs.length}px`}>
+              <View 
+                className={`${cssPrefix}-tab`} 
+                style={`width: ${750 / tabs.length}px`}
+                key={`i${index}`}
+              >
                 <View
                   key={tab.title}
                   className={classnames(`${cssPrefix}-tab-content`, {
