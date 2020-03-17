@@ -559,9 +559,23 @@ class ProductPay extends Taro.Component<Props, State> {
           ? `- ￥${this.setNumber(eraseValue)}`
           : '￥0.00'}`,
         extraTextStyle: 'price',
-        hasBorder: false,
+        // hasBorder: false,
       },
-
+      {
+        title: '优惠券',
+        extraText: `0`,
+        extraTextStyle: 'price',
+        hasBorder: false,
+        isCoupon: true,
+        coupons: [1],
+        arrow: 'right',
+        onClick: () => {
+          
+          Taro.navigateTo({
+            url: `/pages/pay/pay.coupon?entry=product.pay${!!selectMember ? `&phone=${selectMember.phoneNumber}` : ''}`
+          });
+        }
+      },
     ];
     return (
       <View className={`${cssPrefix}-pay-pos`}>

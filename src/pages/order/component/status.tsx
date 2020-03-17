@@ -3,6 +3,7 @@ import { View, Text } from '@tarojs/components';
 import './index.less';
 import { OrderInterface } from 'src/constants';
 import { OrderAction } from '../../../actions';
+import dayJs from 'dayjs';
 
 const prefix = 'component-order-product';
 
@@ -10,7 +11,53 @@ type Props = {
   orderDetail: OrderInterface.OrderDetail;
 };
 
+type State = {
+  time: string;
+};
+
 class OrderComponent extends Taro.Component<Props> {
+
+  state: State = {
+    time: ''
+  };
+
+  private timer: any;
+  componentWillMount () {
+    const { orderDetail } = this.props;
+    const status = OrderAction.orderStatus([], orderDetail as any);
+    console.log('componentWillMount status: ', status);
+    if (status.id === 0) {
+      this.setTimer(orderDetail.order.createTime);
+      return;
+    }
+
+    if (status.id === 10 || status.id === 13) {
+      this.setTimer(orderDetail.order.transTime);
+      return;
+    }
+  }
+
+  setTimer = (time: string) => {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
+    const createTime = dayJs(time);
+    const now = dayJs();
+    const dif = now.diff(createTime, 'm');
+    this.setState({time: dif });
+    this.timer = setInterval(() => {
+      const createTime = dayJs(time);
+      const now = dayJs();
+      const dif = now.diff(createTime, 'm');
+      this.setState({time: dif });
+    }, 1000 * 60);
+  }
+
+  componentWillUnmount = () => {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
+  }
 
   public onPhone = () => {
     const { orderDetail } = this.props;
@@ -79,6 +126,7 @@ class OrderComponent extends Taro.Component<Props> {
   }
 
   render () {
+    const { time } = this.state;
     const { orderDetail = {} } = this.props;
     const status = OrderAction.orderStatus([], orderDetail as any);
     return (
@@ -89,7 +137,18 @@ class OrderComponent extends Taro.Component<Props> {
           style={`${this.statusImage(status)}`}
         >
           <View className={`${prefix}-status-title`} >{status.title}</View>
-          <View className={`${prefix}-status-tip`} >{status.detail}</View>
+          {status.id === 0 
+          ? (
+            <View className={`${prefix}-status-tip`} >{`买家已下单${time}分`}</View>
+          ) 
+          : status.id === 10 || status.id === 13
+            ? (
+              <View className={`${prefix}-status-tip`} >{`买家已付款${time}分`}</View>
+            )
+            : (
+            <View className={`${prefix}-status-tip`} >{status.detail}</View>
+          )}
+          
           <View 
             className={`${prefix}-status-button`}
             onClick={() => this.onPhone()}

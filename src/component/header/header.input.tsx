@@ -11,6 +11,8 @@ const cssPrefix = 'product';
 type Props = { 
   isRenderInputRight?: boolean;
   inputRightClick?: any;
+  isRenderScan?: boolean;
+  scanClick?: any;
   containerClassName?: string;
 } & InputProps;
 
@@ -28,7 +30,7 @@ class HeaderInput extends Taro.Component<Props> {
   };
 
   render () {
-    const { value, onInput, placeholder, isRenderInputRight, inputRightClick, className } = this.props;
+    const { value, onInput, placeholder, isRenderScan, scanClick, isRenderInputRight, inputRightClick, className } = this.props;
     return (
       <View className={`${cssPrefix}-header`}>
         <View className={classnames(`${memberPrefix}-main-header-search`, className)}>
@@ -48,6 +50,17 @@ class HeaderInput extends Taro.Component<Props> {
               <Image 
                 src="//net.huanmusic.com/weapp/icon_del_1.png" 
                 className={`${memberPrefix}-main-header-search-del`} 
+              />
+            </View>
+          )}
+          {!!isRenderScan && (
+            <View
+              onClick={scanClick}
+              className={`${memberPrefix}-main-header-search-scan ${memberPrefix}-main-header-search-mar`} 
+            >
+              <Image
+                src="//net.huanmusic.com/weapp/icon_commodity_scan.png" 
+                className={`${memberPrefix}-main-header-search-scan`} 
               />
             </View>
           )}

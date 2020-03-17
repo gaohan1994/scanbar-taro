@@ -3,13 +3,18 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:28:21 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-16 10:10:34
+ * @Last Modified time: 2020-03-17 16:28:56
  */
 import { ResponseCode, OrderService, OrderInterface, OrderInterfaceMap } from '../constants/index';
 import { store } from '../app';
 import { OrderReducer } from '../reducers/app.order';
 
 class OrderAction {
+
+  public orderSend = async (orderNo: string) => {
+    const result = await OrderService.orderSend(orderNo);
+    return result;
+  }
 
   public orderConfirmRefund = async (orderNo: string) => {
     const result = await OrderService.orderConfirmRefund(orderNo);
@@ -136,36 +141,36 @@ class OrderAction {
         case 5: {
           return {
             id: 5,
-            title: '退货中	',
-            detail: '',
+            title: '退货中',
+            detail: '已同意退货，待买家退回商品',
           }
         }
         case 6: {
           return {
             id: 6,
             title: '拒绝退货',
-            detail: '',
+            detail: '您拒绝了买家的退货申请',
           }
         }
         case 7: {
           return {
             id: 7,
             title: '已退货',
-            detail: '',
+            detail: '已将钱款原路退回买家账户',
           }
         }
         case 8: {
           return {
             id: 8,
             title: '申请退货',
-            detail: '',
+            detail: '买家申请退货',
           }
         }
         case 9: {
           return {
             id: 9,
             title: '买家取消退货',
-            detail: '',
+            detail: '买家取消了退货申请',
           }
         }
         case 10: {

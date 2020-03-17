@@ -65,7 +65,7 @@ class OrderItem extends Taro.Component<Props, State> {
           </View>
           <View className={classnames(`${cssPrefix}-card-status`)} >
             <View className={`${cssPrefix}-card-header-text-time`}>
-              {dayJs(order.createTime).format('YYYY-MM-DD HH:MM') || ''}
+              {dayJs(order.createTime).format('YYYY-MM-DD HH:mm') || ''}
             </View>
           </View>
         </View>

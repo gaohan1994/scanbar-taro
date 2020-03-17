@@ -2,12 +2,16 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:16:32 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-16 09:49:55
+ * @Last Modified time: 2020-03-17 13:38:30
  */
 import requestHttp from "../../common/request/request.http";
 import { OrderInterfaceMap, OrderInterface, HTTPInterface } from '..';
 
 class OrderService {
+
+  public orderSend = async (orderNo: string): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.post(`/order/send`, {orderNo});
+  }
 
   public orderConfirmRefund = async (orderNo: string): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.post(`/order/confirmRefund/${orderNo}`, {});

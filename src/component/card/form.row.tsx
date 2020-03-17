@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-05 14:41:35 
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-17 17:26:54
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-03-16 14:53:57
  * 
  * @todo [fockedTaroUiListItem,增加以及修改了一些属性]
  */
@@ -12,7 +12,9 @@ import classnames from 'classnames';
 import './style.sass';
 import './form.card.less';
 import { AtButton, AtInput } from 'taro-ui';
+import { MerchantInterface } from 'src/constants';
 
+const prefix = 'component-form';
 interface ListRowButton {
   onPress: () => void;
   title: string;
@@ -47,6 +49,8 @@ export interface FormRowProps {
   extraTextBold?: 'bold';       // 是否加粗
   inputCursorSpacing?: number;  // cursorSpacing
   maxInput?: boolean;           // 右侧450px input
+  isCoupon?: boolean;
+  coupons?: MerchantInterface.Coupon[];
 }
 
 interface FormRowState { }
@@ -107,6 +111,8 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
       extraTextColor,
       inputCursorSpacing,
       extraTextSize,
+      isCoupon,
+      coupons,
       children,
     } = this.props;
 
@@ -143,6 +149,16 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
                 className={classnames('item-content__info-title', `component-form-info-${infoColor}`)}
               >
                 {title}{main ? <View className="item-content__info-icon">*</View> : null}
+                {!!isCoupon && (
+                  <View
+                    className={classnames({
+                      [`${prefix}-coupon-active`]: coupons && coupons.length > 0,
+                      [`${prefix}-coupon-normal`]: coupons && coupons.length === 0
+                    })}
+                  >
+                    {coupons && coupons.length > 0 ? `${coupons.length}张可以用` : '无可用优惠券'}
+                  </View>
+                )}
               </View>
               {note && <View className='item-content__info-note'>{note}</View>}
             </View>

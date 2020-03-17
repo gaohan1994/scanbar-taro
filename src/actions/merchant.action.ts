@@ -4,6 +4,47 @@ import { store } from '../app';
 
 class MerchantAction {
 
+  public selectCoupon = (coupon?: MerchantInterface.Coupon) => {
+    store.dispatch({
+      type: MerchantInterfaceMap.reducerInterface.RECEIVE_SELECT_COUPON,
+      payload: { coupon }
+    });
+  }
+
+  public emptyCoupon = () => {
+    store.dispatch({
+      type: MerchantInterfaceMap.reducerInterface.RECEIVE_EXPIRED_COUPON,
+      payload: {rows: []}
+    });
+
+    store.dispatch({
+      type: MerchantInterfaceMap.reducerInterface.RECEIVE_COUPON_LIST,
+      payload: {rows: []}
+    });
+  }
+
+  public couponGetMemberExpiredCoupons = async (params: any) => {
+    const result = await MerchantService.couponGetMemberExpiredCoupons(params);
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: MerchantInterfaceMap.reducerInterface.RECEIVE_EXPIRED_COUPON,
+        payload: result.data
+      });
+    }
+    return result;
+  }
+
+  public couponList = async (params: any) => {
+    const result = await MerchantService.couponList(params);
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: MerchantInterfaceMap.reducerInterface.RECEIVE_COUPON_LIST,
+        payload: result.data
+      });
+    }
+    return result;
+  }
+
   public merchantSubList = async () => {
     const result = await MerchantService.merchantSubList();
     if (result.code === ResponseCode.success) {

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-12-09 11:01:19 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-16 10:27:54
+ * @Last Modified time: 2020-03-17 14:02:15
  */
 
 import Taro from '@tarojs/taro';
@@ -52,7 +52,7 @@ class OrderOnlineList extends Taro.Component<Props> {
     navigationBarTitleText: '订单',
   };
 
-  async componentDidMount() {
+  async componentDidShow() {
     this.init();
   }
 

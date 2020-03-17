@@ -1,0 +1,339 @@
+@import "../../styles/theme.less";
+
+@user-prefix: user;
+@user-bg-size: 416px;
+
+.@{user-prefix} {
+  background-color: #F2F2F2;
+  .flex(center, flex-start, column);
+  width: 100%;
+  height: 100%;
+  
+
+  &-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: @user-bg-size;
+    width: 100%;
+    .background-image('//net.huanmusic.com/scanbar-c/v2/bg_mine.png');
+    z-index: 0;
+  }
+
+  &-container {
+    .flex(center, flex-start, column);
+    .padding(30px, lr);
+    height: 100%;
+    width: 100%;
+    background-color: #F2F2F2;
+  }
+
+  &-user {
+    position: relative;
+    .flex(center, flex-start, row);
+    .margin(45px, t);
+    .margin(50px, b);
+    width: 100%;
+    background-color: transparent;
+
+    &-image {
+      width: 140px;
+      height: 140px;
+      border-radius: 70px;
+    }
+
+    &-box {
+      display: flex;
+      flex-direction: column;
+      .margin(36px, l);
+    }
+
+    &-name {
+      color: #fff;
+      font-size: 36px;
+      height: 38px;
+      font-weight: bold;
+      // display: flex;
+      // flex-direction: row;
+      // align-items: center;
+      .flex(center, center, row);
+
+      &-get {
+        background-color: transparent;
+        padding: 0;
+      }
+    }
+
+    &-member {
+      width: 96px;
+      height: 34px;
+      .flex(center, center);
+      font-size: 18px;
+      line-height: 18px;
+      background-color: rgba(255, 255, 255, .2);
+      color: #fff;
+      border-radius: 10px;
+      margin-left: 15px;
+    }
+
+    &-phone {
+      font-size: 30px;
+      color: #ffffff;
+    }
+  }
+
+  &-rows {
+    margin-top: 30px;
+    width: 690px;
+    z-index: 1;
+
+    &-item {
+      padding: 34px 30px;
+      border-radius: 10px;
+      background-color: #fff;
+      width: 100%;
+      margin-bottom: 22px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+
+      &-left {
+        display: flex;
+        align-items: center;
+
+        &-icon {
+          width: 40px;
+          height: 40px;
+        }
+
+        &-title {
+          color: #333333;
+          font-size: 30px;
+          margin-left: 16px;
+        }
+      }
+
+      &-right {
+        &-icon {
+          width: 13px;
+          height: 24px;
+        }
+      }
+    }
+  }
+
+  &-code {
+    position: absolute;
+    right: 40px;
+    top: 70px;
+    width: 30px;
+    height: 30px;
+    .bg;
+    background-image: url(//net.huanmusic.com/scanbar-c/v2/icon_mine_code.png);
+  }
+
+  &-member {
+    width: 100%;
+    .flex(center, space-around, row);
+    z-index: 1;
+
+    &-item {
+      .flex(center, center, column);
+      color: #fff;
+      font-size: 24px;
+      position: relative;
+      // min-width: 200px;
+      // width: 33%;
+
+      &-discount {
+        min-width: 160px;
+      }
+
+      &-number {
+        font-weight: bold;
+        font-size: 36px;
+      }
+
+      &-pop {
+        position: absolute;
+        top: 10px;
+        right: 0px;
+        transform: translate(50%, 0);
+        margin-left: 10px;
+        min-width: 96px;
+        padding: 0 15px;
+        white-space: nowrap;
+        height: 28px;
+        .bg;
+        background-image: url(//net.huanmusic.com/scanbar-c/v2/bg_coupon_prompt.png);
+        color: #FF893B;
+        font-size: 20px;
+        .flex(center, center);
+      }
+    }
+
+  }
+
+  &-set {
+    &-button {
+      width: 670px;
+      height: 80px;
+      margin: 124px - 22px;
+    }
+  }
+
+  &-coupon {
+    &-tabs {
+      width: 100%;
+      height: 90px;
+    }
+
+    &-banner {
+      width: 692px;
+      height: 177px;
+      margin: 25px 0px 5px 0px;
+    }
+
+    &-item {
+      margin-top: 20px;
+      .padding(30px, l);
+      &-text-grey {
+        color: #CCCCCC !important;
+      }
+
+      &-border-grey {
+        border-color: #CCCCCC !important;
+      }
+
+      &-top {
+        position: relative;
+        .flex(center, center, row);
+        width: 690px;
+        height: 181px;
+        z-index: 2;
+        .bg;
+        background-image: url(//net.huanmusic.com/scanbar-c/v2/bg_coupon.png);
+
+        &-grey {
+          background-image: url(//net.huanmusic.com/scanbar-c/v2/bg_coupon_grey.png);
+        }
+
+        &-left {
+          .flex(center, center, column);
+          width: 212px;
+          height: 100%;
+          color: #fff;
+
+          &-price {
+            font-size: 80px;
+            line-height: 80px;
+            font-weight: bold;
+            position: relative;
+          }
+
+          &-sign {
+            font-size: 24px;
+            line-height: 24px;
+            font-weight: bold;
+            position: absolute;
+            right: -15px;
+            top: 10px;
+          }
+
+          &-info {
+            font-size: 26px;
+            line-height: 26px;
+            margin-top: 25px;
+          }
+        }
+
+        &-right {
+          position: relative;
+          .flex(flex-start, center, column);
+          width: 478px;
+          height: 100%;
+          margin-left: 58px;
+
+          &-row {
+            .flex(center, center, row);
+            margin-top: 30px;
+          }
+
+          &-info {
+            font-size: 30px;
+            line-height: 30px;
+            color: #333333;
+            font-weight: bold;
+          }
+
+          &-time {
+            font-size: 22px;
+            line-height: 22px;
+            color: #666666;
+          }
+
+          &-pop {
+            width: 18px;
+            height: 10px;
+            margin-left: 25px;
+            transform: rotate(180deg);
+            &-down {
+              transform: rotate(0deg);
+            }
+          }
+        }
+        &-button {
+          position: absolute;
+          right: 30px;
+          top: 50%;
+          transform: translateY(-50%);
+          .bg;
+          width:36px;
+          height:36px;
+          &-normal {
+            background-image: url(//net.huanmusic.com/weapp/v2/bt_normal.png);
+          }
+          &-active {
+            background-image: url(//net.huanmusic.com/scanbar-c/v2/bt_coupon_selected.png);
+          }
+        }
+
+        &-radio {
+          position: absolute;
+          right: 40px;
+          top: 73px;
+          width: 36px;
+          height: 36px;
+        }
+      }
+
+      &-bottom {
+        z-index: 1;
+        width: 690px;
+        padding: 46px 27px 33px 27px;
+        margin-top: -19px;
+        border-radius: 10px;
+        .flex(flex-start, center, column);
+        background-color: #fff;
+
+        &-prompt {
+          .flex(center, center, row);
+
+          &-icon {
+            width: 22px;
+            height: 22px;
+            margin-right: 8px;
+          }
+        }
+
+        &-info {
+          font-size: 22px;
+          line-height: 35px;
+          color: #666666;
+        }
+      }
+    }
+  }
+
+}

@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-08 10:01:17 
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-13 17:35:46
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-03-17 10:09:21
  * 
  * @todo [盘点相关的接口]
  * ```js
@@ -17,6 +17,23 @@ import { HTTPInterface, jsonToQueryString } from '../index';
 import MerchantInterfaceMap, { MerchantInterface } from "./merchant";
 
 class MerchantService {
+
+  public couponList = async (params: any) => {
+    const result = await requestHttp.post(`${MerchantInterfaceMap.couponGetAbleToUseCoupon}`, params);
+    return result;
+  }
+  public couponGetMemberExpiredCoupons = async (params: any) => {
+    const result = await requestHttp.get(`${MerchantInterfaceMap.couponGetMemberExpiredCoupons}${jsonToQueryString(params)}`);
+    return result;
+  }
+  public couponGetByCode = async (code: string | number) => {
+    const result = await requestHttp.get(`${MerchantInterfaceMap.couponGetByCode}/${code}`);
+    return result;
+  }
+  public couponGetAbleToUseCoupon = async (params: any) => {
+    const result = await requestHttp.post(`${MerchantInterfaceMap.couponGetAbleToUseCoupon}`, params);
+    return result;
+  }
 
   public merchantSubList = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
     const result = await requestHttp.get(`/merchantInfo/listSubMerchant`);

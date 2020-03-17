@@ -89,6 +89,7 @@ class App extends Component {
           'pay.input',
           'pay.receive',
           'pay.result',
+          'pay.coupon',
         ],
       },
       {

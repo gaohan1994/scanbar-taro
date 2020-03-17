@@ -4,10 +4,11 @@
  * @Author: Ghan 
  * @Date: 2020-03-10 15:29:23 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-16 11:12:38
+ * @Last Modified time: 2020-03-17 16:41:29
  */
 import Taro, { Config } from '@tarojs/taro';
 import { View, ScrollView } from '@tarojs/components';
+import { AtActivityIndicator } from 'taro-ui';
 import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
 import "../style/order.less";
@@ -28,9 +29,17 @@ type Props = {
   orderDetail: OrderInterface.OrderDetail;
 };
 
+type State = {
+  loading: boolean;
+}
+
 class OrderOnline extends Taro.Component<Props> {
   config: Config = {
     navigationBarTitleText: '订单详情'
+  };
+
+  state: State = {
+    loading: false
   };
 
   componentDidShow() {
@@ -38,6 +47,25 @@ class OrderOnline extends Taro.Component<Props> {
       const { params: { id } } = this.$router;
       invariant(!!id, '请传入订单id');
       this.init(id);
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
+
+  public orderSend = async () => {
+    try {
+      const { orderDetail } = this.props;
+      const { orderNo } = orderDetail;
+      invariant(!!orderNo, '请传入订单id');
+      const result = await OrderAction.orderSend(orderNo);
+      invariant(result.code === ResponseCode.success, result.msg || ' ');
+      Taro.showToast({
+        title: '已发货'
+      });
+      this.init(orderNo);
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -146,9 +174,12 @@ class OrderOnline extends Taro.Component<Props> {
 
   public init = async (id: string) => {
     try {
+      this.setState({loading: true});
       const result = await OrderAction.orderDetail({ orderNo: id });
       invariant(result.code === ResponseCode.success, result.msg || ' ');
+      this.setState({loading: false});
     } catch (error) {
+      this.setState({loading: false});
       Taro.showToast({
         title: error.message,
         icon: 'none'
@@ -174,6 +205,54 @@ class OrderOnline extends Taro.Component<Props> {
             }
           });
         }
+      }];
+    }
+
+    // 退货中
+    if (status.id === 5) {
+      return [{
+        title: '拒绝退货',
+        type: 'cancel',
+        onPress: () => this.orderRefuseRefund(),
+      }, {
+        title: '退款',
+        onPress: () => {
+          Taro.showModal({
+            title: '',
+            content: '钱款将退回买家账户，确定退款？',
+            success: (result) => {
+              if (result.confirm) {
+                this.orderRefund();
+              }
+            }
+          });
+        } 
+      }, {
+        title: '查看原订单',
+        onPress: () => Taro.navigateTo({
+          url: `/pages/order/order.online?id=${orderDetail.order.originOrderNo}`
+        })
+      }];
+    }
+
+    if (status.id === 10) {
+      return [{
+        title: '取消并退款',
+        type: 'cancel',
+        onPress: () => {
+          Taro.showModal({
+            title: '提示',
+            content: '确认取消并退款吗?',
+            success: (result) => {
+              if (result.confirm) {
+                this.orderRefund();
+              }
+            }
+          });
+        }
+      }, {
+        title: '发货',
+        onPress: () => this.orderSend()
       }];
     }
 
@@ -245,25 +324,31 @@ class OrderOnline extends Taro.Component<Props> {
   }
 
   render () {
+    const { loading } = this.state;
     const { orderDetail } = this.props;
     const status = OrderAction.orderStatus([], orderDetail as any);
     return (
       <View className={`container ${cssPrefix}`}>
-        <ScrollView
-          scrollY={true}
-          className={`${cssPrefix}-list-online`}
-        >
-          <OrderStatus orderDetail={orderDetail} />
-          <OrderDetail orderDetail={orderDetail} />
-          <ProductPayListView
-            productList={orderDetail.orderDetailList}
-            type={1}
-          />
-          <OrderContent orderDetail={orderDetail} />
-          <View style='width: 100%;height: 100px; background: #f2f2f2' />
-        </ScrollView>
+
+        {!loading ? (
+          <ScrollView
+            scrollY={true}
+            className={`${cssPrefix}-list-online`}
+          >
+            <OrderStatus orderDetail={orderDetail} />
+            <OrderDetail orderDetail={orderDetail} />
+            <ProductPayListView
+              productList={orderDetail.orderDetailList}
+              type={1}
+            />
+            <OrderContent orderDetail={orderDetail} />
+            <View style='width: 100%;height: 100px; background: #f2f2f2' />
+          </ScrollView>
+        ) : (
+          <AtActivityIndicator mode='center' />
+        )}
         
-        {status.id !== -1 && status.id !== 2 && status.id !== 1 && (
+        {!loading && status.id !== -1 && status.id !== 2 && status.id !== 1 && (
           <ButtonFooter
             buttons={this.getButtons()}
           />

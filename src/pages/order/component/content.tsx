@@ -17,25 +17,42 @@ class OrderComponent extends Taro.Component<Props> {
   render () {
     const { orderDetail } = this.props;
     const { order } = orderDetail;
-    const items: any[] = order && [
-      {
-        title: '订单号码',
-        extraText: `${order.orderNo}`,
-      },
-      {
-        title: '创建时间',
-        extraText: `${dayJs(order.createTime || '').format('YYYY/MM/DD HH:mm')}`,
-      },
-      {
-        title: '付款时间',
-        extraText: `${dayJs(order.transTime || '').format('YYYY/MM/DD HH:mm')}`,
-      },
-      {
-        title: '支付方式',
-        extraText: `${OrderAction.orderPayType(orderDetail)}支付`,
-        border: false,
-      },
-    ];
+    const status = OrderAction.orderStatus([], orderDetail as any);
+
+    let items: any[] = [];
+
+    if (status.id === 5 || status.id === 6 || status.id === 7 || status.id === 8 || status.id === 9) {
+      items = [
+        {
+          title: '退货订单号码',
+          extraText: `${order.orderNo}`,
+        },
+        {
+          title: '申请退货时间',
+          extraText: `${dayJs(order.transTime || '').format('YYYY/MM/DD HH:mm')}`,
+        }
+      ];
+    } else {
+      items = order && [
+        {
+          title: '订单号码',
+          extraText: `${order.orderNo}`,
+        },
+        {
+          title: '创建时间',
+          extraText: `${dayJs(order.createTime || '').format('YYYY/MM/DD HH:mm')}`,
+        },
+        {
+          title: '付款时间',
+          extraText: `${dayJs(order.transTime || '').format('YYYY/MM/DD HH:mm')}`,
+        },
+        {
+          title: '支付方式',
+          extraText: `${OrderAction.orderPayType(orderDetail)}支付`,
+          border: false,
+        },
+      ];
+    }
     return (
       <View>
         <View className={`${cssPrefix}-card ${cssPrefix}-card-order`} style='margin-bottom: 0px'>

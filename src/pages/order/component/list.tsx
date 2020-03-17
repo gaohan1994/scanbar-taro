@@ -50,7 +50,7 @@ class ProductPayListView extends Taro.Component<Props> {
              * @time 0313
              * @todo [申请退货不显示header]
              */
-            type && type === 1 && status.id !== 8 && (
+            type && type === 1 && status.id !== 5 && status.id !== 6 && status.id !== 7 && status.id !== 8 && status.id !== 9 && (
               <View className={`${prefix}-detail-item ${prefix}-detail-bor`}> 
                 <View 
                   className={`${prefix}-detail-avator`} 
@@ -103,7 +103,9 @@ class ProductPayListView extends Taro.Component<Props> {
   }
 
   private renderProductItem = (item: any) => {
-    const { type } = this.props;
+    const { type, orderDetail } = this.props;
+    const status = OrderAction.orderStatus([], orderDetail as any);
+
     if (type && type === 1) {
       return (
         <View
@@ -139,7 +141,9 @@ class ProductPayListView extends Taro.Component<Props> {
                   <Text className={`${cssPrefix}-row-corner-price`}>{`.${numeral(item.transAmount).format('0.00').split('.')[1]}`}</Text>
                 </View>
                 {
-                  item.totalAmount !== item.transAmount && (
+                  // 和退货相关的不显示原价格
+                  status.id !== 5 && status.id !== 6 && status.id !== 7 && status.id !== 8 && status.id !== 9
+                  && item.totalAmount !== item.transAmount && (
                     <Text className={`${cssPrefix}-row-corner-origin`}>{`￥${item.totalAmount}`}</Text>
                   )
                 }

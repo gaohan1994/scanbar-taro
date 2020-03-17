@@ -22,6 +22,24 @@ export declare namespace MerchantInterface {
     type: number;
   }
 
+  interface Coupon { 
+    ableToUse: boolean;
+    couponId: number;
+    couponVO: {
+      discount: number;
+      filterType: number;
+      threshold: number;
+      name: string;
+      useWay: string;
+    };
+    createTime: string;
+    disableReason: string;
+    effectiveTime: string;
+    id: number;
+    merchantIds: string;
+    phone: string;
+  }
+
   interface ProfileInfo {
     avatar: string;
     email: string;
@@ -50,6 +68,9 @@ export declare namespace MerchantInterface {
     type RECEIVE_MERCHANT_DETAIL = string;
     type RECEIVE_PROFILE_INFO = string;
     type RECEIVE_USER_INFO = string;
+    type RECEIVE_COUPON_LIST = string;
+    type RECEIVE_EXPIRED_COUPON = string;
+    type RECEIVE_SELECT_COUPON = string;
   }
 
   interface MerchantInterfaceMap {
@@ -58,6 +79,9 @@ export declare namespace MerchantInterface {
       RECEIVE_PROFILE_INFO: ReducerTypes.RECEIVE_PROFILE_INFO;
       RECEIVE_USER_INFO: ReducerTypes.RECEIVE_USER_INFO;
       RECEIVE_MERCHANT_SUB_LIST: string;
+      RECEIVE_COUPON_LIST: string;
+      RECEIVE_SELECT_COUPON: string;
+      RECEIVE_EXPIRED_COUPON: string;
     };
     
     merchantInfoAdd: string;
@@ -74,6 +98,9 @@ class MerchantInterfaceMap implements MerchantInterface.MerchantInterfaceMap {
     RECEIVE_PROFILE_INFO: 'RECEIVE_PROFILE_INFO',
     RECEIVE_USER_INFO: 'RECEIVE_USER_INFO',
     RECEIVE_MERCHANT_SUB_LIST: 'RECEIVE_MERCHANT_SUB_LIST',
+    RECEIVE_COUPON_LIST: 'RECEIVE_COUPON_LIST',
+    RECEIVE_EXPIRED_COUPON: 'RECEIVE_EXPIRED_COUPON',
+    RECEIVE_SELECT_COUPON: 'RECEIVE_SELECT_COUPON',
   };
   public merchantInfoAdd = '/merchantInfo/add';
   public merchantInfoDetail = '/merchantInfo/detail';
@@ -81,6 +108,11 @@ class MerchantInterfaceMap implements MerchantInterface.MerchantInterfaceMap {
   public profileInfo = '/system/user/profile/info';
   public profileEdit = '/system/user/profile/update';
   public profileResetPwd = '/system/user/profile/resetPwd';
+
+  public couponList = '/coupon/list';
+  public couponGetMemberExpiredCoupons = '/coupon/getMemberExpiredCoupons';
+  public couponGetByCode = '/coupon/getByCode';
+  public couponGetAbleToUseCoupon = '/coupon/getAbleToUseCoupon';
 }
 
 export default new MerchantInterfaceMap();
