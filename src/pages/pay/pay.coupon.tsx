@@ -33,9 +33,13 @@ class CouponPage extends Taro.Component<Props> {
     const { phone } = this.$router.params;
     const { productCartList } = this.props;
     if (!!phone) {
+      /**
+       * @time 0318
+       * @todo [修改改成getProductMemberPrice，如果使用transprice则会计算优惠券价格]
+       */
       merchantAction.couponList({
         phone, 
-        amount: productSdk.getProductTransPrice(), 
+        amount: productSdk.getProductMemberPrice(), 
         productIds: productCartList.map(item => item.id)
       });
       merchantAction.couponGetMemberExpiredCoupons({phone: phone});
@@ -46,8 +50,19 @@ class CouponPage extends Taro.Component<Props> {
 
   public onCouponClick = (coupon: MerchantInterface.Coupon) => {
     try {
+      const { selectCoupon } = this.props;
       invariant(!!coupon.ableToUse, '该优惠券暂不可用');
-      this.setState({selectCoupon: coupon.id});
+
+      /**
+       * @time 0318
+       * @todo [如果是再次点击则取消选择该优惠券]
+       */
+      if (selectCoupon && selectCoupon.id === coupon.id) {
+        merchantAction.selectCoupon(undefined);
+        Taro.navigateBack({});
+        return;
+      }
+
       merchantAction.selectCoupon(coupon);
       Taro.showToast({ title: '选择优惠券' });
       setTimeout(() => {

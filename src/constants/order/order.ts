@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-16 11:11:36
+ * @Last Modified time: 2020-03-18 14:28:00
  * 
  * @todo [商品相关的类型定义]
  */
@@ -65,11 +65,13 @@ export declare namespace OrderInterface {
     remark: string;
     levelId: number;
     levelName: string;
+    avator: string;
     memberId: number;
     memberName:  string;
     memberPhone: string;
     createTime: string;
     address: string;
+    couponDiscount: number;
     planDeliveryTime: string;
     receiver: string;
     receiverPhone: string;

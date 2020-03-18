@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-02-25 10:18:07
+ * @Last Modified time: 2020-03-18 15:30:33
  * 
  * @todo [购物车组件]
  */
@@ -258,6 +258,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       .then(async (res) => {
         Taro.showLoading();
         const result = await ProductService.productInfoScanGet({barcode: res.result});
+        console.log('result: ', result);
         if (result.code === ResponseCode.success) {
           Taro.hideLoading();
           // 找到了商品 显示modal名称

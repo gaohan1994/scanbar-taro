@@ -26,6 +26,9 @@ import { getSelectMember } from '../../reducers/app.member';
 import { ModalInput } from '../../component/modal/modal';
 import ProductPayListView from '../../component/product/product.pay.listview';
 import ButtonFooter from '../../component/button/button.footer';
+import merchantAction from '../../actions/merchant.action';
+import { getCouponList, getSelectCoupon } from '../../reducers/app.merchant';
+import { MerchantInterface } from 'src/constants';
 
 const cssPrefix = 'product';
 
@@ -37,6 +40,8 @@ export interface SelectMember extends MemberInterface.MemberInfo {
 interface Props {
   productCartList: ProductCartInterface.ProductCartInfo[];
   addSelectMember?: MemberInterface.MemberInfo;
+  couponList: MerchantInterface.Coupon[];
+  selectCoupon?: MerchantInterface.Coupon;
 }
 
 interface State {
@@ -48,6 +53,7 @@ interface State {
   selectMember?: SelectMember;
   receiveValue: string;     // 应收金额
   receiveDiscount: string;  // 整单折扣
+  selectCoupon?: MerchantInterface.Coupon;
 }
 
 class ProductPay extends Taro.Component<Props, State> {
@@ -64,10 +70,11 @@ class ProductPay extends Taro.Component<Props, State> {
     receiveValue: '',
     receiveDiscount: '',
     selectMember: undefined,
+    selectCoupon: undefined,
   };
 
   public componentDidShow = () => {
-    const { addSelectMember } = this.props;
+    const { addSelectMember, selectCoupon } = this.props;
     productSdk.setSort(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER);
     /**
      * 每次进入结算页面的时候重置数据并清空 productsdk
@@ -87,14 +94,31 @@ class ProductPay extends Taro.Component<Props, State> {
      * @todo 如果是从添加会员页面回来则把新增的会员设置进去，如果是刚进入页面则重置会员状态
      */
     if (addSelectMember !== undefined) {
-      this.setState({ selectMember: addSelectMember });
+      this.setState({ selectMember: addSelectMember }, () => {
+        this.setCoupons();
+      });
       productSdk.setMember(addSelectMember);
       store.dispatch({
         type: MemberInterfaceMap.reducerInterfaces.SET_MEMBER_SELECT,
         payload: { selectMember: undefined }
       });
-    } else {
+    } else if (!this.state.selectMember) {
       productSdk.setMember(undefined);
+      this.setCoupons();
+    } else {
+      this.setCoupons();
+    }
+
+    /**
+     * @time 0318
+     * @todo [加入优惠券]
+     */
+    if (!!selectCoupon) {
+      this.setState({selectCoupon});
+      productSdk.setCoupon(selectCoupon);
+    } else {
+      this.setState({selectCoupon: undefined});
+      productSdk.setCoupon(undefined);
     }
   }
 
@@ -131,7 +155,7 @@ class ProductPay extends Taro.Component<Props, State> {
      * @todo [第一步，先拿到除了改价之外的最终价格]
      * @todo [第二步，计算整单改价的价格和比例]
      */
-    const memberPrice: number = productSdk.getProductMemberPrice();
+    const memberPrice: number = productSdk.getProductTransPrice(false);
     let nextReceiveValue: string = '';
     let nextReceiveDiscount: string = '';
     let nextEraseValue: string = '';
@@ -165,6 +189,34 @@ class ProductPay extends Taro.Component<Props, State> {
     return productSdk.getProductTransPrice();
   }
 
+  /**
+   * @time 0318
+   * @todo [设置优惠券token为true时请求，为false时清空]
+   */
+  public setCoupons = async () => {
+    const { selectMember } = this.state;
+    const { productCartList } = this.props;
+    if (!!selectMember) {
+      /**
+       * @time 0318
+       * @todo [设置会员之后自动搜索该会员的优惠券有则显示]
+       */
+      const coupons = await merchantAction.couponList({
+        phone: selectMember && selectMember.phoneNumber, 
+        amount: productSdk.getProductMemberPrice(), 
+        productIds: productCartList.map(item => item.id)
+      });
+      if (coupons.code !== ResponseCode.success) {
+        /**
+         * @todo [如果没有优惠券则清空]
+         */
+        merchantAction.emptyCoupon();
+      }
+    } else {
+      merchantAction.emptyCoupon();
+    }
+  }
+
   public cancelMember = () => {
     productSdk.setMember(undefined);
     productSdk.setErase(undefined);
@@ -174,6 +226,8 @@ class ProductPay extends Taro.Component<Props, State> {
       eraseValue: '',
       receiveValue: '',
       receiveDiscount: '',
+    }, () => {
+      this.setCoupons();
     });
   }
 
@@ -242,7 +296,10 @@ class ProductPay extends Taro.Component<Props, State> {
         eraseValue: '',
         receiveValue: '',
         receiveDiscount: '',
+      }, () => {
+        this.setCoupons();
       });
+
     } catch (error) {
       Taro.showLoading();
       Taro.showToast({
@@ -275,9 +332,24 @@ class ProductPay extends Taro.Component<Props, State> {
       });
       /**
        * @todo 调用支付接口成功后把抹零和会员都清除
+       * @time 0318
+       * @todo [成功之后reset所有state]
        */
+      // this.setState({
+      //   eraseModal: false,
+      //   eraseValue: '',
+      //   memberModal: false,
+      //   memberValue: '',
+      //   memberLayout: false,
+      //   receiveValue: '',
+      //   receiveDiscount: '',
+      //   selectMember: undefined,
+      //   selectCoupon: undefined,
+      // });
       productSdk.setErase(undefined);
       productSdk.setMember(undefined);
+      productSdk.setCoupon(undefined);
+      merchantAction.selectCoupon(undefined);
       Taro.navigateTo({
         url: `/pages/pay/pay.receive`
       });
@@ -465,8 +537,8 @@ class ProductPay extends Taro.Component<Props, State> {
   }
 
   private renderEraseModal = () => {
-    const { eraseModal, eraseValue, receiveValue, receiveDiscount } = this.state;
-    const receivePrice = productSdk.getProductMemberPrice();
+    const { eraseModal, receiveValue, receiveDiscount } = this.state;
+    const receivePrice = productSdk.getProductTransPrice(false);
 
     const eraseButtons = [
       {
@@ -524,7 +596,8 @@ class ProductPay extends Taro.Component<Props, State> {
   }
 
   private renderListDetail = () => {
-    const { selectMember, eraseValue } = this.state;
+    const { selectMember, eraseValue, selectCoupon } = this.state;
+    const { couponList } = this.props;
 
     const priceForm: FormRowProps[] = [
       {
@@ -563,14 +636,15 @@ class ProductPay extends Taro.Component<Props, State> {
       },
       {
         title: '优惠券',
-        extraText: `0`,
+        extraText: `${!!selectCoupon && selectCoupon.id
+          ? `-￥${numeral(selectCoupon.couponVO && selectCoupon.couponVO.discount).format('0.00')}` 
+          : ''}`,
         extraTextStyle: 'price',
         hasBorder: false,
         isCoupon: true,
-        coupons: [1],
+        coupons: couponList,
         arrow: 'right',
         onClick: () => {
-          
           Taro.navigateTo({
             url: `/pages/pay/pay.coupon?entry=product.pay${!!selectMember ? `&phone=${selectMember.phoneNumber}` : ''}`
           });
@@ -633,6 +707,8 @@ class ProductPay extends Taro.Component<Props, State> {
 const select = (state: AppReducer.AppState) => ({
   productCartList: getProductCartList(state),
   addSelectMember: getSelectMember(state),
+  selectCoupon: getSelectCoupon(state),
+  couponList: getCouponList(state),
 });
 
 export default connect(select)(ProductPay as any);

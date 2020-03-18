@@ -54,7 +54,7 @@ class ProductPayListView extends Taro.Component<Props> {
               <View className={`${prefix}-detail-item ${prefix}-detail-bor`}> 
                 <View 
                   className={`${prefix}-detail-avator`} 
-                  style='background-image: url(//net.huanmusic.com/weapp/icon_order_note.png)'
+                  style={`http://inventory.51cpay.com/memberAvatar/${order.avator}`}
                 />
                 <View className={`${prefix}-detail-box`}>
                   <View className={`${prefix}-detail-box-text`}>
@@ -200,6 +200,7 @@ class ProductPayListView extends Taro.Component<Props> {
   }
 
   private renderDisount = () => {
+    const { orderDetail } = this.props;
     return (
       <View>
         <View className={`${cssPrefix}-row-totals`}>
@@ -219,7 +220,7 @@ class ProductPayListView extends Taro.Component<Props> {
                     })}
                 >
                   满减
-                  </View>
+                </View>
                 <Text className={`${cssPrefix}-row-discount-title`}>满500减20</Text>
               </View>
               <Text className={`${cssPrefix}-row-content-price`}>-￥20</Text>
@@ -242,15 +243,18 @@ class ProductPayListView extends Taro.Component<Props> {
             </View>
           </View>
         </View>
-
-        <View className={`${cssPrefix}-row-totals`}>
-          <View className={`${cssPrefix}-row-content-item`}>
-            <Text className={`${cssPrefix}-row-voucher`}>抵用券</Text>
-            <View>
-              <Text className={`${cssPrefix}-row-content-price`}>-￥20</Text>
+        {orderDetail.order && orderDetail.order.couponDiscount && (
+          <View className={`${cssPrefix}-row-totals`}>
+            <View className={`${cssPrefix}-row-content-item`}>
+              <Text className={`${cssPrefix}-row-voucher`}>优惠券</Text>
+              <View>
+                <Text className={`${cssPrefix}-row-content-price`}>
+                  {`-￥${numeral(orderDetail.order.couponDiscount).format('0.00')}`}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
+        )}
       </View>
     );
   }

@@ -25,6 +25,7 @@ export declare namespace MerchantInterface {
   interface Coupon { 
     ableToUse: boolean;
     couponId: number;
+    couponCode: string;
     couponVO: {
       discount: number;
       filterType: number;

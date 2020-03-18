@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-03 14:30:01
+ * @Last Modified time: 2020-03-18 15:17:25
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -18,7 +18,7 @@
  * ```
  */
 import Taro from '@tarojs/taro';
-import { ProductInterface, ProductService, MemberInterface, HTTPInterface } from '../../../constants';
+import { ProductInterface, ProductService, MemberInterface, HTTPInterface, MerchantInterface } from '../../../constants';
 import { store } from '../../../app';
 import { ProductSDKReducer, getSuspensionCartList } from './product.sdk.reducer';
 import numeral from 'numeral';
@@ -38,6 +38,7 @@ export declare namespace ProductCartInterface {
   interface ProductOrderPayload {
     authCode: string;     // 权限码 -1/为空=非被扫
     orderNo: string;      // 订单号,用于再次支付
+    couponList: any[]; // 优惠券
     terminalCd: string;   // 终端号,获取不到填-1
     terminalSn: string;   // 终端序列号,获取不到填-1
     discount: number;     // 优惠价格
@@ -234,9 +235,16 @@ class ProductSDK {
    */
   private sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
 
+  /**
+   * @time [0318]
+   * @todo [加入优惠券]
+   */
+  private coupon?: MerchantInterface.Coupon;
+
   constructor () {
     this.erase = undefined;
     this.member = undefined;
+    this.coupon = undefined;
     this.sort = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER;
   }
 
@@ -252,6 +260,11 @@ class ProductSDK {
 
   public setSort = (sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND): this => {
     this.sort = sort ? sort : this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER;
+    return this;
+  }
+
+  public setCoupon = (coupon?: MerchantInterface.Coupon) => {
+    this.coupon = coupon;
     return this;
   }
 
@@ -449,17 +462,18 @@ class ProductSDK {
     const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
     const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => {
       const itemPrice = this.getProductItemPrice(item);
-      // /**
-      //  * @todo 如果有改价价格，则计算改价价格
-      //  */
-      // if (item.changePrice !== undefined) {
-      //   return prevTotal + (item.changePrice * item.sellNum); 
-      // }
 
       return prevTotal + (itemPrice * item.sellNum);
     };
     const total = productList.reduce(reduceCallback, 0);
     return total;
+  }
+
+  public getCouponValue = (): number => {
+    if (!!this.coupon) {
+      return numeral(this.coupon && this.coupon.couponVO && this.coupon.couponVO.discount).value();
+    }
+    return 0;
   }
 
   /**
@@ -476,10 +490,26 @@ class ProductSDK {
    *
    * @memberof ProductSDK
    */
-  public getProductTransPrice = () => {
+  public getProductTransPrice = (withErase: boolean = true) => {
     // 计算如果有会员的话使用会员价格，如果没有会员则返回原价
     let total: number = this.getProductMemberPrice();
     // 抹零价格在会员价之后减去
+
+    if (!!this.coupon) {
+      /**
+       * @time 0318
+       * @todo [如果有优惠券则减去优惠券金额]
+       */
+      total = total - numeral(this.coupon && this.coupon.couponVO && this.coupon.couponVO.discount).value();
+    }
+
+    /**
+     * @todo 如果不计算抹零的话可以返回了
+     */
+    if (!withErase) {
+      return total;
+    }
+
     total = total - this.getErase();
     return total;
   }
@@ -489,6 +519,7 @@ class ProductSDK {
    * 
    * ```ts
    * import productSdk from 'xxx';
+import { MerchantInterface } from 'src/constants';
    * const payload = productSdk
    * .setErase(1)
    * .setMember(member)
@@ -503,6 +534,7 @@ class ProductSDK {
       flag: false,
       order: {
         authCode: '-1',
+        couponList: !!this.coupon && this.coupon.couponCode ? [this.coupon.couponCode] : [],
         discount: 0,
         erase: this.getErase(),
         memberId: this.member !== undefined ? this.member.id : -1,
@@ -559,6 +591,7 @@ class ProductSDK {
       flag: true,
       order: {
         authCode: '-1',
+        couponList: [],
         discount: 0,
         erase: 0,
         memberId: -1,

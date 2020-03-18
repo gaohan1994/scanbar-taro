@@ -24,10 +24,16 @@ const NavItems = [
     url: '/pages/pay/pay.input',
   },
   {
-    image: '//net.huanmusic.com/weapp/icon_menu_details.png',
-    value: '订单',
+    image: '//net.huanmusic.com/weapp/v2/icon_menu_details.png',
+    value: '查账',
     subTitle: 'Transcation details',
     url: '/pages/order/order.main',
+  },
+  {
+    image: '//net.huanmusic.com/weapp/v2/icon_menu_order.png',
+    value: '线上订单',
+    subTitle: 'Gathering',
+    url: '/pages/order/order.online.list',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_more.png',
@@ -58,12 +64,6 @@ const NavItems = [
     value: '盘点',
     subTitle: 'Procurement',
     url: '/pages/inventory/inventory.stock',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/-icon_menu_proceeds.png',
-    value: '线上订单',
-    subTitle: 'Gathering',
-    url: '/pages/order/order.online.list',
   },
 ];
 
