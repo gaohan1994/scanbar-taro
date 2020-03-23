@@ -19,7 +19,15 @@ type Props = {
   selectCoupon?: MerchantInterface.Coupon;
 };
 
-class CouponPage extends Taro.Component<Props> {
+type State = {
+  selectId: number;
+}
+
+class CouponPage extends Taro.Component<Props, State> {
+
+  state: State = {
+    selectId: -1
+  };
 
   config = {
     navigationBarTitleText: '优惠券'
@@ -30,7 +38,7 @@ class CouponPage extends Taro.Component<Props> {
   }
 
   public init = async () => {
-    const { phone } = this.$router.params;
+    const { phone, selectId } = this.$router.params;
     const { productCartList } = this.props;
     if (!!phone) {
       /**
@@ -46,23 +54,29 @@ class CouponPage extends Taro.Component<Props> {
     } else {
       merchantAction.emptyCoupon();
     }
+
+    if (!!selectId) {
+      this.setState({selectId: Number(selectId)});
+    }
   }
 
   public onCouponClick = (coupon: MerchantInterface.Coupon) => {
     try {
-      const { selectCoupon } = this.props;
+      const { selectId } = this.state;
       invariant(!!coupon.ableToUse, '该优惠券暂不可用');
 
       /**
        * @time 0318
        * @todo [如果是再次点击则取消选择该优惠券]
        */
-      if (selectCoupon && selectCoupon.id === coupon.id) {
+      if (selectId === coupon.id) {
+        this.setState({selectId: -1});
         merchantAction.selectCoupon(undefined);
         Taro.navigateBack({});
         return;
       }
 
+      this.setState({selectId: coupon.id});
       merchantAction.selectCoupon(coupon);
       Taro.showToast({ title: '选择优惠券' });
       setTimeout(() => {
@@ -94,6 +108,7 @@ class CouponPage extends Taro.Component<Props> {
   }
 
   render () {
+    const { selectId } = this.state;
     const { couponList, selectCoupon } = this.props;
     return (
       <View className='container container-color'>
@@ -118,7 +133,7 @@ class CouponPage extends Taro.Component<Props> {
         >
           <View className={`product-list-right`}>
             {couponList.map((item) => {
-              const select = selectCoupon && selectCoupon.id === item.id;
+              const select = selectId === item.id;
               return (
                 <CouponItem 
                   key={item.id}

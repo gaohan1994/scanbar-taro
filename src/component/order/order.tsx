@@ -81,10 +81,16 @@ class OrderItem extends Taro.Component<Props, State> {
             }
 
             <View className={`${cssPrefix}-left-detail`}>
-              {/**
-               * 02 27
-               * @todo 修改 退货订单爷显示成黑色
-               */}
+              {/*
+                * 02 27
+                * @todo 修改 退货订单爷显示成黑色
+                * 
+                * 退货状态 refundStatus
+                * -1=不能退货（如待支付或交易关闭，以及取消申请中,以及储蓄/直接收款）
+                * 0=未退货（可能有退货记录包含退货中的，但没有实际退货成功的数量）
+                * 1=部分退货
+                * 2=全退
+                */}
               <View className={`${cssPrefix}-no`}>{`${data.order.orderNo}`}</View>
               <View className={`${cssPrefix}-row`}>
                 <View className={`${cssPrefix}-time`}>{`${dayJs(data.order.transTime).format('HH:mm:ss')}`}</View>
@@ -97,7 +103,11 @@ class OrderItem extends Taro.Component<Props, State> {
                       ? (
                         <View className={`${cssPrefix}-flag ${cssPrefix}-flag-orange`}>退货订单</View>
                       )
-                      : <View/>
+                      : data.order.refundStatus === 1
+                        ? <View className={`${cssPrefix}-flag ${cssPrefix}-flag-orange`}>部分退货</View>
+                        : data.order.refundStatus === 2
+                          ? <View className={`${cssPrefix}-flag ${cssPrefix}-flag-orange`}>全部退货</View>
+                          : <View/>
                 }
                 
               </View>

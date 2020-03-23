@@ -3,13 +3,18 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:28:21 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-17 16:28:56
+ * @Last Modified time: 2020-03-20 11:36:12
  */
 import { ResponseCode, OrderService, OrderInterface, OrderInterfaceMap } from '../constants/index';
 import { store } from '../app';
 import { OrderReducer } from '../reducers/app.order';
 
 class OrderAction {
+
+  public orderFinishRefund = async (orderNo: string) => {
+    const result = await OrderService.orderFinishRefund(orderNo);
+    return result;
+  }
 
   public orderSend = async (orderNo: string) => {
     const result = await OrderService.orderSend(orderNo);
@@ -94,8 +99,8 @@ class OrderAction {
     if (time && time === -1) {
       return {
         id: -1,
-        title: '已取消',
-        detail: '该订单已取消'
+        title: '交易关闭',
+        detail: '该订单已关闭'
       };
     }
     if (order && order.transFlag !== undefined) {
@@ -116,13 +121,13 @@ class OrderAction {
           return {
             id: 1,
             title: '已完成',
-            detail: '订单已完成，感谢您的信任'
+            detail: '订单已完成'
           }
         case 2:
           return {
             id: 2,
-            title: '已取消',
-            detail: '超时未支付或您已取消，订单已取消'
+            title: '交易关闭',
+            detail: '该订单已关闭'
           }
         case 3: {
           return {
@@ -197,7 +202,7 @@ class OrderAction {
           return {
             id: 11,
             title: '待自提',
-            detail: '请去门店自提商品'
+            detail: ''
           }
         default:
           for (let i = 0; i < orderAllStatus.length; i++) {
@@ -309,11 +314,11 @@ export const ORDER_STATUS = [{
 }, {
   id: 1,
   title: '已完成',
-  detail: '订单已完成，感谢您的信任'
+  detail: '订单已完成'
 }, {
   id: 2,
-  title: '已取消',
-  detail: '超时未支付或您已取消，订单已取消'
+  title: '交易关闭',
+  detail: '该订单已关闭'
 }, {
   id: 3,
   title: '待邮寄',

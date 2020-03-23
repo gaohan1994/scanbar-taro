@@ -30,6 +30,26 @@ class OrderComponent extends Taro.Component<Props> {
         {
           title: '申请退货时间',
           extraText: `${dayJs(order.transTime || '').format('YYYY/MM/DD HH:mm')}`,
+          border: false,
+        }
+      ];
+    } else if (status.id === 0) {
+      items = order && [
+        {
+          title: '订单号码',
+          extraText: `${order.orderNo}`,
+          onClick: () => {
+            Taro.setClipboardData({ data: order.orderNo }).then(() => {
+              Taro.showToast({
+                title: '复制成功'
+              });
+            });
+          }
+        },
+        {
+          title: '创建时间',
+          extraText: `${dayJs(order.createTime || '').format('YYYY/MM/DD HH:mm')}`,
+          border: false,
         }
       ];
     } else {
@@ -53,6 +73,15 @@ class OrderComponent extends Taro.Component<Props> {
         },
       ];
     }
+
+    if (status.id === 12) {
+      items.push({
+        title: '发货时间',
+        extraText: `${dayJs(order.deliveryTime || '').format('YYYY/MM/DD HH:mm')}`,
+        border: false,
+      });
+    }
+
     return (
       <View>
         <View className={`${cssPrefix}-card ${cssPrefix}-card-order`} style='margin-bottom: 0px'>
@@ -64,13 +93,19 @@ class OrderComponent extends Taro.Component<Props> {
                   className={classnames(`${cssPrefix}-card-order-item`, {
                     [`${cssPrefix}-card-order-item-border`]: !(item.border === false)
                   })}
+                  onClick={item.onClick}
                 >
                   <Text className={`${cssPrefix}-card-order-item-title`}>
                     {item.title}
                   </Text>
-                  <Text className={`${cssPrefix}-card-order-item-content`}>
+                  <View className={`${cssPrefix}-card-order-item-content`}>
                     {item.extraText}
-                  </Text>
+                    {item.title === '订单号码' && (
+                      <View  
+                        className={`${cssPrefix}-card-order-item-copy`}
+                      />
+                    )}
+                  </View>
                 </View>
               );
             })

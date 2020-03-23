@@ -6,6 +6,7 @@ import classnames from 'classnames';
 import { OrderInterface } from '../../../constants';
 import PriceComponent from '../../../component/layout/price';
 import numeral from 'numeral';
+import merge from 'lodash.merge';
 
 const prefix = 'component-order-product';
 const cssPrefix = 'component-product';
@@ -80,7 +81,7 @@ class OrderProduct extends Taro.Component<Props> {
 
   private renderDetail = () => {
     const { product } = this.props;
-
+    const productData = merge(product, {price: product.unitPrice});
     return (
       <View className={classnames(`${cssPrefix}-content-detail`)}>
         <View className={`${cssPrefix}-title`} >
@@ -88,7 +89,7 @@ class OrderProduct extends Taro.Component<Props> {
         </View>
         <View className={`${prefix}-box`}>
           <PriceComponent
-            product={product as any}
+            product={productData as any}
             numeral={numeral}
           />
           <View className={`${prefix}-tip`}>可退x{product.num}</View>

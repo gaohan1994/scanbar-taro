@@ -4,6 +4,7 @@ import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
 import "../style/order.less";
 import "../style/product.less";
+import dayJs from 'dayjs';
 import { OrderAction } from '../../actions';
 import invariant from 'invariant';
 import { ResponseCode, OrderInterface } from '../../constants/index';
@@ -131,6 +132,25 @@ class OrderDetail extends Taro.Component<Props, State> {
     const extraTextColor: any = orderDetail.order.transType === 1 ? '#FC4E44' : '#333333';
     const symbol = orderDetail.order.transType === 1 ? '-' : '';
 
+    const Form: FormRowProps[] = [
+      {
+        title: '订单号',
+        extraText: `${orderDetail.order && orderDetail.order.orderNo}`,
+      },
+      {
+        title: '下单时间',
+        extraText: `${orderDetail.order && dayJs(orderDetail.order.createTime).format('YYYY/MM/DD HH:mm:ss')}`,
+      },
+      
+    ];
+
+    if (orderDetail.order && orderDetail.order.username) {
+      Form.push({
+        title: '收银员',
+        extraText: `${orderDetail.order && orderDetail.order.username}`,
+      });
+    }
+
     const Form2: FormRowProps[] = orderDetail.order && [
       {
         title: `${orderDetail.order.transType !== 1 ? '应收金额' : '应退金额'}`,
@@ -141,7 +161,9 @@ class OrderDetail extends Taro.Component<Props, State> {
       },
       {
         title: `${OrderAction.orderPayType(orderDetail)}${orderDetail.order.transType !== 1 ? '收款' : '退款'}`,
-        extraText: orderDetail.order.transFlag === -1 ? `${orderDetail.order.transType !== 1 ? '收款' : '退款'}失败` : `${symbol}￥ ${numeral(orderDetail.order.transAmount).format('0.00')}`,
+        extraText: orderDetail.order.transFlag === -1 
+          ? `${orderDetail.order.transType !== 1 ? '收款' : '退款'}失败` 
+          : `${symbol}￥ ${numeral(orderDetail.order.transAmount).format('0.00')}`,
         extraTextStyle: 'title',
         extraTextColor: extraTextColor,
         extraTextBold: 'bold',
@@ -174,6 +196,12 @@ class OrderDetail extends Taro.Component<Props, State> {
       },
     ];
 
+    const memberForm = orderDetail.order && orderDetail.order.memberPhone && [{
+      title: '会员',
+      extraText: orderDetail.order.memberPhone,
+      hasBorder: false,
+    }];
+
     /**
      * @time 02.27
      * @todo [退货订单不显示这两项]
@@ -194,20 +222,52 @@ class OrderDetail extends Taro.Component<Props, State> {
             <FormCard items={Form3} />
           </View>
         )}
-        {/* {memberForm && (
-          <FormCard items={memberForm} />
-        )} */}
+        {memberForm && (
+          <View className={`${cssPrefix}-detail-card container-color`}>
+            <FormCard items={memberForm} />
+          </View>
+        )}
         <View className={`${cssPrefix}-detail-card container-color`}>
           {this.renderList()}
         </View>
-        <View className={`${cssPrefix}-area`} />
+        <View className={`${cssPrefix}-detail-card ${cssPrefix}-detail-card-mar container-color`}>
+          <FormCard items={Form} margin={false} />
+        </View>
 
-        <ButtonFooter
-          buttons={[{
-            title: '退货',
-            onPress: () => this.onRefund()
-          }]}
-        />
+        {orderDetail.order && orderDetail.order.originOrderNo && (
+          <View 
+            className={`${cssPrefix}-detail-card container-color`}
+            onClick={() => {
+              Taro.navigateTo({
+                url: `/pages/order/order.detail?id=${orderDetail.order.originOrderNo}`
+              });
+            }}
+          >
+            <View className={`${cssPrefix}-detail-item`}>
+              <View className={`${cssPrefix}-detail-item-box`}>
+                <Text className={`${cssPrefix}-detail-item-title`}>原销售订单</Text>
+                <Text className={`${cssPrefix}-detail-item-text`}>未返回</Text>
+              </View>
+              <View className={`${cssPrefix}-detail-item-extra`}>
+                <Text className={`${cssPrefix}-detail-item-price`}>未返回</Text>
+                <View  
+                  className={`${cssPrefix}-detail-item-arrow`}
+                />
+              </View>
+            </View>
+          </View>
+        )}
+
+        <View style='width: 100%; height: 100px; background: #f2f2f2;' />
+        {orderDetail.orderDetailList && orderDetail.orderDetailList.length > 0 
+        && orderDetail.order && orderDetail.order.orderSource !== 3 && orderDetail.order.transType !== 1 && (
+          <ButtonFooter
+            buttons={[{
+              title: '退货',
+              onPress: () => this.onRefund()
+            }]}
+          />
+        )}
       </View>
     );
   }
@@ -216,21 +276,23 @@ class OrderDetail extends Taro.Component<Props, State> {
     const { orderDetail } = this.props;
     if (orderDetail.orderDetailList) {
       const productList: ProductCartInterface.ProductCartInfo[] = orderDetail.orderDetailList.map((item) => {
+        /**
+         * @time 0319
+         * @todo [修改价格和原价]
+         */
         const formartItem: any = {
           id: item.productId,
           name: item.productName,
-          price: item.transAmount / item.num,
+          price: item.originPrice,
           sellNum: item.num,
-        }
-
-        if (item.originPrice) {
-          formartItem.changePrice = item.originPrice
-        }
-        return formartItem
+          changePrice: item.unitPrice,
+        };
+        return formartItem;
       });
       return (
         <ProductPayListView
           padding={false}
+          area={false}
           sort={orderDetail.order && orderDetail.order.transType === 1
             ? productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND
             : productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER}

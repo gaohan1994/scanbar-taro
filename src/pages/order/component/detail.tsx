@@ -24,16 +24,18 @@ class OrderComponent extends Taro.Component<Props> {
     const status = OrderAction.orderStatus([], orderDetail as any);
     return (
       <View className={`${prefix}-detail`}>
-        <View className={`${prefix}-detail-item`}> 
-          <View 
-            className={`${prefix}-detail-icon`} 
-            style='background-image: url(//net.huanmusic.com/weapp/icon_order_note.png)'
-          />
-          <View className={`${prefix}-detail-box`}>
-            <View className={`${prefix}-detail-text`}>订单备注</View>
-            <View className={`${prefix}-detail-title ${prefix}-detail-mar`}>{orderDetail.order && orderDetail.order.remark || '无备注'}</View>
+        {orderDetail.order && orderDetail.order.remark && (
+          <View className={`${prefix}-detail-item`}> 
+            <View 
+              className={`${prefix}-detail-icon`} 
+              style='background-image: url(//net.huanmusic.com/weapp/icon_order_note.png)'
+            />
+            <View className={`${prefix}-detail-box`}>
+              <View className={`${prefix}-detail-text`}>订单备注</View>
+              <View className={`${prefix}-detail-title ${prefix}-detail-mar`}>{orderDetail.order && orderDetail.order.remark}</View>
+            </View>
           </View>
-        </View>
+        )}
         {(status.id === 5 || status.id === 6 || status.id === 7 || status.id === 8 || status.id === 9) ? (
           <View className={`${prefix}-detail-item`}> 
             <View 
@@ -72,7 +74,7 @@ class OrderComponent extends Taro.Component<Props> {
             />
             <View className={`${prefix}-detail-box`}>
               <View className={`${prefix}-detail-box-text ${prefix}-detail-title ${prefix}-detail-mar`}>
-                {orderDetail.order && orderDetail.order.memberName || '接口未返回'}
+                {orderDetail.order && orderDetail.order.receiver || orderDetail.order.memberName || '接口未返回'}
                 <View className={`${prefix}-detail-text ${prefix}-detail-mar-l`}>{orderDetail.order && orderDetail.order.memberPhone}</View>
               </View>
               <View className={`${prefix}-detail-title ${prefix}-detail-mar`}>{orderDetail.order && orderDetail.order.address || '接口未返回'}</View>

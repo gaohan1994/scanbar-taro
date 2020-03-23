@@ -112,10 +112,13 @@ class ProductPay extends Taro.Component<Props, State> {
     /**
      * @time 0318
      * @todo [加入优惠券]
+     * @todo [从购物车进入则清空优惠券]
      */
+    console.log('this.props: ', this.props);
     if (!!selectCoupon) {
       this.setState({selectCoupon});
       productSdk.setCoupon(selectCoupon);
+      merchantAction.selectCoupon(undefined);
     } else {
       this.setState({selectCoupon: undefined});
       productSdk.setCoupon(undefined);
@@ -646,7 +649,7 @@ class ProductPay extends Taro.Component<Props, State> {
         arrow: 'right',
         onClick: () => {
           Taro.navigateTo({
-            url: `/pages/pay/pay.coupon?entry=product.pay${!!selectMember ? `&phone=${selectMember.phoneNumber}` : ''}`
+            url: `/pages/pay/pay.coupon?entry=product.pay${!!selectMember ? `&phone=${selectMember.phoneNumber}` : ''}${!!selectCoupon ? `&selectId=${selectCoupon.id}` : ''}`
           });
         }
       },

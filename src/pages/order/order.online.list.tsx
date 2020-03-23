@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-12-09 11:01:19 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-17 14:02:15
+ * @Last Modified time: 2020-03-18 17:26:00
  */
 
 import Taro from '@tarojs/taro';
@@ -281,10 +281,10 @@ class OrderOnlineList extends Taro.Component<Props> {
     const orderTypes = [
       {
         title: '待发货',
-        num: orderCount.waitForSend || 0,
+        num: orderCount.waitForDelivery || 0,
       },
       {
-        title: '配送中',
+        title: '待收货',
         num: orderCount.inTransNum || 0,
       },
       {

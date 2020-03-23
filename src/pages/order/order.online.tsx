@@ -4,7 +4,7 @@
  * @Author: Ghan 
  * @Date: 2020-03-10 15:29:23 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-17 16:41:29
+ * @Last Modified time: 2020-03-18 17:56:15
  */
 import Taro, { Config } from '@tarojs/taro';
 import { View, ScrollView } from '@tarojs/components';
@@ -131,6 +131,25 @@ class OrderOnline extends Taro.Component<Props> {
     }
   }
 
+  public orderFinishRefund = async (message = '已退货') => {
+    try {
+      const { orderDetail } = this.props;
+      const { orderNo } = orderDetail;
+      invariant(!!orderNo, '请传入订单id');
+      const result = await OrderAction.orderFinishRefund(orderNo);
+      invariant(result.code === ResponseCode.success, result.msg || ' ');
+      Taro.showToast({
+        title: message
+      });
+      this.init(orderNo);
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
+
   public orderRefund = async () => {
     try {
       const { orderDetail } = this.props;
@@ -222,7 +241,7 @@ class OrderOnline extends Taro.Component<Props> {
             content: '钱款将退回买家账户，确定退款？',
             success: (result) => {
               if (result.confirm) {
-                this.orderRefund();
+                this.orderFinishRefund();
               }
             }
           });
@@ -292,7 +311,17 @@ class OrderOnline extends Taro.Component<Props> {
         onPress: () => this.orderRefuseRefund(),
       }, {
         title: '同意并退款',
-        onPress: () => this.orderConfirmRefund(),
+        onPress: () => {
+          Taro.showModal({
+            title: '提示',
+            content: '钱款将退回买家账户，确定退款?',
+            success: (result) => {
+              if (result.confirm) {
+                this.orderConfirmRefund();
+              }
+            }
+          });
+        } 
       }];
     }
 
@@ -313,14 +342,16 @@ class OrderOnline extends Taro.Component<Props> {
       }];
     }
 
-    return [{
-      title: '查看原订单',
-      onPress: () => {
-        Taro.navigateTo({
-          url: `/pages/order/order.online?id=${orderDetail.order.originOrderNo}`
-        });
-      }
-    }];
+    if (orderDetail.order.originOrderNo) {
+      return [{
+        title: '查看原订单',
+        onPress: () => {
+          Taro.navigateTo({
+            url: `/pages/order/order.online?id=${orderDetail.order.originOrderNo}`
+          });
+        }
+      }];
+    }
   }
 
   render () {

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-18 15:30:33
+ * @Last Modified time: 2020-03-20 13:54:43
  * 
  * @todo [购物车组件]
  */
@@ -167,7 +167,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     if (productCartList.length > 0) {
       if (sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER) {
         Taro.navigateTo({
-          url: `/pages/product/product.pay`
+          url: `/pages/product/product.pay?entry=cart`
         });
         return;
       }

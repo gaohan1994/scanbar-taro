@@ -20,6 +20,7 @@ type Props = {
   className?: string;
   padding?: boolean;
   sort?: string;
+  area?: boolean;
 };
 
 class ProductPayListView extends Taro.Component<Props> {
@@ -34,7 +35,7 @@ class ProductPayListView extends Taro.Component<Props> {
   };
 
   render () {
-    const { productList, className, padding, sort } = this.props;
+    const { productList, className, padding, sort, area = true } = this.props;
     return (
       <View 
         className={classnames(className, {
@@ -154,7 +155,9 @@ class ProductPayListView extends Taro.Component<Props> {
             })
           }
         </View>
-        <View style="height: 100px; width: 100%" />
+        {!!area && (
+          <View style="height: 100px; width: 100%" />
+        )}
       </View>
     );
   }

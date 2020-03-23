@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-15 21:22:46
+ * @Last Modified time: 2020-03-20 10:58:49
  */
 import Taro from '@tarojs/taro';
 import { View, ScrollView, Input, Image, Text } from '@tarojs/components';
@@ -392,11 +392,16 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
                     onClick={() => { Taro.navigateTo({ url: `/pages/member/member.detail?id=${member.id}` }) }}
                   >
                     <View className={`${cssPrefix}-card-row-box`}>
-                      <Image src="//net.huanmusic.com/weapp/icon_vip_user.png" className={`${cssPrefix}-card-row-image`} />
+                      <View 
+                        className={`${cssPrefix}-card-row-image`} 
+                        style={member.avatar 
+                          ? `background-image: url(http://inventory.51cpay.com/memberAvatar/${member.avatar})` 
+                          : '//net.huanmusic.com/weapp/icon_vip_user.png'}
+                      />
                       <View className={`${cssPrefix}-card-row-detail`}>
                         <View className={`${cssPrefix}-card-row-detail-name`}>
                           <Text className={`${cssPrefix}-card-text`}>{member.username}</Text>
-                          <View className={`${cssPrefix}-card-row-detail-icon`}>普通会员</View>
+                          <View className={`${cssPrefix}-card-row-detail-icon`}>{member.levelName}</View>
                         </View>
                         <Text className={`${cssPrefix}-card-row-margin ${cssPrefix}-card-phone`}>{member.phoneNumber}</Text>
                       </View>

@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:09:10 
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-25 14:09:13
+ * @Last Modified time: 2020-03-19 18:28:32
  */
 import { jsonToQueryString, HTTPInterface } from '../index';
 
@@ -28,7 +28,10 @@ export declare namespace MemberInterface {
     id: number;
     lastPayTime: string;
     totalAmount: number;
+    levelName: string;
+    avatar: string;
     totalTimes: number;
+    enableMemberPrice: boolean;
   }
 
   /**

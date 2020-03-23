@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-18 15:17:25
+ * @Last Modified time: 2020-03-20 15:59:21
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -334,26 +334,27 @@ class ProductSDK {
    */
   public getProductItemPriceType = (product: ProductCartInterface.ProductCartInfo, member?: MemberInterface.MemberInfo) => {
     if (product.changePrice !== undefined) {
-      return '改价'
+      return '改价';
     }
 
-    if (!!member || !!this.member) {
+    const currentMember = member || this.member;
+    if (!!currentMember && !!currentMember.enableMemberPrice) {
       if (product.activityInfos && product.activityInfos.length > 0) {
         const activity = product.activityInfos.find(a => a.type === 2);
         if (activity && activity.discountPrice < product.memberPrice) {
-          return '活动价'
+          return '活动价';
         }
       }
-      return '会员价'
+      return '会员价';
     }
 
     if (product.activityInfos && product.activityInfos.length > 0) {
       const activity = product.activityInfos.find(a => a.type === 2);
       if (!!activity) {
-        return '活动价'
+        return '活动价';
       }
     }
-    return '原价'
+    return '原价';
   }
 
   /**
@@ -365,14 +366,21 @@ class ProductSDK {
       return product.changePrice;
     }
 
-    if (!!member || !!this.member) {
+    /**
+     * @time 0323
+     * @todo 修改计算规则，会员加入了是否可用开关
+     * @todo [1.如果可以用会员价则使用会员价/活动价较低的那个]
+     * @todo [2.如果不可以使用会员价则有活动价返回活动价,没有活动价返回原价]
+     */
+    const currentMember = member || this.member;
+    if (!!currentMember && !!currentMember.enableMemberPrice) {
       if (product.activityInfos && product.activityInfos.length > 0) {
         const activity = product.activityInfos.find(a => a.type === 2);
         if (activity && activity.discountPrice < product.memberPrice) {
           return activity.discountPrice;
         }
       }
-      return product.memberPrice || product.price;
+      return product.memberPrice;
     }
 
     if (product.activityInfos && product.activityInfos.length > 0) {
@@ -507,11 +515,11 @@ class ProductSDK {
      * @todo 如果不计算抹零的话可以返回了
      */
     if (!withErase) {
-      return total;
+      return numeral(total).format('0.00');
     }
 
     total = total - this.getErase();
-    return total;
+    return numeral(total).format('0.00');
   }
 
   /**

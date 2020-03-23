@@ -50,18 +50,18 @@ class ProductPayListView extends Taro.Component<Props> {
              * @time 0313
              * @todo [申请退货不显示header]
              */
-            type && type === 1 && status.id !== 5 && status.id !== 6 && status.id !== 7 && status.id !== 8 && status.id !== 9 && (
+            type && type === 1 && status.id !== 5 && status.id !== 6 && status.id !== 7 && status.id !== 8 && status.id !== 9 && order.memberName && (
               <View className={`${prefix}-detail-item ${prefix}-detail-bor`}> 
                 <View 
                   className={`${prefix}-detail-avator`} 
-                  style={`http://inventory.51cpay.com/memberAvatar/${order.avator}`}
+                  style={`background-image: url(http://inventory.51cpay.com/memberAvatar/${order.avatar})`}
                 />
                 <View className={`${prefix}-detail-box`}>
                   <View className={`${prefix}-detail-box-text`}>
-                    <View className={`${prefix}-detail-title `}>{order.receiver || order.memberName}</View>
+                    <View className={`${prefix}-detail-title `}>{order.memberName}</View>
                     <View className={`${prefix}-detail-vip`}>{order.levelName}</View>
                   </View>
-                  <View className={`${prefix}-detail-text ${prefix}-detail-mar`}>{order.receiverPhone || order.memberPhone}</View>
+                  <View className={`${prefix}-detail-text ${prefix}-detail-mar`}>{order.memberPhone}</View>
                 </View>
                 <View className={`${prefix}-detail-arror`} />
               </View>
@@ -203,7 +203,7 @@ class ProductPayListView extends Taro.Component<Props> {
     const { orderDetail } = this.props;
     return (
       <View>
-        <View className={`${cssPrefix}-row-totals`}>
+        {/* <View className={`${cssPrefix}-row-totals`}>
           <View className={`${cssPrefix}-row-content-item ${cssPrefix}-row-content-column`}>
             <View className={`${cssPrefix}-row-content-column-item`}>
               <View 
@@ -242,7 +242,7 @@ class ProductPayListView extends Taro.Component<Props> {
               <Text className={`${cssPrefix}-row-content-price`}>-￥20</Text>
             </View>
           </View>
-        </View>
+        </View> */}
         {orderDetail.order && orderDetail.order.couponDiscount && (
           <View className={`${cssPrefix}-row-totals`}>
             <View className={`${cssPrefix}-row-content-item`}>

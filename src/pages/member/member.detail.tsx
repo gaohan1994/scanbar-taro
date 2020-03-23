@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-17 11:52:13
+ * @Last Modified time: 2020-03-20 10:59:11
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
@@ -129,7 +129,12 @@ class MemberMain extends Taro.Component<MemberMainProps> {
             <View className={`${cssPrefix}-detail-zindex`}>
               <Card card-class="home-card member-card">
                 <View className={`${cssPrefix}-detail-img`}>
-                  <Image className={`${cssPrefix}-detail-avator`} src="//net.huanmusic.com/weapp/icon_user.png" />
+                  <View 
+                    className={`${cssPrefix}-detail-avator`} 
+                    style={memberDetail.avatar 
+                      ? `background-image: url(http://inventory.51cpay.com/memberAvatar/${memberDetail.avatar})` 
+                      : '//net.huanmusic.com/weapp/icon_vip_user.png'}
+                  />
                 </View>
                 <View className={`${cssPrefix}-detail`}>
                   <View className={`title-text ${cssPrefix}-detail-name`}>

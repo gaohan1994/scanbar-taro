@@ -12,26 +12,25 @@ type Props = {
 };
 
 type State = {
-  time: string;
+  time: number;
 };
 
 class OrderComponent extends Taro.Component<Props> {
 
   state: State = {
-    time: ''
+    time: -1
   };
 
   private timer: any;
   componentWillMount () {
     const { orderDetail } = this.props;
     const status = OrderAction.orderStatus([], orderDetail as any);
-    console.log('componentWillMount status: ', status);
     if (status.id === 0) {
       this.setTimer(orderDetail.order.createTime);
       return;
     }
 
-    if (status.id === 10 || status.id === 13) {
+    if (status.id === 10 || status.id === 11 || status.id === 13) {
       this.setTimer(orderDetail.order.transTime);
       return;
     }
@@ -125,6 +124,12 @@ class OrderComponent extends Taro.Component<Props> {
     }
   }
 
+  public setTime = (time: number): string => {
+    const hour = Math.floor(time / 60);
+    const min = time % 60;
+    return `${hour}时${min}分`;
+  }
+
   render () {
     const { time } = this.state;
     const { orderDetail = {} } = this.props;
@@ -139,11 +144,11 @@ class OrderComponent extends Taro.Component<Props> {
           <View className={`${prefix}-status-title`} >{status.title}</View>
           {status.id === 0 
           ? (
-            <View className={`${prefix}-status-tip`} >{`买家已下单${time}分`}</View>
+            <View className={`${prefix}-status-tip`} >{`买家已下单${this.setTime(time)}`}</View>
           ) 
-          : status.id === 10 || status.id === 13
+          : status.id === 10 || status.id === 11 || status.id === 13
             ? (
-              <View className={`${prefix}-status-tip`} >{`买家已付款${time}分`}</View>
+              <View className={`${prefix}-status-tip`} >{`买家已付款${this.setTime(time)}`}</View>
             )
             : (
             <View className={`${prefix}-status-tip`} >{status.detail}</View>

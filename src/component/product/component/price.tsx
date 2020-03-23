@@ -22,7 +22,6 @@ class PayListPrice extends Taro.Component<Props> {
      * @todo 加入活动价格
      * @todo 如果称重商品有改价 则优先计算改价，如果没有改价 计算会员价和活动价格的最低价
      */
-    // 如果称重商品有改价 则优先计算改价，如果没有优先计算会员价
     const itemPrice: number = productSdk.getProductItemPrice(product);
     return (
       <View className={`${cssPrefix}-row-content-item ${cssPrefix}-row-content-top`}>

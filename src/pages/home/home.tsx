@@ -26,7 +26,7 @@ const NavItems = [
   {
     image: '//net.huanmusic.com/weapp/v2/icon_menu_details.png',
     value: '查账',
-    subTitle: 'Transcation details',
+    subTitle: 'Inquiry account',
     url: '/pages/order/order.main',
   },
   {
