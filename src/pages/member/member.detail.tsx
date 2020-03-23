@@ -133,7 +133,7 @@ class MemberMain extends Taro.Component<MemberMainProps> {
                     className={`${cssPrefix}-detail-avator`} 
                     style={memberDetail.avatar 
                       ? `background-image: url(http://inventory.51cpay.com/memberAvatar/${memberDetail.avatar})` 
-                      : '//net.huanmusic.com/weapp/icon_vip_user.png'}
+                      : `background-image: url(//net.huanmusic.com/weapp/icon_vip_user.png)`}
                   />
                 </View>
                 <View className={`${cssPrefix}-detail`}>

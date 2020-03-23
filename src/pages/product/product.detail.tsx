@@ -665,8 +665,6 @@ class ProductDetail extends Taro.Component<Props, State> {
       productChangeDetail
     } = this.state;
 
-    console.log('productChangeDetail.cost: ', productChangeDetail.cost);
-
     const costInputs: ModalInput[] = [
       {
         title: '进价',

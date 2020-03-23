@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:01:17 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-17 10:09:21
+ * @Last Modified time: 2020-03-23 11:42:36
  * 
  * @todo [盘点相关的接口]
  * ```js
@@ -17,6 +17,11 @@ import { HTTPInterface, jsonToQueryString } from '../index';
 import MerchantInterfaceMap, { MerchantInterface } from "./merchant";
 
 class MerchantService {
+
+  public getByCode = async (code: string) => {
+    const result = await requestHttp.get(`/coupon/getByCode/${code}`);
+    return result;
+  }
 
   public couponList = async (params: any) => {
     const result = await requestHttp.post(`${MerchantInterfaceMap.couponGetAbleToUseCoupon}`, params);

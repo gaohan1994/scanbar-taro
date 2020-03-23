@@ -258,7 +258,6 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       .then(async (res) => {
         Taro.showLoading();
         const result = await ProductService.productInfoScanGet({barcode: res.result});
-        console.log('result: ', result);
         if (result.code === ResponseCode.success) {
           Taro.hideLoading();
           // 找到了商品 显示modal名称

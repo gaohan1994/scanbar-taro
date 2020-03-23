@@ -76,7 +76,6 @@ class OrderDetail extends Taro.Component<Props, State> {
           };
         })
       };
-      console.log('payload: ', payload);
       const result = await OrderService.orderRefund(payload);
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       Taro.showToast({

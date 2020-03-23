@@ -12,6 +12,7 @@ import ButtonCostom from '../../component/button/button';
 import invariant from 'invariant';
 import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
+import { ResponseCode } from '../../constants/index';
 
 type Props = {
   couponList: MerchantInterface.Coupon[];
@@ -21,12 +22,14 @@ type Props = {
 
 type State = {
   selectId: number;
-}
+  value: string;
+};
 
 class CouponPage extends Taro.Component<Props, State> {
 
   state: State = {
-    selectId: -1
+    selectId: -1,
+    value: '',
   };
 
   config = {
@@ -97,7 +100,7 @@ class CouponPage extends Taro.Component<Props, State> {
         scanType: ['qrCode']
       }).then((result) => {
         const { } = result;
-        console.log('result: ', result);
+        
       });
     } catch (error) {
       Taro.showToast({
@@ -107,23 +110,41 @@ class CouponPage extends Taro.Component<Props, State> {
     }
   }
 
+  public onInput = (value: string) => {
+    this.setState({value});
+  }
+
+  public onCoupon = async () => {
+    try {
+      const { value } = this.state;
+      invariant(!!value, '请输入要查询的优惠券码');
+      const result = await merchantAction.getByCode(value);
+      invariant(result.code === ResponseCode.success, result.msg || ' ');
+      this.onCouponClick(result.data);
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
+
   render () {
-    const { selectId } = this.state;
-    const { couponList, selectCoupon } = this.props;
+    const { selectId, value } = this.state;
+    const { couponList } = this.props;
     return (
       <View className='container container-color'>
         <HeaderInput
           placeholder="请输入业务单号"
-          value={''}
-          // onInput={this.onInput}
+          value={value}
+          onInput={({detail: {value}}) => this.onInput(value)}
           isRenderScan={true}
           scanClick={() => this.onScan()}
           // inputRightClick={() => this.onInput({detail: {value: ''}})}
         >
           <ButtonCostom
             title="确定"
-            // onClick={() => this.onSuspensionHandle()}
-            // badge={suspensionList.length}
+            onClick={() => this.onCoupon()}
           />
         </HeaderInput>
 

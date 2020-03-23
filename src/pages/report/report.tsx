@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-03 14:49:11
+ * @Last Modified time: 2020-03-23 11:46:03
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text, Picker } from '@tarojs/components';
@@ -134,7 +134,6 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
    * @todo 总店管理员可以查看分店
    */
   public onMerchantPress = (merchant: MerchantInterface.MerchantDetail) => {
-    console.log('merchant', merchant);
     this.setState({currentMerchant: merchant}, () => {
       this.fetchData();
     });

@@ -29,7 +29,6 @@ type Props = {
 class Page extends Taro.Component<Props> {
   render () {
     const { visible, selectMember, onClose, buttons } = this.props;
-    console.log('this.props, ', this.props);
     if (selectMember !== undefined && visible) {
       const cssPrefix = 'member';
       const memberForm: FormRowProps[] = [{

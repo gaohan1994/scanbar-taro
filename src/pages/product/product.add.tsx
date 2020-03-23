@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-20 13:37:23 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-02 10:36:44
+ * @Last Modified time: 2020-03-23 11:45:41
  */
 import Taro, { Config } from '@tarojs/taro';
 import { View, Image, Picker, Text } from '@tarojs/components';
@@ -198,7 +198,6 @@ class ProductAdd extends Taro.Component<Props, State> {
   public onChooseImages = (paths: string[]) => {
     const { result } = LoginManager.getUserToken();
 
-    console.log('paths ', paths);
     this.setState({
       tempFilePaths: paths
     });
@@ -268,7 +267,6 @@ class ProductAdd extends Taro.Component<Props, State> {
           count: 1,
         })
         .then(res => {
-          console.log('res: ', res);
           const { tempFilePaths } = res;
           this.onChooseImages(tempFilePaths);
         });

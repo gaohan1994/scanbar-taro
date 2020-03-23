@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-15 20:21:24
+ * @Last Modified time: 2020-03-23 11:45:59
  * 
  * @todo 开单页面
  */
@@ -78,7 +78,6 @@ class ProductRefund extends Taro.Component<Props, State> {
   public changeCurrentType = (typeInfo: ProductInterface.ProductTypeInfo, fetchProduct: boolean = true) => {
     this.setState({ currentType: typeInfo }, async () => {
       if (fetchProduct) {
-        console.log('this.state', this.state);
         this.fetchData(typeInfo);
       }
     });

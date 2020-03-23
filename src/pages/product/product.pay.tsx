@@ -115,7 +115,6 @@ class ProductPay extends Taro.Component<Props, State> {
      * @todo [加入优惠券]
      * @todo [从购物车进入则清空优惠券]
      */
-    console.log('this.props: ', this.props);
     if (!!selectCoupon) {
       this.setState({selectCoupon});
       productSdk.setCoupon(selectCoupon);

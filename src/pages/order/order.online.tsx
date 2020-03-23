@@ -4,7 +4,7 @@
  * @Author: Ghan 
  * @Date: 2020-03-10 15:29:23 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-18 17:56:15
+ * @Last Modified time: 2020-03-23 11:45:31
  */
 import Taro, { Config } from '@tarojs/taro';
 import { View, ScrollView } from '@tarojs/components';
@@ -175,7 +175,6 @@ class OrderOnline extends Taro.Component<Props> {
           };
         }) : []
       };
-      console.log('payload: ', payload);
       const result = await OrderService.orderRefund(payload);
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       Taro.showToast({

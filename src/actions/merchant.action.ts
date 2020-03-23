@@ -23,6 +23,11 @@ class MerchantAction {
     });
   }
 
+  public getByCode = async (code: string) => {
+    const result = await MerchantService.getByCode(code);
+    return result;
+  }
+
   public couponGetMemberExpiredCoupons = async (params: any) => {
     const result = await MerchantService.couponGetMemberExpiredCoupons(params);
     if (result.code === ResponseCode.success) {
