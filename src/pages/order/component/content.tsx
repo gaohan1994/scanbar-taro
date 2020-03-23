@@ -75,6 +75,7 @@ class OrderComponent extends Taro.Component<Props> {
     }
 
     if (status.id === 12) {
+      items[items.length - 1].border = true;
       items.push({
         title: '发货时间',
         extraText: `${dayJs(order.deliveryTime || '').format('YYYY/MM/DD HH:mm')}`,

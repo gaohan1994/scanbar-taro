@@ -9,6 +9,11 @@ import { connect } from '@tarojs/redux';
 import { getOrderDetail } from '../../../reducers/app.order';
 import { OrderInterface } from '../../../constants';
 import { OrderAction } from '../../../actions';
+import MemberModal from '../../../component/modal/member.modal';
+import { SelectMember } from '../../../component/modal/member.modal';
+import merge from 'lodash.merge';
+import memberService from '../../../constants/member/member.service';
+import { ResponseCode } from '../../../constants/index';
 
 const cssPrefix = 'product';
 const prefix = 'component-order-product';
@@ -23,14 +28,50 @@ type Props = {
   showCallModal?: () => void;
 };
 
+type State = {
+  memberVisible: boolean;
+  selectMember?: SelectMember;
+};
+
 class ProductPayListView extends Taro.Component<Props> {
 
   static options = {
     addGlobalClass: true
   };
 
+  state: State = {
+    memberVisible: false,
+    selectMember: undefined,
+  };
+
+  async componentDidMount () {
+    /**
+     * @param {selectMember} 选择的会员
+     * 
+     * @param {memberPerference} 会员的消费偏好
+     * @param {memberOrderInfo} 会员的消费信息
+     */
+    const { orderDetail } = this.props;
+    const { order } = orderDetail;
+
+    if (order.memberId) {
+      const result = await memberService.memberDetailByPreciseInfo({ identity: order.memberId });
+      let selectMember: SelectMember = merge({}, result.data);
+      const memberPerference = await memberService.memberPreference({ id: order.memberId });
+      if (memberPerference.code === ResponseCode.success) {
+        selectMember.perference = memberPerference.data;
+      }
+
+      const memberOrderInfo = await memberService.memberOrderInfo({ id: order.memberId });
+      if (memberOrderInfo.code === ResponseCode.success) {
+        selectMember.orderInfo = memberOrderInfo.data;
+      }
+      this.setState({selectMember});
+    }
+  }
+
   render() {
-    const { productList, className, padding = true, payOrderDetail, type, orderDetail, showCallModal } = this.props;
+    const { productList, className, padding = true, payOrderDetail, type, orderDetail } = this.props;
     const { orderDetailList, order } = orderDetail;
     const status = OrderAction.orderStatus([], orderDetail as any);
     return (
@@ -51,7 +92,10 @@ class ProductPayListView extends Taro.Component<Props> {
              * @todo [申请退货不显示header]
              */
             type && type === 1 && status.id !== 5 && status.id !== 6 && status.id !== 7 && status.id !== 8 && status.id !== 9 && order.memberName && (
-              <View className={`${prefix}-detail-item ${prefix}-detail-bor`}> 
+              <View 
+                className={`${prefix}-detail-item ${prefix}-detail-bor`}
+                onClick={() => this.setState({memberVisible: true})}
+              > 
                 <View 
                   className={`${prefix}-detail-avator`} 
                   style={`background-image: url(http://inventory.51cpay.com/memberAvatar/${order.avatar})`}
@@ -98,7 +142,20 @@ class ProductPayListView extends Taro.Component<Props> {
           {this.renderDisount()}
           {this.renderTotal()}
         </View>
+        {this.renderMemberLayout()}
       </View>
+    );
+  }
+
+  private renderMemberLayout = () => {
+    const { memberVisible, selectMember } = this.state;
+    const { } = this.props;
+    return (
+      <MemberModal
+        selectMember={selectMember as any}
+        visible={memberVisible}
+        onClose={() => this.setState({memberVisible: false})}
+      />
     );
   }
 
@@ -133,6 +190,9 @@ class ProductPayListView extends Taro.Component<Props> {
 
             <View className={`${cssPrefix}-row-content ${cssPrefix}-row-content-box`}>
               <Text className={`${cssPrefix}-row-name`}>{item.productName}</Text>
+              {!!item.barcode && (
+                <Text className={`${cssPrefix}-row-barcode`}>{item.barcode}</Text>
+              )}
               <Text className={`${cssPrefix}-row-normal`}>{`x ${item.num}`}</Text>
               <View className={`${cssPrefix}-row-corner`}>
                 <View>
