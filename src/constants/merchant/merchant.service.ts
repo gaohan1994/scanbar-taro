@@ -18,6 +18,11 @@ import MerchantInterfaceMap, { MerchantInterface } from "./merchant";
 
 class MerchantService {
 
+  public activityInfoList = async () => {
+    const result = await requestHttp.get('/activityInfo/list');
+    return result;
+  }
+
   public getByCode = async (code: string) => {
     const result = await requestHttp.get(`/coupon/getByCode/${code}`);
     return result;

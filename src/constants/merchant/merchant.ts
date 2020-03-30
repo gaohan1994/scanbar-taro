@@ -83,6 +83,7 @@ export declare namespace MerchantInterface {
       RECEIVE_COUPON_LIST: string;
       RECEIVE_SELECT_COUPON: string;
       RECEIVE_EXPIRED_COUPON: string;
+      RECEIVE_ACTIVITYINFO: string;
     };
     
     merchantInfoAdd: string;
@@ -102,6 +103,7 @@ class MerchantInterfaceMap implements MerchantInterface.MerchantInterfaceMap {
     RECEIVE_COUPON_LIST: 'RECEIVE_COUPON_LIST',
     RECEIVE_EXPIRED_COUPON: 'RECEIVE_EXPIRED_COUPON',
     RECEIVE_SELECT_COUPON: 'RECEIVE_SELECT_COUPON',
+    RECEIVE_ACTIVITYINFO: 'RECEIVE_ACTIVITYINFO',
   };
   public merchantInfoAdd = '/merchantInfo/add';
   public merchantInfoDetail = '/merchantInfo/detail';

@@ -76,6 +76,12 @@ class ProductPay extends Taro.Component<Props, State> {
 
   public componentDidShow = () => {
     const { addSelectMember, selectCoupon } = this.props;
+
+    /**
+     * @todo 获取满减信息
+     */
+    merchantAction.activityInfoList();
+
     productSdk.setSort(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER);
     /**
      * 每次进入结算页面的时候重置数据并清空 productsdk

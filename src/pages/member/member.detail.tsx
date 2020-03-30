@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-20 10:59:11
+ * @Last Modified time: 2020-03-24 10:09:17
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
@@ -140,7 +140,7 @@ class MemberMain extends Taro.Component<MemberMainProps> {
                   <View className={`title-text ${cssPrefix}-detail-name`}>
                     {memberDetail.username || ''}
                     <View className={`${cssPrefix}-detail-name-level`}>
-                      {this.setLevel(memberDetail.levelId || 1)}
+                      {memberDetail.levelName}
                     </View>
                   </View>
                   <View className="normal-text">{memberDetail.phoneNumber || ''}</View>
@@ -207,13 +207,6 @@ class MemberMain extends Taro.Component<MemberMainProps> {
         </View>
       </View>
     );
-  }
-
-  private setLevel = (id: number): string => {
-    if (id === 1) {
-      return '普通会员';
-    }
-    return '普通会员';
   }
 }
 

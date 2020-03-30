@@ -44,6 +44,7 @@ export declare namespace MerchantReducer {
     couponsList: MerchantInterface.Coupon[];
     couponsExpiredList: MerchantInterface.Coupon[];
     selectCoupon: MerchantInterface.Coupon;
+    activityInfo: any;
   }
 
   type Action = 
@@ -62,10 +63,17 @@ export const initState: MerchantReducer.State = {
   couponsList: [],
   couponsExpiredList: [],
   selectCoupon: {} as MerchantInterface.Coupon,
+  activityInfo: {} as any,
 };
 
 export default function merchant (state: MerchantReducer.State = initState, action: MerchantReducer.Action): MerchantReducer.State {
   switch (action.type) {
+    case MerchantInterfaceMap.reducerInterface.RECEIVE_ACTIVITYINFO: {
+      const { } = action;
+      return {
+        ...state,
+      };
+    }
 
     case MerchantInterfaceMap.reducerInterface.RECEIVE_SELECT_COUPON: {
       const { payload } = action as MerchantReducer.Reducers.SelectCouponReducer;

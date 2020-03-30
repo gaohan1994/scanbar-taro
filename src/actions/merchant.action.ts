@@ -4,6 +4,17 @@ import { store } from '../app';
 
 class MerchantAction {
 
+  public activityInfoList = async () => {
+    const result = await MerchantService.activityInfoList();
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: MerchantInterfaceMap.reducerInterface.RECEIVE_ACTIVITYINFO,
+        payload: result.data
+      });
+    } 
+    return result;
+  }
+
   public selectCoupon = (coupon?: MerchantInterface.Coupon) => {
     store.dispatch({
       type: MerchantInterfaceMap.reducerInterface.RECEIVE_SELECT_COUPON,
