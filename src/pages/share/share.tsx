@@ -2,10 +2,10 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-30 10:16:35
+ * @Last Modified time: 2020-03-31 11:44:23
  */
 import Taro from '@tarojs/taro';
-import { View } from '@tarojs/components';
+import { View, Button } from '@tarojs/components';
 
 type Props = {
 
@@ -13,16 +13,22 @@ type Props = {
 
 class Page extends Taro.Component<Props> {
 
-  public navTo = () => {
-    
+  onShareAppMessage = (res) => {
+    console.log('res: ', res);
+    return {
+      title: 'title',
+      path: '/pages/share/share.product?id=276',
+    };
   }
 
   render () {
     return (
       <View className='container'>
-        <View onClick={() => this.navTo()}>
-          navto
-        </View>
+        <Button
+          openType='share'
+        >
+          share
+        </Button>
       </View>
     );
   }

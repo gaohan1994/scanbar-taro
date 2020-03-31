@@ -36,6 +36,13 @@ class App extends Component {
     ],
     subPackages: [
       {
+        root: 'pages/share',
+        pages: [
+          'share',
+          'share.product'
+        ],
+      },
+      {
         root: 'pages/mine',
         pages: [
           'user.merchant',
