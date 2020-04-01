@@ -1,5 +1,5 @@
 import Taro from '@tarojs/taro';
-import { View, Image } from '@tarojs/components';
+import { View, Image, ScrollView } from '@tarojs/components';
 import "../card/form.card.less";
 import '../../pages/style/product.less';
 import '../../styles/theme.less';
@@ -10,15 +10,11 @@ import numeral from 'numeral';
 import { Card } from '../../component/common/card/card.common';
 import FormRow from '../../component/card/form.row';
 import ButtonFooter from '../../component/button/button.footer';
-import { MemberInterface } from 'src/constants';
+import CouponItem from '../coupon/coupon';
+import './modal.less';
+import { SelectMember } from '../../pages/product/product.pay';
 
-const cssPrefix = 'product';
-
-export interface SelectMember extends MemberInterface.MemberInfo {
-  perference?: MemberInterface.MemberPerference[];
-  orderInfo?: MemberInterface.MemberOrderInfo;
-}
-
+const prefix = 'component-modal';
 type Props = {
   visible: boolean;
   selectMember: SelectMember;
@@ -27,7 +23,13 @@ type Props = {
 };
 
 class Page extends Taro.Component<Props> {
+
+  state = {
+    showMoreCoupon: true,
+  };
+
   render () {
+    const { showMoreCoupon } = this.state;
     const { visible, selectMember, onClose, buttons } = this.props;
     if (selectMember !== undefined && visible) {
       const cssPrefix = 'member';
@@ -47,7 +49,6 @@ class Page extends Taro.Component<Props> {
         {
           title: '优惠券',
           extraText: '5',
-          hasBorder: false
         },
       ];
       return (
@@ -66,63 +67,84 @@ class Page extends Taro.Component<Props> {
                 src="//net.huanmusic.com/weapp/icon_del_1.png"
               />
             </View>
-            <Card card-class="home-card member-card product-pay-member-layout-card">
-              <View className={classnames(`${cssPrefix}-detail-img`)}>
-                <Image className={`${cssPrefix}-detail-avator`} src="//net.huanmusic.com/weapp/icon_user.png" />
-              </View>
-              <View className={`${cssPrefix}-detail`}>
-                <View className={`title-text ${cssPrefix}-detail-name`}>
-                  {selectMember.username || ''}
-                  <View className={`${cssPrefix}-detail-name-level`}>{selectMember.levelName}</View>
+            <ScrollView
+              scrollY={true}
+              className={`${prefix}-scroll`}
+            >
+              <Card card-class="home-card member-card product-pay-member-layout-card">
+                <View className={classnames(`${cssPrefix}-detail-img`)}>
+                  <Image className={`${cssPrefix}-detail-avator`} src="//net.huanmusic.com/weapp/icon_user.png" />
                 </View>
-                <View className="small-text">{selectMember.phoneNumber || ''}</View>
-              </View>
-              <View className="home-buttons member-buttons">
-                <View className="member-buttons-button home-buttons-button-border">
-                  <View className="title-text">
-                    ￥{numeral(selectMember.orderInfo !== undefined && selectMember.orderInfo.totalAmount || 0).format('0.00')}
+                <View className={`${cssPrefix}-detail`}>
+                  <View className={`title-text ${cssPrefix}-detail-name`}>
+                    {selectMember.username || ''}
+                    <View className={`${cssPrefix}-detail-name-level`}>{selectMember.levelName}</View>
                   </View>
-                  <View className="small-text">累计消费</View>
+                  <View className="small-text">{selectMember.phoneNumber || ''}</View>
                 </View>
-                <View className="member-buttons-button">
-                  <View className="title-text">
-                    {numeral(selectMember.orderInfo !== undefined && selectMember.orderInfo.totalTimes || 0).value()}
+                <View className="home-buttons member-buttons">
+                  <View className="member-buttons-button home-buttons-button-border">
+                    <View className="title-text">
+                      ￥{numeral(selectMember.orderInfo !== undefined && selectMember.orderInfo.totalAmount || 0).format('0.00')}
+                    </View>
+                    <View className="small-text">累计消费</View>
                   </View>
-                  <View className="small-text">购买次数</View>
+                  <View className="member-buttons-button">
+                    <View className="title-text">
+                      {numeral(selectMember.orderInfo !== undefined && selectMember.orderInfo.totalTimes || 0).value()}
+                    </View>
+                    <View className="small-text">购买次数</View>
+                  </View>
                 </View>
-              </View>
-            </Card>
-            <Card card-class="home-card member-card">
-              {memberForm.map((item) => {
-                return <FormRow key={item.title} {...item} />;
-              })}
-              <FormRow
-                title="消费偏好"
-                hasBorder={false}
-                extraText={selectMember.perference !== undefined && selectMember.perference.length > 0 ? '' : '暂无消费偏好'}
-              >
-                {
-                  selectMember.perference !== undefined && selectMember.perference.length > 0 && (
-                    selectMember.perference.map((perference) => {
-                      return (
-                        <View
-                          key={perference.typeId}
-                          className={`member-detail-row-icons`}
-                        >
-                          <View className={`member-detail-row-icon`}>{perference.typeName}</View>
-                        </View>
-                      );
-                    })
-                  )
-                }
-              </FormRow>
-            </Card>
-            <Card card-class="home-card member-card">
-              {form4.map((item) => {
-                return <FormRow key={item.title} {...item} />;
-              })}
-            </Card>
-            <View style="height: 100px; width: 100%" />
+              </Card>
+              <Card card-class="home-card member-card">
+                {memberForm.map((item) => {
+                  return <FormRow key={item.title} {...item} />;
+                })}
+                <FormRow
+                  title="消费偏好"
+                  hasBorder={false}
+                  extraText={selectMember.perference !== undefined && selectMember.perference.length > 0 ? '' : '暂无消费偏好'}
+                >
+                  {
+                    selectMember.perference !== undefined && selectMember.perference.length > 0 && (
+                      selectMember.perference.map((perference) => {
+                        return (
+                          <View
+                            key={perference.typeId}
+                            className={`member-detail-row-icons`}
+                          >
+                            <View className={`member-detail-row-icon`}>{perference.typeName}</View>
+                          </View>
+                        );
+                      })
+                    )
+                  }
+                </FormRow>
+              </Card>
+              <Card card-class="home-card member-card">
+                {form4.map((item) => {
+                  return <FormRow key={item.title} {...item} />;
+                })}
+                <View className={`${prefix}-coupons`}>
+                  {!!showMoreCoupon && selectMember && selectMember.couponList && (
+                    <View>
+                      {selectMember.couponList.map((item) => {
+                        return (
+                          <CouponItem
+                            key={item.id}
+                            touchable={false}
+                            coupon={item}
+                            onClick={() => {}}
+                          />
+                        );
+                      })}
+                    </View>
+                  )}
+                </View>
+              </Card>
+              <View style="height: 100px; width: 100%" />
+            </ScrollView>
             {buttons && buttons.length > 0 && (
               <ButtonFooter
                 buttons={buttons}

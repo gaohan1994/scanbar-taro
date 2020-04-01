@@ -18,24 +18,23 @@ import { ProductInterfaceMap } from '../../constants';
 import Modal from '../../component/modal/modal';
 import numeral from 'numeral';
 import memberService from '../../constants/member/member.service';
-import { Card } from '../../component/common/card/card.common';
-import FormRow from '../../component/card/form.row';
 import merge from 'lodash.merge';
 import { PayReducer } from '../../reducers/app.pay';
 import { getSelectMember } from '../../reducers/app.member';
 import { ModalInput } from '../../component/modal/modal';
 import ProductPayListView from '../../component/product/product.pay.listview';
-import ButtonFooter from '../../component/button/button.footer';
 import merchantAction from '../../actions/merchant.action';
 import { getCouponList, getSelectCoupon } from '../../reducers/app.merchant';
 import { MerchantInterface } from 'src/constants';
 import MemberModal from '../../component/modal/member.modal';
+import merchantService from '../../constants/merchant/merchant.service';
 
 const cssPrefix = 'product';
 
 export interface SelectMember extends MemberInterface.MemberInfo {
   perference?: MemberInterface.MemberPerference[];
   orderInfo?: MemberInterface.MemberOrderInfo;
+  couponList?: MerchantInterface.Coupon[];
 }
 
 interface Props {
@@ -291,6 +290,11 @@ class ProductPay extends Taro.Component<Props, State> {
       const memberOrderInfo = await memberService.memberOrderInfo({ id: result.data.id });
       if (memberOrderInfo.code === ResponseCode.success) {
         selectMember.orderInfo = memberOrderInfo.data;
+      }
+
+      const memberCoupons = await merchantService.getMemberCoupons({phone: selectMember.phoneNumber});
+      if (memberCoupons.code === ResponseCode.success) {
+        selectMember.couponList = memberCoupons.data.rows;
       }
 
       Taro.hideLoading();
