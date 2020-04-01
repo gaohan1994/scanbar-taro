@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 14:41:35 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-18 15:02:05
+ * @Last Modified time: 2020-04-01 15:38:47
  * 
  * @todo [fockedTaroUiListItem,增加以及修改了一些属性]
  */
@@ -247,7 +247,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
             {arrow ? (
               <Image 
                 src="//net.huanmusic.com/weapp/icon_commodity_into.png" 
-                className={`component-form-arrow`}
+                className={`component-form-arrow component-form-arrow-${arrow}`}
               />
             ) : null}
           </View>

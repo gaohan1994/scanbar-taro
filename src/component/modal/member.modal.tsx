@@ -49,6 +49,14 @@ class Page extends Taro.Component<Props> {
         {
           title: '优惠券',
           extraText: '5',
+          arrow: `${!!showMoreCoupon ? 'top' : 'bottom'}`,
+          onClick: () => {
+            this.setState((prevState: any) => {
+              return {
+                showMoreCoupon: !prevState.showMoreCoupon
+              };
+            });
+          }
         },
       ];
       return (

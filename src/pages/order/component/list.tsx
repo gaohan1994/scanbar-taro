@@ -55,7 +55,7 @@ class ProductPayListView extends Taro.Component<Props> {
     const { order } = orderDetail;
 
     if (order.memberId) {
-      const result = await memberService.memberDetailByPreciseInfo({ identity: order.memberId });
+      const result = await memberService.memberDetail({ id: order.memberId });
       let selectMember: SelectMember = merge({}, result.data);
       const memberPerference = await memberService.memberPreference({ id: order.memberId });
       if (memberPerference.code === ResponseCode.success) {
