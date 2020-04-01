@@ -22,6 +22,32 @@ export declare namespace MerchantInterface {
     type: number;
   }
 
+  interface Activity {
+    auditorName: string;
+    createTime: string;
+    cycleRule: string;
+    docMakerName: string;
+    endDetailTime: string;
+    endTime: string;
+    merchantIds: string;
+    merchantName: string;
+    name: string;
+    startDetailTime: string;
+    startTime: string;
+    updateTime: string;
+    filterType: number;
+    id: number;
+    isDeleted: number;
+    type: number;
+    updateBy: number;
+    rule: {
+      discount: number;
+      threshold: number;
+    }[];
+    status: boolean;
+    auditStatus: boolean;
+  }
+
   interface Coupon { 
     ableToUse: boolean;
     couponId: number;

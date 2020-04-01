@@ -7,9 +7,22 @@ class MerchantAction {
   public activityInfoList = async () => {
     const result = await MerchantService.activityInfoList();
     if (result.code === ResponseCode.success) {
+
+      let data: any[] = [];
+
+      if (result.data.rows.length > 0) {
+        result.data.rows.map((item) => {
+          const row = {
+            ...item,
+            rule: !!item.rule && item.rule.length > 0 ? JSON.parse(item.rule) : item.rule,
+          };
+          data.push(row);
+        });
+      }
+
       store.dispatch({
         type: MerchantInterfaceMap.reducerInterface.RECEIVE_ACTIVITYINFO,
-        payload: result.data
+        payload: data
       });
     } 
     return result;

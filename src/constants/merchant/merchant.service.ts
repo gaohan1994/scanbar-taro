@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:01:17 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-23 11:42:36
+ * @Last Modified time: 2020-03-31 11:49:54
  * 
  * @todo [盘点相关的接口]
  * ```js
@@ -15,11 +15,13 @@
 import requestHttp from "../../common/request/request.http";
 import { HTTPInterface, jsonToQueryString } from '../index';
 import MerchantInterfaceMap, { MerchantInterface } from "./merchant";
+import { store } from "../../app";
 
 class MerchantService {
 
   public activityInfoList = async () => {
-    const result = await requestHttp.get('/activityInfo/list');
+    const merchant = await store.getState().merchant.profileInfo;
+    const result = await requestHttp.get(`/activityInfo/list/${merchant.merchantInfoDTO.id}`);
     return result;
   }
 

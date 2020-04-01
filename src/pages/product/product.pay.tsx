@@ -74,13 +74,13 @@ class ProductPay extends Taro.Component<Props, State> {
     selectCoupon: undefined,
   };
 
-  public componentDidShow = () => {
+  public componentDidShow = async () => {
     const { addSelectMember, selectCoupon } = this.props;
 
     /**
      * @todo 获取满减信息
      */
-    merchantAction.activityInfoList();
+    await merchantAction.activityInfoList();
 
     productSdk.setSort(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER);
     /**
@@ -344,17 +344,6 @@ class ProductPay extends Taro.Component<Props, State> {
        * @time 0318
        * @todo [成功之后reset所有state]
        */
-      // this.setState({
-      //   eraseModal: false,
-      //   eraseValue: '',
-      //   memberModal: false,
-      //   memberValue: '',
-      //   memberLayout: false,
-      //   receiveValue: '',
-      //   receiveDiscount: '',
-      //   selectMember: undefined,
-      //   selectCoupon: undefined,
-      // });
       productSdk.setErase(undefined);
       productSdk.setMember(undefined);
       productSdk.setCoupon(undefined);
@@ -522,6 +511,8 @@ class ProductPay extends Taro.Component<Props, State> {
       }
     ];
 
+    const activityToken = productSdk.checkActivity(productSdk.getProductMemberPrice());
+
     const formCard: FormRowProps[] = [
       {
         title: '商品数量',
@@ -531,38 +522,59 @@ class ProductPay extends Taro.Component<Props, State> {
         title: '原价金额',
         extraText: `￥${this.setNumber(numeral(productSdk.getProductsOriginPrice()).value())}`
       },
-      {
+    ];
+
+    if (productSdk.getProductsOriginPrice() - productSdk.getProductMemberPrice() !== 0) {
+      formCard.push({
         title: '商品优惠',
         extraText: `${productSdk.getProductsOriginPrice() - productSdk.getProductMemberPrice() !== 0
           ? `${productSdk.getProductsOriginPrice() - productSdk.getProductMemberPrice() > 0 ? '-' : '+'} ￥${this.setNumber(Math.abs(productSdk.getProductsOriginPrice() - productSdk.getProductMemberPrice()))}`
           : '￥0.00'}`,
         extraTextStyle: 'price'
-      },
-      {
+      });
+    }
+
+    if (eraseValue !== '') {
+      formCard.push({
         title: '整单优惠',
         extraText: `${eraseValue !== ''
           ? `- ￥${this.setNumber(eraseValue)}`
           : '￥0.00'}`,
         extraTextStyle: 'price',
-        // hasBorder: false,
-      },
-      {
-        title: '优惠券',
-        extraText: `${!!selectCoupon && selectCoupon.id
-          ? `-￥${numeral(selectCoupon.couponVO && selectCoupon.couponVO.discount).format('0.00')}` 
-          : ''}`,
+      });
+    }
+
+    formCard.push({
+      title: '优惠券',
+      extraText: `${!!selectCoupon && selectCoupon.id
+        ? `-￥${numeral(selectCoupon.couponVO && selectCoupon.couponVO.discount).format('0.00')}` 
+        : ''}`,
+      extraTextStyle: 'price',
+      hasBorder: false,
+      isCoupon: true,
+      coupons: couponList,
+      arrow: 'right',
+      onClick: () => {
+        Taro.navigateTo({
+          url: `/pages/pay/pay.coupon?entry=product.pay${!!selectMember 
+            ? `&phone=${selectMember.phoneNumber}` 
+            : ''}${!!selectCoupon ? `&selectId=${selectCoupon.id}` : ''}`
+        });
+      }
+    });
+
+    if (!!activityToken) {
+      formCard[formCard.length - 1].hasBorder = true;
+      formCard.push({
+        title: '满减优惠',
+        extraText: `${!!activityToken
+          ? `- ￥${this.setNumber(activityToken.rule[0].discount)}`
+          : '￥0.00'}`,
         extraTextStyle: 'price',
-        hasBorder: false,
-        isCoupon: true,
-        coupons: couponList,
-        arrow: 'right',
-        onClick: () => {
-          Taro.navigateTo({
-            url: `/pages/pay/pay.coupon?entry=product.pay${!!selectMember ? `&phone=${selectMember.phoneNumber}` : ''}${!!selectCoupon ? `&selectId=${selectCoupon.id}` : ''}`
-          });
-        }
-      },
-    ];
+        hasBorder: false
+      });
+    }
+
     return (
       <View className={`${cssPrefix}-pay-pos`}>
         <FormCard items={priceForm} />

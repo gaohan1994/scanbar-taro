@@ -484,6 +484,76 @@ class ProductSDK {
     return 0;
   }
 
+  public checkActivity = (price: number) => {
+    const activitys = store.getState().merchant.activityInfo;
+    let activity: MerchantInterface.Activity;
+
+    if (!!activitys) {
+      activitys.map((item) => {
+        if (item.type === 3) {
+          activity = item;
+        }
+      });
+    }
+
+    console.log('price: ', price);
+    console.log('activity: ', activitys);
+    /**
+     * @todo 如果有满减活动则计算满减活动
+     */
+    if (!!activity) {
+      
+      /**
+       * @todo 如果有满减金额
+       */
+      if (activity.rule && activity.rule.length > 0) {
+
+        /**
+         * @todo 如果阈值小于价格则使用满减
+         */
+        if (activity.rule[0].threshold < price) {
+          return activity;
+        }
+        return false;
+      }
+      return false;
+    }
+    return false;
+  }
+
+  public getProductActivityPrice = (price: number) => {
+    const activitys = store.getState().merchant.activityInfo;
+    let activity: MerchantInterface.Activity;
+
+    activitys.map((item) => {
+      if (item.type === 3) {
+        activity = item;
+      }
+    });
+
+    /**
+     * @todo 如果有满减活动则计算满减活动
+     */
+    if (!!activity) {
+      
+      /**
+       * @todo 如果有满减金额
+       */
+      if (activity.rule && activity.rule.length > 0) {
+
+        /**
+         * @todo 如果阈值小于价格则使用满减
+         */
+        if (activity.rule[0].threshold < price) {
+          return numeral(price - activity.rule[0].discount).value();
+        }
+        return price;
+      }
+      return price;
+    }
+    return price;
+  }
+
   /**
    * @todo 计算交易价格
    * 
@@ -502,6 +572,8 @@ class ProductSDK {
     // 计算如果有会员的话使用会员价格，如果没有会员则返回原价
     let total: number = this.getProductMemberPrice();
     // 抹零价格在会员价之后减去
+
+    total = this.getProductActivityPrice(total);
 
     if (!!this.coupon) {
       /**
