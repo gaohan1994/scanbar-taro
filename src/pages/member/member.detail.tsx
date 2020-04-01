@@ -2,13 +2,14 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-24 10:09:17
+ * @Last Modified time: 2020-04-01 14:49:38
  */
 import Taro from '@tarojs/taro';
-import { View, Image, Text } from '@tarojs/components';
+import { View, Image, Text, ScrollView } from '@tarojs/components';
 import "../style/member.less";
 import "../style/product.less";
 import "../style/home.less";
+import "../style/inventory.less";
 import { Card } from '../../component/common/card/card.common';
 import FormCard from '../../component/card/form.card';
 import FormRow, { FormRowProps } from '../../component/card/form.row';
@@ -17,8 +18,11 @@ import { MemberAction } from '../../actions';
 import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
 import { getMemberDetail, getMemberPerference, getMemberOrderInfo } from '../../reducers/app.member';
-import { MemberInterface } from '../../constants';
+import { MemberInterface, MerchantService } from '../../constants';
 import numeral from 'numeral';
+import ModalLayout from '../../component/layout/modal.layout';
+import CouponItem from '../../component/coupon/coupon';
+import { ResponseCode } from '../../constants/index';
 
 const cssPrefix: string = 'member';
 
@@ -38,6 +42,11 @@ class MemberMain extends Taro.Component<MemberMainProps> {
    */
   config: Taro.Config = {
     navigationBarTitleText: '会员详情'
+  };
+
+  state = {
+    showCoupon: false, // 显示优惠券modal
+    couponsList: [], // 会员优惠券列表
   };
 
   componentWillMount = () => {
@@ -60,10 +69,50 @@ class MemberMain extends Taro.Component<MemberMainProps> {
     });
   }
 
-  public fetchMemberDetail = (id: string) => {
-    MemberAction.memberDetail({id: Number(id)});
+  public fetchMemberDetail = async (id: string) => {
+    const result = await MemberAction.memberDetail({id: Number(id)});
+    if (!!result.success) {
+      const coupons = await MerchantService.getMemberCoupons({
+        phone: result.result.phoneNumber,
+      });
+      if (coupons.code === ResponseCode.success) {
+        this.setState({ couponsList: coupons.data.rows });
+      }
+    }
     MemberAction.memberPreference({id: Number(id)});
     MemberAction.memberOrderInfo({id: Number(id)});
+  }
+
+  public renderCouponeModal = () => {
+    const { showCoupon, couponsList } = this.state;
+    return (
+      <ModalLayout
+        visible={showCoupon}
+        onClose={() => this.setState({showCoupon: false})}
+        // contentClassName={`${cssPrefix}-layout`}
+        title="优惠券"
+      >
+        <View className={`inventory-select`}>
+          {!!couponsList && couponsList.length > 0 && (
+            <ScrollView
+              scrollY={true}
+              className={`${cssPrefix}-coupons`}
+            >
+              {couponsList.map((item) => {
+                return (
+                  <CouponItem 
+                    key={(item as any).id}
+                    coupon={item} 
+                    touchable={false}
+                    onClick={() => { }}
+                  />
+                );
+              })}
+            </ScrollView>
+          )}
+        </View>
+      </ModalLayout>
+    );
   }
 
   render () {
@@ -86,6 +135,7 @@ class MemberMain extends Taro.Component<MemberMainProps> {
       {
         title: '优惠券',
         extraText: '5',
+        onClick: () => this.setState({ showCoupon: true }),
         hasBorder: false
       },
     ];
@@ -205,6 +255,7 @@ class MemberMain extends Taro.Component<MemberMainProps> {
             </AtButton>
           </View>
         </View>
+        {this.renderCouponeModal()}
       </View>
     );
   }

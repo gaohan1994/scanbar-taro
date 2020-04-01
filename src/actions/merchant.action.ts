@@ -47,8 +47,14 @@ class MerchantAction {
     });
   }
 
-  public getByCode = async (code: string) => {
-    const result = await MerchantService.getByCode(code);
+  public getByCode = async (params: any) => {
+    const result = await MerchantService.getByCode(params);
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: MerchantInterfaceMap.reducerInterface.RECEIVE_SEARCH_COUPON,
+        payload: result.data
+      });
+    }
     return result;
   }
 

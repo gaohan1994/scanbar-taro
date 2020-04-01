@@ -3,7 +3,7 @@ import { connect } from '@tarojs/redux';
 import { View, Text, ScrollView } from '@tarojs/components';
 import CouponItem from '../../component/coupon/coupon';
 import merchantAction from '../../actions/merchant.action';
-import { getCouponList, getSelectCoupon } from '../../reducers/app.merchant';
+import { getCouponList, getSelectCoupon, getSearchCoupon } from '../../reducers/app.merchant';
 import { MerchantInterface } from 'src/constants';
 import '../style/pay.less';
 import '../style/product.less';
@@ -18,6 +18,7 @@ type Props = {
   couponList: MerchantInterface.Coupon[];
   productCartList: ProductCartInterface.ProductCartInfo[];
   selectCoupon?: MerchantInterface.Coupon;
+  searchCoupon?: MerchantInterface.Coupon[];
 };
 
 type State = {
@@ -65,19 +66,21 @@ class CouponPage extends Taro.Component<Props, State> {
 
   public onCouponClick = (coupon: MerchantInterface.Coupon) => {
     try {
-      const { selectId } = this.state;
       invariant(!!coupon.ableToUse, '该优惠券暂不可用');
 
       /**
        * @time 0318
        * @todo [如果是再次点击则取消选择该优惠券]
+       * 
+       * @time 0401
+       * @todo [取消反选]
        */
-      if (selectId === coupon.id) {
-        this.setState({selectId: -1});
-        merchantAction.selectCoupon(undefined);
-        Taro.navigateBack({});
-        return;
-      }
+      // if (selectId === coupon.id) {
+      //   this.setState({selectId: -1});
+      //   merchantAction.selectCoupon(undefined);
+      //   Taro.navigateBack({});
+      //   return;
+      // }
 
       this.setState({selectId: coupon.id});
       merchantAction.selectCoupon(coupon);
@@ -116,11 +119,18 @@ class CouponPage extends Taro.Component<Props, State> {
 
   public onCoupon = async () => {
     try {
+      const { phone } = this.$router.params;
+      const { productCartList } = this.props;
       const { value } = this.state;
       invariant(!!value, '请输入要查询的优惠券码');
-      const result = await merchantAction.getByCode(value);
+      const result = await merchantAction.getByCode({
+        code: value,
+        phone,
+        amount: productSdk.getProductMemberPrice(), 
+        productIds: productCartList.map(item => item.id),
+      });
       invariant(result.code === ResponseCode.success, result.msg || ' ');
-      this.onCouponClick(result.data);
+      // this.onCouponClick(result.data);
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -131,7 +141,7 @@ class CouponPage extends Taro.Component<Props, State> {
 
   render () {
     const { selectId, value } = this.state;
-    const { couponList } = this.props;
+    const { couponList, searchCoupon } = this.props;
     return (
       <View className='container container-color'>
         <HeaderInput
@@ -153,6 +163,16 @@ class CouponPage extends Taro.Component<Props, State> {
           className={`product-list-container`}
         >
           <View className={`product-list-right`}>
+            {!!searchCoupon && searchCoupon.map((item) => {
+              return (
+                <CouponItem 
+                  key={item.id}
+                  select={item.id === selectId}
+                  coupon={item} 
+                  onClick={(coupon: MerchantInterface.Coupon) => this.onCouponClick(coupon)}
+                />
+              );
+            })}
             {couponList.map((item) => {
               const select = selectId === item.id;
               return (
@@ -175,6 +195,7 @@ const select = (state: any) => ({
   couponList: getCouponList(state),
   productCartList: getProductCartList(state),
   selectCoupon: getSelectCoupon(state),
+  searchCoupon: getSearchCoupon(state),
 });
 
 export default connect(select)(CouponPage as any);

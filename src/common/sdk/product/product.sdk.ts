@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-20 15:59:21
+ * @Last Modified time: 2020-04-01 11:34:04
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -496,8 +496,6 @@ class ProductSDK {
       });
     }
 
-    console.log('price: ', price);
-    console.log('activity: ', activitys);
     /**
      * @todo 如果有满减活动则计算满减活动
      */

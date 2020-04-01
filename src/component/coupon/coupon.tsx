@@ -10,6 +10,7 @@ interface Props {
   coupon: MerchantInterface.Coupon;
   select?: boolean;
   onClick?: any;
+  touchable?: boolean;
 }
 interface State {
   showMore: boolean;
@@ -34,6 +35,7 @@ class Page extends Taro.Component<Props, State> {
       coupon = {} as MerchantInterface.Coupon, 
       select = false, 
       onClick = () => {},
+      touchable = true,
     } = this.props;
     return (
       <View 
@@ -81,12 +83,14 @@ class Page extends Taro.Component<Props, State> {
               />
             </View>
           </View>
-          <View 
-            className={classnames(`${cssPrefix}-item-top-button`, {
-              [`${cssPrefix}-item-top-button-active`]: !!select,
-              [`${cssPrefix}-item-top-button-normal`]: !select,
-            })}
-          />
+          {!!touchable && (
+            <View 
+              className={classnames(`${cssPrefix}-item-top-button`, {
+                [`${cssPrefix}-item-top-button-active`]: !!select,
+                [`${cssPrefix}-item-top-button-normal`]: !select,
+              })}
+            />
+          )}
         </View>
         {!!showMore && (
           <View className={`${cssPrefix}-item-bottom`}>

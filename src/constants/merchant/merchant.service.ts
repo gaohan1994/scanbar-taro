@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:01:17 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-31 11:49:54
+ * @Last Modified time: 2020-04-01 14:40:20
  * 
  * @todo [盘点相关的接口]
  * ```js
@@ -25,8 +25,13 @@ class MerchantService {
     return result;
   }
 
-  public getByCode = async (code: string) => {
-    const result = await requestHttp.get(`/coupon/getByCode/${code}`);
+  public getMemberCoupons = async (params: any) => {
+    const result = await requestHttp.get(`/coupon/getMemberCoupons${jsonToQueryString(params)}`);
+    return result;
+  }
+
+  public getByCode = async (params: any) => {
+    const result = await requestHttp.post(`${MerchantInterfaceMap.couponGetAbleToUseCoupon}`, params);
     return result;
   }
 
