@@ -198,6 +198,63 @@ class ProductPay extends Taro.Component<Props, State> {
   }
 
   /**
+   * @todo 扫描C端小程序二维码
+   */
+  public onScanMember = () => {
+    Taro.scanCode({ onlyFromCamera: true })
+    .then(async (barcode) => {
+      Taro.showLoading();
+      const memberPhone = barcode.result;
+      const result = await memberService.memberDetailByPreciseInfo({ identity: memberPhone });
+      invariant(result.code === ResponseCode.success, '会员登录失败');
+      /**
+       * @param {selectMember} 选择的会员
+       * 
+       * @param {memberPerference} 会员的消费偏好
+       * @param {memberOrderInfo} 会员的消费信息
+       */
+      let selectMember: SelectMember = merge({}, result.data);
+      const memberPerference = await memberService.memberPreference({ id: result.data.id });
+      if (memberPerference.code === ResponseCode.success) {
+        selectMember.perference = memberPerference.data;
+      }
+
+      const memberOrderInfo = await memberService.memberOrderInfo({ id: result.data.id });
+      if (memberOrderInfo.code === ResponseCode.success) {
+        selectMember.orderInfo = memberOrderInfo.data;
+      }
+
+      const memberCoupons = await merchantService.getMemberCoupons({phone: selectMember.phoneNumber});
+      if (memberCoupons.code === ResponseCode.success) {
+        selectMember.couponList = memberCoupons.data.rows;
+      }
+
+      Taro.hideLoading();
+      productSdk.setMember(selectMember);
+      Taro.showToast({ title: '登录成功' });
+      /**
+       * @todo [目前重新设置会员之后重置抹零]
+       */
+      productSdk.setErase(undefined);
+      this.setState({
+        selectMember,
+        memberModal: false,
+        eraseValue: '',
+        receiveValue: '',
+        receiveDiscount: '',
+      }, () => {
+        this.setCoupons();
+      });
+    })
+    .catch(error => {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    });
+  }
+
+  /**
    * @time 0318
    * @todo [设置优惠券token为true时请求，为false时清空]
    */
@@ -229,6 +286,7 @@ class ProductPay extends Taro.Component<Props, State> {
     productSdk.setMember(undefined);
     productSdk.setErase(undefined);
     this.setState({
+      memberLayout: false,
       selectMember: undefined,
       memberModal: false,
       eraseValue: '',
@@ -434,6 +492,12 @@ class ProductPay extends Taro.Component<Props, State> {
               type="number"
               placeholderClass={`${cssPrefix}-pay-member-input-place`}
               onInput={({ detail: { value } }) => this.onChangeValue('memberValue', value)}
+            />
+
+            <View 
+              className={`${cssPrefix}-pay-member-input-icon`} 
+              style={`background-image: url(//net.huanmusic.com/weapp/icon_commodity_scan.png)`}
+              onClick={() => this.onScanMember()}
             />
           </View>
         </View>
