@@ -13,6 +13,7 @@ import invariant from 'invariant';
 import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import { ResponseCode } from '../../constants/index';
+import ButtonFooter from '../../component/button/button.footer';
 
 type Props = {
   couponList: MerchantInterface.Coupon[];
@@ -62,6 +63,15 @@ class CouponPage extends Taro.Component<Props, State> {
     if (!!selectId) {
       this.setState({selectId: Number(selectId)});
     }
+  }
+
+  public cancelCoupon = () => {
+    /**
+     * @todo 取消使用优惠券
+     */
+    this.setState({selectId: -1});
+    merchantAction.selectCoupon(undefined);
+    Taro.navigateBack({});
   }
 
   public onCouponClick = (coupon: MerchantInterface.Coupon) => {
@@ -186,6 +196,13 @@ class CouponPage extends Taro.Component<Props, State> {
             })}
           </View>
         </ScrollView>
+
+        <ButtonFooter
+          buttons={[{
+            title: '不使用券',
+            onPress: () => this.cancelCoupon()
+          }]}
+        />
       </View>
     );
   }

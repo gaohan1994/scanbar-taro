@@ -81,7 +81,12 @@ class Page extends Taro.Component<Props> {
             >
               <Card card-class="home-card member-card product-pay-member-layout-card">
                 <View className={classnames(`${cssPrefix}-detail-img`)}>
-                  <Image className={`${cssPrefix}-detail-avator`} src="//net.huanmusic.com/weapp/icon_user.png" />
+                  <Image 
+                    className={`${cssPrefix}-detail-avator`} 
+                    src={selectMember.avatar 
+                      ? `http://inventory.51cpay.com/memberAvatar/${selectMember.avatar}`
+                      : '//net.huanmusic.com/weapp/icon_vip_user.png'}
+                  />
                 </View>
                 <View className={`${cssPrefix}-detail`}>
                   <View className={`title-text ${cssPrefix}-detail-name`}>
