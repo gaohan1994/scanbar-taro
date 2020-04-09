@@ -3,6 +3,21 @@ import { store } from '../app';
 
 class ProductAction {
 
+  public toogleShare = async (token?: boolean) => {
+    store.dispatch({
+      type: ProductInterfaceMap.reducerInterfaces.TOOGLE_SHARE,
+      payload: typeof token === 'boolean' ? token : undefined
+    });
+  }
+
+  public setShare = async (product, show: boolean = true) => {
+    store.dispatch({
+      type: ProductInterfaceMap.reducerInterfaces.SET_SHARE,
+      payload: product
+    });
+    this.toogleShare(show);
+  }
+
   public productInfoList = async (params?: ProductInterface.ProductInfoListFetchFidle) => {
     const result = await ProductService.productInfoList(params);
     if (result.code === ResponseCode.success) {

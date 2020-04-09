@@ -1,8 +1,8 @@
 /*
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-21 14:36:05
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-04-09 12:07:30
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
@@ -126,7 +126,7 @@ class UserMain extends Taro.Component<UserMainProps, UserMainState> {
               userinfo.avatar && userinfo.avatar.length > 0
                 ? (
                   <Image
-                    src={userinfo.avatar}
+                    src={`http://inventory.51cpay.com/memberAvatar/${userinfo.avatar}`}
                     className={`${cssPrefix}-user-image`}
                   />
                 )

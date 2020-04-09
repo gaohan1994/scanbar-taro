@@ -43,19 +43,19 @@ const NavItems = [
   },
   {
     image: '//net.huanmusic.com/weapp/-icon_menu_member.png',
-    value: '会员管理',
+    value: '会员',
     subTitle: 'Member management',
     url: '/pages/member/member',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_commodity.png',
-    value: '商品管理',
+    value: '商品',
     subTitle: 'Commodity management',
     url: '/pages/product/product.manage',
   },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_inventory1.png',
-    value: '采购进货',
+    value: '进货',
     subTitle: 'inventory',
     url: '/pages/inventory/inventory.main',
   },
@@ -222,7 +222,7 @@ class Home extends Component<Props, State> {
                     src="//net.huanmusic.com/weapp/v1/icon_home_into.png"
                   />
                 </View>
-                <View className="home-money">{reportTodayData.todaySales}</View>
+                <View className="home-money">{reportTodayData.todaySales || 0}</View>
               </View>
               <View
                 className="home-buttons-button home-buttons-button-end"

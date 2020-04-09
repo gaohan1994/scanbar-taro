@@ -2,13 +2,14 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-31 11:45:09
+ * @Last Modified time: 2020-04-08 15:25:53
  */
 import Taro from '@tarojs/taro';
 import { View, Button } from '@tarojs/components';
 import requestHttp from '../../common/request/request.http';
 import { jsonToQueryString } from '../../constants';
 import invariant from 'invariant';
+import "./index.less";
 import { ResponseCode } from '../../constants/index';
 
 type Props = {
@@ -24,7 +25,7 @@ class Page extends Taro.Component<Props> {
 
   onClick = async () => {
     try {
-      const { id = 276 } = this.$router.params;
+      const { id } = this.$router.params;
       const result = await requestHttp.get(`/product/productInfo/getShareInfo${jsonToQueryString({
         merchantId: 1,
         productId: id
@@ -44,12 +45,18 @@ class Page extends Taro.Component<Props> {
   }
 
   render () {
+    const { id } = this.$router.params;
     return (
-      <View className='container'>
+      <View className='container share'>
+        <View className='share-img' />
+        <View className='share-text'>
+          你收到一个好物分享，快来围观吧{id}
+        </View>
         <Button
           onClick={this.onClick}
+          className='share-button'
         >
-          scanbar C
+          立即查看
         </Button>
       </View>
     );

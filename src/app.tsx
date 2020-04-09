@@ -34,6 +34,9 @@ class App extends Component {
       "pages/report/report",
       "pages/user/user",
     ],
+    navigateToMiniProgramAppIdList: [
+      "wxba027d099f6ec41b"
+    ],
     subPackages: [
       {
         root: 'pages/share',

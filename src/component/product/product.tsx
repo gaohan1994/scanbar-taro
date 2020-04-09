@@ -1,6 +1,5 @@
 import Taro from '@tarojs/taro';
-import { View, Image, Text, Button } from '@tarojs/components';
-import { AtActionSheet, AtActionSheetItem } from 'taro-ui';
+import { View, Image, Text } from '@tarojs/components';
 import './product.less';
 import { ProductInterface } from '../../constants';
 import { connect } from '@tarojs/redux';
@@ -10,6 +9,7 @@ import PriceComponent from '../layout/price';
 import AcitivityComponent from '../layout/activity';
 import classnames from 'classnames';
 import numeral from 'numeral';
+import productAction from '../../actions/product.action';
 
 const cssPrefix = 'component-product';
 interface Props { 
@@ -23,7 +23,6 @@ interface State {
   priceModal: boolean;
   changePrice: string;
   changeSellNum: string;
-  showShare: boolean;
 }
 
 class ProductComponent extends Taro.Component<Props, State> {
@@ -32,7 +31,6 @@ class ProductComponent extends Taro.Component<Props, State> {
     priceModal: false,
     changePrice: '',
     changeSellNum: '',
-    showShare: false,
   };
 
   public changeValue = (key: string, value: string) => {
@@ -42,14 +40,6 @@ class ProductComponent extends Taro.Component<Props, State> {
         [key]: value
       };
     });
-  }
-
-  onShareAppMessage = (res) => {
-    const { product } = this.props;
-    return {
-      title: product.name,
-      path: `/pages/share/share.product?id=${product.id}`,
-    };
   }
 
   /**
@@ -83,7 +73,6 @@ class ProductComponent extends Taro.Component<Props, State> {
   }
 
   render () {
-    const { showShare } = this.state;
     const { product, sort, share = true } = this.props;
     const showManageDetailToken = 
       sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE ||
@@ -94,7 +83,9 @@ class ProductComponent extends Taro.Component<Props, State> {
           [`${cssPrefix} `]: !showManageDetailToken,
           [`${cssPrefix}-manage`]: showManageDetailToken
         })}
-        onLongPress={() => this.setState({showShare: true})}
+        onLongPress={() => {
+          productAction.setShare(product, true);
+        }}
       >
         <View 
           className={`${cssPrefix}-content`}
@@ -110,15 +101,6 @@ class ProductComponent extends Taro.Component<Props, State> {
           {this.renderDetail()}
           {this.renderStepper()}
         </View>
-
-        <AtActionSheet 
-          isOpened={showShare} 
-          cancelText='取消'
-        >
-          <AtActionSheetItem>
-            <Button openType='share' style='background: #fff'>微信好友</Button>
-          </AtActionSheetItem>
-        </AtActionSheet>
       </View>
     );
   }

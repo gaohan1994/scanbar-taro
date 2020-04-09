@@ -1,8 +1,8 @@
 /*
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-21 14:38:18
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-04-09 12:07:43
  */
 import Taro, { Config } from '@tarojs/taro';
 import { View, Image, } from '@tarojs/components';
@@ -85,7 +85,7 @@ class UserMerchant extends Taro.Component<Props, State> {
                 userinfo.avatar && userinfo.avatar.length > 0
                   ? (
                     <Image
-                      src={userinfo.avatar}
+                      src={`http://inventory.51cpay.com/memberAvatar/${userinfo.avatar}`}
                       className={`${cssPrefix}-detail-img`}
                     />
                   )

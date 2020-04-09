@@ -154,7 +154,7 @@ class OrderDetail extends Taro.Component<Props, State> {
     const Form2: FormRowProps[] = orderDetail.order && [
       {
         title: `${orderDetail.order.transType !== 1 ? '应收金额' : '应退金额'}`,
-        extraText: `${symbol}￥ ${numeral(orderDetail.order.totalAmount).format('0.00')}`,
+        extraText: `${symbol}￥ ${numeral(orderDetail.order.transAmount).format('0.00')}`,
         extraTextStyle: 'title',
         extraTextColor: extraTextColor,
         extraTextBold: 'bold',

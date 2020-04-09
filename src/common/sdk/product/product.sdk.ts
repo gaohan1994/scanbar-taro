@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-04-01 11:34:04
+ * @Last Modified time: 2020-04-09 15:57:48
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -338,9 +338,10 @@ class ProductSDK {
     }
 
     const currentMember = member || this.member;
+    const currentActivity = product.activityInfos.find(a => a.type === 2 || a.type === 1);
     if (!!currentMember && !!currentMember.enableMemberPrice) {
-      if (product.activityInfos && product.activityInfos.length > 0) {
-        const activity = product.activityInfos.find(a => a.type === 2);
+      if (product.activityInfos && !!currentActivity) {
+        const activity = currentActivity;
         if (activity && activity.discountPrice < product.memberPrice) {
           return '活动价';
         }
@@ -348,8 +349,8 @@ class ProductSDK {
       return '会员价';
     }
 
-    if (product.activityInfos && product.activityInfos.length > 0) {
-      const activity = product.activityInfos.find(a => a.type === 2);
+    if (product.activityInfos && !!currentActivity) {
+      const activity = currentActivity;
       if (!!activity) {
         return '活动价';
       }
@@ -373,9 +374,10 @@ class ProductSDK {
      * @todo [2.如果不可以使用会员价则有活动价返回活动价,没有活动价返回原价]
      */
     const currentMember = member || this.member;
+    const currentActivity = product.activityInfos.find(a => a.type === 2 || a.type === 1);
     if (!!currentMember && !!currentMember.enableMemberPrice) {
       if (product.activityInfos && product.activityInfos.length > 0) {
-        const activity = product.activityInfos.find(a => a.type === 2);
+        const activity = currentActivity;
         if (activity && activity.discountPrice < product.memberPrice) {
           return activity.discountPrice;
         }
@@ -384,7 +386,7 @@ class ProductSDK {
     }
 
     if (product.activityInfos && product.activityInfos.length > 0) {
-      const activity = product.activityInfos.find(a => a.type === 2);
+      const activity = currentActivity;
       if (!!activity) {
         return activity.discountPrice;
       }

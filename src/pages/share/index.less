@@ -1,0 +1,33 @@
+@import "../../styles/theme.less";
+
+@prefix: share;
+
+.@{prefix} {
+    .flex(center, center, column);
+
+    &-text {
+        width: 100%;
+        .flex(center, center, row);
+        font-size:30px;
+        font-weight:500;
+        color:rgba(51,51,51,1);
+        .margin(65px, t);
+    }
+    &-img {
+        width: 464px;
+        height: 422px;
+        .bg;
+        background-image: url(//net.huanmusic.com/weapp/img_share.png);
+    }
+    &-button {
+        .margin(110px, t);
+        .margin(40px, l);
+        width:670px;
+        height:80px;
+        background:rgba(42,134,252,1);
+        border-radius:40px;
+        font-size:32px;
+        color:rgba(255,255,255,1);
+        .flex(center, center, row);
+    }
+}

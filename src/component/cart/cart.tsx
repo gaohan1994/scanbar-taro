@@ -2,16 +2,17 @@
  * @Author: Ghan 
  * @Date: 2019-11-05 15:10:38 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-20 13:54:43
+ * @Last Modified time: 2020-04-08 14:23:17
  * 
  * @todo [购物车组件]
  */
 import Taro from '@tarojs/taro';
-import { View, Image, Text } from '@tarojs/components';
+import { View, Image, Text, Button } from '@tarojs/components';
 import "./cart.less";
 import "../product/product.less";
 import classnames from 'classnames';
 import { AppReducer } from '../../reducers';
+import { AtActionSheet, AtActionSheetItem } from 'taro-ui';
 import { 
   getChangeWeigthProduct, 
   getNonBarcodeProduct,
@@ -31,6 +32,7 @@ import { ResponseCode } from '../../constants/index';
 import { ModalInput } from '../modal/modal';
 import { getSelectProduct } from '../../reducers/app.product';
 import { store } from '../../app';
+import productAction from '../../actions/product.action';
 
 const cssPrefix = 'cart';
 
@@ -42,6 +44,8 @@ interface CartBarProps {
   selectProduct?: ProductInterface.ProductInfo;
   changeProduct?: ProductCartInterface.ProductCartInfo;
   sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
+  shareToken: boolean;
+  shareProduct: ProductInterface.ProductInfo;
 }
 
 interface CartBarState { 
@@ -338,7 +342,12 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     productSdk.changeProductVisible(false, undefined);
   }
 
+  public onCloseShare = () => {
+    productAction.toogleShare();
+  }
+
   render () {
+    const { shareToken } = this.props;
     return (
       <View>
         {this.renderContent()}
@@ -352,6 +361,16 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
             {this.renderCartRight()}  
           </View>
         </View>
+
+        <AtActionSheet
+          isOpened={shareToken}
+          cancelText='取消'
+          onCancel={() => this.onCloseShare()}
+        >
+          <AtActionSheetItem>
+            <Button openType='share' style='background: #fff'>微信好友</Button>
+          </AtActionSheetItem>
+        </AtActionSheet>
       </View>
     );
   }
@@ -801,6 +820,8 @@ const select = (state: AppReducer.AppState, ownProps: CartBarProps) => {
     changeProductVisible: getChangeProductVisible(state),
     changeProduct: getChangeProduct(state),
     selectProduct: getSelectProduct(state),
+    shareToken: state.product.shareToken,
+    shareProduct: state.product.shareProduct
   };
 };
 

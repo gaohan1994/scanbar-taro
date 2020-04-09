@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:26:45 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-13 11:06:36
+ * @Last Modified time: 2020-04-08 14:13:27
  */
 
 import { ProductInterface, ProductInterfaceMap } from "../constants";
@@ -21,6 +21,8 @@ export declare namespace ProductReducer {
     productSupplier: Array<ProductInterface.ProductSupplier>;
     productDetail: ProductInterface.ProductInfo;
     selectProduct?: ProductInterface.ProductInfo;
+    shareToken: boolean;
+    shareProduct: ProductInterface.ProductInfo;
   }
 
   interface Action {
@@ -46,10 +48,29 @@ export const initState: ProductReducer.InitState = {
   productSupplier: [],
   productDetail: {} as any,
   selectProduct: undefined,
+  shareToken: false,
+  shareProduct: {} as any,
 };
 
 export default function productReducer (state: ProductReducer.InitState = initState, action: ProductReducer.Action): ProductReducer.InitState {
   switch (action.type) {
+
+    case ProductInterfaceMap.reducerInterfaces.TOOGLE_SHARE: {
+      const { payload } = action;
+      return {
+        ...state,
+        shareToken: typeof payload === 'boolean' ? payload : !state.shareToken
+      };
+    }
+
+    case ProductInterfaceMap.reducerInterfaces.SET_SHARE: {
+      const { payload } = action;
+      return {
+        ...state,
+        shareProduct: payload
+      };
+    }
+
     case ProductInterfaceMap.reducerInterfaces.SET_SELECT_PRODUCT: {
       const { payload: { selectProduct } } = action;
       return {

@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-17 09:38:18
+ * @Last Modified time: 2020-04-08 14:09:46
  * 
  * @todo [商品相关的类型定义]
  */
@@ -210,6 +210,8 @@ export declare namespace ProductInterface {
     RECEIVE_PRODUCT_DETAIL: RECEIVE_PRODUCT_DETAIL;
     RECEIVE_PAY_DETAIL: RECEIVE_PAY_DETAIL;
     SET_SELECT_PRODUCT: SET_SELECT_PRODUCT;
+    TOOGLE_SHARE: string;
+    SET_SHARE: string;
   }
 }
 
@@ -233,6 +235,8 @@ interface ProductInterfaceMap {
 class ProductInterfaceMap {
 
   public reducerInterfaces = {
+    TOOGLE_SHARE: 'TOOGLE_SHARE',
+    SET_SHARE: 'SET_SHARE',
     RECEIVE_PRODUCT_LIST: 'RECEIVE_PRODUCT_LIST',
     RECEIVE_PRODUCT_SEARCH_LIST: 'RECEIVE_PRODUCT_SEARCH_LIST',
     RECEIVE_PRODUCT_MANAGE_LIST: 'RECEIVE_PRODUCT_MANAGE_LIST',
