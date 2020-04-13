@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 09:41:02 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-04-08 14:26:28
+ * @Last Modified time: 2020-04-13 14:09:32
  * 
  * @todo 开单页面
  */
@@ -50,7 +50,11 @@ interface Props {
    */
   productCartList: ProductCartInterface.ProductCartInfo[];
   suspensionList: ProductSDKReducer.SuspensionCartBase[];
-  shareProduct: ProductInterface.ProductInfo;
+  shareProduct: ProductInterface.ProductInfo & {
+    shareImagePath: string;
+    path: string;
+    appId: string;
+  };
 }
 
 interface State {
@@ -82,10 +86,10 @@ class ProductOrder extends Taro.Component<Props, State> {
 
   onShareAppMessage = () => {
     const { shareProduct } = this.props;
-    console.log('this.props ', this.props);
     return {
       title: shareProduct.name,
       path: `/pages/share/share.product?id=${shareProduct.id}`,
+      imageUrl: shareProduct.shareImagePath,
     };
   }
   

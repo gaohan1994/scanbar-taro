@@ -71,12 +71,12 @@ const NavItems = [
   //   subTitle: 'Procurement',
   //   url: '/pages/share/share',
   // },
-  // {
-  //   image: '//net.huanmusic.com/weapp/icon_menu_procurement1.png',
-  //   value: 'shareproduct',
-  //   subTitle: 'Procurement',
-  //   url: '/pages/share/share.product',
-  // },
+  {
+    image: '//net.huanmusic.com/weapp/icon_menu_procurement1.png',
+    value: 'shareproduct',
+    subTitle: 'Procurement',
+    url: '/pages/share/share.product',
+  },
 ];
 
 // type PageState = {};

@@ -344,7 +344,7 @@ class ProductSDK {
         const activity = currentActivity;
         if (activity && activity.discountPrice < product.memberPrice) {
           return '活动价';
-        }
+        } 
       }
       return '会员价';
     }

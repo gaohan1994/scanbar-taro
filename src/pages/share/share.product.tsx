@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-04-08 15:25:53
+ * @Last Modified time: 2020-04-13 14:01:57
  */
 import Taro from '@tarojs/taro';
 import { View, Button } from '@tarojs/components';
@@ -25,7 +25,7 @@ class Page extends Taro.Component<Props> {
 
   onClick = async () => {
     try {
-      const { id } = this.$router.params;
+      const { id = 276 } = this.$router.params;
       const result = await requestHttp.get(`/product/productInfo/getShareInfo${jsonToQueryString({
         merchantId: 1,
         productId: id
@@ -35,6 +35,7 @@ class Page extends Taro.Component<Props> {
       Taro.navigateToMiniProgram({
         appId: result.data.appId,
         path: result.data.path,
+        envVersion: 'trial',
       });
     } catch (error) {
       Taro.showToast({
@@ -50,7 +51,7 @@ class Page extends Taro.Component<Props> {
       <View className='container share'>
         <View className='share-img' />
         <View className='share-text'>
-          你收到一个好物分享，快来围观吧{id}
+          你收到一个好物分享，快来围观吧
         </View>
         <Button
           onClick={this.onClick}
