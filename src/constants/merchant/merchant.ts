@@ -23,6 +23,15 @@ export declare namespace MerchantInterface {
   }
 
   interface Activity {
+    activityDetailVOList?: Array<{
+      giftFlag: boolean;
+      identity: string;
+      name: string;
+      pic: string;
+      activityId: number;
+      id: number;
+      price: number;
+    }>;
     auditorName: string;
     createTime: string;
     cycleRule: string;

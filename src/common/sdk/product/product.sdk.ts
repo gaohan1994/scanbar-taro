@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-04-09 15:57:48
+ * @Last Modified time: 2020-04-14 16:03:29
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -25,6 +25,13 @@ import numeral from 'numeral';
 import merge from 'lodash.merge';
 import productService from '../../../constants/product/product.service';
 import { ConsoleUtil } from '../../../common/util/common';
+
+export const NonActivityName = 'NonActivityName';
+
+interface FilterProductList {
+    activity?: MerchantInterface.Activity;
+    productList: ProductCartInterface.ProductCartInfo[]; 
+}
 
 const cu = new ConsoleUtil({title: 'ProductSdk', env: 'production'});
 
@@ -486,72 +493,69 @@ class ProductSDK {
     return 0;
   }
 
-  public checkActivity = (price: number) => {
-    const activitys = store.getState().merchant.activityInfo;
-    let activity: MerchantInterface.Activity;
+  public setMaxActivityRule = (price: number, activity: MerchantInterface.Activity) => {
+    const rule: {discount: number; threshold: number}[] = merge([], activity.rule);
+    if (!!rule && rule.length > 0) {
+      const discountArray = rule.map((item) => item.discount);
 
-    if (!!activitys) {
-      activitys.map((item) => {
-        if (item.type === 3) {
-          activity = item;
+      const maxDiscount = Math.max(...discountArray);
+      const maxDiscountIndex = rule.findIndex((r) => r.discount === maxDiscount);
+      const maxDiscountItem = rule.find((r) => r.discount === maxDiscount);
+      while (discountArray.length > 0) {
+        if (maxDiscountItem && price <= maxDiscountItem.threshold) {
+          return maxDiscountItem;
+        } else {
+          discountArray.splice(maxDiscountIndex, 1);
         }
-      });
-    }
-
-    /**
-     * @todo 如果有满减活动则计算满减活动
-     */
-    if (!!activity) {
-      
-      /**
-       * @todo 如果有满减金额
-       */
-      if (activity.rule && activity.rule.length > 0) {
-
-        /**
-         * @todo 如果阈值小于价格则使用满减
-         */
-        if (activity.rule[0].threshold < price) {
-          return activity;
-        }
-        return false;
       }
-      return false;
+      return {};
     }
-    return false;
+    return {};
   }
 
-  public getProductActivityPrice = (price: number) => {
-    const activitys = store.getState().merchant.activityInfo;
-    let activity: MerchantInterface.Activity;
-
-    activitys.map((item) => {
-      if (item.type === 3) {
-        activity = item;
-      }
-    });
+  public getProductActivityPrice = (price: number, activity?: MerchantInterface.Activity) => {
 
     /**
      * @todo 如果有满减活动则计算满减活动
+     * @todo 如果有满减金额
      */
-    if (!!activity) {
-      
-      /**
-       * @todo 如果有满减金额
-       */
-      if (activity.rule && activity.rule.length > 0) {
-
+    if (!!activity && activity.id && activity.rule && activity.rule.length > 0) {
         /**
-         * @todo 如果阈值小于价格则使用满减
+         * @todo 如果只有一个规则且阈值小于价格则使用满减
          */
-        if (activity.rule[0].threshold < price) {
-          return numeral(price - activity.rule[0].discount).value();
+        if (activity.rule.length === 1) {
+          return activity.rule[0].threshold <= price ? numeral(price - activity.rule[0].discount).value() : price;
         }
-        return price;
-      }
-      return price;
+        /**
+         * @todo 如果有多个规则找出最优惠规则并使用该规则
+         */
+        const rule: any = this.setMaxActivityRule(price, activity);
+        return !!rule ? numeral(price - rule.discount).value() : price;
     }
     return price;
+  }
+  /**
+   * @todo 商家满减活动
+   */
+  public getProductTotalActivityPrice = (productList?: ProductCartInterface.ProductCartInfo[]): number => {
+    const products = productList !== undefined ? productList : store.getState().productSDK.productCartList;
+    const activityList = store.getState().merchant.activityInfo;    
+    const filterProductList = this.filterByActivity(products, activityList);
+    let activityMoney: number = 0;
+    
+    filterProductList.forEach((activityItem) => {
+      const { activity, productList } = activityItem;
+      let subTotal: number = 0;
+      productList.forEach((product) => {
+        subTotal += this.getProductItemPrice(product) * product.sellNum;
+      });
+      const subActivityMoney = this.getProductActivityPrice(subTotal, activity);
+      if (subTotal !== subActivityMoney) {
+        activityMoney = subTotal - subActivityMoney;
+      }
+    });
+    // console.log('filterProductList: ', filterProductList);
+    return activityMoney;
   }
 
   /**
@@ -569,11 +573,14 @@ class ProductSDK {
    * @memberof ProductSDK
    */
   public getProductTransPrice = (withErase: boolean = true) => {
-    // 计算如果有会员的话使用会员价格，如果没有会员则返回原价
-    let total: number = this.getProductMemberPrice();
-    // 抹零价格在会员价之后减去
-
-    total = this.getProductActivityPrice(total);
+    
+    const productList = store.getState().productSDK.productCartList;
+    let total = 0;
+    for (let i = 0; i < productList.length; i++) {
+      total += this.getProductItemPrice(productList[i]) * productList[i].sellNum;
+    }
+    
+    total -= this.getProductTotalActivityPrice();
 
     if (!!this.coupon) {
       /**
@@ -974,6 +981,72 @@ import { MerchantInterface } from 'src/constants';
     };
     store.dispatch(reducer);
     return;
+  }
+
+  /**
+   * @time 0410
+   * @todo [根据店家的活动把商品进行分类显示]
+   */
+  public filterByActivity = (
+    productList: ProductCartInterface.ProductCartInfo[], 
+    activityList?: MerchantInterface.Activity[]
+  ): Array<FilterProductList> => {
+    if (!!activityList && activityList.length > 0) {
+      let nextProductList: FilterProductList[] = [];
+
+      if (activityList.length === 1 && !activityList[0].activityDetailVOList) {
+      /**
+       * @todo [说明是全部满减]
+       */
+        return [{productList, activity: {name: NonActivityName} as any}];
+      }
+
+      /**
+       * @todo [先把活动和非活动预设好]
+       * @todo [全部满减和非满减只能存在一个]
+       */
+      activityList.forEach((activity) => {
+        if (!!activity.activityDetailVOList) {
+          nextProductList.push({
+            activity,
+            productList: [],
+          });
+        }
+      });
+
+      nextProductList.push({
+        activity: activityList.find((a) => !a.activityDetailVOList) || {name: NonActivityName} as any,
+        productList: [],
+      });
+
+      for (let i = 0; i < productList.length; i++) {
+        let execd = false;
+        const currentProduct = productList[i];
+
+        nextProductList.forEach((nextProductListItem, nextProductListItemIndex) => {
+          /**
+           * @todo [如果该分类是部分满减分类]
+           */
+          if (!execd && !!nextProductListItem.activity && !!nextProductListItem.activity.activityDetailVOList) {
+            const token = nextProductListItem.activity.activityDetailVOList.some((activityItem) => activityItem.identity === currentProduct.barcode);
+            if (!!token) {
+              execd = true;
+              nextProductList[nextProductListItemIndex].productList.push(currentProduct);
+            } else {
+              /**
+               * @todo [如果没有满足条件的满减分类则插入到全部满减/非满减中]
+               */
+              if (!nextProductList[nextProductList.length - 1].productList.some((p) => p.barcode === currentProduct.barcode)) {
+                  execd = true;
+                  nextProductList[nextProductList.length - 1].productList.push(currentProduct);
+              }
+            }
+          }
+        });
+      }
+      return nextProductList;
+    }
+    return [{productList, activity: {name: NonActivityName} as any}];
   }
 }
 

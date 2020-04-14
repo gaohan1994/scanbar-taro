@@ -579,7 +579,7 @@ class ProductPay extends Taro.Component<Props, State> {
       }
     ];
 
-    const activityToken = productSdk.checkActivity(productSdk.getProductMemberPrice());
+    const totalActivityMoney = productSdk.getProductTotalActivityPrice();
 
     const formCard: FormRowProps[] = [
       {
@@ -631,17 +631,29 @@ class ProductPay extends Taro.Component<Props, State> {
       }
     });
 
-    if (!!activityToken) {
+    if (totalActivityMoney !== 0) {
       formCard[formCard.length - 1].hasBorder = true;
       formCard.push({
         title: '满减优惠',
-        extraText: `${!!activityToken
-          ? `- ￥${this.setNumber(activityToken.rule[0].discount)}`
+        extraText: `${!!totalActivityMoney
+          ? `- ￥${this.setNumber(totalActivityMoney)}`
           : '￥0.00'}`,
         extraTextStyle: 'price',
         hasBorder: false
       });
     }
+
+    // if (!!activityToken) {
+    //   formCard[formCard.length - 1].hasBorder = true;
+    //   formCard.push({
+    //     title: '满减优惠',
+    //     extraText: `${!!activityToken
+    //       ? `- ￥${this.setNumber(activityToken.rule[0].discount)}`
+    //       : '￥0.00'}`,
+    //     extraTextStyle: 'price',
+    //     hasBorder: false
+    //   });
+    // }
 
     return (
       <View className={`${cssPrefix}-pay-pos`}>
