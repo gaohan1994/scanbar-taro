@@ -83,9 +83,9 @@ class ProductComponent extends Taro.Component<Props, State> {
           [`${cssPrefix} `]: !showManageDetailToken,
           [`${cssPrefix}-manage`]: showManageDetailToken
         })}
-        onLongPress={() => {
-          productAction.setShare(product, true);
-        }}
+        // onLongPress={() => {
+        //   productAction.setShare(product, true);
+        // }}
       >
         <View 
           className={`${cssPrefix}-content`}

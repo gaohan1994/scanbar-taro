@@ -1,6 +1,5 @@
-import { ResponseCode, ProductInterfaceMap, ProductInterface, ProductService, jsonToQueryString } from '../constants/index';
+import { ResponseCode, ProductInterfaceMap, ProductInterface, ProductService } from '../constants/index';
 import { store } from '../app';
-import requestHttp from '../common/request/request.http';
 
 class ProductAction {
 
@@ -12,20 +11,10 @@ class ProductAction {
   }
 
   public setShare = async (product, show: boolean = true) => {
-    const { merchantInfoDTO } = store.getState().merchant.profileInfo;
-    const shareResult = await requestHttp.get(`/product/productInfo/getShareInfo${jsonToQueryString({
-      merchantId: merchantInfoDTO.id,
-      productId: product.id
-    })}`);
-    if (shareResult.code === ResponseCode.success) {
-      store.dispatch({
-        type: ProductInterfaceMap.reducerInterfaces.SET_SHARE,
-        payload: {
-          ...product,
-          ...shareResult.data
-        }
-      });
-    }
+    store.dispatch({
+      type: ProductInterfaceMap.reducerInterfaces.SET_SHARE,
+      payload: product
+    });
     this.toogleShare(show);
   }
 
