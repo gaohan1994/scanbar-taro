@@ -13,81 +13,9 @@ import { getProfileInfo } from '../../reducers/app.merchant';
 import merchantAction from '../../actions/merchant.action';
 import { ResponseCode } from '../../constants/index';
 import loginManager from '../../common/sdk/sign/login.manager';
+import HomeMenus from './component/menus';
 
 const cssPrefix = 'home';
-
-const NavItems = [
-  {
-    image: '//net.huanmusic.com/weapp/-icon_menu_proceeds.png',
-    value: '收款',
-    subTitle: 'Gathering',
-    url: '/pages/pay/pay.input',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/v2/icon_menu_details.png',
-    value: '查账',
-    subTitle: 'Inquiry account',
-    url: '/pages/order/order.main',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/v2/icon_menu_order.png',
-    value: '线上订单',
-    subTitle: 'Gathering',
-    url: '/pages/order/order.online.list',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/icon_menu_more.png',
-    value: '退货',
-    subTitle: 'Even more',
-    url: '/pages/product/product.refund',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/-icon_menu_member.png',
-    value: '会员',
-    subTitle: 'Member management',
-    url: '/pages/member/member',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/icon_menu_commodity.png',
-    value: '商品',
-    subTitle: 'Commodity management',
-    url: '/pages/product/product.manage',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/icon_menu_inventory1.png',
-    value: '进货',
-    subTitle: 'inventory',
-    url: '/pages/inventory/inventory.main',
-  },
-  {
-    image: '//net.huanmusic.com/weapp/icon_menu_procurement1.png',
-    value: '盘点',
-    subTitle: 'Procurement',
-    url: '/pages/inventory/inventory.stock',
-  },
-  // {
-  //   image: '//net.huanmusic.com/weapp/icon_menu_procurement1.png',
-  //   value: 'share',
-  //   subTitle: 'Procurement',
-  //   url: '/pages/share/share',
-  // },
-  {
-    image: '//net.huanmusic.com/weapp/icon_menu_procurement1.png',
-    value: 'register',
-    subTitle: 'Procurement',
-    url: '/pages/sign/register',
-  },
-];
-
-// type PageState = {};
-// type IProps = {};
-// type IState = {
-//   userinfo: LoginInterface.OAuthToken;
-// };
-// interface Home {
-//   props: IProps;
-//   state: IState;
-// }
 
 interface Props {
   reportTodayData: ReportInterface.ReportTodayData;
@@ -122,6 +50,7 @@ class Home extends Component<Props, State> {
       };
       ReportAction.reportTodayData(payload);
       this.setState({ userinfo });
+      loginManager.getUserInfo();
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -245,25 +174,7 @@ class Home extends Component<Props, State> {
               <Text className="home-order-text" >开单</Text>
             </Card>
           </View>
-          <View className="home-bar">
-            {
-              NavItems.map((item, index) => {
-                return (
-                  <Card
-                    key={item.value}
-                    shadow={false}
-                    card-class={`home-bar-card ${(index + 1) % 3 !== 0 ? 'home-bar-card-right' : ''}`}
-                  >
-                    <View className="home-bar-card-content" onClick={() => this.onNavHandle(item)}>
-                      <Image className="home-icon home-card-icon" src={item.image} />
-                      <Text className="home-normal-text">{item.value}</Text>
-                      <Text className="home-small-text">{item.subTitle}</Text>
-                    </View>
-                  </Card>
-                );
-              })
-            }
-          </View>
+          <HomeMenus />
         </View>
       </View>
     );

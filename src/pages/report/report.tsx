@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-01 15:43:06 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-23 11:46:03
+ * @Last Modified time: 2020-04-15 16:41:51
  */
 import Taro from '@tarojs/taro';
 import { View, Image, Text, Picker } from '@tarojs/components';
@@ -311,8 +311,11 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
     }
   }
 
-  public fetchData = () => {
+  public fetchData = async () => {
     try {
+      const userinfo = await loginManager.getUserInfo();
+      invariant(userinfo.success, '暂未登录');
+      invariant(userinfo.result.menus.some((menu) => menu.name === '数据'), '您没有查看数据权限');
       const { minDate, maxDate, currentDate, costomMinDate, costomMaxDate, currentMerchant } = this.state;
       let payload: ReportInterface.ReportBaseFetchFidle = {
         beginDate: dayJs(minDate).format('YYYY-MM-DD 00:00:00'),
