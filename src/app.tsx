@@ -122,7 +122,8 @@ class App extends Component {
       {
         root: 'pages/sign',
         pages: [
-          'login'
+          'login',
+          'register'
         ]
       },
       {

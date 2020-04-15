@@ -1,8 +1,24 @@
-import { MerchantService, MerchantInterface, MerchantInterfaceMap } from "../constants";
+import { MerchantService, MerchantInterface, MerchantInterfaceMap, jsonToQueryString } from "../constants";
 import { ResponseCode } from '../constants/index';
 import { store } from '../app';
+import requestHttp from "../common/request/request.http";
 
 class MerchantAction {
+
+  public merchantInfoType = async () => {
+    const result = await requestHttp.get(`/merchantInfo/type`);
+    return result;
+  }
+
+  public register = async (params: any) => {
+    const result = await requestHttp.post(`/merchantInfo/register`, params);
+    return result;
+  }
+
+  public getCode = async (phone: string) => {
+    const result = await requestHttp.get(`/sms/getCode${jsonToQueryString({phone})}`);
+    return result;
+  }
 
   public activityInfoList = async () => {
     const result = await MerchantService.activityInfoList();

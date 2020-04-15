@@ -73,9 +73,9 @@ const NavItems = [
   // },
   {
     image: '//net.huanmusic.com/weapp/icon_menu_procurement1.png',
-    value: 'shareproduct',
+    value: 'register',
     subTitle: 'Procurement',
-    url: '/pages/share/share.product',
+    url: '/pages/sign/register',
   },
 ];
 
