@@ -51,6 +51,8 @@ class Home extends Component<Props, State> {
       ReportAction.reportTodayData(payload);
       this.setState({ userinfo });
       loginManager.getUserInfo();
+      
+      merchantAction.pointConfigDetail();
     } catch (error) {
       Taro.showToast({
         title: error.message,

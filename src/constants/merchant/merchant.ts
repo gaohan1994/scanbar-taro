@@ -1,6 +1,17 @@
 import { LoginInterface } from "../../common/sdk/sign/login.manager";
 
 export declare namespace MerchantInterface {
+
+  interface PointConfig {
+    clearDate: string;
+    createTime: string;
+    updateTime: string;
+    deductRate: number;
+    merchantId: number;
+    refundObtainPoints: boolean;
+    refundUsedPoints: boolean;
+  }
+  
   interface MerchantDetail {
     address: string;
     contactName: string;
@@ -141,6 +152,7 @@ class MerchantInterfaceMap implements MerchantInterface.MerchantInterfaceMap {
     RECEIVE_SELECT_COUPON: 'RECEIVE_SELECT_COUPON',
     RECEIVE_ACTIVITYINFO: 'RECEIVE_ACTIVITYINFO',
     RECEIVE_SEARCH_COUPON: 'RECEIVE_SEARCH_COUPON',
+    RECEIVE_MERCHANT_POINT_CONFIG: 'RECEIVE_MERCHANT_POINT_CONFIG',
   };
   public merchantInfoAdd = '/merchantInfo/add';
   public merchantInfoDetail = '/merchantInfo/detail';

@@ -6,6 +6,7 @@ import { connect } from '@tarojs/redux';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import "../../component/card/form.card.less";
 import '../style/product.less';
+import '../style/order.less';
 import '../../styles/theme.less';
 import "../../component/cart/cart.less";
 import classnames from 'classnames';
@@ -28,6 +29,7 @@ import { getCouponList, getSelectCoupon } from '../../reducers/app.merchant';
 import { MerchantInterface } from 'src/constants';
 import MemberModal from '../../component/modal/member.modal';
 import merchantService from '../../constants/merchant/merchant.service';
+import memberAction from '../../actions/member.action';
 
 const cssPrefix = 'product';
 
@@ -50,6 +52,7 @@ interface State {
   memberModal: boolean;
   memberLayout: boolean;
   memberValue: string;
+  usePoint: boolean;
   selectMember?: SelectMember;
   receiveValue: string;     // 应收金额
   receiveDiscount: string;  // 整单折扣
@@ -69,6 +72,7 @@ class ProductPay extends Taro.Component<Props, State> {
     memberLayout: false,
     receiveValue: '',
     receiveDiscount: '',
+    usePoint: false,
     selectMember: undefined,
     selectCoupon: undefined,
   };
@@ -146,6 +150,20 @@ class ProductPay extends Taro.Component<Props, State> {
         [key]: value
       };
     });
+  }
+
+  public setPoint = () => {
+    const { usePoint } = this.state;
+    const point: any = productSdk.getPointPrice();
+    if (usePoint === true) {
+      // 当前为选中状态，则取消选中
+      productSdk.setPoint(undefined);
+      this.setState({ usePoint: false });
+      return;
+    }
+    productSdk.setPoint(point.pointPrice);
+    this.setState({ usePoint: true });
+    return;
   }
 
   public onChangeReceive = (key: string, value: string) => {
@@ -228,6 +246,9 @@ class ProductPay extends Taro.Component<Props, State> {
       if (memberCoupons.code === ResponseCode.success) {
         selectMember.couponList = memberCoupons.data.rows;
       }
+
+      const memberr = await memberAction.getMemberLevelInfo(result.data.id);
+      console.log('memberr: ', memberr);
 
       Taro.hideLoading();
       productSdk.setMember(selectMember);
@@ -355,6 +376,9 @@ class ProductPay extends Taro.Component<Props, State> {
         selectMember.couponList = memberCoupons.data.rows;
       }
 
+      const memberr = await memberAction.getMemberLevelInfo(result.data.id);
+      console.log('memberr: ', memberr);
+
       Taro.hideLoading();
       productSdk.setMember(selectMember);
       /**
@@ -421,8 +445,6 @@ class ProductPay extends Taro.Component<Props, State> {
       });
     }
   }
-
-  // public get
 
   render() {
     return (
@@ -565,7 +587,7 @@ class ProductPay extends Taro.Component<Props, State> {
   }
 
   private renderListDetail = () => {
-    const { selectMember, eraseValue, selectCoupon } = this.state;
+    const { selectMember, eraseValue, selectCoupon, usePoint } = this.state;
     const { couponList } = this.props;
 
     const priceForm: FormRowProps[] = [
@@ -643,22 +665,38 @@ class ProductPay extends Taro.Component<Props, State> {
       });
     }
 
-    // if (!!activityToken) {
-    //   formCard[formCard.length - 1].hasBorder = true;
-    //   formCard.push({
-    //     title: '满减优惠',
-    //     extraText: `${!!activityToken
-    //       ? `- ￥${this.setNumber(activityToken.rule[0].discount)}`
-    //       : '￥0.00'}`,
-    //     extraTextStyle: 'price',
-    //     hasBorder: false
-    //   });
-    // }
+    const point: any = productSdk.getPointPrice();
 
     return (
       <View className={`${cssPrefix}-pay-pos`}>
         <FormCard items={priceForm} />
-        <FormCard items={formCard} />
+        <FormCard items={formCard} >
+          {selectMember && !!point.pointPrice && (
+            <View
+              className={`${cssPrefix}-row ${cssPrefix}-content-item ${cssPrefix}-pay-item`}
+              onClick={() => this.setPoint()}
+            >
+              <View className={`${cssPrefix}-pay-title  ${cssPrefix}-pay-item-box`}>
+                {`积分抵现 `}
+                <View className={`${cssPrefix}-pay-text`}>{` (${point.pointPrice / point.deductRate}积分)`}</View>
+              </View>
+              <View className={`${cssPrefix}-row-price ${cssPrefix}-pay-item-box`}>
+                -￥{numeral(point.pointPrice).format('0.00')}
+                {!usePoint ? (
+                  <View 
+                    className={`order-refund-title-icon`}
+                    style='background-image: url(//net.huanmusic.com/weapp/bt_normal.png); margin-left: 5px'
+                  />
+                ) : (
+                  <View 
+                    className={`order-refund-title-icon`}
+                    style='background-image: url(//net.huanmusic.com/weapp/bt_selected.png); margin-left: 5px'
+                  />
+                )}
+              </View>
+            </View>
+          )}
+        </FormCard>
       </View>
     );
   }

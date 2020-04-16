@@ -46,6 +46,7 @@ export declare namespace MerchantReducer {
     selectCoupon: MerchantInterface.Coupon;
     activityInfo: MerchantInterface.Activity[];
     searchCoupon: MerchantInterface.Coupon[];
+    pointConfig: MerchantInterface.PointConfig;
   }
 
   type Action = 
@@ -66,10 +67,19 @@ export const initState: MerchantReducer.State = {
   selectCoupon: {} as MerchantInterface.Coupon,
   activityInfo: [] as any,
   searchCoupon: [] as any,
+  pointConfig: {} as any,
 };
 
 export default function merchant (state: MerchantReducer.State = initState, action: MerchantReducer.Action): MerchantReducer.State {
   switch (action.type) {
+
+    case MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_POINT_CONFIG: {
+      const { payload } = action as any;
+      return {
+        ...state,
+        pointConfig: payload
+      };
+    }
 
     case MerchantInterfaceMap.reducerInterface.RECEIVE_SEARCH_COUPON: {
       const { payload } = action as any;
@@ -154,3 +164,5 @@ export const getCouponList = (state: AppReducer.AppState) => state.merchant.coup
 export const getSelectCoupon = (state: AppReducer.AppState) => state.merchant.selectCoupon;
 
 export const getSearchCoupon = (state: AppReducer.AppState) => state.merchant.searchCoupon;
+
+export const getPointConfig = (state: AppReducer.AppState) => state.merchant.pointConfig;

@@ -45,6 +45,7 @@ export declare namespace ProductInterface {
    */
   interface ProductInfo {
     id: number;
+    enableMemberDiscount: boolean; // 是否使用折扣价
     activityInfos: ProductActivity[]; // 活动信息
     cost: number;         // 进货价
     avgCost: number;      // 平均进货价

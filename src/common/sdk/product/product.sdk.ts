@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-04-14 16:03:29
+ * @Last Modified time: 2020-04-15 17:18:44
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -17,14 +17,15 @@
  * });
  * ```
  */
-import Taro from '@tarojs/taro';
-import { ProductInterface, ProductService, MemberInterface, HTTPInterface, MerchantInterface } from '../../../constants';
+import Taro, { useState, useEffect } from '@tarojs/taro';
+import { ProductInterface, ProductService, MemberInterface, HTTPInterface, MerchantInterface, ResponseCode } from '../../../constants';
 import { store } from '../../../app';
 import { ProductSDKReducer, getSuspensionCartList } from './product.sdk.reducer';
 import numeral from 'numeral';
 import merge from 'lodash.merge';
 import productService from '../../../constants/product/product.service';
 import { ConsoleUtil } from '../../../common/util/common';
+import { getPointConfig } from '../../../reducers/app.merchant';
 
 export const NonActivityName = 'NonActivityName';
 
@@ -56,6 +57,7 @@ export declare namespace ProductCartInterface {
     totalAmount: number;  // 交易总金额=交易金额就好
     totalNum: number;     // 商品总数量
     transAmount: number;  // 实付金额
+    points?: number;      // 积分
   }
 
   interface ProductOrderActivity {
@@ -242,6 +244,8 @@ class ProductSDK {
    */
   private sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
 
+  private point?: number;
+
   /**
    * @time [0318]
    * @todo [加入优惠券]
@@ -252,6 +256,7 @@ class ProductSDK {
     this.erase = undefined;
     this.member = undefined;
     this.coupon = undefined;
+    this.point = undefined;
     this.sort = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER;
   }
 
@@ -262,6 +267,11 @@ class ProductSDK {
 
   public setMember = (member?: MemberInterface.MemberInfo): this => {
     this.member = member;
+    return this;
+  }
+
+  public setPoint = (point?: number): this => {
+    this.point = point;
     return this;
   }
 
@@ -346,21 +356,21 @@ class ProductSDK {
 
     const currentMember = member || this.member;
     const currentActivity = product.activityInfos.find(a => a.type === 2 || a.type === 1);
+    const activityPrice = currentActivity && currentActivity.discountPrice || 0;
+
     if (!!currentMember && !!currentMember.enableMemberPrice) {
-      if (product.activityInfos && !!currentActivity) {
-        const activity = currentActivity;
-        if (activity && activity.discountPrice < product.memberPrice) {
-          return '活动价';
-        } 
+      /**
+       * @todo [enableMemberDiscount=false使用折扣率]
+       */
+      if (!product.enableMemberDiscount) {
+        return '会员价';
       }
-      return '会员价';
+
+      return product.memberPrice < activityPrice ? '会员价' : '活动价';
     }
 
-    if (product.activityInfos && !!currentActivity) {
-      const activity = currentActivity;
-      if (!!activity) {
-        return '活动价';
-      }
+    if (activityPrice !== 0) {
+      return '活动价';
     }
     return '原价';
   }
@@ -379,24 +389,28 @@ class ProductSDK {
      * @todo 修改计算规则，会员加入了是否可用开关
      * @todo [1.如果可以用会员价则使用会员价/活动价较低的那个]
      * @todo [2.如果不可以使用会员价则有活动价返回活动价,没有活动价返回原价]
+     * 
+     * @time 0416
+     * @todo [加入会员折扣率]
+     * @todo [enableMemberDiscount=true时使用memberprice，enableMemberDiscount=false时，使用memberDiscount]
      */
     const currentMember = member || this.member;
     const currentActivity = product.activityInfos.find(a => a.type === 2 || a.type === 1);
+    const activityPrice = currentActivity && currentActivity.discountPrice || 0;
     if (!!currentMember && !!currentMember.enableMemberPrice) {
-      if (product.activityInfos && product.activityInfos.length > 0) {
-        const activity = currentActivity;
-        if (activity && activity.discountPrice < product.memberPrice) {
-          return activity.discountPrice;
-        }
+      /**
+       * @todo [enableMemberDiscount=false使用折扣率]
+       */
+      if (!product.enableMemberDiscount) {
+        const discountMemberPrice = product.price * currentMember.memberDiscount;
+        return discountMemberPrice;
       }
-      return product.memberPrice;
+
+      return Math.min(product.memberPrice, activityPrice);
     }
 
-    if (product.activityInfos && product.activityInfos.length > 0) {
-      const activity = currentActivity;
-      if (!!activity) {
-        return activity.discountPrice;
-      }
+    if (activityPrice !== 0) {
+      return activityPrice;
     }
     return product.price;
   }
@@ -545,17 +559,65 @@ class ProductSDK {
     
     filterProductList.forEach((activityItem) => {
       const { activity, productList } = activityItem;
-      let subTotal: number = 0;
-      productList.forEach((product) => {
-        subTotal += this.getProductItemPrice(product) * product.sellNum;
-      });
-      const subActivityMoney = this.getProductActivityPrice(subTotal, activity);
-      if (subTotal !== subActivityMoney) {
-        activityMoney = subTotal - subActivityMoney;
+      if (productList && productList.length > 0) {
+        let subTotal: number = 0;
+        productList.forEach((product) => {
+          subTotal += this.getProductItemPrice(product) * product.sellNum;
+        });
+        const subActivityMoney = this.getProductActivityPrice(subTotal, activity);
+        if (subTotal !== subActivityMoney) {
+          activityMoney = subTotal - subActivityMoney;
+        }
       }
     });
-    // console.log('filterProductList: ', filterProductList);
     return activityMoney;
+  }
+
+  /**
+   * @time 0416
+   * @todo [加入积分抵扣]
+   */
+  public getPointPrice = (products?: ProductCartInterface.ProductCartInfo[]) => {
+
+    /**
+     * @todo [如果没有选择会员则没有积分抵扣]
+     */
+    if (!this.member) {
+      return {};
+    }
+    const state = store.getState();
+    const pointConfig = getPointConfig(state);
+    const { accumulativePoints } = this.member;
+    console.log('pointConfig: ', pointConfig);
+    const productList = products !== undefined 
+      ? products 
+      : store.getState().productSDK.productCartList;
+
+    /**
+     * @param {total} 计算出价格
+     * @todo [如果有优惠券则减去优惠券金额]
+     * @todo [如果有活动减去活动价格]
+     * @todo [最后返回积分价格让用户选择是否使用]
+     */
+    let total = 0;
+    for (let i = 0; i < productList.length; i++) {
+      total += this.getProductItemPrice(productList[i]) * productList[i].sellNum;
+    }
+    total -= this.getProductTotalActivityPrice();
+    if (!!this.coupon) {
+      total = total - numeral(this.coupon && this.coupon.couponVO && this.coupon.couponVO.discount).value();
+    }
+    
+    /**
+     * @todo [这里注意向上取整]
+     * @param {deductRate} 转换比例
+     * @param {pointPrice} 实际可抵扣的积分数量
+     */
+    const memberAccumulativePrice = Math.ceil(accumulativePoints) * pointConfig.deductRate;
+    return {
+      deductRate: pointConfig.deductRate,
+      pointPrice: Math.min(memberAccumulativePrice, total)
+    };
   }
 
   /**
@@ -590,6 +652,14 @@ class ProductSDK {
       total = total - numeral(this.coupon && this.coupon.couponVO && this.coupon.couponVO.discount).value();
     }
 
+    if (!!this.point) {
+      /**
+       * @time 0416
+       * @todo [加入积分抵扣]
+       */
+      total = total - this.point;
+    }
+
     /**
      * @todo 如果不计算抹零的话可以返回了
      */
@@ -606,7 +676,6 @@ class ProductSDK {
    * 
    * ```ts
    * import productSdk from 'xxx';
-import { MerchantInterface } from 'src/constants';
    * const payload = productSdk
    * .setErase(1)
    * .setMember(member)
@@ -616,10 +685,18 @@ import { MerchantInterface } from 'src/constants';
    * @memberof ProductSDK
    */
   public getProductInterfacePayload = (products?: ProductCartInterface.ProductCartInfo[]): ProductCartInterface.ProductPayPayload => {
-    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+    const state = store.getState();
+    const productList = products !== undefined 
+      ? products 
+      : state.productSDK.productCartList;
+    const pointConfig = state.merchant.pointConfig;
+    console.log('pointConfig: ', pointConfig);
     const payload: ProductCartInterface.ProductPayPayload = {
       flag: false,
       order: {
+        ...!!this.point 
+          ? {points: this.point / pointConfig.deductRate} 
+          : {},
         authCode: '-1',
         couponList: !!this.coupon && this.coupon.couponCode ? [this.coupon.couponCode] : [],
         discount: 0,

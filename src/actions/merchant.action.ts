@@ -4,7 +4,18 @@ import { store } from '../app';
 import requestHttp from "../common/request/request.http";
 
 class MerchantAction {
-
+  
+  public pointConfigDetail = async () => {
+    const result = await requestHttp.get('/merchant/point/config/detail');
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_POINT_CONFIG,
+        payload: result.data
+      });
+    }
+    return result;
+  }
+  
   public merchantInfoType = async () => {
     const result = await requestHttp.get(`/merchantInfo/type`);
     return result;

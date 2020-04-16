@@ -32,6 +32,9 @@ export declare namespace MemberInterface {
     avatar: string;
     totalTimes: number;
     enableMemberPrice: boolean;
+    memberDiscount: number;
+    accumulativeMoney: number;
+    accumulativePoints: number;
   }
 
   /**

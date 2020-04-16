@@ -3,13 +3,14 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:28:21 
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-13 12:10:59
+ * @Last Modified time: 2020-04-15 17:05:10
  */
 import memberService from "../constants/member/member.service";
 import { ResponseCode, ActionsInterface, MemberInterface, MemberInterfaceMap } from '../constants/index';
 import { store } from '../app';
 import merge from 'lodash.merge';
 import moment from 'dayjs';
+import requestHttp from "../common/request/request.http";
 interface MemberAction {
   /**
    * @interface memberList
@@ -76,6 +77,11 @@ interface MemberAction {
 }
 
 class MemberAction {
+
+  public getMemberLevelInfo = async (id: any) => {
+    const result = await requestHttp.get(`/memberInfo/getMemberLevelInfo/${id}`);
+    return result;
+  }
 
   public fliterDataByDate = <T>(data: T[], datekey = 'createTime') => {
     // return [];
