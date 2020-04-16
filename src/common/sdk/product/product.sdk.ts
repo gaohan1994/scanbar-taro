@@ -362,11 +362,11 @@ class ProductSDK {
       /**
        * @todo [enableMemberDiscount=false使用折扣率]
        */
-      if (!product.enableMemberDiscount) {
+      if (!!product.enableMemberDiscount) {
         return '会员价';
       }
 
-      return product.memberPrice < activityPrice ? '会员价' : '活动价';
+      return activityPrice > 0 ? product.memberPrice < activityPrice ? '会员价' : '活动价' : '会员价';
     }
 
     if (activityPrice !== 0) {
@@ -399,14 +399,14 @@ class ProductSDK {
     const activityPrice = currentActivity && currentActivity.discountPrice || 0;
     if (!!currentMember && !!currentMember.enableMemberPrice) {
       /**
-       * @todo [enableMemberDiscount=false使用折扣率]
+       * @todo [enableMemberDiscount=true使用折扣率]
        */
-      if (!product.enableMemberDiscount) {
+      if (!!product.enableMemberDiscount) {
         const discountMemberPrice = product.price * currentMember.memberDiscount;
         return discountMemberPrice;
       }
 
-      return Math.min(product.memberPrice, activityPrice);
+      return activityPrice > 0 ? Math.min(product.memberPrice, activityPrice) : product.memberPrice;
     }
 
     if (activityPrice !== 0) {
