@@ -1,10 +1,10 @@
-import '@tarojs/async-await';
-import Taro, { Component, Config } from '@tarojs/taro';
-import { Provider } from '@tarojs/redux';
+import "@tarojs/async-await";
+import Taro, { Component, Config } from "@tarojs/taro";
+import { Provider } from "@tarojs/redux";
 // import Home from './pages/home/home';
-import configStore from './store';
-import { View } from '@tarojs/components';
-import 'taro-ui/dist/style/index.scss';
+import configStore from "./store";
+import { View } from "@tarojs/components";
+import "taro-ui/dist/style/index.scss";
 // import './styles/style/index.sass';
 import "./styles/reset.less";
 
@@ -17,7 +17,6 @@ import "./styles/reset.less";
 export const store = configStore() || {};
 
 class App extends Component {
-
   /**
    * 指定config的类型声明为: Taro.Config
    *
@@ -30,106 +29,88 @@ class App extends Component {
       /**
        * @todo [首页相关页面]
        */
-      'pages/home/home',
+      "pages/home/home",
       "pages/report/report",
-      "pages/user/user",
+      "pages/user/user"
     ],
-    navigateToMiniProgramAppIdList: [
-      "wxba027d099f6ec41b"
-    ],
+    navigateToMiniProgramAppIdList: ["wxba027d099f6ec41b"],
     subPackages: [
       {
-        root: 'pages/share',
-        pages: [
-          'share',
-          'share.product'
-        ],
+        root: "pages/share",
+        pages: ["share", "share.product"]
       },
       {
-        root: 'pages/mine',
+        root: "pages/mine",
         pages: [
-          'user.merchant',
-          'user.set',
-          'user.about',
-          'user.detail',
-          'user.merchant.name',
-          'user.merchant.address',
-          'user.merchant.owner',
-          'user.merchant.phone',
-          'user.detail.phone',
-          'user.password',
-        ],
+          "user.merchant",
+          "user.set",
+          "user.about",
+          "user.detail",
+          "user.merchant.name",
+          "user.merchant.address",
+          "user.merchant.owner",
+          "user.merchant.phone",
+          "user.detail.phone",
+          "user.password"
+        ]
       },
       {
         /**
          * @todo [盘点模块]
          */
-        root: 'pages/inventory',
+        root: "pages/inventory",
         pages: [
-          'inventory.main',
-          'inventory.pay',
-          'inventory.purchase.detail',
-          'inventory.list',
-          'inventory.stock',
-          'inventory.stock.detail',
-          'inventory.stock.pay',
-          'inventory.stock.list',
+          "inventory.main",
+          "inventory.pay",
+          "inventory.purchase.detail",
+          "inventory.list",
+          "inventory.stock",
+          "inventory.stock.detail",
+          "inventory.stock.pay",
+          "inventory.stock.list"
         ]
       },
       {
         /**
          * @todo 订单模块
-         * 
+         *
          * ```ts
          * Taro.navigateTo({url: 'pages/order/order.detail?id=1'});
          * ```
          */
-        root: 'pages/order',
+        root: "pages/order",
         pages: [
-          'order.main',
-          'order.detail',
-          'order.refund',
-          'order.online',
-          'order.online.list',
-        ],
+          "order.main",
+          "order.detail",
+          "order.refund",
+          "order.online",
+          "order.online.list"
+        ]
       },
       {
-        root: 'pages/pay',
-        pages: [
-          'pay.input',
-          'pay.receive',
-          'pay.result',
-          'pay.coupon',
-        ],
+        root: "pages/pay",
+        pages: ["pay.input", "pay.receive", "pay.result", "pay.coupon"]
       },
       {
         /**
          * @param {id} number
-         * 
+         *
          * ```js
          * Taro.navigateTo({url: 'pages/member/member.detail?id=1',});
          * Taro.navigateTo({url: 'pages/member/member.edit?id=1',});
          * ```
          */
-        root: 'pages/member',
-        pages: [
-          'member',
-          'member.add',
-          'member.detail',
-          'member.edit',
-        ],
+        root: "pages/member",
+        pages: ["member", "member.add", "member.detail", "member.edit"]
       },
       {
-        root: 'pages/sign',
-        pages: [
-          'login',
-          'register'
-        ]
+        root: "pages/sign",
+        pages: ["login", "register"]
       },
       {
         /**
          * @todo [商品详情]
-         * 
+         *
          * @todo [开单页面]
          * @todo [商品管理页面]
          * ```js
@@ -138,46 +119,50 @@ class App extends Component {
          * });
          * ```
          */
-        root: 'pages/product',
+        root: "pages/product",
         pages: [
-          'product.order',
-          'product.pay',
-          'product.manage',
-          'product.detail',
-          'product.add',
-          'product.suspension',
-          'product.refund',
-          'product.refund.pay',
-        ],
+          "product.order",
+          "product.pay",
+          "product.manage",
+          "product.detail",
+          "product.add",
+          "product.suspension",
+          "product.refund",
+          "product.refund.pay"
+        ]
       }
-    ], 
+    ],
     window: {
-      backgroundTextStyle: 'light',
-      navigationBarBackgroundColor: '#2a86fc',
-      navigationBarTitleText: 'WeChat',
-      navigationBarTextStyle: 'white',
+      backgroundTextStyle: "light",
+      navigationBarBackgroundColor: "#2a86fc",
+      navigationBarTitleText: "WeChat",
+      navigationBarTextStyle: "white"
     },
     tabBar: {
       color: "#ACACAC",
       selectedColor: "#2EAAF8",
       backgroundColor: "#ffffff",
-      borderStyle: 'white',
-      list: [{
-        pagePath: "pages/home/home",
-        iconPath: "./assets/tab-bar/icon_nav_home.png",
-        selectedIconPath: "./assets/tab-bar/icon_nav_home_xuan.png",
-        text: "首页"
-      }, {
-        pagePath: "pages/report/report",
-        iconPath: "./assets/tab-bar/icon_reportforms.png",
-        selectedIconPath: "./assets/tab-bar/icon_reportforms_xuan.png",
-        text: "数据"
-      }, {
-        pagePath: "pages/user/user",
-        iconPath: "./assets/tab-bar/icon_mine.png",
-        selectedIconPath: "./assets/tab-bar/icon_mine_xuan.png",
-        text: "我的"
-      }]
+      borderStyle: "white",
+      list: [
+        {
+          pagePath: "pages/home/home",
+          iconPath: "./assets/tab-bar/icon_nav_home.png",
+          selectedIconPath: "./assets/tab-bar/icon_nav_home_xuan.png",
+          text: "首页"
+        },
+        {
+          pagePath: "pages/report/report",
+          iconPath: "./assets/tab-bar/icon_reportforms.png",
+          selectedIconPath: "./assets/tab-bar/icon_reportforms_xuan.png",
+          text: "数据"
+        },
+        {
+          pagePath: "pages/user/user",
+          iconPath: "./assets/tab-bar/icon_mine.png",
+          selectedIconPath: "./assets/tab-bar/icon_mine_xuan.png",
+          text: "我的"
+        }
+      ]
     }
   };
 
@@ -185,7 +170,7 @@ class App extends Component {
    * 在 App 类中的 render() 函数没有实际作用
    * 请勿修改此函数
    */
-  render () {
+  render() {
     return (
       <Provider store={store}>
         {/* <Home /> */}
@@ -195,4 +180,4 @@ class App extends Component {
   }
 }
 
-Taro.render(<App />, document.getElementById('app'));
+Taro.render(<App />, document.getElementById("app"));
