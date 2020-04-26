@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-22 11:12:09
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-04-15 17:18:44
+ * @Last Modified time: 2020-04-26 16:38:40
  *
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -369,6 +369,9 @@ class ProductSDK {
     product: ProductCartInterface.ProductCartInfo,
     member?: MemberInterface.MemberInfo
   ) => {
+    if (product.name === "无码商品") {
+      return "原价";
+    }
     if (product.changePrice !== undefined) {
       return "改价";
     }
@@ -409,10 +412,12 @@ class ProductSDK {
     product: ProductCartInterface.ProductCartInfo,
     member?: MemberInterface.MemberInfo
   ) => {
+    if (product.name === "无码商品") {
+      return product.price;
+    }
     if (product.changePrice !== undefined) {
       return product.changePrice;
     }
-
     /**
      * @time 0323
      * @todo 修改计算规则，会员加入了是否可用开关
