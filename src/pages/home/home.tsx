@@ -95,40 +95,6 @@ class Home extends Component<Props, State> {
     })
   }
 
-  /**
-   * @todo [跳转函数]
-   *
-   * @memberof Home
-   */
-  public onNavHandle = (item: any) => {
-    if (
-      item.value === '更多'
-    ) {
-      Taro.showToast({
-        icon: 'none',
-        title: '正在开发中'
-      });
-      return;
-    }
-
-    if (!loginManager.getUserToken().success) {
-      Taro.showModal({
-        title: '提示',
-        content: '请先登录',
-        success: (result) => {
-          if (result.confirm) {
-            Taro.redirectTo({
-              url: `/pages/sign/login`
-            })
-          }
-        }
-      })
-      return;
-    }
-
-    Taro.navigateTo({ url: item.url });
-  }
-
   render() {
     const { reportTodayData } = this.props;
     const { userinfo } = this.state;
