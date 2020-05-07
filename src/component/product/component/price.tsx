@@ -34,8 +34,9 @@ class PayListPrice extends Taro.Component<Props> {
             {`￥ ${this.setNumber(itemPrice)}`}
           </Text>
         ) : sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_REFUND ? (
+          product.changePrice &&
           numeral(product.changePrice).value() !==
-          numeral(product.price).value() ? (
+            numeral(product.price).value() ? (
             <View className={`${cssPrefix}-row-content-items`}>
               <Text className={`${cssPrefix}-row-normal ${cssPrefix}-row-line`}>
                 {`￥ ${this.setNumber(product.price)}`}
