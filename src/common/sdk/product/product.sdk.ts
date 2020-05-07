@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-22 11:12:09
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-04-26 16:38:40
+ * @Last Modified time: 2020-04-28 15:01:24
  *
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -377,9 +377,9 @@ class ProductSDK {
     }
 
     const currentMember = member || this.member;
-    const currentActivity = product.activityInfos.find(
-      a => a.type === 2 || a.type === 1
-    );
+    const currentActivity =
+      product.activityInfos &&
+      product.activityInfos.find(a => a.type === 2 || a.type === 1);
     const activityPrice =
       (currentActivity && currentActivity.discountPrice) || 0;
 
@@ -429,9 +429,9 @@ class ProductSDK {
      * @todo [enableMemberDiscount=true时使用memberprice，enableMemberDiscount=false时，使用memberDiscount]
      */
     const currentMember = member || this.member;
-    const currentActivity = product.activityInfos.find(
-      a => a.type === 2 || a.type === 1
-    );
+    const currentActivity =
+      product.activityInfos &&
+      product.activityInfos.find(a => a.type === 2 || a.type === 1);
     const activityPrice =
       (currentActivity && currentActivity.discountPrice) || 0;
     if (!!currentMember && !!currentMember.enableMemberPrice) {
@@ -641,9 +641,6 @@ class ProductSDK {
         : store.getState().productSDK.productCartList;
     const activityList = store.getState().merchant.activityInfo;
     const filterProductList = this.filterByActivity(products, activityList);
-    console.log("====================================");
-    console.log(filterProductList);
-    console.log("====================================");
     let activityMoney: number = 0;
     filterProductList.forEach(activityItem => {
       const { activity, productList } = activityItem;

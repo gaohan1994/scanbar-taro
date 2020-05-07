@@ -1,7 +1,7 @@
-import dayJs from 'dayjs';
+import dayJs from "dayjs";
 
 export function dateHelper(date: number): string {
-  return dayJs(date).format('YYYY-MM-DD');
+  return dayJs(date).format("YYYY-MM-DD");
 }
 
 interface ConsoleUtilConfig {
@@ -12,35 +12,34 @@ interface ConsoleUtilConfig {
 export class ConsoleUtil {
   private title: string;
   private env: string;
-  constructor (options: ConsoleUtilConfig) {
+  constructor(options: ConsoleUtilConfig) {
     this.init(options);
   }
 
   public console = (...arg: any[]) => {
-    if (this.env !== 'production') {
+    if (this.env !== "production") {
       console.log(`---- ${this.title} ----`);
       console.log(arg);
     }
-  }
-  
+  };
+
   private init = (options: ConsoleUtilConfig) => {
     const { title, env } = options;
     this.title = title;
-    this.env = env || 'development';
-  }
-
+    this.env = env || "development";
+  };
 }
 
 /**
  * @todo [返回该年份的所有月份]
  */
-export function createMonth (year: number = 2020) {
-  const month = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((item) => {
+export function createMonth(year: number = 2020) {
+  const month = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(item => {
     return {
       month: item + 1,
       monthStr: `${year}年${item + 1}月`,
       startDate: new Date(year, item, 1),
-      endDate: new Date(year, item, getMonthEndDate(item, year)),
+      endDate: new Date(year, item, getMonthEndDate(item, year))
     };
   });
   return month;
@@ -49,7 +48,7 @@ export function createMonth (year: number = 2020) {
 export function getMonthEndDate(month: number, year: number) {
   switch (month + 1) {
     case 2: {
-      if (year % 4 === 0 && year % 100 !== 0 || year % 400 === 0) {
+      if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) {
         return 29;
       } else {
         return 28;
@@ -68,4 +67,17 @@ export function getMonthEndDate(month: number, year: number) {
       return 30;
     }
   }
+}
+
+/**
+ * 校验数字输入
+ *
+ * @author Ghan
+ * @export
+ * @param {string} input 用户输入的金额，
+ * @returns {string} 返回最多2位小数的金额
+ */
+export function checkNumberInput(input: string) {
+  const reg = /([0-9]+\.[0-9]{2})[0-9]*/;
+  return input.replace(reg, "$1");
 }

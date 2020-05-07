@@ -1,21 +1,27 @@
-import Taro from '@tarojs/taro';
-import { ScrollView, View } from '@tarojs/components';
-import ProductComponent from './product';
+import Taro from "@tarojs/taro";
+import { ScrollView, View } from "@tarojs/components";
+import ProductComponent from "./product";
 import "../../pages/style/product.less";
-import { ProductInterface } from '../../constants';
-import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
-import { AtActivityIndicator } from 'taro-ui';
-import classnames from 'classnames';
+import { ProductInterface } from "../../constants";
+import productSdk, {
+  ProductCartInterface
+} from "../../common/sdk/product/product.sdk";
+import { AtActivityIndicator } from "taro-ui";
+import classnames from "classnames";
 
-const cssPrefix = 'product';
+const cssPrefix = "product";
 
-type Props = { 
+type Props = {
   className?: string;
   loading?: boolean;
-  productList: Array<ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo>;
+  productList: Array<
+    ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo
+  >;
   isRenderFooter?: boolean;
   bottomSpector?: boolean;
-  sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
+  sort?:
+    | ProductCartInterface.PAYLOAD_ORDER
+    | ProductCartInterface.PAYLOAD_REFUND;
 };
 
 class ProductListView extends Taro.Component<Props> {
@@ -28,46 +34,46 @@ class ProductListView extends Taro.Component<Props> {
     productList: [],
     isRenderFooter: true,
     bottomSpector: true,
-    sort: productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER,
+    sort: productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
   };
 
-  render () {
-    const { className, loading, productList, isRenderFooter, bottomSpector, sort } = this.props;
+  render() {
+    const {
+      className,
+      loading,
+      productList,
+      isRenderFooter,
+      bottomSpector,
+      sort
+    } = this.props;
     return (
-      <ScrollView 
+      <ScrollView
         scrollY={true}
         className={classnames(`${cssPrefix}-list-right`, className)}
       >
-        {
-          !loading 
-          ? productList && productList.length > 0
-            ? productList.map((product) => {
+        {!loading ? (
+          productList && productList.length > 0 ? (
+            productList.map(product => {
               return (
-                <View    
-                  id={`product${product.id}`}
-                  key={product.id}
-                >
-                  <ProductComponent
-                    product={product}
-                    sort={sort}
-                  /> 
+                <View id={`product${product.id}`} key={product.id}>
+                  <ProductComponent product={product} sort={sort} />
                 </View>
               );
             })
-            : <View />
-          : (
-            <View className="container">
-              <AtActivityIndicator mode='center' />
-            </View>
+          ) : (
+            <View />
           )
-        }
+        ) : (
+          <View className="container">
+            <AtActivityIndicator mode="center" />
+          </View>
+        )}
         {isRenderFooter && productList && productList.length > 0 && (
           <View className={`${cssPrefix}-list-bottom`}>已经到底啦</View>
         )}
-        {bottomSpector && (
-          <View style="height: 100px" />
-        )}
-      </ScrollView>  
+        {bottomSpector && <View style="height: 100px" />}
+        {this.props.children}
+      </ScrollView>
     );
   }
 }

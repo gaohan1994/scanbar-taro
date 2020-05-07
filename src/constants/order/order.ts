@@ -1,18 +1,16 @@
-
 /**
- * @Author: Ghan 
- * @Date: 2019-11-13 10:10:53 
+ * @Author: Ghan
+ * @Date: 2019-11-13 10:10:53
  * @Last Modified by: Ghan
  * @Last Modified time: 2020-03-19 13:50:44
- * 
+ *
  * @todo [商品相关的类型定义]
  */
 
 import { jsonToQueryString } from "../index";
-import { HTTPInterface } from '..';
+import { HTTPInterface } from "..";
 
 export declare namespace OrderInterface {
-
   interface RefundByOrderPayloadOrder {
     orderNo: string;
     terminalCd: string;
@@ -37,6 +35,7 @@ export declare namespace OrderInterface {
 
   interface OrderDetailItem {
     id: number;
+    viewPrice?: number;
     costAmount: number;
     discountAmount: number;
     discountType: number;
@@ -69,7 +68,7 @@ export declare namespace OrderInterface {
     levelName: string;
     avatar: string;
     memberId: number;
-    memberName:  string;
+    memberName: string;
     memberPhone: string;
     createTime: string;
     address: string;
@@ -143,12 +142,14 @@ export declare namespace OrderInterface {
     refundingTime: string;
     updateTime: string;
   }
+
   interface OrderDetail {
     order: OrderInfo;
     orderNo: string;
     orderDetailList?: Array<OrderDetailItem>;
     orderRefundIndices?: OrderRefundIndiceItem[];
     refundOrderList?: OrderRefundListItem[];
+    originOrder?: OrderInfo;
   }
 
   interface OrderListFetchFidle extends HTTPInterface.FetchField {
@@ -168,7 +169,7 @@ export declare namespace OrderInterface {
     endTime?: string;
   }
 
-  interface OrderDetailFetchField { 
+  interface OrderDetailFetchField {
     orderNo: string;
   }
 
@@ -186,25 +187,24 @@ export declare namespace OrderInterface {
     reducerInterfaces: ReducerInterface;
     orderList: (params: OrderListFetchFidle) => string;
     orderDetail: (params: OrderDetailFetchField) => string;
-  }  
+  }
 }
 
 class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
-
   public reducerInterfaces = {
-    RECEIVE_ORDER_LIST: 'RECEIVE_ORDER_LIST',
-    RECEIVE_ORDER_DETAIL: 'RECEIVE_ORDER_DETAIL',
-    RECEIVE_ORDER_SEARCH_LIST: 'RECEIVE_ORDER_SEARCH_LIST',
-    RECEIVE_ORDER_COUNT: 'RECEIVE_ORDER_COUNT',
+    RECEIVE_ORDER_LIST: "RECEIVE_ORDER_LIST",
+    RECEIVE_ORDER_DETAIL: "RECEIVE_ORDER_DETAIL",
+    RECEIVE_ORDER_SEARCH_LIST: "RECEIVE_ORDER_SEARCH_LIST",
+    RECEIVE_ORDER_COUNT: "RECEIVE_ORDER_COUNT"
   };
 
   public orderList = (params?: OrderInterface.OrderListFetchFidle) => {
-    return `/order/list${params ? jsonToQueryString(params) : ''}`;
-  }
+    return `/order/list${params ? jsonToQueryString(params) : ""}`;
+  };
 
   public orderDetail = (params: OrderInterface.OrderDetailFetchField) => {
     return `/order/detail/${params.orderNo}`;
-  }
+  };
 }
 
 export default new OrderInterfaceMap();

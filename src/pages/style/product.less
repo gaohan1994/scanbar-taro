@@ -10,7 +10,7 @@
 @product-list-left-bg-color: #f6f6f6;
 @product-list-type-height: 94px;
 @product-list-type-header-font: 28px;
-@product-section-color: #F8F8FA;
+@product-section-color: #f8f8fa;
 @product-select-title-font: 32px;
 @product-pay-footer-right: 410px;
 
@@ -45,7 +45,7 @@
       position: absolute;
       right: 10px;
       border-radius: 50%;
-      background-color: #FC4E44;
+      background-color: #fc4e44;
       font-size: 24px;
       .flex(center, center);
       height: 37px;
@@ -55,7 +55,7 @@
     }
 
     &-search {
-      width: @product-search-width  !important;
+      width: @product-search-width !important;
     }
 
     &-item {
@@ -380,6 +380,7 @@
 
       &-close {
         position: absolute;
+        z-index: 100;
         left: 10px;
         top: 0px;
         width: 100px;
@@ -505,13 +506,13 @@
     }
 
     &-title {
-      font-size:30px;
-      color:rgba(51,51,51,1);
+      font-size: 30px;
+      color: rgba(51, 51, 51, 1);
     }
 
     &-text {
-      font-size:20px;
-      color:rgba(153,153,153,1);
+      font-size: 20px;
+      color: rgba(153, 153, 153, 1);
     }
 
     &-footer {
@@ -526,7 +527,7 @@
         .padding(@product-pay-footer-right, r);
         width: 750px;
         height: @cart-height;
-        .background-image('//net.huanmusic.com/weapp/bmg_bottom_close.png');
+        .background-image("//net.huanmusic.com/weapp/bmg_bottom_close.png");
       }
 
       &-right {
@@ -541,11 +542,15 @@
         font-size: @cart-button-font;
 
         &-disabled {
-          .background-image('//net.huanmusic.com/weapp/bt_put_bottom_close_und.png');
+          .background-image(
+            "//net.huanmusic.com/weapp/bt_put_bottom_close_und.png"
+          );
         }
 
         &-active {
-          .background-image('//net.huanmusic.com/weapp/bt_put_bottom_close_pitch.png');
+          .background-image(
+            "//net.huanmusic.com/weapp/bt_put_bottom_close_pitch.png"
+          );
         }
       }
 
@@ -583,7 +588,7 @@
       &-input {
         .padding(30px);
         .flex(center, space-between, row);
-        background-color: #F8F8FA;
+        background-color: #f8f8fa;
         border-radius: 20px;
 
         &-icon {
@@ -620,7 +625,7 @@
           right: 0;
           bottom: 0;
           z-index: 1000;
-          background-color: rgba(0, 0, 0, 0.7)
+          background-color: rgba(0, 0, 0, 0.7);
         }
 
         &-transparent {
@@ -679,11 +684,11 @@
       border-radius: 14px;
 
       &-member {
-        background-color: #CCAE80;
+        background-color: #ccae80;
       }
 
       &-refund {
-        background-color: #20BBB9;
+        background-color: #20bbb9;
       }
     }
 
@@ -692,7 +697,7 @@
     }
 
     &-border {
-      border-bottom: 1PX solid #e3e3e3;
+      border-bottom: 1px solid #e3e3e3;
     }
 
     &-normal {
@@ -767,7 +772,7 @@
         }
 
         &-red {
-          color: #FC4E44 !important;
+          color: #fc4e44 !important;
         }
 
         &-base {
@@ -789,6 +794,34 @@
   &-refund {
     &-input {
       width: 710px !important;
+    }
+  }
+
+  &-search {
+    &-empty {
+      .flex(center, center, column);
+      &-img {
+        width: 323px;
+        height: 156px;
+        .bg;
+        background-image: url(//net.huanmusic.com/weapp/img_commodity_none.png);
+      }
+      &-text {
+        .flex(center, center, row);
+        width: 100%;
+        font-size: 30px;
+        color: rgba(154, 159, 180, 1);
+        .margin(36px, tb);
+      }
+      &-button {
+        width: 230px;
+        height: 66px;
+        .flex(center, center, row);
+        border: 2px solid rgba(42, 134, 252, 1);
+        border-radius: 33px;
+        font-size: 30px;
+        color: rgba(42, 134, 252, 1);
+      }
     }
   }
 }

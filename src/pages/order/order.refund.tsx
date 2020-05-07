@@ -1,20 +1,27 @@
-import Taro, { Config } from '@tarojs/taro';
-import { View } from '@tarojs/components';
-import { connect } from '@tarojs/redux';
-import { AppReducer } from '../../reducers';
+import Taro, { Config } from "@tarojs/taro";
+import { View } from "@tarojs/components";
+import { connect } from "@tarojs/redux";
+import { AppReducer } from "../../reducers";
 import "../style/order.less";
 import "../style/product.less";
-import invariant from 'invariant';
-import { ResponseCode, OrderInterface, OrderService } from '../../constants/index';
-import { getOrderDetail } from '../../reducers/app.order';
-import numeral from 'numeral';
-import ProductComponent from './component/product';
-import merge from 'lodash.merge';
-import Footer from './component/footer';
+import invariant from "invariant";
+import {
+  ResponseCode,
+  OrderInterface,
+  OrderService
+} from "../../constants/index";
+import { getOrderDetail } from "../../reducers/app.order";
+import numeral from "numeral";
+import ProductComponent from "./component/product";
+import merge from "lodash.merge";
+import Footer from "./component/footer";
 
-const cssPrefix = 'order';
+const cssPrefix = "order";
 
-export type CartItem = OrderInterface.OrderDetailItem & {sellNum: number; changePrice?: number};
+export type CartItem = OrderInterface.OrderDetailItem & {
+  sellNum: number;
+  changePrice?: number;
+};
 
 type Props = {
   orderDetail: OrderInterface.OrderDetail;
@@ -26,20 +33,19 @@ type State = {
 };
 
 class OrderDetail extends Taro.Component<Props, State> {
-
   config: Config = {
-    navigationBarTitleText: '退货退款'
+    navigationBarTitleText: "退货退款"
   };
 
   state: State = {
     damageList: [],
-    cartList: [], 
+    cartList: []
   };
 
-  componentDidShow () {
+  componentDidShow() {
     this.setState({
       cartList: [],
-      damageList: [],
+      damageList: []
     });
   }
 
@@ -49,8 +55,10 @@ class OrderDetail extends Taro.Component<Props, State> {
       const { orderDetail } = this.props;
 
       let priceNumber = 0;
-      cartList.map((item) => {
-        priceNumber += numeral(item.sellNum).value() * numeral(item.changePrice || item.unitPrice).value();
+      cartList.map(item => {
+        priceNumber +=
+          numeral(item.sellNum).value() *
+          numeral(item.changePrice || item.unitPrice).value();
       });
 
       const payload: OrderInterface.RefundByOrderPayload = {
@@ -61,9 +69,9 @@ class OrderDetail extends Taro.Component<Props, State> {
           payType: 0,
           terminalCd: "",
           terminalSn: "",
-          transAmount: priceNumber,
+          transAmount: priceNumber
         },
-        productInfoList: cartList.map((item) => {
+        productInfoList: cartList.map(item => {
           const itemPrice = item.changePrice || item.unitPrice;
           const damageToken = damageList.findIndex(d => d === item.productId);
           return {
@@ -72,14 +80,14 @@ class OrderDetail extends Taro.Component<Props, State> {
             orderDetailId: item.id,
             priceChangeFlag: !!item.changePrice,
             remark: "",
-            unitPrice: itemPrice,
+            unitPrice: itemPrice
           };
         })
       };
       const result = await OrderService.orderRefund(payload);
-      invariant(result.code === ResponseCode.success, result.msg || ' ');
+      invariant(result.code === ResponseCode.success, result.msg || " ");
       Taro.showToast({
-        title: '退款成功',
+        title: "退款成功",
         duration: 1000
       });
 
@@ -89,10 +97,10 @@ class OrderDetail extends Taro.Component<Props, State> {
     } catch (error) {
       Taro.showToast({
         title: error.message,
-        icon: 'none'
+        icon: "none"
       });
     }
-  }
+  };
 
   public pickAll = () => {
     const token = this.allSellected();
@@ -104,12 +112,14 @@ class OrderDetail extends Taro.Component<Props, State> {
       const { orderDetail } = this.props;
       const { orderDetailList } = orderDetail;
       this.setState({
-        cartList: orderDetailList ? orderDetailList.map((item) => {
-          return {
-            ...item,
-            sellNum: item.num
-          };
-        }) : []
+        cartList: orderDetailList
+          ? orderDetailList.map(item => {
+              return {
+                ...item,
+                sellNum: item.num
+              };
+            })
+          : []
       });
       return;
     }
@@ -117,7 +127,7 @@ class OrderDetail extends Taro.Component<Props, State> {
     this.setState({
       cartList: []
     });
-  }
+  };
 
   public allSellected = (): boolean => {
     const { cartList } = this.state;
@@ -131,17 +141,19 @@ class OrderDetail extends Taro.Component<Props, State> {
     if (cartList.length !== orderDetailList.length) {
       return false;
     }
-    
+
     let token = true;
-    cartList.forEach((item) => {
+    cartList.forEach(item => {
       if (item.sellNum !== item.num) {
         token = false;
       }
     });
     return token;
-  }
+  };
 
-  public onExtraClick = (product: OrderInterface.OrderDetailItem | CartItem) => {
+  public onExtraClick = (
+    product: OrderInterface.OrderDetailItem | CartItem
+  ) => {
     let damageList: number[] = merge([], this.state.damageList);
     const index = damageList.findIndex(p => p === product.productId);
 
@@ -156,12 +168,16 @@ class OrderDetail extends Taro.Component<Props, State> {
     this.setState({
       damageList: damageList.concat([product.productId])
     });
-  }
+  };
 
-  public manageProduct = (type: string, product: OrderInterface.OrderDetailItem | CartItem, sellNum: number = 1) => {
+  public manageProduct = (
+    type: string,
+    product: OrderInterface.OrderDetailItem | CartItem,
+    sellNum: number = 1
+  ) => {
     let cartList: CartItem[] = merge([], this.state.cartList);
     const index = cartList.findIndex(p => p.productId === product.productId);
-    if (type === 'ADD') {
+    if (type === "ADD") {
       /**
        * @todo [如果已经存在购物车中+1]
        * @todo [如果没存在购物车中加入购物车]
@@ -170,16 +186,15 @@ class OrderDetail extends Taro.Component<Props, State> {
         const currentItem = cartList[index];
         if (currentItem.sellNum + sellNum > currentItem.num) {
           Taro.showToast({
-            title: '超过最大退货数量'
+            title: "超过最大退货数量"
           });
           return;
         }
         currentItem.sellNum = sellNum !== 1 ? sellNum : currentItem.sellNum + 1;
       } else {
-
         if (sellNum > product.num) {
           Taro.showToast({
-            title: '超过最大退货数量'
+            title: "超过最大退货数量"
           });
           return;
         }
@@ -189,7 +204,7 @@ class OrderDetail extends Taro.Component<Props, State> {
           sellNum
         });
       }
-      this.setState({cartList});
+      this.setState({ cartList });
       return;
     }
 
@@ -198,40 +213,41 @@ class OrderDetail extends Taro.Component<Props, State> {
       if (currentItem.sellNum === 1) {
         cartList.splice(index, 1);
       } else {
-        cartList[index].sellNum = sellNum !== 1 ? sellNum : cartList[index].sellNum - 1;
+        cartList[index].sellNum =
+          sellNum !== 1 ? sellNum : cartList[index].sellNum - 1;
       }
-      this.setState({cartList});
+      this.setState({ cartList });
       return;
     }
     return;
-  }
+  };
 
   render() {
     return (
       <View className={`container`}>
         <View className={`${cssPrefix}-refund-title`}>
           <View className={`${cssPrefix}-refund-title-text`}>退货商品</View>
-          <View 
+          <View
             onClick={() => this.pickAll()}
             className={`${cssPrefix}-refund-title-box`}
           >
             {!this.allSellected() ? (
-              <View 
+              <View
                 className={`${cssPrefix}-refund-title-icon`}
-                style='background-image: url(//net.huanmusic.com/weapp/bt_normal.png)'
+                style="background-image: url(//net.huanmusic.com/weapp/bt_normal.png)"
               />
             ) : (
-              <View 
+              <View
                 className={`${cssPrefix}-refund-title-icon`}
-                style='background-image: url(//net.huanmusic.com/weapp/bt_selected.png)'
+                style="background-image: url(//net.huanmusic.com/weapp/bt_selected.png)"
               />
             )}
             <View className={`${cssPrefix}-refund-title-text`}>全选</View>
           </View>
         </View>
         {this.renderList()}
-        <Footer 
-          cartList={this.state.cartList} 
+        <Footer
+          cartList={this.state.cartList}
           onClick={() => this.onRefund()}
         />
       </View>
@@ -244,27 +260,50 @@ class OrderDetail extends Taro.Component<Props, State> {
     const { orderDetailList } = orderDetail;
     return (
       <View>
-        {orderDetailList && orderDetailList.map((product) => {
-          const productInCart = cartList.find((p) => p.productId === product.productId);
-          return (
-            <ProductComponent
-              key={product.productId}
-              product={product}
-              damageList={damageList}
-              onContentClick={() => {}}
-              productInCart={productInCart}
-              manageProduct={this.manageProduct}
-              onExtraClick={this.onExtraClick}
-            />
-          );
-        })}
+        {orderDetailList &&
+          orderDetailList.map(product => {
+            const productInCart = cartList.find(
+              p => p.productId === product.productId
+            );
+            return (
+              <ProductComponent
+                key={product.productId}
+                product={product}
+                damageList={damageList}
+                onContentClick={() => {}}
+                productInCart={productInCart}
+                manageProduct={this.manageProduct}
+                onExtraClick={this.onExtraClick}
+              />
+            );
+          })}
       </View>
     );
-  }
+  };
 }
 
-const select = (state: AppReducer.AppState) => ({
-  orderDetail: getOrderDetail(state),
-});
+const select = (state: AppReducer.AppState) => {
+  /**
+   * @time 0507操作一下
+   * @todo [如果有退货的单子了记得把对应退货数量减去]
+   */
+  const orderDetail = getOrderDetail(state);
+  // const { refundOrderList } = orderDetail;
+  // const orderDetailList: OrderInterface.OrderDetailItem[] = merge([], orderDetail.orderDetailList);
+
+  // const nextOrderDetailList =
+  //   refundOrderList && refundOrderList.length > 0
+  //     ? orderDetailList.map(item => {
+  //       const index = refundOrderList.findIndex(p => p.)
+  //       return {
+  //         ...item,
+  //         num:
+  //       }
+  //     })
+  //     : orderDetailList;
+  return {
+    orderDetail
+  };
+};
 
 export default connect(select)(OrderDetail);
