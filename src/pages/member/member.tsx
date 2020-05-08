@@ -1,28 +1,28 @@
 /**
- * @Author: Ghan 
- * @Date: 2019-11-01 15:43:06 
+ * @Author: Ghan
+ * @Date: 2019-11-01 15:43:06
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-20 10:58:49
+ * @Last Modified time: 2020-05-08 11:37:34
  */
-import Taro from '@tarojs/taro';
-import { View, ScrollView, Input, Image, Text } from '@tarojs/components';
-import MemberAction from '../../actions/member.action';
-import { connect } from '@tarojs/redux';
-import { AppReducer } from '../../reducers';
-import { MemberInterface, ReportInterface } from '../../constants';
-import '../../component/card/form.card.less';
-import '../style/member.less';
-import '../style/home.less';
-import invariant from 'invariant';
-import { AtActivityIndicator } from 'taro-ui';
-import classnames from 'classnames';
+import Taro from "@tarojs/taro";
+import { View, ScrollView, Input, Image, Text } from "@tarojs/components";
+import MemberAction from "../../actions/member.action";
+import { connect } from "@tarojs/redux";
+import { AppReducer } from "../../reducers";
+import { MemberInterface, ReportInterface } from "../../constants";
+import "../../component/card/form.card.less";
+import "../style/member.less";
+import "../style/home.less";
+import invariant from "invariant";
+import { AtActivityIndicator } from "taro-ui";
+import classnames from "classnames";
 import "../style/product.less";
-import { getMemberList } from '../../reducers/app.member';
-import numeral from 'numeral';
-import { getReportTodayData } from '../../reducers/app.report';
-import dayjs from 'dayjs';
+import { getMemberList } from "../../reducers/app.member";
+import numeral from "numeral";
+import { getReportTodayData } from "../../reducers/app.report";
+import dayjs from "dayjs";
 
-const cssPrefix = 'member';
+const cssPrefix = "member";
 
 let pageNum: number = 1;
 const pageSize: number = 20;
@@ -31,10 +31,11 @@ interface MemberMainProps {
   // memberListByDate: MemberInterface.MemberListByDate[];
   memberList: MemberInterface.MemberInfo[];
   reportTodayData: ReportInterface.ReportTodayData;
+  memberListTotal: number;
 }
 
-type MemberQuery = 'total_amount' | 'last_pay_time' | 'create_time';
-type MemberSelect = 'desc' | 'asc';
+type MemberQuery = "total_amount" | "last_pay_time" | "create_time";
+type MemberSelect = "desc" | "asc";
 
 interface State {
   searchValue: string;
@@ -43,7 +44,6 @@ interface State {
   lastIsSearch: boolean;
   memberQuery: MemberQuery;
   memberSelect: MemberSelect;
-
 }
 class MemberMain extends Taro.Component<MemberMainProps, State> {
   /**
@@ -54,21 +54,21 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
   config: Taro.Config = {
-    navigationBarTitleText: '会员管理'
+    navigationBarTitleText: "会员管理"
   };
 
   readonly state = {
-    searchValue: '',
+    searchValue: "",
     refreshing: false,
     loading: false,
-    lastFetch: '',
+    lastFetch: "",
     lastIsSearch: false,
-    memberQuery: 'total_amount' as MemberQuery,
-    memberSelect: 'desc' as MemberSelect,
+    memberQuery: "total_amount" as MemberQuery,
+    memberSelect: "desc" as MemberSelect
   };
 
   componentDidShow() {
-    if (this.state.lastIsSearch === false && this.state.searchValue === '') {
+    if (this.state.lastIsSearch === false && this.state.searchValue === "") {
       this.fetchMember(1);
     }
   }
@@ -80,31 +80,36 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
         [key]: value
       };
     });
-  }
+  };
 
   public onTabClick = (type: MemberQuery) => {
     const { memberQuery } = this.state;
     if (memberQuery === type) {
-
-      this.setState(prevState => {
-        return {
-          ...prevState,
-          memberSelect: prevState.memberSelect === 'desc' ? 'asc' : 'desc'
-        };
-      }, () => {
-        this.fetchMember(1);
-      });
+      this.setState(
+        prevState => {
+          return {
+            ...prevState,
+            memberSelect: prevState.memberSelect === "desc" ? "asc" : "desc"
+          };
+        },
+        () => {
+          this.fetchMember(1);
+        }
+      );
       return;
     }
 
     // 说明不是
-    this.setState({
-      memberQuery: type,
-      memberSelect: 'desc'
-    }, () => {
-      this.fetchMember(1);
-    });
-  }
+    this.setState(
+      {
+        memberQuery: type,
+        memberSelect: "desc"
+      },
+      () => {
+        this.fetchMember(1);
+      }
+    );
+  };
 
   /**
    * @todo [修改loading状态]
@@ -113,7 +118,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
    */
   public changeLoading = (loading: boolean) => {
     this.setState({ loading });
-  }
+  };
 
   /**
    * @todo [修改刷新状态]
@@ -122,7 +127,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
    */
   public changeRefreshing = (refreshing: boolean) => {
     this.setState({ refreshing });
-  }
+  };
 
   /**
    * @todo 修改搜索的value同时触发搜索查询
@@ -133,7 +138,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
     this.setState({ searchValue: value }, () => {
       this.searchMember(1);
     });
-  }
+  };
 
   /**
    * @todo [上次请求是否是查询]
@@ -142,26 +147,32 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
    */
   public changeLastIsSearch = (lastIsSearch: boolean) => {
     this.setState({ lastIsSearch });
-  }
+  };
 
   public fetchMember = async (page?: number) => {
     try {
       /**
        * @todo [如果外部传入的page那么使用外面初入的page并给全局page赋值]
        */
-      const currentPage = typeof page === 'number' ? page : pageNum;
+      const { memberListTotal, memberList } = this.props;
+      const currentPage = typeof page === "number" ? page : pageNum;
       if (currentPage === 1) {
         if (this.state.refreshing === true) {
           return;
-        } else {
-          this.changeRefreshing(true);
         }
+        this.changeRefreshing(true);
       } else {
         if (this.state.loading === true) {
           return;
-        } else {
-          this.changeLoading(true);
         }
+        if (memberList.length >= memberListTotal) {
+          Taro.showToast({
+            title: "已经到底了",
+            icon: "none"
+          });
+          return;
+        }
+        this.changeLoading(true);
       }
       const { memberQuery, memberSelect } = this.state;
       const payload: MemberInterface.MemberInfoListFetchFidle = {
@@ -170,11 +181,11 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
         orderByColumn: `${memberQuery} ${memberSelect}`
       };
       const result = await MemberAction.memberList(payload);
-      invariant(result.success, result.result || '服务器开了个小差');
+      invariant(result.success, result.result || "服务器开了个小差");
       /**
        * @todo [请求结束之后如果外部传入的page那么赋值给全局，如果没传那么默认+1]
        */
-      if (typeof page === 'number') {
+      if (typeof page === "number") {
         pageNum = page;
       } else {
         pageNum += 1;
@@ -186,10 +197,10 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
       this.changeLoading(false);
       Taro.showToast({
         title: error.message,
-        icon: 'none'
+        icon: "none"
       });
     }
-  }
+  };
 
   /**
    * @todo [搜索会员，每次搜索的时候重置pageNum]
@@ -200,7 +211,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
     try {
       const { searchValue: value } = this.state;
       this.changeLastIsSearch(true);
-      if (value === '') {
+      if (value === "") {
         /**
          * @todo [如果搜索是''那么回归查询全部]
          */
@@ -208,7 +219,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
         this.changeLastIsSearch(false);
         return;
       }
-      const currentPage = typeof page === 'number' ? page : pageNum;
+      const currentPage = typeof page === "number" ? page : pageNum;
       if (currentPage === 1) {
         if (this.state.refreshing === true) {
           return;
@@ -225,11 +236,11 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
       const params: MemberInterface.MemberInfoSearchFidle = {
         pageSize,
         pageNum: currentPage,
-        identity: value,
+        identity: value
       };
       const result = await MemberAction.memberSearch(params);
-      invariant(result.success === true, result.result || '服务器开了个小差');
-      if (typeof page === 'number') {
+      invariant(result.success === true, result.result || "服务器开了个小差");
+      if (typeof page === "number") {
         pageNum = page;
       } else {
         pageNum += 1;
@@ -239,13 +250,13 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
     } catch (error) {
       Taro.showToast({
         title: error.message,
-        icon: 'none'
+        icon: "none"
       });
       this.changeLastIsSearch(false);
       this.changeRefreshing(false);
       this.changeLoading(false);
     }
-  }
+  };
 
   public loadMore = async (): Promise<void> => {
     const { lastIsSearch } = this.state;
@@ -254,7 +265,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
     } else {
       this.searchMember();
     }
-  }
+  };
 
   public refresh = async (): Promise<void> => {
     const { lastIsSearch } = this.state;
@@ -263,7 +274,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
     } else {
       this.searchMember(1);
     }
-  }
+  };
 
   render() {
     const { reportTodayData } = this.props;
@@ -271,19 +282,22 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
       <View className={`container ${cssPrefix}-main container-color`}>
         <View className={`${cssPrefix}-main-header`}>
           <View className={`${cssPrefix}-main-header-search`}>
-            <Image src="//net.huanmusic.com/weapp/icon_search.png" className={`${cssPrefix}-main-header-search-icon`} />
+            <Image
+              src="//net.huanmusic.com/weapp/icon_search.png"
+              className={`${cssPrefix}-main-header-search-icon`}
+            />
             <Input
               className={`${cssPrefix}-main-header-search-input`}
               placeholder="请输入手机号/姓名"
               placeholderClass={`${cssPrefix}-main-header-search-input-holder`}
               value={this.state.searchValue}
-              onInput={(event) => this.changeSearchValue(event.detail.value)}
+              onInput={event => this.changeSearchValue(event.detail.value)}
               onConfirm={() => this.searchMember()}
             />
           </View>
           <View
             className={`${cssPrefix}-main-header-add`}
-            onClick={() => Taro.navigateTo({ url: '/pages/member/member.add' })}
+            onClick={() => Taro.navigateTo({ url: "/pages/member/member.add" })}
           >
             <Text className={`${cssPrefix}-main-header-add-text`}>添加</Text>
           </View>
@@ -293,13 +307,29 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
           <View className={`${cssPrefix}-main-card`}>
             <View className="home-card">
               <View className="home-buttons member-card-buttons">
-                <View className={`home-buttons-button home-buttons-button-border ${cssPrefix}-main-button`}>
-                  <View className="home-money">{reportTodayData.totalMember || 0}</View>
-                  <View className={`normal-text home-buttons-button-box home-buttons-button-mar`}>会员总数</View>
+                <View
+                  className={`home-buttons-button home-buttons-button-border ${cssPrefix}-main-button`}
+                >
+                  <View className="home-money">
+                    {reportTodayData.totalMember || 0}
+                  </View>
+                  <View
+                    className={`normal-text home-buttons-button-box home-buttons-button-mar`}
+                  >
+                    会员总数
+                  </View>
                 </View>
-                <View className={`home-buttons-button  ${cssPrefix}-main-button`}>
-                  <View className="home-money">{reportTodayData.todayAddMember || 0}</View>
-                  <View className={`normal-text home-buttons-button-box home-buttons-button-mar`}>今日新增</View>
+                <View
+                  className={`home-buttons-button  ${cssPrefix}-main-button`}
+                >
+                  <View className="home-money">
+                    {reportTodayData.todayAddMember || 0}
+                  </View>
+                  <View
+                    className={`normal-text home-buttons-button-box home-buttons-button-mar`}
+                  >
+                    今日新增
+                  </View>
                 </View>
               </View>
             </View>
@@ -314,49 +344,51 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
   private renderTabsHeader = () => {
     const { memberQuery, memberSelect } = this.state;
 
-    const tabs: { key: MemberQuery, value: string }[] = [
-      { key: 'total_amount', value: '累计消费' },
-      { key: 'last_pay_time', value: '上次消费时间' },
-      { key: 'create_time', value: '注册时间' },
+    const tabs: { key: MemberQuery; value: string }[] = [
+      { key: "total_amount", value: "累计消费" },
+      { key: "last_pay_time", value: "上次消费时间" },
+      { key: "create_time", value: "注册时间" }
     ];
     return (
       <View className={`${cssPrefix}-tabs-header`}>
-        {
-          tabs.map((tab) => {
-            return (
-              <View
-                key={tab.key}
-                className={classnames(`${cssPrefix}-tabs-header-item`, {
-                  [`${cssPrefix}-tabs-header-item-active`]: memberQuery === tab.key
-                })}
-                onClick={() => this.onTabClick(tab.key)}
-              >
-                {tab.value}
-                {memberQuery === tab.key && memberSelect === 'desc' && (
-                  <Image src="//net.huanmusic.com/weapp/icon_sort2.png" className={`${cssPrefix}-tabs-header-item-icon`} />
-                )}
-                {memberQuery === tab.key && memberSelect === 'asc' && (
-                  <Image
-                    src="//net.huanmusic.com/weapp/icon_sort1.png"
-                    className={`${cssPrefix}-tabs-header-item-icon ${cssPrefix}-tabs-header-item-icon`}
-                  />
-                )}
-                {memberQuery !== tab.key && (
-                  <Image
-                    src="//net.huanmusic.com/weapp/icon_sort3.png"
-                    className={`${cssPrefix}-tabs-header-item-icon ${cssPrefix}-tabs-header-item-icon`}
-                  />
-                )}
-                {memberQuery === tab.key && (
-                  <View className={`${cssPrefix}-tabs-header-item-border`} />
-                )}
-              </View>
-            );
-          })
-        }
+        {tabs.map(tab => {
+          return (
+            <View
+              key={tab.key}
+              className={classnames(`${cssPrefix}-tabs-header-item`, {
+                [`${cssPrefix}-tabs-header-item-active`]:
+                  memberQuery === tab.key
+              })}
+              onClick={() => this.onTabClick(tab.key)}
+            >
+              {tab.value}
+              {memberQuery === tab.key && memberSelect === "desc" && (
+                <Image
+                  src="//net.huanmusic.com/weapp/icon_sort2.png"
+                  className={`${cssPrefix}-tabs-header-item-icon`}
+                />
+              )}
+              {memberQuery === tab.key && memberSelect === "asc" && (
+                <Image
+                  src="//net.huanmusic.com/weapp/icon_sort1.png"
+                  className={`${cssPrefix}-tabs-header-item-icon ${cssPrefix}-tabs-header-item-icon`}
+                />
+              )}
+              {memberQuery !== tab.key && (
+                <Image
+                  src="//net.huanmusic.com/weapp/icon_sort3.png"
+                  className={`${cssPrefix}-tabs-header-item-icon ${cssPrefix}-tabs-header-item-icon`}
+                />
+              )}
+              {memberQuery === tab.key && (
+                <View className={`${cssPrefix}-tabs-header-item-border`} />
+              )}
+            </View>
+          );
+        })}
       </View>
     );
-  }
+  };
 
   private renderTabs = () => {
     const { loading, refreshing, memberQuery } = this.state;
@@ -372,75 +404,100 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
         >
           {refreshing === true && (
             <View className={`${cssPrefix}-loading`}>
-              <AtActivityIndicator mode='center' />
+              <AtActivityIndicator mode="center" />
             </View>
           )}
           {memberList.length > 0 ? (
             <View
-              className={classnames('component-form', {
-                'component-form-shadow': true,
+              className={classnames("component-form", {
+                "component-form-shadow": true,
                 [`${cssPrefix}-list-pos`]: true
               })}
             >
-              {memberList.map((member) => {
+              {memberList.map(member => {
                 return (
                   <View
                     key={member.id}
                     className={classnames(`${cssPrefix}-card-row`, {
                       [`${cssPrefix}-card-row-border`]: true
                     })}
-                    onClick={() => { Taro.navigateTo({ url: `/pages/member/member.detail?id=${member.id}` }) }}
+                    onClick={() => {
+                      Taro.navigateTo({
+                        url: `/pages/member/member.detail?id=${member.id}`
+                      });
+                    }}
                   >
                     <View className={`${cssPrefix}-card-row-box`}>
-                      <View 
-                        className={`${cssPrefix}-card-row-image`} 
-                        style={member.avatar 
-                          ? `background-image: url(http://inventory.51cpay.com/memberAvatar/${member.avatar})` 
-                          : `background-image: url(//net.huanmusic.com/weapp/icon_vip_user.png)`}
+                      <View
+                        className={`${cssPrefix}-card-row-image`}
+                        style={
+                          member.avatar
+                            ? `background-image: url(http://inventory.51cpay.com/memberAvatar/${member.avatar})`
+                            : `background-image: url(//net.huanmusic.com/weapp/icon_vip_user.png)`
+                        }
                       />
                       <View className={`${cssPrefix}-card-row-detail`}>
                         <View className={`${cssPrefix}-card-row-detail-name`}>
-                          <Text className={`${cssPrefix}-card-text`}>{member.username}</Text>
-                          <View className={`${cssPrefix}-card-row-detail-icon`}>{member.levelName}</View>
+                          <Text className={`${cssPrefix}-card-text`}>
+                            {member.username}
+                          </Text>
+                          <View className={`${cssPrefix}-card-row-detail-icon`}>
+                            {member.levelName}
+                          </View>
                         </View>
-                        <Text className={`${cssPrefix}-card-row-margin ${cssPrefix}-card-phone`}>{member.phoneNumber}</Text>
+                        <Text
+                          className={`${cssPrefix}-card-row-margin ${cssPrefix}-card-phone`}
+                        >
+                          {member.phoneNumber}
+                        </Text>
                       </View>
                     </View>
-                    {memberQuery === 'total_amount' && (
-                      <Text className={`${cssPrefix}-card-price`}>{`￥${numeral(member.totalAmount).format('0.00')}`}</Text>
+                    {memberQuery === "total_amount" && (
+                      <Text className={`${cssPrefix}-card-price`}>{`￥${numeral(
+                        member.totalAmount
+                      ).format("0.00")}`}</Text>
                     )}
-                    {memberQuery === 'create_time' && (
-                      <Text className={`${cssPrefix}-card-price`}>{dayjs(member.createTime).format('  YY/MM/DD HH:mm')}</Text>
+                    {memberQuery === "create_time" && (
+                      <Text className={`${cssPrefix}-card-price`}>
+                        {dayjs(member.createTime).format("  YY/MM/DD HH:mm")}
+                      </Text>
                     )}
-                    {memberQuery === 'last_pay_time' && (
-                      <Text className={`${cssPrefix}-card-price`}>{dayjs(member.lastPayTime).format('  YY/MM/DD HH:mm')}</Text>
+                    {memberQuery === "last_pay_time" && (
+                      <Text className={`${cssPrefix}-card-price`}>
+                        {member.lastPayTime
+                          ? dayjs(member.lastPayTime).format("  YY/MM/DD HH:mm")
+                          : "暂无消费"}
+                      </Text>
                     )}
                   </View>
                 );
               })}
             </View>
           ) : (
-              <View className={`product-suspension`}>
-                <Image src="//net.huanmusic.com/weapp/img_kong.png" className={`product-suspension-image`} />
-                <Text className={`product-suspension-text`}>会员不存在</Text>
-              </View>
-            )}
-          {loading && (
-            <View className={`${cssPrefix}-loading`}>
-              <AtActivityIndicator mode='center' />
+            <View className={`product-suspension`}>
+              <Image
+                src="//net.huanmusic.com/weapp/img_kong.png"
+                className={`product-suspension-image`}
+              />
+              <Text className={`product-suspension-text`}>会员不存在</Text>
             </View>
           )}
-
+          {loading && (
+            <View className={`${cssPrefix}-loading`}>
+              <AtActivityIndicator mode="center" />
+            </View>
+          )}
         </ScrollView>
       </View>
     );
-  }
+  };
 }
 
 const mapState = (state: AppReducer.AppState) => {
   return {
     memberList: getMemberList(state).data || [],
-    reportTodayData: getReportTodayData(state),
+    memberListTotal: getMemberList(state).total || 0,
+    reportTodayData: getReportTodayData(state)
   };
 };
 

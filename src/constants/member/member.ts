@@ -1,13 +1,13 @@
 /**
- * @Author: Ghan 
- * @Date: 2019-11-08 10:09:10 
+ * @Author: Ghan
+ * @Date: 2019-11-08 10:09:10
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-19 18:28:32
+ * @Last Modified time: 2020-05-08 11:45:24
  */
-import { jsonToQueryString, HTTPInterface } from '../index';
+import { jsonToQueryString, HTTPInterface } from "../index";
+import { MerchantInterface } from "src/constants";
 
 export declare namespace MemberInterface {
-
   /**
    * @todo [会员主页数据需要用到的数据格式，根据时间来排序]
    *
@@ -30,11 +30,14 @@ export declare namespace MemberInterface {
     totalAmount: number;
     levelName: string;
     avatar: string;
+    points: number;
     totalTimes: number;
+    couponVOS: MerchantInterface.Coupon[];
     enableMemberPrice: boolean;
     memberDiscount: number;
     accumulativeMoney: number;
     accumulativePoints: number;
+    preferenceVo: any[];
   }
 
   /**
@@ -81,7 +84,7 @@ export declare namespace MemberInterface {
     levelId?: number;
   }
 
-  interface MemberInfoEditParams extends MemberInfoAddParams { }
+  interface MemberInfoEditParams extends MemberInfoAddParams {}
 
   /**
    * @todo [请求会员列表时的请求参数]
@@ -107,7 +110,7 @@ export declare namespace MemberInterface {
    * @interface MemberInfoSearchFidle
    * @extends {HTTPInterface.FetchField}
    */
-  interface MemberInfoSearchFidle extends MemberInfoListFetchFidle { }
+  interface MemberInfoSearchFidle extends MemberInfoListFetchFidle {}
 
   /**
    * @todo [请求会员详情的参数]
@@ -115,7 +118,7 @@ export declare namespace MemberInterface {
    * @author Ghan
    * @interface MemberInfoDetail
    */
-  interface MemberInfoDetail { 
+  interface MemberInfoDetail {
     id: number;
   }
 
@@ -144,7 +147,6 @@ export declare namespace MemberInterface {
     SET_MEMBER_SELECT: SET_MEMBER_SELECT;
     RECEIVE_MEMBER_LEVEL: RECEIVE_MEMBER_LEVEL;
   }
-  
 }
 interface MemberInterfaceMap {
   reducerInterfaces: MemberInterface.MemberReducerInterface;
@@ -165,46 +167,52 @@ class MemberInterfaceMap {
    * @memberof MemberInterfaceMap
    */
   public reducerInterfaces = {
-    RECEIVE_MEMBER_LIST: 'RECEIVE_MEMBER_LIST',
-    RECEIVE_MEMBER_DETAIL: 'RECEIVE_MEMBER_DETAIL',
-    RECEIVE_MEMBER_PERFERENCE: 'RECEIVE_MEMBER_PERFERENCE',
-    RECEIVE_MEMBER_ORDER_INFO: 'RECEIVE_MEMBER_ORDER_INFO',
-    SET_MEMBER_SELECT: 'SET_MEMBER_SELECT',
-    RECEIVE_MEMBER_LEVEL: 'RECEIVE_MEMBER_LEVEL',
+    RECEIVE_MEMBER_LIST: "RECEIVE_MEMBER_LIST",
+    RECEIVE_MEMBER_DETAIL: "RECEIVE_MEMBER_DETAIL",
+    RECEIVE_MEMBER_PERFERENCE: "RECEIVE_MEMBER_PERFERENCE",
+    RECEIVE_MEMBER_ORDER_INFO: "RECEIVE_MEMBER_ORDER_INFO",
+    SET_MEMBER_SELECT: "SET_MEMBER_SELECT",
+    RECEIVE_MEMBER_LEVEL: "RECEIVE_MEMBER_LEVEL"
   };
-  
-  public memberInfoAdd = '/memberInfo/add';
-  public memberInfoEdit = '/memberInfo/edit';
-  public getRandomCaroNo = '/memberInfo/getRandomCaroNo';
-  public memberLevelList = '/memberLevel/list';
+
+  public memberInfoAdd = "/memberInfo/add";
+  public memberInfoEdit = "/memberInfo/edit";
+  public getRandomCaroNo = "/memberInfo/getRandomCaroNo";
+  public memberLevelList = "/memberLevel/list";
   /**
    * @todo [请求会员列表]
    *
    * @memberof MemberInterfaceMap
    */
-  public memberInfoList = (params?: MemberInterface.MemberInfoListFetchFidle) => {
-    return `/memberInfo/list${params ? jsonToQueryString(params) : ''}`;
-  }
+  public memberInfoList = (
+    params?: MemberInterface.MemberInfoListFetchFidle
+  ) => {
+    return `/memberInfo/list${params ? jsonToQueryString(params) : ""}`;
+  };
 
-  public memberInfoSearch = (params?: MemberInterface.MemberInfoSearchFidle) => {
+  public memberInfoSearch = (
+    params?: MemberInterface.MemberInfoSearchFidle
+  ) => {
     return `/memberInfo/detailByIdentity${jsonToQueryString(params)}`;
-  }
+  };
 
   public memberInfoDetail = (params: MemberInterface.MemberInfoDetail) => {
     return `/memberInfo/detail/${params.id}`;
-  }
+  };
 
-  public memberDetailByPreciseInfo = (params: MemberInterface.MemberByPreciseInfo) => {
+  public memberDetailByPreciseInfo = (
+    params: MemberInterface.MemberByPreciseInfo
+  ) => {
     return `/memberInfo/detailByPreciseInfo/${params.identity}`;
-  }
+  };
 
   public memberPreference = (params: MemberInterface.MemberInfoDetail) => {
     return `/memberInfo/preference${jsonToQueryString(params)}`;
-  }
+  };
 
   public memberOrderInfo = (params: MemberInterface.MemberInfoDetail) => {
     return `/memberInfo/getMemberOrderInfo/${params.id}`;
-  }
+  };
 }
 
 export default new MemberInterfaceMap();

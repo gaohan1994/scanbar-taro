@@ -1,54 +1,54 @@
 /*
- * @Author: Ghan 
- * @Date: 2019-11-01 15:43:06 
+ * @Author: Ghan
+ * @Date: 2019-11-01 15:43:06
  * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-27 11:32:35
+ * @Last Modified time: 2020-05-08 13:50:19
  */
-import Taro from '@tarojs/taro';
-import { View, ScrollView, Picker } from '@tarojs/components';
+import Taro from "@tarojs/taro";
+import { View, ScrollView, Picker } from "@tarojs/components";
 import "../style/member.less";
 import "../../component/card/form.card.less";
-import FormCard from '../../component/card/form.card';
-import { FormRowProps } from '../../component/card/form.row';
-import { AtButton, AtMessage } from 'taro-ui';
-import FormRow from '../../component/card/form.row';
-import { MemberAction } from '../../actions';
-import invariant from 'invariant';
-import { MemberInterface } from '../../constants';
-import Validator from '../../common/util/validator';
-import { AppReducer } from '../../reducers';
-import { getMemberDetail, getMemberLevel } from '../../reducers/app.member';
-import { connect } from '@tarojs/redux';
-import { Props as AddProps } from './member.add';
-import { ResponseCode } from '../../constants/index';
+import FormCard from "../../component/card/form.card";
+import { FormRowProps } from "../../component/card/form.row";
+import { AtButton, AtMessage } from "taro-ui";
+import FormRow from "../../component/card/form.row";
+import { MemberAction } from "../../actions";
+import invariant from "invariant";
+import { MemberInterface } from "../../constants";
+import Validator from "../../common/util/validator";
+import { AppReducer } from "../../reducers";
+import { getMemberDetail, getMemberLevel } from "../../reducers/app.member";
+import { connect } from "@tarojs/redux";
+import { Props as AddProps } from "./member.add";
+import { ResponseCode } from "../../constants/index";
 
-const cssPrefix: string = 'member';
+const cssPrefix: string = "member";
 
-interface Props extends AddProps { 
+interface Props extends AddProps {
   memberDetail: MemberInterface.MemberInfo;
 }
 
-interface State { 
-  sex: 'male' | 'female'; // 会员性别
-  phone: string;          // 会员手机号
-  name: string;           // 会员姓名
-  birthday: string;       // 会员生日
-  memberStatus: boolean;  // 会员状态
-  cardNo: string;         // 会员卡号
-  createTime: string;     // 开卡时间
+interface State {
+  sex: "male" | "female"; // 会员性别
+  phone: string; // 会员手机号
+  name: string; // 会员姓名
+  birthday: string; // 会员生日
+  memberStatus: boolean; // 会员状态
+  cardNo: string; // 会员卡号
+  createTime: string; // 开卡时间
   levelValue: number;
 }
 
 class MemberMain extends Taro.Component<Props, State> {
   readonly state: State = {
-    sex: 'male',
-    phone: '',
-    name: '',
-    birthday: '1990-01-01',
+    sex: "male",
+    phone: "",
+    name: "",
+    birthday: "1990-01-01",
     memberStatus: true,
-    cardNo: '',
-    createTime: '',
-    levelValue: 0,
+    cardNo: "",
+    createTime: "",
+    levelValue: 0
   };
   /**
    * 指定config的类型声明为: Taro.Config
@@ -58,13 +58,13 @@ class MemberMain extends Taro.Component<Props, State> {
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
   config: Taro.Config = {
-    navigationBarTitleText: '会员编辑'
+    navigationBarTitleText: "会员编辑"
   };
 
   componentWillMount() {
     const { id } = this.$router.params;
     if (!id) {
-      console.error('请传入会员id');
+      console.error("请传入会员id");
       return;
     }
     this.fetchMemberDetail(id);
@@ -74,54 +74,63 @@ class MemberMain extends Taro.Component<Props, State> {
     try {
       Taro.showLoading();
       const levels = await MemberAction.memberLevelList();
-      const { success, result } = await MemberAction.memberDetail({id: Number(id)});
-      invariant(success, result || ' ');
-      const memberInfo: MemberInterface.MemberInfo = result;
-      this.setState({
-        sex: memberInfo.sex === '1' ? 'male' : 'female',
-        phone: memberInfo.phoneNumber,
-        name: memberInfo.username,
-        birthday: memberInfo.birthDate || '',
-        memberStatus: memberInfo.status === 0 ? true : false,
-        cardNo: memberInfo.cardNo || '',
-        createTime: memberInfo.createTime,
-        levelValue: levels.code === ResponseCode.success
-          ? (levels.data as any).rows.findIndex(l => l.id === memberInfo.levelId)
-          : 0
-      }, () => {
-        Taro.hideLoading();
+      const { success, result } = await MemberAction.memberDetail({
+        id: Number(id)
       });
+      invariant(success, result || " ");
+      const memberInfo: MemberInterface.MemberInfo = result;
+      this.setState(
+        {
+          sex: memberInfo.sex === "1" ? "male" : "female",
+          phone: memberInfo.phoneNumber,
+          name: memberInfo.username,
+          birthday: memberInfo.birthDate || "",
+          memberStatus: memberInfo.status === 0 ? true : false,
+          cardNo: memberInfo.cardNo || "",
+          createTime: memberInfo.createTime,
+          levelValue:
+            levels.code === ResponseCode.success
+              ? (levels.data as any).rows.findIndex(
+                  l => l.id === memberInfo.levelId
+                )
+              : 0
+        },
+        () => {
+          Taro.hideLoading();
+        }
+      );
     } catch (error) {
       Taro.hideLoading();
       Taro.showToast({
         title: error.message,
-        icon: 'none'
+        icon: "none"
       });
     }
-  }
+  };
 
   /**
    * @todo [切换会员性别]
    * @todo [如果外部传入性别则改为外部传入的性别否则切换性别]
    * @memberof MemberMain
    */
-  public onChangSex = (sex?: 'male' | 'female') => {
+  public onChangSex = (sex?: "male" | "female") => {
     this.setState(prevState => {
       return {
         ...prevState,
-        sex: typeof sex === 'string' 
-              ? sex 
-              : prevState.sex === 'male'
-                ? 'female'
-                : 'male'
+        sex:
+          typeof sex === "string"
+            ? sex
+            : prevState.sex === "male"
+            ? "female"
+            : "male"
       };
     });
-  }
+  };
 
   public changeLevel = (event: any) => {
     const value: number = event.detail.value;
-    this.setState({levelValue: value});
-  }
+    this.setState({ levelValue: value });
+  };
 
   /**
    * @todo [用户修改姓名函数]
@@ -130,7 +139,7 @@ class MemberMain extends Taro.Component<Props, State> {
    */
   public onChangeMemberName = (value: string) => {
     this.setState({ name: value });
-  }
+  };
 
   /**
    * @todo [用户修改手机号函数]
@@ -139,7 +148,7 @@ class MemberMain extends Taro.Component<Props, State> {
    */
   public onChangeMemberPhone = (value: string) => {
     this.setState({ phone: value });
-  }
+  };
 
   /**
    * @todo [用户选择日期回调]
@@ -147,8 +156,8 @@ class MemberMain extends Taro.Component<Props, State> {
    * @memberof MemberMain
    */
   public onDateChange = (event: any) => {
-    this.setState({birthday: event.detail.value});
-  }
+    this.setState({ birthday: event.detail.value });
+  };
 
   /**
    * @todo [修改会员状态]
@@ -157,35 +166,40 @@ class MemberMain extends Taro.Component<Props, State> {
    */
   public onChangeMemberStatus = (status: boolean) => {
     this.setState({ memberStatus: status });
-  }
+  };
 
   /**
    * @todo [判断是否通过校验]
    *
    * @memberof MemberMain
    */
-  public validate = (): { success: boolean, result: any } => {
+  public validate = (): { success: boolean; result: any } => {
     const { phone, name } = this.state;
     const helper = new Validator();
-    helper.add(phone, [{
-      strategy: 'isNonEmpty',
-      errorMsg: '请输入会员手机号',
-    }, {
-      strategy: 'isNumberVali',
-      errorMsg: '请输入正确的手机号码'
-    }]);
+    helper.add(phone, [
+      {
+        strategy: "isNonEmpty",
+        errorMsg: "请输入会员手机号"
+      },
+      {
+        strategy: "isNumberVali",
+        errorMsg: "请输入正确的手机号码"
+      }
+    ]);
 
-    helper.add(name, [{
-      strategy: 'isNonEmpty',
-      errorMsg: '请输入会员姓名',
-    }]);
+    helper.add(name, [
+      {
+        strategy: "isNonEmpty",
+        errorMsg: "请输入会员姓名"
+      }
+    ]);
 
     const result = helper.start();
     if (result) {
       return { success: false, result: result.msg };
     }
     return { success: true, result: { phoneNumber: phone, username: name } };
-  }
+  };
 
   /**
    * @todo [添加会员事件]
@@ -197,122 +211,127 @@ class MemberMain extends Taro.Component<Props, State> {
     try {
       Taro.showLoading();
       const { success, result } = this.validate();
-      invariant(success, result || ' ');
+      invariant(success, result || " ");
 
       const { levelValue } = this.state;
       const { memberDetail, memberLevel } = this.props;
       const params: MemberInterface.MemberInfoEditParams = {
         ...result,
         merchantId: memberDetail.merchantId,
-        sex: this.state.sex === 'male' ? '1' : '0',
+        sex: this.state.sex === "male" ? "1" : "0",
         status: this.state.memberStatus === true ? 0 : 1,
         birthDate: this.state.birthday,
         cardNo: memberDetail.cardNo,
         id: memberDetail.id,
-        levelId: memberLevel[levelValue] && memberLevel[levelValue].id,
+        levelId: memberLevel[levelValue] && memberLevel[levelValue].id
       };
       const editResult = await MemberAction.memberEdit(params);
-      invariant(editResult.success, editResult.result || ' ');
+      invariant(editResult.success, editResult.result || " ");
       Taro.hideLoading();
       Taro.showToast({
-        title: '修改成功',
-        icon: 'success',
-        success: () => {
-          Taro.redirectTo({url: `/pages/member/member.detail?id=${memberDetail.id}`});
-        }
+        title: "修改成功",
+        icon: "success",
+        duration: 1500
       });
+
+      setTimeout(() => {
+        Taro.navigateBack({});
+      }, 1500);
     } catch (error) {
       Taro.hideLoading();
       Taro.showToast({
         title: error.message,
-        icon: 'none'
+        icon: "none"
       });
     }
-  }
+  };
 
-  render () {
+  render() {
     const memberDetailForm: FormRowProps[] = [
       {
-        title: '卡号',
+        title: "卡号",
         extraText: this.state.cardNo,
-        disabled: false,
+        disabled: false
       },
       {
-        title: '手机号',
+        title: "手机号",
         isInput: true,
-        inputName: 'member.phone',
+        inputName: "member.phone",
         inputValue: this.state.phone,
-        inputPlaceHolder: '请输入手机号码',
+        inputPlaceHolder: "请输入手机号码",
         inputOnChange: this.onChangeMemberPhone,
-        inputType: 'phone',
+        inputType: "phone"
       },
       {
-        title: '姓名',
+        title: "姓名",
         isInput: true,
-        inputName: 'member.name',
+        inputName: "member.name",
         inputValue: this.state.name,
-        inputPlaceHolder: '请输入姓名',
-        inputOnChange: this.onChangeMemberName,
+        inputPlaceHolder: "请输入姓名",
+        inputOnChange: this.onChangeMemberName
       }
     ];
 
-    const form2 = [{
-      title: '性别',
-      hasBorder: false,
-      buttons: [
-        {
-          title: '先生',
-          type: this.state.sex === 'male' ? 'confirm' : 'cancel',
-          onPress: () => this.onChangSex('male')
-        },
-        {
-          title: '女士',
-          type: this.state.sex !== 'male' ? 'confirm' : 'cancel',
-          onPress: () => this.onChangSex('female')
-        }
-      ]
-    }];
+    const form2 = [
+      {
+        title: "性别",
+        hasBorder: false,
+        buttons: [
+          {
+            title: "先生",
+            type: this.state.sex === "male" ? "confirm" : "cancel",
+            onPress: () => this.onChangSex("male")
+          },
+          {
+            title: "女士",
+            type: this.state.sex !== "male" ? "confirm" : "cancel",
+            onPress: () => this.onChangSex("female")
+          }
+        ]
+      }
+    ];
     const { levelValue } = this.state;
     const { memberSelector, memberLevel } = this.props;
-    
+
     return (
       <ScrollView scrollY={true} className={`container`}>
         <AtMessage />
         <View className={`container ${cssPrefix} ${cssPrefix}-add`}>
           <FormCard items={memberDetailForm} />
           <View className="component-form">
-            <Picker 
+            <Picker
               mode="selector"
               range={memberSelector}
               onChange={this.changeLevel}
               value={levelValue}
             >
-              <FormRow 
+              <FormRow
                 title="等级"
-                extraText={memberLevel[levelValue] && memberLevel[levelValue].levelName || ''}
+                extraText={
+                  (memberLevel[levelValue] &&
+                    memberLevel[levelValue].levelName) ||
+                  ""
+                }
                 arrow="right"
               />
             </Picker>
-            {form2.map((item) => {
-              return <FormRow key={item.title} {...item} />
+            {form2.map(item => {
+              return <FormRow key={item.title} {...item} />;
             })}
-            <Picker 
-              mode='date'
-              onChange={this.onDateChange} 
+            <Picker
+              mode="date"
+              onChange={this.onDateChange}
               value={this.state.birthday}
             >
-              <FormRow 
-                title="生日" 
-                extraText={this.state.birthday || '请选择生日'} 
+              <FormRow
+                title="生日"
+                extraText={this.state.birthday || "请选择生日"}
                 hasBorder={false}
               />
             </Picker>
           </View>
           <View className={`${cssPrefix}-edit`}>
-            <AtButton 
-              className="theme-button "
-              onClick={this.onSaveMember}
-            >
+            <AtButton className="theme-button " onClick={this.onSaveMember}>
               保存
             </AtButton>
           </View>
@@ -325,13 +344,13 @@ class MemberMain extends Taro.Component<Props, State> {
 const mapState = (state: AppReducer.AppState) => {
   const memberDetail = getMemberDetail(state);
   const memberLevel = getMemberLevel(state);
-  const memberSelector: string[] = memberLevel.map((item) => {
+  const memberSelector: string[] = memberLevel.map(item => {
     return item.levelName;
   });
   return {
     memberDetail,
     memberLevel,
-    memberSelector,
+    memberSelector
   };
 };
 
