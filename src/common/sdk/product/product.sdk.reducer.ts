@@ -1,17 +1,16 @@
 import productSdk, { ProductCartInterface } from "./product.sdk";
 import { AppReducer } from "../../../reducers";
 import { ProductInterface } from "../../../constants";
-import merge from 'lodash.merge';
+import merge from "lodash.merge";
 
 /**
- * @Author: Ghan 
- * @Date: 2019-11-22 14:20:31 
+ * @Author: Ghan
+ * @Date: 2019-11-22 14:20:31
  * @Last Modified by: Ghan
  * @Last Modified time: 2020-01-13 15:20:07
  * @todo productsdk
  */
 export declare namespace ProductSDKReducer {
-
   interface SuspensionCartBase {
     suspension: {
       date: number;
@@ -21,10 +20,16 @@ export declare namespace ProductSDKReducer {
   interface State {
     productCartList: Array<ProductCartInterface.ProductCartInfo>;
     productStockList: Array<ProductCartInterface.ProductCartInfo>;
-    changeWeightProduct: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo;
-    nonBarcodeProduct?: Partial<ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo>;
+    changeWeightProduct:
+      | ProductInterface.ProductInfo
+      | ProductCartInterface.ProductCartInfo;
+    nonBarcodeProduct?: Partial<
+      ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo
+    >;
     suspensionCartList: Array<SuspensionCartBase>;
-    changeProduct?: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo;
+    changeProduct?:
+      | ProductInterface.ProductInfo
+      | ProductCartInterface.ProductCartInfo;
     changeProductVisible: boolean;
     productRefundList: Array<ProductCartInterface.ProductCartInfo>;
     productPurchaseList: Array<ProductCartInterface.ProductCartInfo>;
@@ -43,9 +48,13 @@ export declare namespace ProductSDKReducer {
 
   interface ManageCartPayloadBase {
     product: ProductInterface.ProductInfo;
-    type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce;
+    type:
+      | ProductCartInterface.ProductCartAdd
+      | ProductCartInterface.ProductCartReduce;
     suspension?: number;
-    sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
+    sort?:
+      | ProductCartInterface.PAYLOAD_ORDER
+      | ProductCartInterface.PAYLOAD_REFUND;
   }
 
   /**
@@ -60,7 +69,6 @@ export declare namespace ProductSDKReducer {
   }
 
   namespace Reducers {
-
     interface DeleteProductItemreducer {
       type: ProductCartInterface.DELETE_PRODUCT_ITEM;
       payload: {
@@ -80,25 +88,34 @@ export declare namespace ProductSDKReducer {
 
     interface ManageCartList {
       type: ProductCartInterface.MANAGE_CART;
-      payload: { productCartList: ProductCartInterface.ProductCartInfo[], sort: string };
+      payload: {
+        productCartList: ProductCartInterface.ProductCartInfo[];
+        sort: string;
+      };
     }
-    
+
     interface ChangeProductAction {
       type: ProductCartInterface.CHANGE_PRODUCT;
-      payload: { 
-        product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo;
+      payload: {
+        product:
+          | ProductInterface.ProductInfo
+          | ProductCartInterface.ProductCartInfo;
         sellNum?: number;
         changePrice?: number;
-        sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
+        sort?:
+          | ProductCartInterface.PAYLOAD_ORDER
+          | ProductCartInterface.PAYLOAD_REFUND;
       };
     }
 
     interface ChangeProductVisible {
       type: ProductCartInterface.CHANGE_PRODUCT_VISIBLE;
-      payload: { 
+      payload: {
         visible: boolean;
         sort: string;
-        product?: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo;
+        product?:
+          | ProductInterface.ProductInfo
+          | ProductCartInterface.ProductCartInfo;
       };
     }
   }
@@ -112,7 +129,7 @@ export declare namespace ProductSDKReducer {
   interface ProductManageWeightCartPayload extends ManageCartPayloadBase {
     product: ProductCartInterface.ProductCartInfo;
   }
-  
+
   interface ProductManageWeightCart {
     type: ProductCartInterface.MANAGE_CART_WEIGHT_PRODUCT;
     payload: ProductManageWeightCartPayload;
@@ -121,8 +138,8 @@ export declare namespace ProductSDKReducer {
     product: ProductInterface.ProductInfo;
   }
 
-  type Action = 
-    ProductManageCart 
+  type Action =
+    | ProductManageCart
     | ProductManageWeightCart
     | Reducers.DeleteSuspensionAction
     | Reducers.EmptySuspensionAction
@@ -130,12 +147,12 @@ export declare namespace ProductSDKReducer {
     | Reducers.ChangeProductAction
     | Reducers.ChangeProductVisible
     | {
-      type: 
-        ProductCartInterface.ADD_SUSPENSION_CART 
-        | ProductCartInterface.DELETE_SUSPENSION_CART
-        | ProductCartInterface.EMPTY_SUSPENSION_CART;
-      payload: any;
-    };
+        type:
+          | ProductCartInterface.ADD_SUSPENSION_CART
+          | ProductCartInterface.DELETE_SUSPENSION_CART
+          | ProductCartInterface.EMPTY_SUSPENSION_CART;
+        payload: any;
+      };
 }
 
 const initState: ProductSDKReducer.State = {
@@ -148,19 +165,24 @@ const initState: ProductSDKReducer.State = {
   nonBarcodeProduct: {},
   changeProduct: {} as any,
   changeProductVisible: false,
-  changeProductSort: '',
+  changeProductSort: ""
 };
 
-export default function productSDKReducer (
-  state: ProductSDKReducer.State = initState, 
+export default function productSDKReducer(
+  state: ProductSDKReducer.State = initState,
   action: ProductSDKReducer.Action
 ): ProductSDKReducer.State {
   switch (action.type) {
     case productSdk.reducerInterface.DELETE_PRODUCT_ITEM: {
-      const { payload } = action as ProductSDKReducer.Reducers.DeleteProductItemreducer;
+      const {
+        payload
+      } = action as ProductSDKReducer.Reducers.DeleteProductItemreducer;
       const { product, sort } = payload;
       const nextProductKey = productSdk.getSortDataKey(sort);
-      const nextList: ProductCartInterface.ProductCartInfo[] = merge([], state[nextProductKey]);
+      const nextList: ProductCartInterface.ProductCartInfo[] = merge(
+        [],
+        state[nextProductKey]
+      );
       const index = nextList.findIndex(p => p.id === product.id);
       if (index !== -1) {
         nextList.splice(index, 1);
@@ -170,33 +192,45 @@ export default function productSDKReducer (
         };
       }
       return {
-        ...state,
+        ...state
       };
     }
     case productSdk.reducerInterface.CHANGE_PRODUCT_VISIBLE: {
-      const { payload } = action as ProductSDKReducer.Reducers.ChangeProductVisible;
-      const { visible, product, sort } = payload; 
+      const {
+        payload
+      } = action as ProductSDKReducer.Reducers.ChangeProductVisible;
+      const { visible, product, sort } = payload;
       return {
         ...state,
         changeProductVisible: visible,
         changeProduct: product,
-        changeProductSort: sort,
+        changeProductSort: sort
       };
     }
 
     case productSdk.reducerInterface.CHANGE_PRODUCT: {
-      const { payload } = action as ProductSDKReducer.Reducers.ChangeProductAction;
-      const { product, sellNum, changePrice, sort = productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER } = payload;
+      const {
+        payload
+      } = action as ProductSDKReducer.Reducers.ChangeProductAction;
+      const {
+        product,
+        sellNum,
+        changePrice,
+        sort = productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
+      } = payload;
       const nextProductKey = productSdk.getSortDataKey(sort);
       const index = state[nextProductKey].findIndex(p => p.id === product.id);
       if (index !== -1) {
-        const nextList: ProductCartInterface.ProductCartInfo[] = merge([], state[nextProductKey]);
+        const nextList: ProductCartInterface.ProductCartInfo[] = merge(
+          [],
+          state[nextProductKey]
+        );
         const prevProduct = merge({}, state[nextProductKey][index]);
-        let newProduct: ProductCartInterface.ProductCartInfo = { 
-          ...product, 
-          sellNum: typeof sellNum === 'number' ? sellNum : prevProduct.sellNum,
+        let newProduct: ProductCartInterface.ProductCartInfo = {
+          ...product,
+          sellNum: typeof sellNum === "number" ? sellNum : prevProduct.sellNum
         };
-        if (typeof changePrice === 'number') {
+        if (typeof changePrice === "number") {
           newProduct.changePrice = changePrice;
         }
         nextList[index] = newProduct;
@@ -206,14 +240,17 @@ export default function productSDKReducer (
         };
       }
 
-      let newProduct: ProductCartInterface.ProductCartInfo = { 
-        ...product, 
-        sellNum: typeof sellNum === 'number' ? sellNum : 1,
+      let newProduct: ProductCartInterface.ProductCartInfo = {
+        ...product,
+        sellNum: typeof sellNum === "number" ? sellNum : 1
       };
-      if (typeof changePrice === 'number') {
+      if (typeof changePrice === "number") {
         newProduct.changePrice = changePrice;
       }
-      const nextList: ProductCartInterface.ProductCartInfo[] = merge([], state[nextProductKey]);
+      const nextList: ProductCartInterface.ProductCartInfo[] = merge(
+        [],
+        state[nextProductKey]
+      );
       nextList.push(newProduct);
       return {
         ...state,
@@ -222,13 +259,17 @@ export default function productSDKReducer (
     }
 
     case productSdk.reducerInterface.DELETE_SUSPENSION_CART: {
-      const { payload } = action as ProductSDKReducer.Reducers.DeleteSuspensionAction;
+      const {
+        payload
+      } = action as ProductSDKReducer.Reducers.DeleteSuspensionAction;
       const { suspension } = payload;
 
       /**
        * @todo 如果没找到则直接返回state
        */
-      const currentSuspensionIndex = state.suspensionCartList.findIndex(s => s.suspension.date === suspension);
+      const currentSuspensionIndex = state.suspensionCartList.findIndex(
+        s => s.suspension.date === suspension
+      );
       if (currentSuspensionIndex === -1) {
         return { ...state };
       }
@@ -236,7 +277,10 @@ export default function productSDKReducer (
       /**
        * @todo 把对应的suspension挂单删除
        */
-      let nextSuspensionList: ProductSDKReducer.SuspensionCartBase[] = merge([], state.suspensionCartList);
+      let nextSuspensionList: ProductSDKReducer.SuspensionCartBase[] = merge(
+        [],
+        state.suspensionCartList
+      );
       nextSuspensionList.splice(currentSuspensionIndex, 1);
       return {
         ...state,
@@ -253,7 +297,10 @@ export default function productSDKReducer (
 
     case productSdk.reducerInterface.MANAGE_CART: {
       const { payload } = action as ProductSDKReducer.Reducers.ManageCartList;
-      const { productCartList, sort = productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER } = payload;
+      const {
+        productCartList,
+        sort = productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
+      } = payload;
       const productKey = productSdk.getSortDataKey(sort);
       return {
         ...state,
@@ -262,7 +309,9 @@ export default function productSDKReducer (
     }
 
     case productSdk.reducerInterface.CHANGE_NON_BARCODE_PRODUCT: {
-      const { payload: { nonBarcodeProduct } } = action;
+      const {
+        payload: { nonBarcodeProduct }
+      } = action;
       return {
         ...state,
         nonBarcodeProduct
@@ -274,7 +323,7 @@ export default function productSDKReducer (
         suspensionCartList: []
       };
     }
-    
+
     case productSdk.reducerInterface.ADD_SUSPENSION_CART: {
       const { payload } = action as ProductSDKReducer.AddSuspensionCartPayload;
       const { productCartList } = payload;
@@ -288,7 +337,7 @@ export default function productSDKReducer (
       return {
         ...state,
         suspensionCartList: newSuspensionList,
-        productCartList: [],
+        productCartList: []
       };
     }
     case productSdk.reducerInterface.DELETE_SUSPENSION_CART: {
@@ -298,40 +347,64 @@ export default function productSDKReducer (
     }
     case productSdk.reducerInterface.MANAGE_EMPTY_CART: {
       const { payload } = action;
-      const { sort = productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER } = payload;
+      const {
+        sort = productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
+      } = payload;
       const productKey = productSdk.getSortDataKey(sort);
       return {
         ...state,
-        [`${productKey}`]: [],
+        [`${productKey}`]: []
       };
     }
     case productSdk.reducerInterface.MANAGE_CART_PRODUCT: {
       const { payload } = action as ProductSDKReducer.ProductManageCart;
-      const { product, type, suspension, sort = productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER } = payload;
+      const {
+        product,
+        type,
+        suspension,
+        sort = productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
+      } = payload;
 
       if (!!suspension) {
         // 如果是挂单的话修改挂单中的商品,首先找到这个挂单list没找到直接返回
-        const currentSuspensionIndex = state.suspensionCartList.findIndex(s => s.suspension.date === suspension);
+        const currentSuspensionIndex = state.suspensionCartList.findIndex(
+          s => s.suspension.date === suspension
+        );
         if (currentSuspensionIndex === -1) {
           return { ...state };
         }
 
-        let nextSuspensionList: ProductSDKReducer.SuspensionCartBase[] = merge([], state.suspensionCartList);
+        let nextSuspensionList: ProductSDKReducer.SuspensionCartBase[] = merge(
+          [],
+          state.suspensionCartList
+        );
         // 找到这个商品的位置, 挂单购物车中一定有这个商品否则直接返回
-        const currentProductIndex = nextSuspensionList[currentSuspensionIndex].productCartList.findIndex(p => p.id === product.id);
+        const currentProductIndex = nextSuspensionList[
+          currentSuspensionIndex
+        ].productCartList.findIndex(p => p.id === product.id);
         if (currentProductIndex === -1) {
           return { ...state };
         }
-        
+
         if (type === productSdk.productCartManageType.ADD) {
           // 将该商品数量+1
-          nextSuspensionList[currentSuspensionIndex].productCartList[currentProductIndex].sellNum += 1;
+          nextSuspensionList[currentSuspensionIndex].productCartList[
+            currentProductIndex
+          ].sellNum += 1;
         } else {
           // 商品数量-1 如果只有一个则删除该商品
-          const currentProduct = nextSuspensionList[currentSuspensionIndex].productCartList[currentProductIndex];
+          const currentProduct =
+            nextSuspensionList[currentSuspensionIndex].productCartList[
+              currentProductIndex
+            ];
           currentProduct.sellNum === 1
-            ? nextSuspensionList[currentSuspensionIndex].productCartList.splice(currentProductIndex, 1)
-            : nextSuspensionList[currentSuspensionIndex].productCartList[currentProductIndex].sellNum -= 1;
+            ? nextSuspensionList[currentSuspensionIndex].productCartList.splice(
+                currentProductIndex,
+                1
+              )
+            : (nextSuspensionList[currentSuspensionIndex].productCartList[
+                currentProductIndex
+              ].sellNum -= 1);
         }
         return {
           ...state,
@@ -340,15 +413,21 @@ export default function productSDKReducer (
       }
 
       const nextProductKey = productSdk.getSortDataKey(sort);
-      console.log('nextProductKey: ', nextProductKey);
-      const productCartList: Array<ProductCartInterface.ProductCartInfo> = merge([], state[nextProductKey]);
+      console.log("nextProductKey: ", nextProductKey);
+      const productCartList: Array<ProductCartInterface.ProductCartInfo> = merge(
+        [],
+        state[nextProductKey]
+      );
       const index = productCartList.findIndex(p => p.id === product.id);
       if (type === productSdk.productCartManageType.ADD) {
         /**
          * @todo [如果是普通商品，如果购物车中有了则+1]
          * @todo [如果是普通商品，如果购物车中没有则新增一个数量为1]
          */
-        let newProductCartList: Array<ProductCartInterface.ProductCartInfo> = merge([], productCartList);
+        let newProductCartList: Array<ProductCartInterface.ProductCartInfo> = merge(
+          [],
+          productCartList
+        );
         if (index === -1) {
           newProductCartList.push({
             ...product,
@@ -367,13 +446,16 @@ export default function productSDKReducer (
         }
       } else {
         if (index !== -1) {
-          let newProductCartList: Array<ProductCartInterface.ProductCartInfo> = merge([], productCartList);
+          let newProductCartList: Array<ProductCartInterface.ProductCartInfo> = merge(
+            [],
+            productCartList
+          );
           const currentItem = newProductCartList[index];
           if (currentItem.sellNum === 1) {
             newProductCartList.splice(index, 1);
             return {
               ...state,
-              [`${nextProductKey}`]: newProductCartList,
+              [`${nextProductKey}`]: newProductCartList
             };
           } else {
             newProductCartList[index].sellNum -= 1;
@@ -383,13 +465,13 @@ export default function productSDKReducer (
             };
           }
         } else {
-          return {...state};
+          return { ...state };
         }
       }
     }
     case productSdk.reducerInterface.MANAGE_CART_WEIGHT_PRODUCT: {
       const { payload } = action as ProductSDKReducer.ProductManageWeightCart;
-      const { product, type, suspension } = payload;
+      const { product, type, suspension, sort } = payload;
 
       if (!!suspension) {
         // 挂单称重商品不存在+ 只有-
@@ -398,26 +480,45 @@ export default function productSDKReducer (
         }
 
         // 如果是挂单的话修改挂单中的商品,首先找到这个挂单list没找到直接返回
-        const currentSuspensionIndex = state.suspensionCartList.findIndex(s => s.suspension.date === suspension);
+        const currentSuspensionIndex = state.suspensionCartList.findIndex(
+          s => s.suspension.date === suspension
+        );
         if (currentSuspensionIndex === -1) {
           return { ...state };
         }
 
-        const nextSuspensionList: ProductSDKReducer.SuspensionCartBase[] = merge([], state.suspensionCartList);
+        const nextSuspensionList: ProductSDKReducer.SuspensionCartBase[] = merge(
+          [],
+          state.suspensionCartList
+        );
         // 找到这个商品的位置, 挂单购物车中一定有这个商品否则直接返回
-        const currentProductIndex = nextSuspensionList[currentSuspensionIndex].productCartList.findIndex(p => p.id === product.id);
+        const currentProductIndex = nextSuspensionList[
+          currentSuspensionIndex
+        ].productCartList.findIndex(p => p.id === product.id);
         if (currentProductIndex === -1) {
           return { ...state };
         }
 
-        nextSuspensionList[currentSuspensionIndex].productCartList.splice(currentProductIndex, 1);
-        return { 
+        nextSuspensionList[currentSuspensionIndex].productCartList.splice(
+          currentProductIndex,
+          1
+        );
+        return {
           ...state,
           suspensionCartList: nextSuspensionList
-        }; 
+        };
       }
 
-      const productCartList: Array<ProductCartInterface.ProductCartInfo> = merge([], state.productCartList);
+      const nextProductKey = productSdk.getSortDataKey(sort);
+      console.log("nextProductKey: ", nextProductKey);
+      const productCartList: Array<ProductCartInterface.ProductCartInfo> = merge(
+        [],
+        state[nextProductKey]
+      );
+      const newProductCartList: Array<ProductCartInterface.ProductCartInfo> = merge(
+        [],
+        productCartList
+      );
       const index = productCartList.findIndex(p => p.id === product.id);
       if (type === productSdk.productCartManageType.ADD) {
         /**
@@ -425,34 +526,28 @@ export default function productSDKReducer (
          * @todo [如果是称重商品购物车中没有，添加一个]
          */
         if (index === -1) {
-          let newProductCartList: Array<ProductCartInterface.ProductCartInfo> = merge([], productCartList);
           newProductCartList.push(product);
           return {
             ...state,
-            productCartList: newProductCartList
-          };
-        } else {
-          let newProductCartList: Array<ProductCartInterface.ProductCartInfo> = merge([], productCartList);
-          newProductCartList[index] = product;
-          return {
-            ...state,
-            productCartList: newProductCartList
+            [`${nextProductKey}`]: newProductCartList
           };
         }
-      } else {
-        if (index !== -1) {
-          let newProductCartList: Array<ProductCartInterface.ProductCartInfo> = merge([], productCartList);
-          newProductCartList.splice(index, 1);
-          return {
-            ...state,
-            productCartList: newProductCartList
-          };
-        } else {
-          return {
-            ...state
-          };
-        }
+        newProductCartList[index] = product;
+        return {
+          ...state,
+          [`${nextProductKey}`]: newProductCartList
+        };
       }
+      if (index !== -1) {
+        newProductCartList.splice(index, 1);
+        return {
+          ...state,
+          [`${nextProductKey}`]: newProductCartList
+        };
+      }
+      return {
+        ...state
+      };
     }
     case productSdk.reducerInterface.CHANGE_WEIGHT_PRODUCT_MODAL: {
       const { payload } = action;
@@ -467,23 +562,32 @@ export default function productSDKReducer (
         ...state
       };
     }
-  } 
+  }
 }
 
-export const getProductCartList = (state: AppReducer.AppState) => state.productSDK.productCartList;
+export const getProductCartList = (state: AppReducer.AppState) =>
+  state.productSDK.productCartList;
 
-export const getChangeWeigthProduct = (state: AppReducer.AppState) => state.productSDK.changeWeightProduct;
+export const getChangeWeigthProduct = (state: AppReducer.AppState) =>
+  state.productSDK.changeWeightProduct;
 
-export const getSuspensionCartList = (state: AppReducer.AppState) => state.productSDK.suspensionCartList;
+export const getSuspensionCartList = (state: AppReducer.AppState) =>
+  state.productSDK.suspensionCartList;
 
-export const getNonBarcodeProduct = (state: AppReducer.AppState) => state.productSDK.nonBarcodeProduct;
+export const getNonBarcodeProduct = (state: AppReducer.AppState) =>
+  state.productSDK.nonBarcodeProduct;
 
-export const getChangeProductVisible = (state: AppReducer.AppState) => state.productSDK.changeProductVisible;
+export const getChangeProductVisible = (state: AppReducer.AppState) =>
+  state.productSDK.changeProductVisible;
 
-export const getChangeProduct = (state: AppReducer.AppState) => state.productSDK.changeProduct;
+export const getChangeProduct = (state: AppReducer.AppState) =>
+  state.productSDK.changeProduct;
 
-export const getProductRefundList = (state: AppReducer.AppState) => state.productSDK.productRefundList;
+export const getProductRefundList = (state: AppReducer.AppState) =>
+  state.productSDK.productRefundList;
 
-export const getProductPurchaseList = (state: AppReducer.AppState) => state.productSDK.productPurchaseList;
+export const getProductPurchaseList = (state: AppReducer.AppState) =>
+  state.productSDK.productPurchaseList;
 
-export const getProductStockList = (state: AppReducer.AppState) => state.productSDK.productStockList;
+export const getProductStockList = (state: AppReducer.AppState) =>
+  state.productSDK.productStockList;

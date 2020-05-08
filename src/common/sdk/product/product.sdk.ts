@@ -548,10 +548,9 @@ class ProductSDK {
   public getProductMemberPrice = (
     products?: ProductCartInterface.ProductCartInfo[]
   ): number => {
+    const key = this.getSortDataKey();
     const productList =
-      products !== undefined
-        ? products
-        : store.getState().productSDK.productCartList;
+      products !== undefined ? products : store.getState().productSDK[key];
     const reduceCallback = (
       prevTotal: number,
       item: ProductCartInterface.ProductCartInfo
@@ -730,7 +729,8 @@ class ProductSDK {
    * @memberof ProductSDK
    */
   public getProductTransPrice = (withErase: boolean = true) => {
-    const productList = store.getState().productSDK.productCartList;
+    const productListKey = this.getSortDataKey();
+    const productList = store.getState().productSDK[productListKey];
     let total = 0;
     for (let i = 0; i < productList.length; i++) {
       total +=
