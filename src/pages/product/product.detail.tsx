@@ -544,6 +544,7 @@ class ProductDetail extends Taro.Component<Props, State> {
       },
       {
         title: "售价",
+        main: true,
         extraText: `￥${numeral(
           productChangeDetail.price || productDetail.price
         ).format("0.00")}`,
