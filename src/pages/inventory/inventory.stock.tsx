@@ -1,33 +1,38 @@
 /**
- * @Author: Ghan 
- * @Date: 2019-11-13 09:41:02 
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-17 17:59:49
- * 
+ * @Author: Ghan
+ * @Date: 2019-11-13 09:41:02
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-05-11 09:40:22
+ *
  * @todo 盘点
  */
-import Taro, { Config } from '@tarojs/taro';
-import { View, Image, Text } from '@tarojs/components';
+import Taro, { Config } from "@tarojs/taro";
+import { View, Image, Text } from "@tarojs/components";
 import "../style/product.less";
 import "../style/member.less";
 import "../style/inventory.less";
-import CartBar from '../../component/cart/cart';
-import { ProductAction } from '../../actions';
-import { getProductSearchList, getSelectProduct, getProductType, getProductList } from '../../reducers/app.product';
-import { AppReducer } from '../../reducers';
-import { connect } from '@tarojs/redux';
-import { ProductInterface } from '../../constants';
-import invariant from 'invariant';
-import { ResponseCode } from '../../constants/index';
-import productSdk from '../../common/sdk/product/product.sdk';
-import HeaderInput from '../../component/header/header.input';
-import ProductListView from '../../component/product/product.listview';
-import TabsHeader from '../../component/layout/tabs.header';
-import merge from 'lodash.merge';
+import CartBar from "../../component/cart/cart";
+import { ProductAction } from "../../actions";
+import {
+  getProductSearchList,
+  getSelectProduct,
+  getProductType,
+  getProductList
+} from "../../reducers/app.product";
+import { AppReducer } from "../../reducers";
+import { connect } from "@tarojs/redux";
+import { ProductInterface } from "../../constants";
+import invariant from "invariant";
+import { ResponseCode } from "../../constants/index";
+import productSdk from "../../common/sdk/product/product.sdk";
+import HeaderInput from "../../component/header/header.input";
+import ProductListView from "../../component/product/product.listview";
+import TabsHeader from "../../component/layout/tabs.header";
+import merge from "lodash.merge";
 
-const cssPrefix = 'product';
+const cssPrefix = "product";
 
-type Props = { 
+type Props = {
   /**
    * @param {productList} 商品数据，商品在分类里
    * @type {ProductInterface.ProductList[]}
@@ -40,7 +45,7 @@ type Props = {
   productTypeList: ProductInterface.ProductTypeInfo[];
 };
 
-type State = { 
+type State = {
   /**
    * @param {currentType} 左边当前分类
    *
@@ -48,46 +53,52 @@ type State = {
    * @memberof State
    */
   currentType: ProductInterface.ProductTypeInfo;
-  searchValue: string;              
+  searchValue: string;
   loading: boolean;
 };
 
 class InventoryStock extends Taro.Component<Props, State> {
   config: Config = {
-    navigationBarTitleText: '盘点'
-  };
-  
-  readonly state: State = {
-    currentType: {
-      name: '',
-      id: 0,
-      createTime: ''
-    },
-    searchValue: '',
-    loading: false,
+    navigationBarTitleText: "盘点"
   };
 
-  componentDidShow () {
+  readonly state: State = {
+    currentType: {
+      name: "",
+      id: 0,
+      createTime: ""
+    },
+    searchValue: "",
+    loading: false
+  };
+
+  componentDidShow() {
     this.setState({
-      searchValue: ''
+      searchValue: ""
     });
     ProductAction.productInfoEmptySearchList();
     productSdk.setSort(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK);
     this.init();
   }
 
-  public changeCurrentType = (typeInfo: ProductInterface.ProductTypeInfo, fetchProduct: boolean = true) => {
+  public changeCurrentType = (
+    typeInfo: ProductInterface.ProductTypeInfo,
+    fetchProduct: boolean = true
+  ) => {
     this.setState({ currentType: typeInfo }, async () => {
       if (fetchProduct) {
         this.fetchData(typeInfo);
       }
     });
-  }
+  };
 
   public init = async (): Promise<void> => {
     try {
       const productTypeResult = await ProductAction.productInfoType();
-      invariant(productTypeResult.code === ResponseCode.success, productTypeResult.msg || ' ');
+      invariant(
+        productTypeResult.code === ResponseCode.success,
+        productTypeResult.msg || " "
+      );
       /**
        * @todo [刚进入界面显示全部商品]
        */
@@ -95,15 +106,15 @@ class InventoryStock extends Taro.Component<Props, State> {
     } catch (error) {
       Taro.showToast({
         title: error.message,
-        icon: 'none'
+        icon: "none"
       });
     }
-  }
+  };
 
   public fetchData = async (type: ProductInterface.ProductTypeInfo) => {
     this.setState({ loading: true });
     let payload: ProductInterface.ProductInfoListFetchFidle = {
-      status: 0,
+      // status: 0
     };
     if (type && type.id !== 999) {
       payload.type = `${type.id}`;
@@ -111,25 +122,27 @@ class InventoryStock extends Taro.Component<Props, State> {
     const result = await ProductAction.productOrderInfoList(payload);
     this.setState({ loading: false });
     return result;
-  }
+  };
 
   public onNavToList = () => {
     Taro.navigateTo({
       url: `/pages/inventory/inventory.stock.list`
     });
-  }
+  };
 
   public searchData = async () => {
     const { searchValue } = this.state;
     try {
-      if (searchValue === '') {
+      if (searchValue === "") {
         /**
          * @todo 如果输入的是空则清空搜索
          */
         ProductAction.productInfoEmptySearchList();
       } else {
         Taro.showLoading();
-        const { success, result } = await ProductAction.productInfoSearchList({words: searchValue});
+        const { success, result } = await ProductAction.productInfoSearchList({
+          words: searchValue
+        });
         Taro.hideLoading();
         invariant(success, result || ResponseCode.error);
       }
@@ -137,14 +150,14 @@ class InventoryStock extends Taro.Component<Props, State> {
       Taro.hideLoading();
       Taro.showToast({
         title: error.message,
-        icon: 'none'
+        icon: "none"
       });
     }
-  }
-  
+  };
+
   public onTypeChange = (type: ProductInterface.ProductTypeInfo) => {
     this.onTypeClick(type);
-  }
+  };
 
   /**
    * @todo [点击菜单的时候修改当前菜单并跳转至对应商品]
@@ -152,22 +165,22 @@ class InventoryStock extends Taro.Component<Props, State> {
    * @memberof ProductOrder
    */
   public onTypeClick = (params: ProductInterface.ProductTypeInfo) => {
-    this.onInput({detail: {value: ''}});
+    this.onInput({ detail: { value: "" } });
     this.changeCurrentType(params);
-  }
+  };
 
   /**
    * @todo 绑定输入事件
    *
    * @memberof ProductOrder
    */
-  public onInput = ({detail}: any) => {
-    this.setState({searchValue: detail.value}, () => {
+  public onInput = ({ detail }: any) => {
+    this.setState({ searchValue: detail.value }, () => {
       this.searchData();
     });
-  }
+  };
 
-  render () {
+  render() {
     const { searchValue } = this.state;
     return (
       <View className={`container ${cssPrefix}`}>
@@ -177,25 +190,29 @@ class InventoryStock extends Taro.Component<Props, State> {
           value={searchValue}
           onInput={this.onInput}
           isRenderInputRight={true}
-          inputRightClick={() => this.onInput({detail: {value: ''}})}
+          inputRightClick={() => this.onInput({ detail: { value: "" } })}
         >
-          <View 
-            className={'inventory-header-item'}
+          <View
+            className={"inventory-header-item"}
             onClick={() => this.onNavToList()}
           >
-            <Image 
-              src="//net.huanmusic.com/weapp/icon_record_inventory.png" 
-              className={`inventory-header-item-stock`} 
+            <Image
+              src="//net.huanmusic.com/weapp/icon_record_inventory.png"
+              className={`inventory-header-item-stock`}
             />
             <Text className="inventory-header-item-text">盘点记录</Text>
           </View>
         </HeaderInput>
-        
+
         {this.renderTabs()}
-        <View className={`${cssPrefix}-list-container ${cssPrefix}-list-container-inventory`}>
+        <View
+          className={`${cssPrefix}-list-container ${cssPrefix}-list-container-inventory`}
+        >
           {this.renderList()}
         </View>
-        <CartBar sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK} />
+        <CartBar
+          sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK}
+        />
       </View>
     );
   }
@@ -205,15 +222,15 @@ class InventoryStock extends Taro.Component<Props, State> {
     return (
       <TabsHeader
         tabs={productTypeList}
-        onChange={(type) => this.onTypeChange(type)}
+        onChange={type => this.onTypeChange(type)}
       />
     );
-  }
+  };
 
   private renderList = () => {
     const { productList, pureProductSearchList } = this.props;
     const { searchValue, loading } = this.state;
-    if (pureProductSearchList.length === 0 && searchValue === '') {
+    if (pureProductSearchList.length === 0 && searchValue === "") {
       return (
         <View className={`${cssPrefix}-list-right`}>
           <ProductListView
@@ -224,7 +241,7 @@ class InventoryStock extends Taro.Component<Props, State> {
           />
         </View>
       );
-    } 
+    }
     return (
       <View className={`${cssPrefix}-list-right`}>
         <ProductListView
@@ -234,7 +251,7 @@ class InventoryStock extends Taro.Component<Props, State> {
         />
       </View>
     );
-  }
+  };
 }
 
 const mapState = (state: AppReducer.AppState) => {
@@ -245,16 +262,16 @@ const mapState = (state: AppReducer.AppState) => {
   const productTypeList: any[] = merge([], getProductType(state));
   productTypeList.unshift({
     id: 999,
-    name: '全部品类',
-    title: '全部品类',
-    createTime: '',
+    name: "全部品类",
+    title: "全部品类",
+    createTime: ""
   } as any);
   return {
     productList,
     productSearchList,
     pureProductSearchList,
     selectProduct,
-    productTypeList,
+    productTypeList
   };
 };
 
