@@ -1,11 +1,11 @@
-import Taro from '@tarojs/taro';
-import { View, Text, Input } from '@tarojs/components';
-import { AtButton } from 'taro-ui';
+import Taro from "@tarojs/taro";
+import { View, Text, Input } from "@tarojs/components";
+import { AtButton } from "taro-ui";
 import "../style/user.less";
-import merchantAction from '../../actions/merchant.action';
-import Item from './component/item'
+import merchantAction from "../../actions/merchant.action";
+import Item from "./component/item";
 
-const cssPrefix = 'user';
+const cssPrefix = "user";
 
 type State = {
   value: string;
@@ -13,11 +13,11 @@ type State = {
 
 class UserMerchantEdit extends Taro.Component<any, State> {
   readonly state: State = {
-    value: ''
+    value: ""
   };
 
   config: Taro.Config = {
-    navigationBarTitleText: '更改门店名称'
+    navigationBarTitleText: "更改门店名称"
   };
 
   componentDidMount() {
@@ -34,7 +34,7 @@ class UserMerchantEdit extends Taro.Component<any, State> {
         [`${key}`]: value
       };
     });
-  }
+  };
 
   public onSave = async () => {
     const { id } = this.$router.params;
@@ -46,18 +46,18 @@ class UserMerchantEdit extends Taro.Component<any, State> {
     if (res.success) {
       await merchantAction.profileInfo();
       Taro.showToast({
-        title: '保存成功！'
+        title: "保存成功！"
       });
       setTimeout(() => {
         Taro.navigateBack();
       }, 1000);
     } else {
       Taro.showToast({
-        title: '保存失败！',
-        icon: 'none'
+        title: "保存失败！",
+        icon: "none"
       });
     }
-  }
+  };
 
   render() {
     const { value } = this.state;
@@ -67,17 +67,19 @@ class UserMerchantEdit extends Taro.Component<any, State> {
           <Item>
             <Input
               value={value}
+              maxLength={15}
               className={`${cssPrefix}-merchant-area`}
-              onInput={({ detail: { value } }) => this.onChangeValue('value', value)}
+              onInput={({ detail: { value } }) =>
+                this.onChangeValue("value", value)
+              }
             />
           </Item>
 
-          <View className={`product-add-buttons-one ${cssPrefix}-merchant-button`}>
-            <AtButton
-              className="theme-button"
-              onClick={() => this.onSave()}
-            >
-              <Text className="theme-button-text" >保存</Text>
+          <View
+            className={`product-add-buttons-one ${cssPrefix}-merchant-button`}
+          >
+            <AtButton className="theme-button" onClick={() => this.onSave()}>
+              <Text className="theme-button-text">保存</Text>
             </AtButton>
           </View>
         </View>
