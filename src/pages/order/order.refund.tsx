@@ -52,48 +52,11 @@ class OrderDetail extends Taro.Component<Props, State> {
   public onRefund = async () => {
     try {
       const { cartList, damageList } = this.state;
-      const { orderDetail } = this.props;
-
-      let priceNumber = 0;
-      cartList.map(item => {
-        priceNumber +=
-          numeral(item.sellNum).value() *
-          numeral(item.changePrice || item.unitPrice).value();
+      Taro.navigateTo({
+        url: `/pages/order/order.refund.confirm?damageList=${JSON.stringify(
+          damageList
+        )}&cartList=${JSON.stringify(cartList)}`
       });
-
-      const payload: OrderInterface.RefundByOrderPayload = {
-        order: {
-          orderNo: orderDetail.orderNo,
-          refundByPreOrder: true,
-          orderSource: 0,
-          payType: 0,
-          terminalCd: "",
-          terminalSn: "",
-          transAmount: priceNumber
-        },
-        productInfoList: cartList.map(item => {
-          const itemPrice = item.changePrice || item.unitPrice;
-          const damageToken = damageList.findIndex(d => d === item.productId);
-          return {
-            changeNumber: item.sellNum,
-            isDamaged: damageToken !== -1,
-            orderDetailId: item.id,
-            priceChangeFlag: !!item.changePrice,
-            remark: "",
-            unitPrice: itemPrice
-          };
-        })
-      };
-      const result = await OrderService.orderRefund(payload);
-      invariant(result.code === ResponseCode.success, result.msg || " ");
-      Taro.showToast({
-        title: "退款成功",
-        duration: 1000
-      });
-
-      setTimeout(() => {
-        Taro.navigateBack({});
-      }, 1000);
     } catch (error) {
       Taro.showToast({
         title: error.message,

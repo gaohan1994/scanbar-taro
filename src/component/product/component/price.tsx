@@ -25,6 +25,42 @@ class PayListPrice extends Taro.Component<Props> {
      * @todo 如果称重商品有改价 则优先计算改价，如果没有改价 计算会员价和活动价格的最低价
      */
     const itemPrice: number = productSdk.getProductItemPrice(product);
+
+    if ((product as any).priceType !== undefined) {
+      const priceType = (product as any).priceType;
+      return (
+        <View
+          className={`${cssPrefix}-row-content-item ${cssPrefix}-row-content-top`}
+        >
+          {(product as any).priceType === 0 ? (
+            <Text className={`${cssPrefix}-row-normal`}>
+              {`￥ ${this.setNumber(itemPrice)}`}
+            </Text>
+          ) : (
+            <View className={`${cssPrefix}-row-content-items`}>
+              <Text className={`${cssPrefix}-row-normal ${cssPrefix}-row-line`}>
+                {`￥ ${this.setNumber(product.price)}`}
+              </Text>
+              <View
+                className={`${cssPrefix}-row-icon ${cssPrefix}-row-icon-refund`}
+              >
+                {priceType === 0
+                  ? "原价"
+                  : priceType === 1
+                  ? "会员价"
+                  : priceType === 2
+                  ? "活动价"
+                  : "改价"}
+              </View>
+              <Text className={`${cssPrefix}-row-normal`}>
+                {`￥ ${numeral(product.changePrice).format("0.00")}`}
+              </Text>
+            </View>
+          )}
+        </View>
+      );
+    }
+
     return (
       <View
         className={`${cssPrefix}-row-content-item ${cssPrefix}-row-content-top`}

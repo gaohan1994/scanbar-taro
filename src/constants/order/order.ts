@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-13 10:10:53
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-19 13:50:44
+ * @Last Modified time: 2020-05-13 13:39:48
  *
  * @todo [商品相关的类型定义]
  */
@@ -55,6 +55,7 @@ export declare namespace OrderInterface {
     brand: string;
     orderNo: string;
     originPrice?: number;
+    priceType: number;
   }
 
   interface OrderInfo {

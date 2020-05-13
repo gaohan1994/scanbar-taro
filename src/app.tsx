@@ -83,6 +83,7 @@ class App extends Component {
           "order.main",
           "order.detail",
           "order.refund",
+          "order.refund.confirm",
           "order.online",
           "order.online.list"
         ]

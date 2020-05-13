@@ -325,7 +325,8 @@ class OrderDetail extends Taro.Component<Props, State> {
             name: item.productName,
             price: item.originPrice || item.unitPrice,
             sellNum: item.num,
-            changePrice: item.unitPrice
+            changePrice: item.viewPrice,
+            priceType: item.priceType
           };
           return formartItem;
         }
