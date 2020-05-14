@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-12 14:01:28
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-06 10:39:40
+ * @Last Modified time: 2020-05-14 10:51:17
  */
 import Taro, { Config } from "@tarojs/taro";
 import { View, Image, Text, Input } from "@tarojs/components";
@@ -329,7 +329,7 @@ class PayReceive extends Taro.Component<Props, State> {
               <Image
                 className={`${cssPrefix}-receive-content-code-image`}
                 // src={`${getBaseUrl('').replace('inventory-app/api', '')}${payDetail.transResult.codeUrl}`}
-                src={`http://inventory.51cpay.com${payDetail.transResult.codeUrl}`}
+                src={`${payDetail.transResult.codeUrl}`}
               />
             ) : (
               <AtActivityIndicator mode="center" />

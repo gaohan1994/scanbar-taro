@@ -101,8 +101,8 @@ class ProductComponent extends Taro.Component<Props, State> {
         >
           <View className={`${cssPrefix}-content-cover`}>
             {product.pictures && product.pictures !== "" ? (
-              <Image
-                src={product.pictures[0]}
+              <View
+                style={`background-image: url(${product.pictures[0]})`}
                 className={`${cssPrefix}-content-cover-image`}
               />
             ) : (

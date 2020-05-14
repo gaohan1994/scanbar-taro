@@ -44,12 +44,12 @@ class Page extends Taro.Component<Props> {
       const form4: FormRowProps[] = [
         {
           title: "积分",
-          extraText: `${(selectMember as any).obtainPoints || 0}`
+          extraText: `${(selectMember as any).accumulativePoints || 0}`
         },
         {
           title: "储值余额",
           extraText: `￥${numeral(
-            (selectMember as any).obtainMoney || 0
+            (selectMember as any).accumulativeMoney || 0
           ).format("0.00")}`
         },
         {
@@ -89,7 +89,7 @@ class Page extends Taro.Component<Props> {
                     className={`${cssPrefix}-detail-avator`}
                     src={
                       selectMember.avatar
-                        ? `http://inventory.51cpay.com/memberAvatar/${selectMember.avatar}`
+                        ? `${selectMember.avatar}`
                         : "//net.huanmusic.com/weapp/icon_vip_user.png"
                     }
                   />
@@ -111,7 +111,7 @@ class Page extends Taro.Component<Props> {
                       ￥
                       {numeral(
                         (selectMember.orderInfo !== undefined &&
-                          selectMember.orderInfo.totalAmount) ||
+                          selectMember.totalAmount) ||
                           0
                       ).format("0.00")}
                     </View>
@@ -121,7 +121,7 @@ class Page extends Taro.Component<Props> {
                     <View className="title-text">
                       {numeral(
                         (selectMember.orderInfo !== undefined &&
-                          selectMember.orderInfo.totalTimes) ||
+                          selectMember.totalTimes) ||
                           0
                       ).value()}
                     </View>
@@ -137,15 +137,15 @@ class Page extends Taro.Component<Props> {
                   title="消费偏好"
                   hasBorder={false}
                   extraText={
-                    selectMember.perference !== undefined &&
-                    selectMember.perference.length > 0
+                    selectMember.preferenceVo !== undefined &&
+                    selectMember.preferenceVo.length > 0
                       ? ""
                       : "暂无消费偏好"
                   }
                 >
-                  {selectMember.perference !== undefined &&
-                    selectMember.perference.length > 0 &&
-                    selectMember.perference.map(perference => {
+                  {selectMember.preferenceVo !== undefined &&
+                    selectMember.preferenceVo.length > 0 &&
+                    selectMember.preferenceVo.map(perference => {
                       return (
                         <View
                           key={perference.typeId}

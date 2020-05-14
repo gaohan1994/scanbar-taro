@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-01 15:43:06
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-08 11:37:34
+ * @Last Modified time: 2020-05-14 11:55:17
  */
 import Taro from "@tarojs/taro";
 import { View, ScrollView, Input, Image, Text } from "@tarojs/components";
@@ -432,7 +432,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
                         className={`${cssPrefix}-card-row-image`}
                         style={
                           member.avatar
-                            ? `background-image: url(http://inventory.51cpay.com/memberAvatar/${member.avatar})`
+                            ? `background-image: url(${member.avatar})`
                             : `background-image: url(//net.huanmusic.com/weapp/icon_vip_user.png)`
                         }
                       />

@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-01 15:43:06
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-08 13:46:27
+ * @Last Modified time: 2020-05-14 11:55:09
  */
 import Taro from "@tarojs/taro";
 import { View, Image, Text, ScrollView } from "@tarojs/components";
@@ -190,7 +190,7 @@ class MemberMain extends Taro.Component<MemberMainProps> {
                     className={`${cssPrefix}-detail-avator`}
                     style={
                       memberDetail.avatar
-                        ? `background-image: url(http://inventory.51cpay.com/memberAvatar/${memberDetail.avatar})`
+                        ? `background-image: url(${memberDetail.avatar})`
                         : `background-image: url(//net.huanmusic.com/weapp/icon_vip_user.png)`
                     }
                   />

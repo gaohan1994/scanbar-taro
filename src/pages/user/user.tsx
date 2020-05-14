@@ -1,39 +1,39 @@
 /*
- * @Author: Ghan 
- * @Date: 2019-11-01 15:43:06 
+ * @Author: Ghan
+ * @Date: 2019-11-01 15:43:06
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-04-09 12:07:30
+ * @Last Modified time: 2020-05-14 11:56:09
  */
-import Taro from '@tarojs/taro';
-import { View, Image, Text } from '@tarojs/components';
+import Taro from "@tarojs/taro";
+import { View, Image, Text } from "@tarojs/components";
 import "../style/user.less";
 import "../../component/card/form.card.less";
-import merchantAction from '../../actions/merchant.action';
-import { AppReducer } from '../../reducers';
-import { connect } from '@tarojs/redux';
-import { getProfileInfo } from '../../reducers/app.merchant';
-import { MerchantInterface } from 'src/constants';
-import loginManager from '../../common/sdk/sign/login.manager';
+import merchantAction from "../../actions/merchant.action";
+import { AppReducer } from "../../reducers";
+import { connect } from "@tarojs/redux";
+import { getProfileInfo } from "../../reducers/app.merchant";
+import { MerchantInterface } from "src/constants";
+import loginManager from "../../common/sdk/sign/login.manager";
 
 const Rows = [
   {
-    title: '我的门店',
-    url: '/pages/mine/user.merchant',
-    icon: '//net.huanmusic.com/weapp/icon_mine_shop.png',
+    title: "我的门店",
+    url: "/pages/mine/user.merchant",
+    icon: "//net.huanmusic.com/weapp/icon_mine_shop.png"
   },
   {
-    title: '我的设置',
-    url: '/pages/mine/user.set',
-    icon: '//net.huanmusic.com/weapp/icon_mine_massage.png',
+    title: "我的设置",
+    url: "/pages/mine/user.set",
+    icon: "//net.huanmusic.com/weapp/icon_mine_massage.png"
   },
   {
-    title: '关于千阳',
-    url: '/pages/mine/user.about',
-    icon: '//net.huanmusic.com/weapp/icon_mine_about.png',
+    title: "关于千阳",
+    url: "/pages/mine/user.about",
+    icon: "//net.huanmusic.com/weapp/icon_mine_about.png"
   }
 ];
 
-const cssPrefix = 'user';
+const cssPrefix = "user";
 
 interface UserMainProps {
   userinfo: MerchantInterface.ProfileInfo;
@@ -55,7 +55,7 @@ class UserMain extends Taro.Component<UserMainProps, UserMainState> {
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
   config: Taro.Config = {
-    navigationBarTitleText: '我的'
+    navigationBarTitleText: "我的"
   };
 
   async componentDidShow() {
@@ -70,44 +70,44 @@ class UserMain extends Taro.Component<UserMainProps, UserMainState> {
     await merchantAction.profileInfo();
     const { userinfo } = this.props;
     this.setState({ userinfo });
-  }
+  };
 
   public onRowClick = (row: any) => {
     Taro.navigateTo({
       url: `${row.url}`
     });
-  }
+  };
 
   public onNavDetail = () => {
     Taro.navigateTo({
       url: `/pages/mine/user.detail`
     });
-  }
+  };
 
   public getRoles = (): string => {
     const { userinfo } = this.props;
     const { roleNames } = userinfo;
     if (!roleNames || (roleNames && roleNames.length === 0)) {
-      return '';
+      return "";
     }
     const arr = roleNames.split(/[,，]/);
-    let str = '';
+    let str = "";
     if (arr.length > 0) {
       const index = arr.length > 3 ? 3 : arr.length;
       for (let i = 0; i < index; i++) {
         str += arr[i];
-        if (i !== (index - 1)) {
-          str += '/';
+        if (i !== index - 1) {
+          str += "/";
         }
       }
       if (arr.length > 3) {
-        str += '/...';
+        str += "/...";
       }
       return str;
     } else {
-      return '';
+      return "";
     }
-  }
+  };
 
   render() {
     const { userinfo } = this.state;
@@ -118,46 +118,48 @@ class UserMain extends Taro.Component<UserMainProps, UserMainState> {
         <View className={`${cssPrefix}-container`}>
           <View
             className={`${cssPrefix}-user`}
-            onClick={() => loginManager.checkAuth(() => {
-              this.onNavDetail()
-            })}
+            onClick={() =>
+              loginManager.checkAuth(() => {
+                this.onNavDetail();
+              })
+            }
           >
-            {
-              userinfo.avatar && userinfo.avatar.length > 0
-                ? (
-                  <Image
-                    src={`http://inventory.51cpay.com/memberAvatar/${userinfo.avatar}`}
-                    className={`${cssPrefix}-user-image`}
-                  />
-                )
-                : (
-                  <Image
-                    src="//net.huanmusic.com/weapp/icon_mine_touxiang.png"
-                    className={`${cssPrefix}-user-image`}
-                  />
-                )
-            }
+            {userinfo.avatar && userinfo.avatar.length > 0 ? (
+              <Image
+                src={`${userinfo.avatar}`}
+                className={`${cssPrefix}-user-image`}
+              />
+            ) : (
+              <Image
+                src="//net.huanmusic.com/weapp/icon_mine_touxiang.png"
+                className={`${cssPrefix}-user-image`}
+              />
+            )}
 
-            {
-              roleNames && roleNames.length > 0 && (
-                <View className={`${cssPrefix}-user-box`}>
-                  <View className={`${cssPrefix}-user-name`}>
-                    {userinfo.userName}
-                    {userinfo.roleNames && (
-                      <View className={`${cssPrefix}-user-level`}>{this.getRoles()}</View>
-                    )}
-                  </View>
-                  <View className={`${cssPrefix}-user-text`}>{userinfo.phone}</View>
+            {roleNames && roleNames.length > 0 && (
+              <View className={`${cssPrefix}-user-box`}>
+                <View className={`${cssPrefix}-user-name`}>
+                  {userinfo.userName}
+                  {userinfo.roleNames && (
+                    <View className={`${cssPrefix}-user-level`}>
+                      {this.getRoles()}
+                    </View>
+                  )}
                 </View>
-              )
-            }
+                <View className={`${cssPrefix}-user-text`}>
+                  {userinfo.phone}
+                </View>
+              </View>
+            )}
           </View>
 
           <View
             className={`${cssPrefix}-user-edit`}
-            onClick={() => loginManager.checkAuth(() => {
-              this.onNavDetail()
-            })}
+            onClick={() =>
+              loginManager.checkAuth(() => {
+                this.onNavDetail();
+              })
+            }
           >
             <Image
               src="//net.huanmusic.com/weapp/icon_edit.png"
@@ -165,20 +167,20 @@ class UserMain extends Taro.Component<UserMainProps, UserMainState> {
             />
           </View>
           <View className={`${cssPrefix}-rows component-form`}>
-            {
-              Rows.map((row) => {
-                return (
-                  <View
-                    key={row.title}
-                    onClick={() => loginManager.checkAuth(() => {
-                      this.onRowClick(row)
-                    })}
-                  >
-                    {this.renderRow(row)}
-                  </View>
-                );
-              })
-            }
+            {Rows.map(row => {
+              return (
+                <View
+                  key={row.title}
+                  onClick={() =>
+                    loginManager.checkAuth(() => {
+                      this.onRowClick(row);
+                    })
+                  }
+                >
+                  {this.renderRow(row)}
+                </View>
+              );
+            })}
           </View>
         </View>
       </View>
@@ -187,9 +189,7 @@ class UserMain extends Taro.Component<UserMainProps, UserMainState> {
 
   private renderRow = (row: any) => {
     return (
-      <View
-        className={`${cssPrefix}-row`}
-      >
+      <View className={`${cssPrefix}-row`}>
         <View className={`${cssPrefix}-row-left`}>
           {row.icon && (
             <Image src={row.icon} className={`${cssPrefix}-row-left-icon`} />
@@ -201,11 +201,11 @@ class UserMain extends Taro.Component<UserMainProps, UserMainState> {
         </View>
       </View>
     );
-  }
+  };
 }
 
 const select = (state: AppReducer.AppState) => ({
-  userinfo: getProfileInfo(state),
+  userinfo: getProfileInfo(state)
 });
 
 export default connect(select)(UserMain);
