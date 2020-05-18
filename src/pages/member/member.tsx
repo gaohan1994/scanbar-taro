@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-01 15:43:06
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-14 11:55:17
+ * @Last Modified time: 2020-05-18 16:28:08
  */
 import Taro from "@tarojs/taro";
 import { View, ScrollView, Input, Image, Text } from "@tarojs/components";
@@ -174,6 +174,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
         }
         this.changeLoading(true);
       }
+      Taro.showLoading();
       const { memberQuery, memberSelect } = this.state;
       const payload: MemberInterface.MemberInfoListFetchFidle = {
         pageNum: currentPage,
@@ -181,6 +182,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
         orderByColumn: `${memberQuery} ${memberSelect}`
       };
       const result = await MemberAction.memberList(payload);
+      Taro.hideLoading();
       invariant(result.success, result.result || "服务器开了个小差");
       /**
        * @todo [请求结束之后如果外部传入的page那么赋值给全局，如果没传那么默认+1]

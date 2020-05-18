@@ -36,6 +36,7 @@ import { MerchantInterface } from "src/constants";
 import MemberModal from "../../component/modal/member.modal";
 import merchantService from "../../constants/merchant/merchant.service";
 import memberAction from "../../actions/member.action";
+import { checkNumberInput } from "../../common/util/common";
 
 const cssPrefix = "product";
 
@@ -122,6 +123,8 @@ class ProductPay extends Taro.Component<Props, State> {
       productSdk.setMember(undefined);
       this.setCoupons();
     } else {
+      productSdk.setMember(this.state.selectMember);
+      console.log("this.state.selectMember", this.state.selectMember);
       this.setCoupons();
     }
 
@@ -479,6 +482,7 @@ class ProductPay extends Taro.Component<Props, State> {
       productSdk.setErase(undefined);
       productSdk.setMember(undefined);
       productSdk.setCoupon(undefined);
+      productSdk.setPoint(undefined);
       merchantAction.selectCoupon(undefined);
       Taro.navigateTo({
         url: `/pages/pay/pay.receive`
@@ -599,13 +603,20 @@ class ProductPay extends Taro.Component<Props, State> {
       {
         title: "确定",
         type: "confirm",
-        onPress: () => this.changeModalVisible("eraseModal", false)
+        onPress: () => {
+          const currentDiscount = numeral(receiveDiscount).value();
+          if (currentDiscount > 100) {
+            return;
+          }
+          this.changeModalVisible("eraseModal", false);
+        }
       }
     ];
     const eraseInputs: ModalInput[] = [
       {
         title: "应收金额",
         value: receiveValue,
+        type: "digit",
         prefix: "￥",
         onInput: ({ detail: { value } }) =>
           this.onChangeReceive("receiveValue", value),
@@ -614,6 +625,7 @@ class ProductPay extends Taro.Component<Props, State> {
       },
       {
         title: "整单折扣",
+        type: "digit",
         endfix: "%",
         value: receiveDiscount,
         onInput: ({ detail: { value } }) =>
@@ -738,7 +750,7 @@ class ProductPay extends Taro.Component<Props, State> {
         });
       }
     });
-
+    // console.log("totalActivityMoney", totalActivityMoney);
     if (totalActivityMoney !== 0) {
       formCard.push({
         title: "满减优惠",
@@ -779,9 +791,9 @@ class ProductPay extends Taro.Component<Props, State> {
                 className={`${cssPrefix}-pay-title  ${cssPrefix}-pay-item-box`}
               >
                 {`积分抵现 `}
-                <View
-                  className={`${cssPrefix}-pay-text`}
-                >{` (${point.pointPrice / point.deductRate}积分)`}</View>
+                <View className={`${cssPrefix}-pay-text`}>
+                  {` (${Math.ceil(point.pointPrice / point.deductRate)}积分)`}
+                </View>
               </View>
               <View
                 className={`${cssPrefix}-row-price ${cssPrefix}-pay-item-box`}

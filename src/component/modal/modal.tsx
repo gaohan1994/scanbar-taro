@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-04 13:49:58
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-08 14:00:14
+ * @Last Modified time: 2020-05-18 11:14:02
  *
  * @Usage
  * ```jsx
@@ -70,6 +70,7 @@ class Modal extends Taro.Component<Props, State> {
 
   render() {
     const {
+      isOpened,
       header,
       buttons,
       renderHeader,
@@ -87,8 +88,9 @@ class Modal extends Taro.Component<Props, State> {
     delete ModalProps.buttons;
     delete ModalProps.renderHeader;
     delete ModalProps.renderFooter;
+
     return (
-      <View>
+      <View style={`display: ${!!isOpened ? "block" : "none"}`}>
         <AtModal {...ModalProps}>
           {showHeader && (
             <View className={`${ModalCssPrefix}-header`}>

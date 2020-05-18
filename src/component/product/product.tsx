@@ -185,6 +185,7 @@ class ProductComponent extends Taro.Component<Props, State> {
           <PriceComponent
             product={product}
             numeral={numeral}
+            sort={sort || ""}
             // price={product.price}
           />
         )}

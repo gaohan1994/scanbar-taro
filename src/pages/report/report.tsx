@@ -677,23 +677,23 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
           onPress={date => this.onDatePress(date)}
           onClose={() => this.onChangeValue("dateVisible", false)}
         >
-          {/* <Picker
-            mode='date'
+          <Picker
+            mode="date"
             onChange={this.onCostomMinChange}
-            value={dayJs(this.state.costomMinDate).format('YYYY.MM.DD')}
+            value={dayJs(this.state.costomMinDate).format("YYYY.MM.DD")}
           >
-            <View 
+            <View
               className={classnames(`tabs-header-content-menu`, {
-                [`tabs-header-content-menu-active`]: currentDate === '自定义'
+                [`tabs-header-content-menu-active`]: currentDate === "自定义"
               })}
               onClick={() => {
-                this.onDatePress({title: '自定义'})
-                this.onChangeValue('dateVisible', false);
+                this.onDatePress({ title: "自定义" });
+                this.onChangeValue("dateVisible", false);
               }}
             >
-              {'自定义'}
+              {"自定义"}
             </View>
-          </Picker> */}
+          </Picker>
         </TabsMenu>
       </View>
     );
@@ -886,7 +886,9 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
       maxDate,
       monthData,
       weeksData,
-      weekValue
+      weekValue,
+      costomMaxDate,
+      costomMinDate
     } = this.state;
 
     const month = monthData ? monthData.map(item => item.monthStr) : [];
@@ -895,37 +897,37 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
 
     return (
       <View className={`${cssPrefix}-time-box`}>
-        {/* 
-        currentDate === '自定义' 
-          ? (
-            <View className={`${cssPrefix}-time-costom`}>
-              <Image
-                src="//net.huanmusic.com/weapp/v1/icon_rili.png"
-                className={`${cssPrefix}-time-cal`}
-              />
-              <Picker
-                mode='date'
-                onChange={this.onCostomMinChange}
-                value={dayJs(costomMinDate).format('YYYY.MM.DD')}
-              >
-                <Text className={`${cssPrefix}-time-text`}>
-                  {!!costomMinDate ? dayJs(costomMinDate).format('YYYY.MM.DD') : '开始日期'}
-                </Text>
-              </Picker>
-              -
-              <Picker
-                mode='date'
-                onChange={this.onCostomMaxChange}
-                value={dayJs(costomMaxDate).format('YYYY.MM.DD')}
-              >
-                <Text className={`${cssPrefix}-time-text`}>
-                  {!!costomMaxDate ? dayJs(costomMaxDate).format('YYYY.MM.DD') : '结束日期'}
-                </Text>
-              </Picker>
-            </View>
-          )
-          :  */}
-        {currentDate === "今日" ? (
+        {currentDate === "自定义" ? (
+          <View className={`${cssPrefix}-time-costom`}>
+            <Image
+              src="//net.huanmusic.com/weapp/v1/icon_rili.png"
+              className={`${cssPrefix}-time-cal`}
+            />
+            <Picker
+              mode="date"
+              onChange={this.onCostomMinChange}
+              value={dayJs(costomMinDate).format("YYYY.MM.DD")}
+            >
+              <Text className={`${cssPrefix}-time-text`}>
+                {!!costomMinDate
+                  ? dayJs(costomMinDate).format("YYYY.MM.DD")
+                  : "开始日期"}
+              </Text>
+            </Picker>
+            -
+            <Picker
+              mode="date"
+              onChange={this.onCostomMaxChange}
+              value={dayJs(costomMaxDate).format("YYYY.MM.DD")}
+            >
+              <Text className={`${cssPrefix}-time-text`}>
+                {!!costomMaxDate
+                  ? dayJs(costomMaxDate).format("YYYY.MM.DD")
+                  : "结束日期"}
+              </Text>
+            </Picker>
+          </View>
+        ) : currentDate === "今日" ? (
           <Picker
             mode="date"
             onChange={this.onDateChange}

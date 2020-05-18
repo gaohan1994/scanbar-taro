@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-22 11:12:09
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-04-28 15:01:24
+ * @Last Modified time: 2020-05-18 16:14:33
  *
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -387,15 +387,20 @@ class ProductSDK {
       /**
        * @todo [enableMemberDiscount=false使用折扣率]
        */
-      if (!!product.enableMemberDiscount) {
+      if (
+        !!product.enableMemberDiscount &&
+        typeof product.memberPrice === "number"
+      ) {
         return "会员价";
       }
 
       return activityPrice > 0
-        ? product.memberPrice < activityPrice
-          ? "会员价"
-          : "活动价"
-        : "会员价";
+        ? typeof product.memberPrice === "number"
+          ? product.memberPrice < activityPrice
+            ? "会员价"
+            : "活动价"
+          : "会员价"
+        : "活动价";
     }
 
     if (activityPrice !== 0) {
@@ -445,8 +450,15 @@ class ProductSDK {
       }
 
       return activityPrice > 0
-        ? Math.min(product.memberPrice, activityPrice)
-        : product.memberPrice;
+        ? Math.min(
+            typeof product.memberPrice === "number"
+              ? product.memberPrice
+              : product.price,
+            activityPrice
+          )
+        : typeof product.memberPrice === "number"
+        ? product.memberPrice
+        : product.price;
     }
 
     if (activityPrice !== 0) {
@@ -471,7 +483,6 @@ class ProductSDK {
       return prevTotal + item.price * item.sellNum;
     };
     const total = productList.reduce(reduceCallback, 0);
-    cu.console("getProductsOriginPrice", total);
     return total;
   };
 
@@ -581,13 +592,15 @@ class ProductSDK {
       activity.rule
     );
     if (!!rule && rule.length > 0) {
-      const discountArray = rule.map(item => item.discount);
+      let discountArray = rule.map(item => item.discount);
 
-      const maxDiscount = Math.max(...discountArray);
-      const maxDiscountIndex = rule.findIndex(r => r.discount === maxDiscount);
-      const maxDiscountItem = rule.find(r => r.discount === maxDiscount);
       while (discountArray.length > 0) {
-        if (maxDiscountItem && price <= maxDiscountItem.threshold) {
+        const maxDiscount = Math.max(...discountArray);
+        const maxDiscountIndex = rule.findIndex(
+          r => r.discount === maxDiscount
+        );
+        const maxDiscountItem = rule.find(r => r.discount === maxDiscount);
+        if (maxDiscountItem && price >= maxDiscountItem.threshold) {
           return maxDiscountItem;
         } else {
           discountArray.splice(maxDiscountIndex, 1);
@@ -602,6 +615,7 @@ class ProductSDK {
     price: number,
     activity?: MerchantInterface.Activity
   ) => {
+    // return price;
     /**
      * @todo 如果有满减活动则计算满减活动
      * @todo 如果有满减金额
@@ -624,7 +638,9 @@ class ProductSDK {
        * @todo 如果有多个规则找出最优惠规则并使用该规则
        */
       const rule: any = this.setMaxActivityRule(price, activity);
-      return !!rule ? numeral(price - rule.discount).value() : price;
+      return !!rule && rule.discount
+        ? numeral(price - rule.discount).value()
+        : price;
     }
     return price;
   };
@@ -674,7 +690,15 @@ class ProductSDK {
       return {};
     }
     const state = store.getState();
-    const pointConfig = getPointConfig(state);
+    const pointConfig = getPointConfig(state) || {};
+
+    if (!pointConfig.deductRate) {
+      return {
+        deductRate: 0,
+        pointPrice: 0
+      };
+    }
+
     const { accumulativePoints } = this.member;
     const productList =
       products !== undefined
@@ -794,7 +818,9 @@ class ProductSDK {
       flag: false,
       order: {
         ...(!!this.point
-          ? { points: this.point / pointConfig.deductRate }
+          ? {
+              points: Math.ceil(this.point / pointConfig.deductRate)
+            }
           : {}),
         authCode: "-1",
         couponList:
@@ -1219,7 +1245,7 @@ class ProductSDK {
         /**
          * @todo [说明是全部满减]
          */
-        return [{ productList, activity: { name: NonActivityName } as any }];
+        return [{ productList, activity: activityList[0] }];
       }
 
       /**
