@@ -4,11 +4,10 @@
 @user-bg-size: 416px;
 
 .@{user-prefix} {
-  background-color: #F2F2F2;
+  background-color: #f2f2f2;
   .flex(center, flex-start, column);
   width: 100%;
   height: 100%;
-  
 
   &-bg {
     position: absolute;
@@ -16,7 +15,7 @@
     left: 0;
     height: @user-bg-size;
     width: 100%;
-    .background-image('//net.huanmusic.com/scanbar-c/v2/bg_mine.png');
+    .background-image("//net.huanmusic.com/scanbar-c/v2/bg_mine.png");
     z-index: 0;
   }
 
@@ -25,7 +24,7 @@
     .padding(30px, lr);
     height: 100%;
     width: 100%;
-    background-color: #F2F2F2;
+    background-color: #f2f2f2;
   }
 
   &-user {
@@ -70,7 +69,7 @@
       .flex(center, center);
       font-size: 18px;
       line-height: 18px;
-      background-color: rgba(255, 255, 255, .2);
+      background-color: rgba(255, 255, 255, 0.2);
       color: #fff;
       border-radius: 10px;
       margin-left: 15px;
@@ -167,12 +166,11 @@
         height: 28px;
         .bg;
         background-image: url(//net.huanmusic.com/scanbar-c/v2/bg_coupon_prompt.png);
-        color: #FF893B;
+        color: #ff893b;
         font-size: 20px;
         .flex(center, center);
       }
     }
-
   }
 
   &-set {
@@ -199,11 +197,11 @@
       margin-top: 20px;
       .padding(30px, lr);
       &-text-grey {
-        color: #CCCCCC !important;
+        color: #cccccc !important;
       }
 
       &-border-grey {
-        border-color: #CCCCCC !important;
+        border-color: #cccccc !important;
       }
 
       &-top {
@@ -289,8 +287,8 @@
           top: 50%;
           transform: translateY(-50%);
           .bg;
-          width:36px;
-          height:36px;
+          width: 36px;
+          height: 36px;
           &-normal {
             background-image: url(//net.huanmusic.com/weapp/v2/bt_normal.png);
           }
@@ -316,11 +314,12 @@
         border-radius: 10px;
         .flex(flex-start, center, column);
         background-color: #fff;
-
         &-prompt {
-          .flex(center, center, row);
+          .flex(center, flex-start, row);
 
           &-icon {
+            .bg;
+            background-image: url(//net.huanmusic.com/scanbar-c/v2/icon_prompt.png);
             width: 22px;
             height: 22px;
             margin-right: 8px;
@@ -335,5 +334,4 @@
       }
     }
   }
-
 }

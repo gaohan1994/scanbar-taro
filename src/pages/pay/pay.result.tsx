@@ -138,11 +138,6 @@ class PayResult extends Taro.Component<Props, State> {
             <View
               className={`${cssPrefix}-result-container-title ${cssPrefix}-result-container-title-bold`}
             >
-              {payDetail &&
-              payDetail.transPayload &&
-              payDetail.transPayload.flag
-                ? "现金"
-                : "微信"}
               收款失败
             </View>
             <View className={`${cssPrefix}-result-container-button`}>

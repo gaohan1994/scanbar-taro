@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-22 11:12:09
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-18 16:14:33
+ * @Last Modified time: 2020-05-19 09:37:56
  *
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -822,7 +822,7 @@ class ProductSDK {
               points: Math.ceil(this.point / pointConfig.deductRate)
             }
           : {}),
-        authCode: "-1",
+        authCode: "",
         couponList:
           !!this.coupon && this.coupon.couponCode
             ? [this.coupon.couponCode]
@@ -885,7 +885,7 @@ class ProductSDK {
     return {
       flag: true,
       order: {
-        authCode: "-1",
+        authCode: "",
         couponList: [],
         discount: 0,
         erase: 0,

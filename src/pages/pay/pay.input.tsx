@@ -44,6 +44,10 @@ class PayInput extends Taro.Component<Props, State> {
   public onChangeValue = ({ detail: { value } }) => {
     const newValue = checkNumberInput(value);
     console.log("newValue", newValue);
+    if (Number(newValue) > 99999999) {
+      this.setState({ inputValue: "99999999" });
+      return "99999999";
+    }
     this.setState({ inputValue: newValue });
     return newValue;
   };

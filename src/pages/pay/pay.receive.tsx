@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-12 14:01:28
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-14 10:51:17
+ * @Last Modified time: 2020-05-20 14:31:25
  */
 import Taro, { Config } from "@tarojs/taro";
 import { View, Image, Text, Input } from "@tarojs/components";
@@ -104,6 +104,10 @@ class PayReceive extends Taro.Component<Props, State> {
   public onChangeCash = (value: string) => {
     const newValue = checkNumberInput(value);
     console.log("newValue", newValue);
+    if (Number(newValue) > 99999999) {
+      this.setState({ receiveCash: "99999999" });
+      return "99999999";
+    }
     this.setState({ receiveCash: checkNumberInput(value) });
   };
 

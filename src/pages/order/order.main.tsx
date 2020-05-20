@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-12-09 11:01:19
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-02-25 11:38:27
+ * @Last Modified time: 2020-05-20 14:57:00
  */
 
 import Taro, { Config } from "@tarojs/taro";
@@ -123,7 +123,7 @@ class OrderMain extends Taro.Component<Props, State> {
     this.setState(prevState => {
       const prevData = merge([], prevState[key]);
       let nextData: any[] = [];
-      if (prevData.length === 0) {
+      if (prevData.length !== 2) {
         nextData = [0, 1];
       }
       return {

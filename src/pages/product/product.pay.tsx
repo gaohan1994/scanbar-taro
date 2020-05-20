@@ -181,7 +181,7 @@ class ProductPay extends Taro.Component<Props, State> {
     return;
   };
 
-  public onChangeReceive = (key: string, value: string) => {
+  public onChangeReceive = (key: string, value: str$ing) => {
     if (value === "") {
       productSdk.setErase(undefined);
       this.setState({
@@ -620,7 +620,7 @@ class ProductPay extends Taro.Component<Props, State> {
         prefix: "￥",
         onInput: ({ detail: { value } }) =>
           this.onChangeReceive("receiveValue", value),
-        placeholder: `￥${this.setNumber(receivePrice)}`
+        placeholder: `${this.setNumber(receivePrice)}`
         // focus: true,
       },
       {
@@ -630,7 +630,7 @@ class ProductPay extends Taro.Component<Props, State> {
         value: receiveDiscount,
         onInput: ({ detail: { value } }) =>
           this.onChangeReceive("receiveDiscount", value),
-        placeholder: "100%"
+        placeholder: "100"
       }
     ];
     return (

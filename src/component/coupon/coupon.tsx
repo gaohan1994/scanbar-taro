@@ -92,8 +92,21 @@ class Page extends Taro.Component<Props, State> {
             />
           )}
         </View>
+        {!coupon.ableToUse && (
+          <View
+            className={`${cssPrefix}-item-bottom ${cssPrefix}-item-bottom-prompt`}
+          >
+            <View className={`${cssPrefix}-item-bottom-prompt-icon`} />
+            <Text className={`${cssPrefix}-item-bottom-info`}>
+              {coupon.disableReason}
+            </Text>
+          </View>
+        )}
         {!!showMore && (
-          <View className={`${cssPrefix}-item-bottom`}>
+          <View
+            className={`${cssPrefix}-item-bottom`}
+            style={`${!coupon.ableToUse ? "padding-top: 0" : ""}`}
+          >
             <Text className={`${cssPrefix}-item-bottom-info`}>
               1.优惠券满{(coupon.couponVO && coupon.couponVO.threshold) || 0}
               元减
