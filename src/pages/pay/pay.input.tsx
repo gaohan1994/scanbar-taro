@@ -106,7 +106,6 @@ class PayInput extends Taro.Component<Props, State> {
               <Input
                 className={`${cssPrefix}-input-box-input-input`}
                 value={inputValue}
-                // bindinpu
                 onInput={this.onChangeValue}
                 placeholder="请输入收款金额"
                 placeholderClass={`${cssPrefix}-input-box-input-input-placeholder`}

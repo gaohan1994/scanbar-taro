@@ -17,6 +17,7 @@ import productSdk, {
   ProductCartInterface
 } from "../../common/sdk/product/product.sdk";
 import ButtonFooter from "../../component/button/button.footer";
+import OrderRefundComponent from "./component/refund";
 
 const cssPrefix = "order";
 
@@ -237,7 +238,7 @@ class OrderDetail extends Taro.Component<Props, State> {
      */
 
     return (
-      <View className={`${cssPrefix}-detail-cards`}>
+      <View className={`${cssPrefix}-detail-cards`} style="background: #f2f2f2">
         {Form2 && (
           <View className={`${cssPrefix}-detail-card`}>
             <FormCard items={Form2} />
@@ -291,6 +292,8 @@ class OrderDetail extends Taro.Component<Props, State> {
             </View>
           </View>
         )}
+
+        <OrderRefundComponent orderDetail={orderDetail} />
 
         <View style="width: 100%; height: 100px; background: #f2f2f2;" />
         {orderDetail.orderDetailList &&
