@@ -4,6 +4,7 @@ import { connect } from "@tarojs/redux";
 import { AppReducer } from "../../reducers";
 import "../style/order.less";
 import "../style/product.less";
+import Modal from "../../component/modal/modal";
 import invariant from "invariant";
 import {
   ResponseCode,
@@ -15,6 +16,10 @@ import numeral from "numeral";
 import ProductComponent from "./component/product";
 import merge from "lodash.merge";
 import Footer from "./component/footer";
+import { ModalInput } from "../../component/modal/modal";
+import productSdk, {
+  ProductCartInterface
+} from "../../common/sdk/product/product.sdk";
 
 const cssPrefix = "order";
 
@@ -30,6 +35,10 @@ type Props = {
 type State = {
   damageList: number[];
   cartList: CartItem[];
+  changePrice: string;
+  changeSellNum: string;
+  changeProduct: ProductCartInterface.ProductCartInfo;
+  changeProductVisible: boolean;
 };
 
 class OrderDetail extends Taro.Component<Props, State> {
@@ -39,7 +48,11 @@ class OrderDetail extends Taro.Component<Props, State> {
 
   state: State = {
     damageList: [],
-    cartList: []
+    cartList: [],
+    changePrice: "",
+    changeSellNum: "",
+    changeProduct: {} as any,
+    changeProductVisible: false
   };
 
   componentDidShow() {
@@ -133,11 +146,52 @@ class OrderDetail extends Taro.Component<Props, State> {
     });
   };
 
+  public onChangeValue = (key: string, value: string) => {
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        [key]: value
+      };
+    });
+  };
+
+  public onChangeProductClose = () => {
+    this.setState({
+      changePrice: "",
+      changeSellNum: "",
+      changeProduct: {} as any,
+      changeProductVisible: false
+    });
+  };
+
+  public confirmChangeProduct = () => {
+    const { changeSellNum, changePrice, changeProduct } = this.state;
+
+    if (changeSellNum === "" || numeral(changeSellNum).value() <= 0) {
+      return;
+    }
+    if (changePrice === "" || numeral(changePrice).value() <= 0) {
+      return;
+    }
+
+    this.manageProduct(
+      "ADD",
+      changeProduct as any,
+      numeral(changeSellNum).value(),
+      !!changePrice && numeral(changePrice).value() !== changeProduct.unitPrice
+        ? numeral(changePrice).value()
+        : undefined
+    );
+    this.onChangeProductClose();
+  };
+
   public manageProduct = (
     type: string,
     product: OrderInterface.OrderDetailItem | CartItem,
-    sellNum: number = 1
+    sellNum: number = 1,
+    changePrice?: number
   ) => {
+    product = merge({}, product, !!changePrice ? { changePrice } : {});
     let cartList: CartItem[] = merge([], this.state.cartList);
     const index = cartList.findIndex(p => p.productId === product.productId);
     if (type === "ADD") {
@@ -173,7 +227,12 @@ class OrderDetail extends Taro.Component<Props, State> {
 
     if (index !== -1) {
       const currentItem = cartList[index];
-      if (currentItem.sellNum === 1) {
+      /**
+       * @todo 如果是非整数商品直接清零
+       */
+      if (`${currentItem.sellNum}`.indexOf(".") !== -1) {
+        cartList.splice(index, 1);
+      } else if (currentItem.sellNum === 1) {
         cartList.splice(index, 1);
       } else {
         cartList[index].sellNum =
@@ -213,9 +272,73 @@ class OrderDetail extends Taro.Component<Props, State> {
           cartList={this.state.cartList}
           onClick={() => this.onRefund()}
         />
+        {this.renderChangeProductModal()}
       </View>
     );
   }
+
+  private renderChangeProductModal = () => {
+    const {
+      changePrice,
+      changeSellNum,
+      changeProductVisible,
+      changeProduct
+    } = this.state;
+    const unit =
+      changeProduct && changeProduct.unit && changeProduct.unit.length > 0
+        ? changeProduct.unit
+        : "个";
+    let inputs: ModalInput[] = [
+      {
+        title: `${
+          !!changeProduct
+            ? !productSdk.isWeighProduct(changeProduct as any)
+              ? "数量"
+              : "重量"
+            : "数量"
+        }`,
+        value: changeSellNum,
+        placeholder: "请输入数量",
+        type: `${
+          !!changeProduct && changeProduct.saleType === 0 ? "number" : "digit"
+        }` as any,
+        endfix: changeProduct && changeProduct.unit,
+        onInput: ({ detail: { value } }) => {
+          this.onChangeValue("changeSellNum", value);
+        }
+      },
+      {
+        title: "价格",
+        prefix: "￥",
+        value: changePrice || `0`,
+        type: "digit",
+        onInput: ({ detail: { value } }) => {
+          this.onChangeValue("changePrice", value);
+        }
+      }
+    ];
+    const buttons: any[] = [
+      {
+        title: "取消",
+        type: "cancel",
+        onPress: () => this.onChangeProductClose()
+      },
+      {
+        title: "确定",
+        type: "confirm",
+        onPress: () => this.confirmChangeProduct()
+      }
+    ];
+    return (
+      <Modal
+        header={(changeProduct && (changeProduct as any).productName) || ""}
+        isOpened={changeProductVisible}
+        onClose={() => this.onChangeProductClose()}
+        inputs={inputs}
+        buttons={buttons}
+      />
+    );
+  };
 
   private renderList = () => {
     const { orderDetail } = this.props;
@@ -233,7 +356,13 @@ class OrderDetail extends Taro.Component<Props, State> {
                 key={product.productId}
                 product={product}
                 damageList={damageList}
-                onContentClick={() => {}}
+                onContentClick={() => {
+                  this.setState({
+                    changePrice: `${product.unitPrice}`,
+                    changeProduct: product as any,
+                    changeProductVisible: true
+                  });
+                }}
                 productInCart={productInCart}
                 manageProduct={this.manageProduct}
                 onExtraClick={this.onExtraClick}
@@ -251,19 +380,6 @@ const select = (state: AppReducer.AppState) => {
    * @todo [如果有退货的单子了记得把对应退货数量减去]
    */
   const orderDetail = getOrderDetail(state);
-  // const { refundOrderList } = orderDetail;
-  // const orderDetailList: OrderInterface.OrderDetailItem[] = merge([], orderDetail.orderDetailList);
-
-  // const nextOrderDetailList =
-  //   refundOrderList && refundOrderList.length > 0
-  //     ? orderDetailList.map(item => {
-  //       const index = refundOrderList.findIndex(p => p.)
-  //       return {
-  //         ...item,
-  //         num:
-  //       }
-  //     })
-  //     : orderDetailList;
   return {
     orderDetail
   };
