@@ -5,11 +5,11 @@
 @sign-input-box-size: 590px;
 
 .@{sign-prefix} {
-  .background-image('//net.huanmusic.com/weapp/v1/bg.png');
+  .background-image("//net.huanmusic.com/weapp/v1/bg.png");
   display: flex;
   flex-direction: column;
   align-items: center;
-  
+
   &-step {
     width: 100%;
     .flex(center, center, row);
@@ -25,22 +25,27 @@
     &-2 {
       background-image: url(//net.huanmusic.com/weapp/img_step2.png);
     }
+    &-title {
+      font-size: 42px;
+      font-weight: bold;
+      color: rgba(102, 102, 102, 1);
+    }
   }
   &-card {
     .margin(100px, t);
     width: 720px;
     height: 700px;
-    .background-image('//net.huanmusic.com/weapp/bg_login.png');
+    .background-image("//net.huanmusic.com/weapp/bg_login.png");
     .padding(50px, tb);
     .padding(50px + 25px, lr);
     &-register {
-      .background-image('http://net.huanmusic.com/weapp/bg_login_l.png');
+      .background-image("http://net.huanmusic.com/weapp/bg_login_l.png");
       height: 877px + 18px;
       width: 690px;
       .padding(50px, lr);
     }
     &-register2 {
-      .background-image('http://net.huanmusic.com/weapp/bg_login_m.png');
+      .background-image("http://net.huanmusic.com/weapp/bg_login_m.png");
       height: 717px + 18px;
       width: 690px;
       .padding(50px, lr);
@@ -67,7 +72,7 @@
       }
       &-uncheck {
         border-radius: @check-icon-size / 2;
-        border: 1px solid #A0A0A0;
+        border: 1px solid #a0a0a0;
       }
     }
   }
@@ -75,7 +80,7 @@
     &-box {
       width: @sign-input-box-size;
       border-radius: 10px;
-      border: 1px solid #EDEDED;
+      border: 1px solid #ededed;
       .padding(26px, tb);
       .padding(24px, lr);
       display: flex;
@@ -89,8 +94,8 @@
         .padding(0px);
         .flex(center, center);
         .margin(15px, l);
-        font-size:30px;
-        color:rgba(102,102,102,1);
+        font-size: 30px;
+        color: rgba(102, 102, 102, 1);
       }
       &-icon {
         width: 43px;
@@ -107,8 +112,8 @@
       min-width: 120px;
       .padding(24px, r);
       .flex(center, flex-end, row);
-      font-size:30px;
-      color:rgba(102,102,102,1);
+      font-size: 30px;
+      color: rgba(102, 102, 102, 1);
     }
     &-container {
       display: flex;
@@ -121,11 +126,14 @@
     .margin(38px, b);
   }
   &-bar {
+    &-margin {
+      .margin(40px, t);
+    }
     .flex(center, space-between, row);
-    font-size:24px;
-    color:rgba(102,102,102,1);
+    font-size: 24px;
+    color: rgba(102, 102, 102, 1);
     &-active {
-      color:rgba(42,134,252,1);
+      color: rgba(42, 134, 252, 1);
     }
   }
 }

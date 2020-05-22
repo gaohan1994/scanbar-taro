@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-01 10:07:05
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-11 10:45:10
+ * @Last Modified time: 2020-05-22 14:22:55
  */
 import Taro, { Config } from "@tarojs/taro";
 import { View, Image, Text, Input } from "@tarojs/components";
@@ -175,6 +175,20 @@ class Login extends Taro.Component<Props, State> {
           >
             登录
           </AtButton>
+
+          <View className="sign-bar">
+            没有账号？
+            <View
+              className="sign-bar-active"
+              onClick={() =>
+                Taro.navigateTo({
+                  url: `/pages/sign/register`
+                })
+              }
+            >
+              点击注册
+            </View>
+          </View>
         </View>
       </View>
     );

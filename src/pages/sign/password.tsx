@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-01 10:07:05
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-21 16:36:37
+ * @Last Modified time: 2020-05-22 14:14:01
  */
 import Taro, { useState, useEffect } from "@tarojs/taro";
 import { View, Image, Text, Input, Picker } from "@tarojs/components";
@@ -35,7 +35,11 @@ function ForgetPassword() {
     }
   }
 
-  const form = [
+  async function findPassword() {
+    console.log("findPassword");
+  }
+
+  const forms = [
     {
       title: "手机号",
       value: phone,
@@ -50,11 +54,11 @@ function ForgetPassword() {
 
   return (
     <View className={classnames(["container", "sign"])}>
-      <View className="sign-card sign-card-register">
+      <View className="sign-card sign-card-register2">
         <View className="sign-step">
-          <View className="sign-step-item sign-step-1" />
+          <View className="sign-step-title">忘记密码</View>
         </View>
-        {form.map(form => {
+        {forms.map(form => {
           return (
             <View className="sign-card-input" key={form.title}>
               <View className={`${cssPrefix}-input-box`}>
@@ -110,10 +114,26 @@ function ForgetPassword() {
         <AtButton
           type="primary"
           className="theme-button"
-          // onClick={() => onLogin()}
+          onClick={() => findPassword()}
         >
           确定
         </AtButton>
+
+        <View className="sign-bar sign-bar-margin">
+          <View style="display: flex; flex-direction: row; align-items: center; justify-content: center; width: 100%">
+            已有账号，
+            <View
+              className="sign-bar-active"
+              onClick={() =>
+                Taro.navigateTo({
+                  url: `/pages/sign/login`
+                })
+              }
+            >
+              点击登录
+            </View>
+          </View>
+        </View>
       </View>
     </View>
   );
