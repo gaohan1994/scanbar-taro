@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-20 13:37:23
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-18 16:34:36
+ * @Last Modified time: 2020-05-22 17:06:13
  */
 import Taro, { Config } from "@tarojs/taro";
 import { View, Image, Picker, Text } from "@tarojs/components";
@@ -694,6 +694,8 @@ class ProductAdd extends Taro.Component<Props, State> {
             />
           </View>
         )}
+
+        <View className={`${cssPrefix}-add-icon`} />
       </View>
     );
   };

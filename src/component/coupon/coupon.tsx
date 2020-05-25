@@ -22,7 +22,8 @@ class Page extends Taro.Component<Props, State> {
     showMore: false
   };
 
-  onChange = () => {
+  onChange = e => {
+    e.stopPropagation();
     this.setState({
       showMore: !this.state.showMore
     });
@@ -64,7 +65,7 @@ class Page extends Taro.Component<Props, State> {
             </Text>
             <View
               className={`${cssPrefix}-item-top-right-row`}
-              onClick={() => this.onChange()}
+              onClick={this.onChange.bind(this)}
             >
               <Text
                 className={classnames(`${cssPrefix}-item-top-right-time`, {
