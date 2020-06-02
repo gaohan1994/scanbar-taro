@@ -27,7 +27,7 @@ const Rows = [
     icon: "//net.huanmusic.com/weapp/icon_mine_massage.png"
   },
   {
-    title: "关于千阳",
+    title: "关于星亿腾",
     url: "/pages/mine/user.about",
     icon: "//net.huanmusic.com/weapp/icon_mine_about.png"
   }

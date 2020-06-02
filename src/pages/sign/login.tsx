@@ -103,7 +103,7 @@ class Login extends Taro.Component<Props, State> {
     return (
       <View className={classnames(["container", "sign"])}>
         <View className="sign-card">
-          <View className="sign-card-title">欢迎使用千阳零售</View>
+          <View className="sign-card-title">欢迎使用星亿腾零售</View>
           <View className="sign-card-input">
             <View className={`${cssPrefix}-input-box`}>
               <Image
