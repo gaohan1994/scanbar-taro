@@ -5,7 +5,7 @@
 @sign-input-box-size: 590px;
 
 .@{sign-prefix} {
-  .background-image('//net.huanmusic.com/weapp/v1/bg.png');
+  .background-image("//net.huanmusic.com/weapp/v1/bg.png");
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -25,22 +25,27 @@
     &-2 {
       background-image: url(//net.huanmusic.com/weapp/img_step2.png);
     }
+    &-title {
+      font-size: 42px;
+      font-weight: bold;
+      color: rgba(102, 102, 102, 1);
+    }
   }
   &-card {
     .margin(100px, t);
     width: 720px;
     height: 700px;
-    .background-image('//net.huanmusic.com/weapp/bg_login.png');
+    .background-image("//net.huanmusic.com/weapp/bg_login.png");
     .padding(50px, tb);
     .padding(50px + 25px, lr);
     &-register {
-      .background-image('http://net.huanmusic.com/weapp/bg_login_l.png');
+      .background-image("http://net.huanmusic.com/weapp/bg_login_l.png");
       height: 877px + 18px;
       width: 690px;
       .padding(50px, lr);
     }
     &-register2 {
-      .background-image('http://net.huanmusic.com/weapp/bg_login_m.png');
+      .background-image("http://net.huanmusic.com/weapp/bg_login_m.png");
       height: 717px + 18px;
       width: 690px;
       .padding(50px, lr);
@@ -125,6 +130,9 @@
     .margin(38px, b);
   }
   &-bar {
+    &-margin {
+      .margin(40px, t);
+    }
     .flex(center, space-between, row);
     font-size: 24px;
     color: rgba(102, 102, 102, 1);

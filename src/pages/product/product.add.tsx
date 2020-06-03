@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-20 13:37:23
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-08 14:16:56
+ * @Last Modified time: 2020-05-22 17:06:13
  */
 import Taro, { Config } from "@tarojs/taro";
 import { View, Image, Picker, Text } from "@tarojs/components";
@@ -76,7 +76,7 @@ class ProductAdd extends Taro.Component<Props, State> {
       cost: "",
       price: "",
       memberPrice: "",
-      typeValue: 0,
+      typeValue: -1,
       standard: "",
       unit: "",
       brand: "",
@@ -344,7 +344,7 @@ class ProductAdd extends Taro.Component<Props, State> {
       cost: "",
       price: "",
       memberPrice: "",
-      typeValue: 0,
+      typeValue: -1,
       standard: "",
       unit: "",
       brand: "",
@@ -406,10 +406,17 @@ class ProductAdd extends Taro.Component<Props, State> {
         name,
         saleType,
         status,
-        type: productType[typeValue].id,
+        type: typeValue !== -1 ? productType[typeValue].id : ("" as any),
         supplierId: productSupplier[supplierValue].id
       };
 
+      if (!price) {
+        Taro.showToast({
+          title: "请设置售价",
+          icon: "none"
+        });
+        return;
+      }
       if (!!cost) {
         payload.cost = Number(cost);
       }
@@ -522,7 +529,6 @@ class ProductAdd extends Taro.Component<Props, State> {
       {
         title: "条码",
         main: true,
-        extraText: barcode,
         extraThumb: "//net.huanmusic.com/weapp/icon_commodity_scan.png",
         extraThumbClick: this.onScan,
         buttons: [
@@ -531,7 +537,10 @@ class ProductAdd extends Taro.Component<Props, State> {
             type: "confirm",
             onPress: () => this.getBarcode()
           }
-        ]
+        ],
+        isInput: true,
+        inputValue: barcode,
+        inputOnChange: value => this.onChangeValue("barcode", value)
       },
       {
         title: "名称",
@@ -685,6 +694,8 @@ class ProductAdd extends Taro.Component<Props, State> {
             />
           </View>
         )}
+
+        <View className={`${cssPrefix}-add-icon`} />
       </View>
     );
   };

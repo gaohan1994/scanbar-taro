@@ -171,7 +171,10 @@ class Page extends Taro.Component<Props> {
                           <CouponItem
                             key={item.id}
                             touchable={false}
-                            coupon={item}
+                            coupon={{
+                              ...item,
+                              ableToUse: true
+                            }}
                             onClick={() => {}}
                           />
                         );

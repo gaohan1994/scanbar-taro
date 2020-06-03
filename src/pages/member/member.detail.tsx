@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-01 15:43:06
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-14 11:55:09
+ * @Last Modified time: 2020-05-22 14:26:44
  */
 import Taro from "@tarojs/taro";
 import { View, Image, Text, ScrollView } from "@tarojs/components";
@@ -99,11 +99,14 @@ class MemberMain extends Taro.Component<MemberMainProps> {
         <View className={`inventory-select`}>
           {!!couponsList && couponsList.length > 0 && (
             <ScrollView scrollY={true} className={`${cssPrefix}-coupons`}>
-              {couponsList.map(item => {
+              {couponsList.map((item: any) => {
                 return (
                   <CouponItem
                     key={(item as any).id}
-                    coupon={item}
+                    coupon={{
+                      ...item,
+                      ableToUse: true
+                    }}
                     touchable={false}
                     onClick={() => {}}
                   />

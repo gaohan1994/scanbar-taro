@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-01 15:43:06
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-08 13:50:19
+ * @Last Modified time: 2020-05-22 16:10:01
  */
 import Taro from "@tarojs/taro";
 import { View, ScrollView, Picker } from "@tarojs/components";
@@ -275,7 +275,6 @@ class MemberMain extends Taro.Component<Props, State> {
     const form2 = [
       {
         title: "性别",
-        hasBorder: false,
         buttons: [
           {
             title: "先生",
@@ -286,6 +285,21 @@ class MemberMain extends Taro.Component<Props, State> {
             title: "女士",
             type: this.state.sex !== "male" ? "confirm" : "cancel",
             onPress: () => this.onChangSex("female")
+          }
+        ]
+      },
+      {
+        title: "状态",
+        buttons: [
+          {
+            title: "启用",
+            type: !!this.state.memberStatus ? "confirm" : "cancel",
+            onPress: () => this.onChangeMemberStatus(true)
+          },
+          {
+            title: "禁用",
+            type: !this.state.memberStatus ? "confirm" : "cancel",
+            onPress: () => this.onChangeMemberStatus(false)
           }
         ]
       }

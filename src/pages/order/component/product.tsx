@@ -21,7 +21,8 @@ type Props = {
 };
 
 class OrderProduct extends Taro.Component<Props> {
-  public manageProduct = (type: string) => {
+  public manageProduct = (type: string, e) => {
+    e.stopPropagation();
     const { manageProduct, product } = this.props;
     manageProduct(type, product);
   };
@@ -89,7 +90,9 @@ class OrderProduct extends Taro.Component<Props> {
         <View className={`${cssPrefix}-title`}>{product.productName}</View>
         <View className={`${prefix}-box`}>
           <PriceComponent product={productData as any} numeral={numeral} />
-          <View className={`${prefix}-tip`}>可退x{product.ableRefundNum}</View>
+          <View className={`${prefix}-tip`}>
+            可退x{(product as any).ableRefundNum}
+          </View>
         </View>
       </View>
     );

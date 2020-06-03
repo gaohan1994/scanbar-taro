@@ -323,6 +323,7 @@
     background-color: #f2f2f2;
 
     &-cover {
+      position: relative;
       width: 100%;
       height: 388px;
       background-color: #ffffff;
@@ -436,6 +437,16 @@
       &-one {
         width: 100%;
       }
+    }
+
+    &-icon {
+      position: absolute;
+      top: 23px;
+      right: 26px;
+      z-index: 100;
+      width: 60px;
+      height: 60px;
+      .background-image("//net.huanmusic.com/weapp/icon_commodity_camera.png");
     }
 
     &-more {
