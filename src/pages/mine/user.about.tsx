@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-01 15:43:06
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-03-02 11:26:13
+ * @Last Modified time: 2020-06-02 18:04:15
  */
 import Taro, { Config } from "@tarojs/taro";
 import { View, Image, Text } from "@tarojs/components";
@@ -27,7 +27,7 @@ class UserAbount extends Taro.Component<Props> {
             src="//net.huanmusic.com/weapp/v2/logo.png"
             className={`${cssPrefix}-about-box-img`}
           />
-          <Text className={`${cssPrefix}-about-box-title`}>星亿腾"</Text>
+          <Text className={`${cssPrefix}-about-box-title`}>星亿腾</Text>
           <Text className={`${cssPrefix}-about-box-version`}>版本号V1.0</Text>
         </View>
         <View className={`${cssPrefix}-about-bottom`}>
