@@ -23,12 +23,12 @@ import {
   ProductService,
   MemberInterface,
   HTTPInterface,
-  MerchantInterface
+  MerchantInterface,
 } from "../../../constants";
 import { store } from "../../../app";
 import {
   ProductSDKReducer,
-  getSuspensionCartList
+  getSuspensionCartList,
 } from "./product.sdk.reducer";
 import numeral from "numeral";
 import merge from "lodash.merge";
@@ -199,7 +199,7 @@ class ProductSDK {
   public productCartManageType: ProductCartInterface.ProductCartManageType = {
     ADD: "ADD",
     REDUCE: "REDUCE",
-    EMPTY: "EMPTY"
+    EMPTY: "EMPTY",
   };
 
   public reducerInterface: ProductCartInterface.ReducerInterface = {
@@ -220,8 +220,8 @@ class ProductSDK {
       PAYLOAD_REFUND: "PAYLOAD_REFUND",
       PAYLOAD_PURCHASE: "PAYLOAD_PURCHASE",
       PAYLOAD_MANAGE: "PAYLOAD_MANAGE",
-      PAYLOAD_STOCK: "PAYLOAD_STOCK"
-    }
+      PAYLOAD_STOCK: "PAYLOAD_STOCK",
+    },
   };
 
   /**
@@ -379,7 +379,7 @@ class ProductSDK {
     const currentMember = member || this.member;
     const currentActivity =
       product.activityInfos &&
-      product.activityInfos.find(a => a.type === 2 || a.type === 1);
+      product.activityInfos.find((a) => a.type === 2 || a.type === 1);
     const activityPrice =
       (currentActivity && currentActivity.discountPrice) || 0;
 
@@ -431,7 +431,7 @@ class ProductSDK {
     const currentMember = member || this.member;
     const currentActivity =
       product.activityInfos &&
-      product.activityInfos.find(a => a.type === 2 || a.type === 1);
+      product.activityInfos.find((a) => a.type === 2 || a.type === 1);
     const activityPrice =
       (currentActivity && currentActivity.discountPrice) || 0;
     if (!!currentMember && !!currentMember.enableMemberPrice) {
@@ -581,11 +581,15 @@ class ProductSDK {
       activity.rule
     );
     if (!!rule && rule.length > 0) {
-      const discountArray = rule.map(item => item.discount);
+      const discountArray = rule.map((item) => item.discount);
 
       const maxDiscount = Math.max(...discountArray);
-      const maxDiscountIndex = rule.findIndex(r => r.discount === maxDiscount);
-      const maxDiscountItem = rule.find(r => r.discount === maxDiscount);
+      const maxDiscountIndex = rule.findIndex(
+        (r) => r.discount === maxDiscount
+      );
+      const maxDiscountItem = rule.find((r) => r.discount === maxDiscount);
+      console.log("maxDiscountItem", maxDiscountItem);
+      console.log("price", price);
       while (discountArray.length > 0) {
         if (maxDiscountItem && price <= maxDiscountItem.threshold) {
           return maxDiscountItem;
@@ -641,11 +645,11 @@ class ProductSDK {
     const activityList = store.getState().merchant.activityInfo;
     const filterProductList = this.filterByActivity(products, activityList);
     let activityMoney: number = 0;
-    filterProductList.forEach(activityItem => {
+    filterProductList.forEach((activityItem) => {
       const { activity, productList } = activityItem;
       if (productList && productList.length > 0) {
         let subTotal: number = 0;
-        productList.forEach(product => {
+        productList.forEach((product) => {
           subTotal += this.getProductItemPrice(product) * product.sellNum;
         });
         const subActivityMoney = this.getProductActivityPrice(
@@ -710,7 +714,7 @@ class ProductSDK {
       Math.ceil(accumulativePoints) * pointConfig.deductRate;
     return {
       deductRate: pointConfig.deductRate,
-      pointPrice: Math.min(memberAccumulativePrice, total)
+      pointPrice: Math.min(memberAccumulativePrice, total),
     };
   };
 
@@ -811,9 +815,9 @@ class ProductSDK {
         terminalSn: "-1",
         totalAmount: this.getProductPrice(),
         totalNum: this.getProductNumber(),
-        transAmount: this.getProductTransPrice()
+        transAmount: this.getProductTransPrice(),
       },
-      productInfoList: productList.map(item => {
+      productInfoList: productList.map((item) => {
         if (!this.isNonBarcodeProduct(item)) {
           // 如果是称重商品和普通商品，则 改价价格 > 会员价格 > 普通价格
           const itemPrice: number = this.getProductItemPrice(item);
@@ -831,7 +835,7 @@ class ProductSDK {
             totalAmount: item.price * item.sellNum,
             transAmount: itemPrice * item.sellNum,
             type: item.typeId,
-            unitPrice: itemPrice
+            unitPrice: itemPrice,
           } as ProductCartInterface.ProductInfoPayload;
         } else {
           // 如果是无码商品则特殊处理
@@ -843,11 +847,11 @@ class ProductSDK {
             price: item.price,
             unitPrice: item.unitPrice,
             totalAmount: item.price * item.sellNum,
-            transAmount: item.price * item.sellNum
+            transAmount: item.price * item.sellNum,
           } as any;
         }
       }),
-      transProp: true
+      transProp: true,
     };
     return payload;
   };
@@ -871,10 +875,10 @@ class ProductSDK {
         terminalSn: "-1",
         totalAmount: money,
         totalNum: 0,
-        transAmount: money
+        transAmount: money,
       },
       productInfoList: [],
-      transProp: true
+      transProp: true,
     };
   };
 
@@ -915,8 +919,8 @@ class ProductSDK {
         product,
         sellNum,
         changePrice,
-        sort
-      }
+        sort,
+      },
     });
   };
 
@@ -939,7 +943,7 @@ class ProductSDK {
       .PAYLOAD_SORT.PAYLOAD_ORDER
   ) => {
     Taro.showToast({
-      title: "加入购物车"
+      title: "加入购物车",
     });
     if (this.isWeighProduct(product)) {
       const reducer: ProductSDKReducer.ProductManageWeightCart = {
@@ -948,11 +952,11 @@ class ProductSDK {
           type: this.productCartManageType.ADD,
           product: {
             ...product,
-            sellNum: sellNum || 1
+            sellNum: sellNum || 1,
           },
           suspension,
-          sort
-        }
+          sort,
+        },
       };
       store.dispatch(reducer);
     } else {
@@ -962,8 +966,8 @@ class ProductSDK {
           type: this.productCartManageType.ADD,
           product,
           suspension,
-          sort
-        }
+          sort,
+        },
       };
       store.dispatch(reducer);
     }
@@ -993,11 +997,11 @@ class ProductSDK {
           type: this.productCartManageType.REDUCE,
           product: {
             ...product,
-            sellNum: sellNum || 1
+            sellNum: sellNum || 1,
           },
           suspension,
-          sort
-        }
+          sort,
+        },
       };
       store.dispatch(reducer);
     } else {
@@ -1007,8 +1011,8 @@ class ProductSDK {
           type: this.productCartManageType.REDUCE,
           product,
           suspension,
-          sort
-        }
+          sort,
+        },
       };
       store.dispatch(reducer);
     }
@@ -1022,15 +1026,15 @@ class ProductSDK {
       type: this.reducerInterface.DELETE_PRODUCT_ITEM,
       payload: {
         product,
-        sort
-      }
+        sort,
+      },
     });
   };
 
   public empty = (sort?: string) => {
     store.dispatch({
       type: this.reducerInterface.MANAGE_EMPTY_CART,
-      payload: { sort }
+      payload: { sort },
     });
   };
 
@@ -1045,7 +1049,7 @@ class ProductSDK {
       if (type === this.productCartManageType.ADD) {
         store.dispatch({
           type: this.reducerInterface.CHANGE_WEIGHT_PRODUCT_MODAL,
-          payload: { product }
+          payload: { product },
         });
       } else {
         this.reduce(product, undefined, suspension, sort);
@@ -1055,7 +1059,7 @@ class ProductSDK {
       if (type === this.productCartManageType.ADD) {
         store.dispatch({
           type: this.reducerInterface.CHANGE_NON_BARCODE_PRODUCT,
-          payload: { nonBarcodeProduct: product }
+          payload: { nonBarcodeProduct: product },
         });
       } else {
         this.reduce(product);
@@ -1076,7 +1080,7 @@ class ProductSDK {
   ) => {
     const reducer: ProductSDKReducer.Reducers.ManageCartList = {
       type: this.reducerInterface.MANAGE_CART,
-      payload: { productCartList, sort }
+      payload: { productCartList, sort },
     };
     return store.dispatch(reducer);
   };
@@ -1084,14 +1088,14 @@ class ProductSDK {
   public closeNonBarcodeModal = () => {
     store.dispatch({
       type: this.reducerInterface.CHANGE_NON_BARCODE_PRODUCT,
-      payload: { nonBarcodeProduct: {} }
+      payload: { nonBarcodeProduct: {} },
     });
   };
 
   public closeWeightModal = () => {
     store.dispatch({
       type: this.reducerInterface.CHANGE_WEIGHT_PRODUCT_MODAL,
-      payload: { product: {} }
+      payload: { product: {} },
     });
   };
 
@@ -1107,8 +1111,8 @@ class ProductSDK {
       payload: {
         visible,
         product,
-        sort
-      }
+        sort,
+      },
     };
     store.dispatch(reducer);
   };
@@ -1128,8 +1132,8 @@ class ProductSDK {
       } = {
         type: this.reducerInterface.ADD_SUSPENSION_CART,
         payload: {
-          productCartList: merge([], state.productSDK.productCartList)
-        }
+          productCartList: merge([], state.productSDK.productCartList),
+        },
       };
       store.dispatch(reducer);
     }
@@ -1138,12 +1142,12 @@ class ProductSDK {
   public scanProduct = async (): Promise<
     HTTPInterface.ResponseResultBase<any>
   > => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       Taro.scanCode()
-        .then(async barcode => {
+        .then(async (barcode) => {
           Taro.showLoading();
           const payload: ProductInterface.ProductInfoScanGetFetchFidle = {
-            barcode: barcode.result
+            barcode: barcode.result,
           };
           const result = await productService.productInfoScan(payload);
           Taro.hideLoading();
@@ -1151,11 +1155,11 @@ class ProductSDK {
             ...result,
             data: {
               ...(result.data || {}),
-              barcode: barcode.result
-            }
+              barcode: barcode.result,
+            },
           });
         })
-        .catch(error => resolve(error));
+        .catch((error) => resolve(error));
     });
   };
 
@@ -1165,7 +1169,7 @@ class ProductSDK {
     const state = await store.getState();
     const suspensionCartList = getSuspensionCartList(state);
     const currentSuspension = suspensionCartList.find(
-      s => s.suspension.date === suspension
+      (s) => s.suspension.date === suspension
     );
     if (currentSuspension && currentSuspension.productCartList.length > 0) {
       const orderSuspensionList = merge([], currentSuspension.productCartList);
@@ -1190,7 +1194,7 @@ class ProductSDK {
     if (suspension) {
       const reducer: ProductSDKReducer.Reducers.DeleteSuspensionAction = {
         type: this.reducerInterface.DELETE_SUSPENSION_CART,
-        payload: { suspension }
+        payload: { suspension },
       };
       store.dispatch(reducer);
       return;
@@ -1198,7 +1202,7 @@ class ProductSDK {
 
     const reducer: ProductSDKReducer.Reducers.EmptySuspensionAction = {
       type: this.reducerInterface.EMPTY_SUSPENSION_CART,
-      payload: {}
+      payload: {},
     };
     store.dispatch(reducer);
     return;
@@ -1226,20 +1230,20 @@ class ProductSDK {
        * @todo [先把活动和非活动预设好]
        * @todo [全部满减和非满减只能存在一个]
        */
-      activityList.forEach(activity => {
+      activityList.forEach((activity) => {
         if (!!activity.activityDetailVOList) {
           nextProductList.push({
             activity,
-            productList: []
+            productList: [],
           });
         }
       });
 
       nextProductList.push({
         activity:
-          activityList.find(a => !a.activityDetailVOList) ||
+          activityList.find((a) => !a.activityDetailVOList) ||
           ({ name: NonActivityName } as any),
-        productList: []
+        productList: [],
       });
 
       for (let i = 0; i < productList.length; i++) {
@@ -1257,7 +1261,8 @@ class ProductSDK {
               !!nextProductListItem.activity.activityDetailVOList
             ) {
               const token = nextProductListItem.activity.activityDetailVOList.some(
-                activityItem => activityItem.identity === currentProduct.barcode
+                (activityItem) =>
+                  activityItem.identity === currentProduct.barcode
               );
               if (!!token) {
                 execd = true;
@@ -1277,7 +1282,7 @@ class ProductSDK {
            */
           if (
             !nextProductList[nextProductList.length - 1].productList.some(
-              p => p.barcode === currentProduct.barcode
+              (p) => p.barcode === currentProduct.barcode
             )
           ) {
             execd = true;

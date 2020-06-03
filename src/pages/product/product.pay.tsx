@@ -4,7 +4,7 @@ import { AppReducer } from "../../reducers";
 import { getProductCartList } from "../../common/sdk/product/product.sdk.reducer";
 import { connect } from "@tarojs/redux";
 import productSdk, {
-  ProductCartInterface
+  ProductCartInterface,
 } from "../../common/sdk/product/product.sdk";
 import "../../component/card/form.card.less";
 import "../style/product.less";
@@ -18,7 +18,7 @@ import invariant from "invariant";
 import {
   ResponseCode,
   MemberInterface,
-  MemberInterfaceMap
+  MemberInterfaceMap,
 } from "../../constants/index";
 import { store } from "../../app";
 import { ProductInterfaceMap } from "../../constants";
@@ -67,7 +67,7 @@ interface State {
 
 class ProductPay extends Taro.Component<Props, State> {
   config: Taro.Config = {
-    navigationBarTitleText: "结算"
+    navigationBarTitleText: "结算",
   };
 
   readonly state: State = {
@@ -80,7 +80,7 @@ class ProductPay extends Taro.Component<Props, State> {
     receiveDiscount: "",
     usePoint: false,
     selectMember: undefined,
-    selectCoupon: undefined
+    selectCoupon: undefined,
   };
 
   public componentDidShow = async () => {
@@ -102,7 +102,7 @@ class ProductPay extends Taro.Component<Props, State> {
       memberValue: "",
       memberLayout: false,
       receiveValue: "",
-      receiveDiscount: ""
+      receiveDiscount: "",
     });
     productSdk.setErase(undefined);
 
@@ -116,7 +116,7 @@ class ProductPay extends Taro.Component<Props, State> {
       productSdk.setMember(addSelectMember);
       store.dispatch({
         type: MemberInterfaceMap.reducerInterfaces.SET_MEMBER_SELECT,
-        payload: { selectMember: undefined }
+        payload: { selectMember: undefined },
       });
     } else if (!this.state.selectMember) {
       productSdk.setMember(undefined);
@@ -141,19 +141,19 @@ class ProductPay extends Taro.Component<Props, State> {
   };
 
   public changeModalVisible = (key: string, visible?: boolean) => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       return {
         ...prevState,
-        [key]: typeof visible === "boolean" ? visible : !prevState[key]
+        [key]: typeof visible === "boolean" ? visible : !prevState[key],
       };
     });
   };
 
   public onChangeValue = (key: string, value: string) => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       return {
         ...prevState,
-        [key]: value
+        [key]: value,
       };
     });
   };
@@ -184,7 +184,7 @@ class ProductPay extends Taro.Component<Props, State> {
       this.setState({
         receiveValue: "",
         receiveDiscount: "",
-        eraseValue: ""
+        eraseValue: "",
       });
       return;
     }
@@ -215,12 +215,12 @@ class ProductPay extends Taro.Component<Props, State> {
       nextEraseValue = `${erasePrice}`;
     }
 
-    this.setState(prevState => {
+    this.setState((prevState) => {
       return {
         ...prevState,
         receiveValue: nextReceiveValue,
         receiveDiscount: nextReceiveDiscount,
-        eraseValue: nextEraseValue
+        eraseValue: nextEraseValue,
       };
     });
   };
@@ -236,11 +236,11 @@ class ProductPay extends Taro.Component<Props, State> {
    */
   public onScanMember = () => {
     Taro.scanCode({ onlyFromCamera: true })
-      .then(async barcode => {
+      .then(async (barcode) => {
         Taro.showLoading();
         const memberPhone = barcode.result;
         const result = await memberService.memberDetailByPreciseInfo({
-          identity: memberPhone
+          identity: memberPhone,
         });
         invariant(result.code === ResponseCode.success, "会员登录失败");
         /**
@@ -251,21 +251,21 @@ class ProductPay extends Taro.Component<Props, State> {
          */
         let selectMember: SelectMember = merge({}, result.data);
         const memberPerference = await memberService.memberPreference({
-          id: result.data.id
+          id: result.data.id,
         });
         if (memberPerference.code === ResponseCode.success) {
           selectMember.perference = memberPerference.data;
         }
 
         const memberOrderInfo = await memberService.memberOrderInfo({
-          id: result.data.id
+          id: result.data.id,
         });
         if (memberOrderInfo.code === ResponseCode.success) {
           selectMember.orderInfo = memberOrderInfo.data;
         }
 
         const memberCoupons = await merchantService.getMemberCoupons({
-          phone: selectMember.phoneNumber
+          phone: selectMember.phoneNumber,
         });
         if (memberCoupons.code === ResponseCode.success) {
           selectMember.couponList = memberCoupons.data.rows;
@@ -287,17 +287,17 @@ class ProductPay extends Taro.Component<Props, State> {
             memberModal: false,
             eraseValue: "",
             receiveValue: "",
-            receiveDiscount: ""
+            receiveDiscount: "",
           },
           () => {
             this.setCoupons();
           }
         );
       })
-      .catch(error => {
+      .catch((error) => {
         Taro.showToast({
           title: error.message,
-          icon: "none"
+          icon: "none",
         });
       });
   };
@@ -317,7 +317,7 @@ class ProductPay extends Taro.Component<Props, State> {
       const coupons = await merchantAction.couponList({
         phone: selectMember && selectMember.phoneNumber,
         amount: productSdk.getProductMemberPrice(),
-        productIds: productCartList.map(item => item.id)
+        productIds: productCartList.map((item) => item.id),
       });
       if (coupons.code !== ResponseCode.success) {
         /**
@@ -340,7 +340,7 @@ class ProductPay extends Taro.Component<Props, State> {
         memberModal: false,
         eraseValue: "",
         receiveValue: "",
-        receiveDiscount: ""
+        receiveDiscount: "",
       },
       () => {
         this.setCoupons();
@@ -361,7 +361,7 @@ class ProductPay extends Taro.Component<Props, State> {
       }
       Taro.showLoading();
       const result = await memberService.memberDetailByPreciseInfo({
-        identity: memberValue
+        identity: memberValue,
       });
       invariant(
         result.code === ResponseCode.success,
@@ -377,14 +377,16 @@ class ProductPay extends Taro.Component<Props, State> {
             if (confirm) {
               const params = {
                 phoneNumber: memberValue,
-                needCallback: true
+                needCallback: true,
               };
               // 用户点击了确定
               Taro.navigateTo({
-                url: `/pages/member/member.add?params=${JSON.stringify(params)}`
+                url: `/pages/member/member.add?params=${JSON.stringify(
+                  params
+                )}`,
               });
             }
-          }
+          },
         });
         return;
       }
@@ -397,21 +399,21 @@ class ProductPay extends Taro.Component<Props, State> {
        */
       let selectMember: SelectMember = merge({}, result.data);
       const memberPerference = await memberService.memberPreference({
-        id: result.data.id
+        id: result.data.id,
       });
       if (memberPerference.code === ResponseCode.success) {
         selectMember.perference = memberPerference.data;
       }
 
       const memberOrderInfo = await memberService.memberOrderInfo({
-        id: result.data.id
+        id: result.data.id,
       });
       if (memberOrderInfo.code === ResponseCode.success) {
         selectMember.orderInfo = memberOrderInfo.data;
       }
 
       const memberCoupons = await merchantService.getMemberCoupons({
-        phone: selectMember.phoneNumber
+        phone: selectMember.phoneNumber,
       });
       if (memberCoupons.code === ResponseCode.success) {
         selectMember.couponList = memberCoupons.data.rows;
@@ -432,7 +434,7 @@ class ProductPay extends Taro.Component<Props, State> {
           memberModal: false,
           eraseValue: "",
           receiveValue: "",
-          receiveDiscount: ""
+          receiveDiscount: "",
         },
         () => {
           this.setCoupons();
@@ -442,7 +444,7 @@ class ProductPay extends Taro.Component<Props, State> {
       Taro.showLoading();
       Taro.showToast({
         title: error.message,
-        icon: "none"
+        icon: "none",
       });
       this.changeModalVisible("memberModal", false);
     }
@@ -465,11 +467,11 @@ class ProductPay extends Taro.Component<Props, State> {
 
       const payReceive: PayReducer.PayReceive = {
         transPayload: payload,
-        transResult: result.data
+        transResult: result.data,
       };
       store.dispatch({
         type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PAY_DETAIL,
-        payload: { payReceive }
+        payload: { payReceive },
       });
       /**
        * @todo 调用支付接口成功后把抹零和会员都清除
@@ -479,15 +481,16 @@ class ProductPay extends Taro.Component<Props, State> {
       productSdk.setErase(undefined);
       productSdk.setMember(undefined);
       productSdk.setCoupon(undefined);
+      productSdk.setPoint(undefined);
       merchantAction.selectCoupon(undefined);
       Taro.navigateTo({
-        url: `/pages/pay/pay.receive`
+        url: `/pages/pay/pay.receive`,
       });
     } catch (error) {
       Taro.hideLoading();
       Taro.showToast({
         title: error.message,
-        icon: "none"
+        icon: "none",
       });
     }
   };
@@ -518,13 +521,13 @@ class ProductPay extends Taro.Component<Props, State> {
           {
             title: "取消选择",
             type: "cancel",
-            onPress: () => this.cancelMember()
+            onPress: () => this.cancelMember(),
           },
           {
             title: "更换会员",
             type: "confirm",
-            onPress: () => this.changeMember()
-          }
+            onPress: () => this.changeMember(),
+          },
         ]}
         onClose={() => this.changeModalVisible("memberLayout", false)}
       />
@@ -544,13 +547,13 @@ class ProductPay extends Taro.Component<Props, State> {
         onPress: () => {
           this.onChangeValue("memberModal", "");
           this.changeModalVisible("memberModal", false);
-        }
+        },
       },
       {
         title: "确定",
         type: "confirm",
-        onPress: () => this.onSearchMember()
-      }
+        onPress: () => this.onSearchMember(),
+      },
     ];
     return (
       <Modal
@@ -594,13 +597,13 @@ class ProductPay extends Taro.Component<Props, State> {
         onPress: () => {
           // this.onChangeValue('eraseValue', '');
           this.changeModalVisible("eraseModal", false);
-        }
+        },
       },
       {
         title: "确定",
         type: "confirm",
-        onPress: () => this.changeModalVisible("eraseModal", false)
-      }
+        onPress: () => this.changeModalVisible("eraseModal", false),
+      },
     ];
     const eraseInputs: ModalInput[] = [
       {
@@ -609,7 +612,7 @@ class ProductPay extends Taro.Component<Props, State> {
         prefix: "￥",
         onInput: ({ detail: { value } }) =>
           this.onChangeReceive("receiveValue", value),
-        placeholder: `￥${this.setNumber(receivePrice)}`
+        placeholder: `￥${this.setNumber(receivePrice)}`,
         // focus: true,
       },
       {
@@ -618,8 +621,8 @@ class ProductPay extends Taro.Component<Props, State> {
         value: receiveDiscount,
         onInput: ({ detail: { value } }) =>
           this.onChangeReceive("receiveDiscount", value),
-        placeholder: "100%"
-      }
+        placeholder: "100%",
+      },
     ];
     return (
       <Modal
@@ -657,8 +660,8 @@ class ProductPay extends Taro.Component<Props, State> {
         extraTextColor: "#333333",
         extraTextBold: "bold",
         extraTextSize: "36",
-        hasBorder: false
-      }
+        hasBorder: false,
+      },
     ];
 
     const totalActivityMoney = productSdk.getProductTotalActivityPrice();
@@ -666,14 +669,14 @@ class ProductPay extends Taro.Component<Props, State> {
     const formCard: FormRowProps[] = [
       {
         title: "商品数量",
-        extraText: `${productSdk.getProductNumber()}`
+        extraText: `${productSdk.getProductNumber()}`,
       },
       {
         title: "原价金额",
         extraText: `￥${this.setNumber(
           numeral(productSdk.getProductsOriginPrice()).value()
-        )}`
-      }
+        )}`,
+      },
     ];
 
     if (
@@ -701,7 +704,7 @@ class ProductPay extends Taro.Component<Props, State> {
               )}`
             : "￥0.00"
         }`,
-        extraTextStyle: "price"
+        extraTextStyle: "price",
       });
     }
 
@@ -713,7 +716,7 @@ class ProductPay extends Taro.Component<Props, State> {
         extraText: `${
           eraseValue !== "" ? `- ￥${this.setNumber(eraseValue)}` : "￥0.00"
         }`,
-        extraTextStyle: "price"
+        extraTextStyle: "price",
       });
     }
 
@@ -734,9 +737,9 @@ class ProductPay extends Taro.Component<Props, State> {
         Taro.navigateTo({
           url: `/pages/pay/pay.coupon?entry=product.pay${
             !!selectMember ? `&phone=${selectMember.phoneNumber}` : ""
-          }${!!selectCoupon ? `&selectId=${selectCoupon.id}` : ""}`
+          }${!!selectCoupon ? `&selectId=${selectCoupon.id}` : ""}`,
         });
-      }
+      },
     });
 
     if (totalActivityMoney !== 0) {
@@ -747,7 +750,7 @@ class ProductPay extends Taro.Component<Props, State> {
             ? `- ￥${this.setNumber(totalActivityMoney)}`
             : "￥0.00"
         }`,
-        extraTextStyle: "price"
+        extraTextStyle: "price",
       });
     }
 
@@ -755,12 +758,12 @@ class ProductPay extends Taro.Component<Props, State> {
       if (index !== formCard.length - 1) {
         return {
           ...item,
-          hasBorder: true
+          hasBorder: true,
         };
       }
       return {
         ...item,
-        hasBorder: false
+        hasBorder: false,
       };
     });
 
@@ -779,9 +782,9 @@ class ProductPay extends Taro.Component<Props, State> {
                 className={`${cssPrefix}-pay-title  ${cssPrefix}-pay-item-box`}
               >
                 {`积分抵现 `}
-                <View
-                  className={`${cssPrefix}-pay-text`}
-                >{` (${point.pointPrice / point.deductRate}积分)`}</View>
+                <View className={`${cssPrefix}-pay-text`}>{` (${
+                  point.pointPrice / point.deductRate
+                }积分)`}</View>
               </View>
               <View
                 className={`${cssPrefix}-row-price ${cssPrefix}-pay-item-box`}
@@ -828,9 +831,11 @@ class ProductPay extends Taro.Component<Props, State> {
                 className={`${cssPrefix}-pay-footer-left-item-icon`}
               />
               <Text className="cart-suspension-left-item-text">
-                {`${(selectMember &&
-                  (selectMember as MemberInterface.MemberInfo).username) ||
-                  "会员"}`}
+                {`${
+                  (selectMember &&
+                    (selectMember as MemberInterface.MemberInfo).username) ||
+                  "会员"
+                }`}
               </Text>
             </View>
             <View
@@ -851,7 +856,7 @@ class ProductPay extends Taro.Component<Props, State> {
               [`${cssPrefix}-pay-footer-right-active`]:
                 productCartList.length > 0,
               [`${cssPrefix}-pay-footer-right-disabled`]:
-                productCartList.length === 0
+                productCartList.length === 0,
             })}
             onClick={() => this.onPayHandle()}
           >
@@ -867,7 +872,7 @@ const select = (state: AppReducer.AppState) => ({
   productCartList: getProductCartList(state),
   addSelectMember: getSelectMember(state),
   selectCoupon: getSelectCoupon(state),
-  couponList: getCouponList(state)
+  couponList: getCouponList(state),
 });
 
 export default connect(select)(ProductPay as any);

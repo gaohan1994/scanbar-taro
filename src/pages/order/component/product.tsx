@@ -32,7 +32,7 @@ class OrderProduct extends Taro.Component<Props> {
       <View
         className={classnames(`${cssPrefix}-border`, {
           [`${cssPrefix} `]: true,
-          [`${cssPrefix}-manage`]: true
+          [`${cssPrefix}-manage`]: true,
         })}
       >
         <View
@@ -62,7 +62,7 @@ class OrderProduct extends Taro.Component<Props> {
 
   private renderExtra = () => {
     const { damageList, product, onExtraClick } = this.props;
-    const token = damageList.find(t => t === product.productId);
+    const token = damageList.find((t) => t === product.productId);
     return (
       <View className={`${prefix}-extra`} onClick={() => onExtraClick(product)}>
         {!token ? (
@@ -89,7 +89,7 @@ class OrderProduct extends Taro.Component<Props> {
         <View className={`${cssPrefix}-title`}>{product.productName}</View>
         <View className={`${prefix}-box`}>
           <PriceComponent product={productData as any} numeral={numeral} />
-          <View className={`${prefix}-tip`}>可退x{product.num}</View>
+          <View className={`${prefix}-tip`}>可退x{product.ableRefundNum}</View>
         </View>
       </View>
     );
