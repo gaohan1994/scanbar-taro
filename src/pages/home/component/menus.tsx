@@ -29,12 +29,12 @@ function HomeMenus() {
       subTitle: "Inquiry account",
       url: "/pages/order/order.main"
     },
-    // {
-    //   image: "//net.huanmusic.com/weapp/v2/icon_menu_order.png",
-    //   value: "线上订单",
-    //   subTitle: "Gathering",
-    //   url: "/pages/order/order.online.list"
-    // },
+    {
+      image: "//net.huanmusic.com/weapp/v2/icon_menu_order.png",
+      value: "线上订单",
+      subTitle: "Gathering",
+      url: "/pages/order/order.online.list"
+    },
     {
       image: "//net.huanmusic.com/weapp/icon_menu_more.png",
       value: "退货",
