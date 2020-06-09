@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-22 11:12:09
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-19 09:37:56
+ * @Last Modified time: 2020-06-03 09:38:52
  *
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -393,14 +393,17 @@ class ProductSDK {
       ) {
         return "会员价";
       }
-
+      console.log("product.memberPrice", product.memberPrice);
+      console.log("activityPrice", activityPrice);
       return activityPrice > 0
         ? typeof product.memberPrice === "number"
           ? product.memberPrice < activityPrice
             ? "会员价"
             : "活动价"
           : "会员价"
-        : "活动价";
+        : typeof product.memberPrice === "number"
+        ? "会员价"
+        : "原价";
     }
 
     if (activityPrice !== 0) {
@@ -1241,7 +1244,7 @@ class ProductSDK {
     if (!!activityList && activityList.length > 0) {
       let nextProductList: FilterProductList[] = [];
 
-      if (activityList.length === 1 && !activityList[0].activityDetailVOList) {
+      if (activityList.length === 1 && !activityList[0].activityDetailList) {
         /**
          * @todo [说明是全部满减]
          */
@@ -1253,7 +1256,7 @@ class ProductSDK {
        * @todo [全部满减和非满减只能存在一个]
        */
       activityList.forEach(activity => {
-        if (!!activity.activityDetailVOList) {
+        if (!!activity.activityDetailList) {
           nextProductList.push({
             activity,
             productList: []
@@ -1263,7 +1266,7 @@ class ProductSDK {
 
       nextProductList.push({
         activity:
-          activityList.find(a => !a.activityDetailVOList) ||
+          activityList.find(a => !a.activityDetailList) ||
           ({ name: NonActivityName } as any),
         productList: []
       });
@@ -1280,9 +1283,9 @@ class ProductSDK {
             if (
               !execd &&
               !!nextProductListItem.activity &&
-              !!nextProductListItem.activity.activityDetailVOList
+              !!nextProductListItem.activity.activityDetailList
             ) {
-              const token = nextProductListItem.activity.activityDetailVOList.some(
+              const token = nextProductListItem.activity.activityDetailList.some(
                 activityItem => activityItem.identity === currentProduct.barcode
               );
               if (!!token) {

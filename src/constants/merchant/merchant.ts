@@ -1,7 +1,6 @@
 import { LoginInterface } from "../../common/sdk/sign/login.manager";
 
 export declare namespace MerchantInterface {
-
   interface PointConfig {
     clearDate: string;
     createTime: string;
@@ -11,7 +10,7 @@ export declare namespace MerchantInterface {
     refundObtainPoints: boolean;
     refundUsedPoints: boolean;
   }
-  
+
   interface MerchantDetail {
     address: string;
     contactName: string;
@@ -34,7 +33,7 @@ export declare namespace MerchantInterface {
   }
 
   interface Activity {
-    activityDetailVOList?: Array<{
+    activityDetailList?: Array<{
       giftFlag: boolean;
       identity: string;
       name: string;
@@ -68,7 +67,7 @@ export declare namespace MerchantInterface {
     auditStatus: boolean;
   }
 
-  interface Coupon { 
+  interface Coupon {
     ableToUse: boolean;
     couponId: number;
     couponCode: string;
@@ -132,7 +131,7 @@ export declare namespace MerchantInterface {
       RECEIVE_EXPIRED_COUPON: string;
       RECEIVE_ACTIVITYINFO: string;
     };
-    
+
     merchantInfoAdd: string;
     merchantInfoDetail: string;
     profileInfo: string;
@@ -143,28 +142,28 @@ export declare namespace MerchantInterface {
 
 class MerchantInterfaceMap implements MerchantInterface.MerchantInterfaceMap {
   public reducerInterface = {
-    RECEIVE_MERCHANT_DETAIL: 'RECEIVE_MERCHANT_DETAIL',
-    RECEIVE_PROFILE_INFO: 'RECEIVE_PROFILE_INFO',
-    RECEIVE_USER_INFO: 'RECEIVE_USER_INFO',
-    RECEIVE_MERCHANT_SUB_LIST: 'RECEIVE_MERCHANT_SUB_LIST',
-    RECEIVE_COUPON_LIST: 'RECEIVE_COUPON_LIST',
-    RECEIVE_EXPIRED_COUPON: 'RECEIVE_EXPIRED_COUPON',
-    RECEIVE_SELECT_COUPON: 'RECEIVE_SELECT_COUPON',
-    RECEIVE_ACTIVITYINFO: 'RECEIVE_ACTIVITYINFO',
-    RECEIVE_SEARCH_COUPON: 'RECEIVE_SEARCH_COUPON',
-    RECEIVE_MERCHANT_POINT_CONFIG: 'RECEIVE_MERCHANT_POINT_CONFIG',
+    RECEIVE_MERCHANT_DETAIL: "RECEIVE_MERCHANT_DETAIL",
+    RECEIVE_PROFILE_INFO: "RECEIVE_PROFILE_INFO",
+    RECEIVE_USER_INFO: "RECEIVE_USER_INFO",
+    RECEIVE_MERCHANT_SUB_LIST: "RECEIVE_MERCHANT_SUB_LIST",
+    RECEIVE_COUPON_LIST: "RECEIVE_COUPON_LIST",
+    RECEIVE_EXPIRED_COUPON: "RECEIVE_EXPIRED_COUPON",
+    RECEIVE_SELECT_COUPON: "RECEIVE_SELECT_COUPON",
+    RECEIVE_ACTIVITYINFO: "RECEIVE_ACTIVITYINFO",
+    RECEIVE_SEARCH_COUPON: "RECEIVE_SEARCH_COUPON",
+    RECEIVE_MERCHANT_POINT_CONFIG: "RECEIVE_MERCHANT_POINT_CONFIG"
   };
-  public merchantInfoAdd = '/merchantInfo/add';
-  public merchantInfoDetail = '/merchantInfo/detail';
-  public merchantInfoEdit = '/merchantInfo/edit';
-  public profileInfo = '/system/user/profile/info';
-  public profileEdit = '/system/user/profile/update';
-  public profileResetPwd = '/system/user/profile/resetPwd';
+  public merchantInfoAdd = "/merchantInfo/add";
+  public merchantInfoDetail = "/merchantInfo/detail";
+  public merchantInfoEdit = "/merchantInfo/edit";
+  public profileInfo = "/system/user/profile/info";
+  public profileEdit = "/system/user/profile/update";
+  public profileResetPwd = "/system/user/profile/resetPwd";
 
-  public couponList = '/coupon/list';
-  public couponGetMemberExpiredCoupons = '/coupon/getMemberExpiredCoupons';
-  public couponGetByCode = '/coupon/getByCode';
-  public couponGetAbleToUseCoupon = '/coupon/getAbleToUseCoupon';
+  public couponList = "/coupon/list";
+  public couponGetMemberExpiredCoupons = "/coupon/getMemberExpiredCoupons";
+  public couponGetByCode = "/coupon/getByCode";
+  public couponGetAbleToUseCoupon = "/coupon/getAbleToUseCoupon";
 }
 
 export default new MerchantInterfaceMap();
