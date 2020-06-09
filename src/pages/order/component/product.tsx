@@ -33,7 +33,7 @@ class OrderProduct extends Taro.Component<Props> {
       <View
         className={classnames(`${cssPrefix}-border`, {
           [`${cssPrefix} `]: true,
-          [`${cssPrefix}-manage`]: true
+          [`${cssPrefix}-manage`]: true,
         })}
       >
         <View
@@ -63,7 +63,7 @@ class OrderProduct extends Taro.Component<Props> {
 
   private renderExtra = () => {
     const { damageList, product, onExtraClick } = this.props;
-    const token = damageList.find(t => t === product.productId);
+    const token = damageList.find((t) => t === product.productId);
     return (
       <View className={`${prefix}-extra`} onClick={() => onExtraClick(product)}>
         {!token ? (

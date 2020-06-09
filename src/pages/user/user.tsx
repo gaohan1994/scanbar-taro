@@ -19,18 +19,18 @@ const Rows = [
   {
     title: "我的门店",
     url: "/pages/mine/user.merchant",
-    icon: "//net.huanmusic.com/weapp/icon_mine_shop.png"
+    icon: "//net.huanmusic.com/weapp/icon_mine_shop.png",
   },
   {
     title: "我的设置",
     url: "/pages/mine/user.set",
-    icon: "//net.huanmusic.com/weapp/icon_mine_massage.png"
+    icon: "//net.huanmusic.com/weapp/icon_mine_massage.png",
   },
   {
     title: "关于星亿腾",
     url: "/pages/mine/user.about",
-    icon: "//net.huanmusic.com/weapp/icon_mine_about.png"
-  }
+    icon: "//net.huanmusic.com/weapp/icon_mine_about.png",
+  },
 ];
 
 const cssPrefix = "user";
@@ -44,7 +44,7 @@ interface UserMainState {
 
 class UserMain extends Taro.Component<UserMainProps, UserMainState> {
   state = {
-    userinfo: {} as any
+    userinfo: {} as any,
   };
 
   /**
@@ -55,7 +55,7 @@ class UserMain extends Taro.Component<UserMainProps, UserMainState> {
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
   config: Taro.Config = {
-    navigationBarTitleText: "我的"
+    navigationBarTitleText: "我的",
   };
 
   async componentDidShow() {
@@ -74,13 +74,13 @@ class UserMain extends Taro.Component<UserMainProps, UserMainState> {
 
   public onRowClick = (row: any) => {
     Taro.navigateTo({
-      url: `${row.url}`
+      url: `${row.url}`,
     });
   };
 
   public onNavDetail = () => {
     Taro.navigateTo({
-      url: `/pages/mine/user.detail`
+      url: `/pages/mine/user.detail`,
     });
   };
 
@@ -167,7 +167,7 @@ class UserMain extends Taro.Component<UserMainProps, UserMainState> {
             />
           </View>
           <View className={`${cssPrefix}-rows component-form`}>
-            {Rows.map(row => {
+            {Rows.map((row) => {
               return (
                 <View
                   key={row.title}
@@ -205,7 +205,7 @@ class UserMain extends Taro.Component<UserMainProps, UserMainState> {
 }
 
 const select = (state: AppReducer.AppState) => ({
-  userinfo: getProfileInfo(state)
+  userinfo: getProfileInfo(state),
 });
 
 export default connect(select)(UserMain);

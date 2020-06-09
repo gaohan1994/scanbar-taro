@@ -16,7 +16,7 @@ type Props = {};
 
 class UserAbount extends Taro.Component<Props> {
   config: Config = {
-    navigationBarTitleText: "关于星亿腾"
+    navigationBarTitleText: "关于星亿腾",
   };
 
   render() {

@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-22 11:12:09
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-03 09:38:52
+ * @Last Modified time: 2020-06-09 09:24:06
  *
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -595,8 +595,13 @@ class ProductSDK {
       activity.rule
     );
     if (!!rule && rule.length > 0) {
-      let discountArray = rule.map(item => item.discount);
+      const discountArray = rule.map(item => item.discount);
 
+      const maxDiscount = Math.max(...discountArray);
+      const maxDiscountIndex = rule.findIndex(r => r.discount === maxDiscount);
+      const maxDiscountItem = rule.find(r => r.discount === maxDiscount);
+      console.log("maxDiscountItem", maxDiscountItem);
+      console.log("price", price);
       while (discountArray.length > 0) {
         const maxDiscount = Math.max(...discountArray);
         const maxDiscountIndex = rule.findIndex(
