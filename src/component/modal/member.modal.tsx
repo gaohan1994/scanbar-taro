@@ -44,7 +44,7 @@ class Page extends Taro.Component<Props> {
       const form4: FormRowProps[] = [
         {
           title: "积分",
-          extraText: `${(selectMember as any).accumulativePoints || 0}`
+          extraText: `${(selectMember as any).points || 0}`
         },
         {
           title: "储值余额",

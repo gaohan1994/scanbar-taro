@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-01 10:07:05
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-22 14:22:55
+ * @Last Modified time: 2020-06-10 09:36:25
  */
 import Taro, { Config } from "@tarojs/taro";
 import { View, Image, Text, Input } from "@tarojs/components";
@@ -24,14 +24,14 @@ type State = {
 
 class Login extends Taro.Component<Props, State> {
   config: Taro.Config = {
-    navigationBarTitleText: "登录",
+    navigationBarTitleText: "登录"
     // navigationStyle: 'custom'
   };
 
   readonly state: State = {
     username: "",
     password: "",
-    checked: true,
+    checked: true
   };
 
   /**
@@ -56,10 +56,10 @@ class Login extends Taro.Component<Props, State> {
    * @memberof Login
    */
   public changeChecked = () => {
-    this.setState((preState) => {
+    this.setState(preState => {
       return {
         ...preState,
-        checked: !preState.checked,
+        checked: !preState.checked
       };
     });
   };
@@ -73,26 +73,26 @@ class Login extends Taro.Component<Props, State> {
       invariant(!!checked, "请先勾选用户协议");
       const result = await LoginManager.login({
         phoneNumber: username,
-        password: password,
+        password: password
       });
       invariant(result.success, result.msg || "登录失败");
       // Taro.navigateTo({ url: '/pages/home/home' });
       // Taro.navigateBack();
       Taro.switchTab({
-        url: `/pages/home/home`,
+        url: `/pages/home/home`
       });
     } catch (error) {
       Taro.showToast({
         title: error.message,
-        icon: "none",
+        icon: "none"
       });
     }
   };
   public onChangeValue = (key: string, value: string) => {
-    this.setState((prevState) => {
+    this.setState(prevState => {
       return {
         ...prevState,
-        [key]: value,
+        [key]: value
       };
     });
     return value;
@@ -103,7 +103,7 @@ class Login extends Taro.Component<Props, State> {
     return (
       <View className={classnames(["container", "sign"])}>
         <View className="sign-card">
-          <View className="sign-card-title">欢迎使用星亿腾零售</View>
+          <View className="sign-card-title" />
           <View className="sign-card-input">
             <View className={`${cssPrefix}-input-box`}>
               <Image
@@ -159,7 +159,7 @@ class Login extends Taro.Component<Props, State> {
                 onClick={this.changeChecked}
                 className={classnames([
                   "sign-card-check-icon",
-                  "sign-card-check-uncheck",
+                  "sign-card-check-uncheck"
                 ])}
               />
             )}
@@ -182,7 +182,7 @@ class Login extends Taro.Component<Props, State> {
               className="sign-bar-active"
               onClick={() =>
                 Taro.navigateTo({
-                  url: `/pages/sign/register`,
+                  url: `/pages/sign/register`
                 })
               }
             >

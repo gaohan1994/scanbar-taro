@@ -31,13 +31,13 @@ class App extends Component {
        */
       "pages/home/home",
       "pages/report/report",
-      "pages/user/user",
+      "pages/user/user"
     ],
     navigateToMiniProgramAppIdList: ["wxba027d099f6ec41b"],
     subPackages: [
       {
         root: "pages/share",
-        pages: ["share", "share.product"],
+        pages: ["share", "share.product"]
       },
       {
         root: "pages/mine",
@@ -51,8 +51,8 @@ class App extends Component {
           "user.merchant.owner",
           "user.merchant.phone",
           "user.detail.phone",
-          "user.password",
-        ],
+          "user.password"
+        ]
       },
       {
         /**
@@ -67,8 +67,8 @@ class App extends Component {
           "inventory.stock",
           "inventory.stock.detail",
           "inventory.stock.pay",
-          "inventory.stock.list",
-        ],
+          "inventory.stock.list"
+        ]
       },
       {
         /**
@@ -85,12 +85,12 @@ class App extends Component {
           "order.refund",
           "order.refund.confirm",
           "order.online",
-          "order.online.list",
-        ],
+          "order.online.list"
+        ]
       },
       {
         root: "pages/pay",
-        pages: ["pay.input", "pay.receive", "pay.result", "pay.coupon"],
+        pages: ["pay.input", "pay.receive", "pay.result", "pay.coupon"]
       },
       {
         /**
@@ -102,7 +102,7 @@ class App extends Component {
          * ```
          */
         root: "pages/member",
-        pages: ["member", "member.add", "member.detail", "member.edit"],
+        pages: ["member", "member.add", "member.detail", "member.edit"]
       },
       {
         root: "pages/sign",
@@ -129,15 +129,15 @@ class App extends Component {
           "product.add",
           "product.suspension",
           "product.refund",
-          "product.refund.pay",
-        ],
-      },
+          "product.refund.pay"
+        ]
+      }
     ],
     window: {
       backgroundTextStyle: "light",
       navigationBarBackgroundColor: "#2a86fc",
       navigationBarTitleText: "WeChat",
-      navigationBarTextStyle: "white",
+      navigationBarTextStyle: "white"
     },
     tabBar: {
       color: "#ACACAC",
@@ -149,22 +149,22 @@ class App extends Component {
           pagePath: "pages/home/home",
           iconPath: "./assets/tab-bar/icon_nav_home.png",
           selectedIconPath: "./assets/tab-bar/icon_nav_home_xuan.png",
-          text: "首页",
+          text: "首页"
         },
         {
           pagePath: "pages/report/report",
           iconPath: "./assets/tab-bar/icon_reportforms.png",
           selectedIconPath: "./assets/tab-bar/icon_reportforms_xuan.png",
-          text: "数据",
+          text: "数据"
         },
         {
           pagePath: "pages/user/user",
           iconPath: "./assets/tab-bar/icon_mine.png",
           selectedIconPath: "./assets/tab-bar/icon_mine_xuan.png",
-          text: "我的",
-        },
-      ],
-    },
+          text: "我的"
+        }
+      ]
+    }
   };
 
   /**

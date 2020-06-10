@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-01 15:43:06
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-22 14:26:44
+ * @Last Modified time: 2020-06-10 15:14:34
  */
 import Taro from "@tarojs/taro";
 import { View, Image, Text, ScrollView } from "@tarojs/components";
@@ -33,7 +33,6 @@ const cssPrefix: string = "member";
 interface MemberMainProps {
   memberDetail: MemberInterface.MemberInfo;
   memberPerference: MemberInterface.MemberPerference[];
-  memberOrderInfo: MemberInterface.MemberOrderInfo;
 }
 
 class MemberMain extends Taro.Component<MemberMainProps> {
@@ -84,7 +83,6 @@ class MemberMain extends Taro.Component<MemberMainProps> {
       }
     }
     MemberAction.memberPreference({ id: Number(id) });
-    MemberAction.memberOrderInfo({ id: Number(id) });
   };
 
   public renderCouponeModal = () => {
@@ -120,11 +118,11 @@ class MemberMain extends Taro.Component<MemberMainProps> {
   };
 
   render() {
-    const { memberDetail, memberPerference, memberOrderInfo } = this.props;
+    const { memberDetail } = this.props;
     const form1: FormRowProps[] = [
       {
         title: "上次消费时间",
-        extraText: memberDetail.createTime
+        extraText: `${memberDetail.lastPayTime || "暂无消费记录"}`
       }
     ];
     const form4: FormRowProps[] = [
@@ -212,14 +210,13 @@ class MemberMain extends Taro.Component<MemberMainProps> {
                 <View className="home-buttons member-buttons">
                   <View className="member-buttons-button home-buttons-button-border">
                     <View className="title-text">
-                      ￥{" "}
-                      {numeral(memberOrderInfo.totalAmount || 0).format("0.00")}
+                      ￥ {numeral(memberDetail.totalAmount || 0).format("0.00")}
                     </View>
                     <View className="small-text">累计消费</View>
                   </View>
                   <View className="member-buttons-button">
                     <View className="title-text">
-                      {numeral(memberOrderInfo.totalTimes || 0).value()}
+                      {numeral(memberDetail.totalTimes || 0).value()}
                     </View>
                     <View className="small-text">购买次数</View>
                   </View>
@@ -283,8 +280,7 @@ class MemberMain extends Taro.Component<MemberMainProps> {
 
 const mapState = (state: AppReducer.AppState) => ({
   memberDetail: getMemberDetail(state),
-  memberPerference: getMemberPerference(state),
-  memberOrderInfo: getMemberOrderInfo(state)
+  memberPerference: getMemberPerference(state)
 });
 
 export default connect(mapState)(MemberMain);

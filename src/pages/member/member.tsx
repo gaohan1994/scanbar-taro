@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-01 15:43:06
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-18 16:28:08
+ * @Last Modified time: 2020-06-10 15:49:13
  */
 import Taro from "@tarojs/taro";
 import { View, ScrollView, Input, Image, Text } from "@tarojs/components";
@@ -489,6 +489,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
               <AtActivityIndicator mode="center" />
             </View>
           )}
+          <View style="width: 100%; height: 50px" />
         </ScrollView>
       </View>
     );

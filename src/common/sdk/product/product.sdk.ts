@@ -707,7 +707,7 @@ class ProductSDK {
       };
     }
 
-    const { accumulativePoints } = this.member;
+    const { points } = this.member;
     const productList =
       products !== undefined
         ? products
@@ -738,8 +738,7 @@ class ProductSDK {
      * @param {deductRate} 转换比例
      * @param {pointPrice} 实际可抵扣的积分数量
      */
-    const memberAccumulativePrice =
-      Math.ceil(accumulativePoints) * pointConfig.deductRate;
+    const memberAccumulativePrice = Math.ceil(points) * pointConfig.deductRate;
     return {
       deductRate: pointConfig.deductRate,
       pointPrice: Math.min(memberAccumulativePrice, total)

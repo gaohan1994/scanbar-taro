@@ -293,7 +293,10 @@ class OrderDetail extends Taro.Component<Props, State> {
           </View>
         )}
 
-        <OrderRefundComponent orderDetail={orderDetail} />
+        <OrderRefundComponent
+          orderDetail={orderDetail}
+          sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER}
+        />
 
         <View style="width: 100%; height: 100px; background: #f2f2f2;" />
         {orderDetail.orderDetailList &&

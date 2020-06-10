@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-20 13:37:23
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-22 17:06:13
+ * @Last Modified time: 2020-06-10 15:41:20
  */
 import Taro, { Config } from "@tarojs/taro";
 import { View, Image, Picker, Text } from "@tarojs/components";
@@ -178,6 +178,15 @@ class ProductAdd extends Taro.Component<Props, State> {
           return;
         }
 
+        if (result.code === "product.not.exist") {
+          Taro.showModal({
+            title: "提示",
+            content: "请扫码正确的商品码",
+            showCancel: false
+          });
+          return;
+        }
+
         if ((barcode.result as string).startsWith("http")) {
           // 如果扫码出http说明不是商品码
           Taro.hideLoading();
@@ -219,8 +228,14 @@ class ProductAdd extends Taro.Component<Props, State> {
           });
           Taro.hideLoading();
           return;
+        } else {
+          Taro.showModal({
+            title: "提示",
+            content: "请扫码正确的商品码",
+            showCancel: false
+          });
+          return;
         }
-        throw new Error(thirdResult.msg || "没有找到该商品");
       });
     } catch (error) {
       Taro.hideLoading();
@@ -539,6 +554,7 @@ class ProductAdd extends Taro.Component<Props, State> {
           }
         ],
         isInput: true,
+        inputPlaceHolder: "输入或自动生成",
         inputValue: barcode,
         inputOnChange: value => this.onChangeValue("barcode", value)
       },

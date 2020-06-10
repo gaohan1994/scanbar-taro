@@ -357,10 +357,10 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     const { changeSellNum, changePrice } = this.state;
 
     if (changeSellNum === "" || numeral(changeSellNum).value() <= 0) {
-      // Taro.showToast({
-      //   title: '请填写商品数量',
-      //   icon: 'none'
-      // });
+      Taro.showToast({
+        title: "不可为0",
+        icon: "none"
+      });
       return;
     }
     if (changePrice === "" || numeral(changePrice).value() <= 0) {

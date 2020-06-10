@@ -100,11 +100,6 @@ class PayResult extends Taro.Component<Props, State> {
               className={`${cssPrefix}-result-container-image`}
             />
             <View className={`${cssPrefix}-result-container-title`}>
-              {payDetail &&
-              payDetail.transPayload &&
-              payDetail.transPayload.flag
-                ? "现金"
-                : "微信"}
               收款成功
             </View>
             <View
