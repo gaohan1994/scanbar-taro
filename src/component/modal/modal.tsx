@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-04 13:49:58
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-05-18 11:14:02
+ * @Last Modified time: 2020-07-10 12:25:30
  *
  * @Usage
  * ```jsx
@@ -157,7 +157,6 @@ class Modal extends Taro.Component<Props, State> {
                           type={item.type}
                           disabled={item.disabled}
                           placeholder={item.placeholder}
-                          focus={item.focus}
                           className={classnames(
                             `${ModalCssPrefix}-content-item-input`,
                             {

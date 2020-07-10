@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-05 15:10:38
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-04-08 14:23:17
+ * @Last Modified time: 2020-07-10 12:26:53
  *
  * @todo [购物车组件]
  */
@@ -106,7 +106,9 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
         : `${nextProps.changeProduct.price}` || "";
       this.setState({
         changePrice: nextChangePrice,
-        changeSellNum: `${nextProps.changeProduct.sellNum || ""}`
+        changeSellNum: `${(nextProps.changeProduct &&
+          nextProps.changeProduct.sellNum) ||
+          ""}`
       });
     }
   }
@@ -812,7 +814,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
         inputs = [
           {
             title: `盘点数量（${unit})`,
-            value: changeSellNum,
+            value: `${changeSellNum}`,
             type: "digit",
             onInput: ({ detail: { value } }) =>
               this.onChangeValue("changeSellNum", value),
@@ -832,14 +834,10 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                   : "重量"
                 : "数量"
             }`,
-            value: changeSellNum,
+            value: `${changeSellNum}`,
             placeholder: "请输入数量",
             // type: "digit",
-            type: `${
-              !!changeProduct && changeProduct.saleType === 0
-                ? "number"
-                : "digit"
-            }` as any,
+            type: "digit" as any,
             endfix: changeProduct && changeProduct.unit,
             onInput: ({ detail: { value } }) =>
               this.onChangeValue("changeSellNum", value)

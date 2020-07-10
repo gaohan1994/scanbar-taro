@@ -37,6 +37,7 @@ import MemberModal from "../../component/modal/member.modal";
 import merchantService from "../../constants/merchant/merchant.service";
 import memberAction from "../../actions/member.action";
 import { checkNumberInput } from "../../common/util/common";
+import FormRow from "../../component/card/form.row";
 
 const cssPrefix = "product";
 
@@ -646,7 +647,7 @@ class ProductPay extends Taro.Component<Props, State> {
         onClose={() => this.changeModalVisible("eraseModal", false)}
         isOpened={eraseModal}
         buttons={eraseButtons}
-        header="整单优惠"
+        header="改价优惠"
         tip={`当前金额：￥${this.setNumber(receivePrice)}`}
         inputs={eraseInputs}
       />
@@ -728,8 +729,7 @@ class ProductPay extends Taro.Component<Props, State> {
     if (eraseValue !== "") {
       formCard.push({
         onClick: () => {},
-        arrow: undefined,
-        title: "整单优惠",
+        title: "改价优惠",
         extraText: `${
           eraseValue !== "" ? `- ￥${this.setNumber(eraseValue)}` : "￥0.00"
         }`,
@@ -737,30 +737,32 @@ class ProductPay extends Taro.Component<Props, State> {
       });
     }
 
-    formCard.push({
-      title: "优惠券",
-      extraText: `${
-        !!selectCoupon && selectCoupon.id
-          ? `-￥${numeral(
-              selectCoupon.couponVO && selectCoupon.couponVO.discount
-            ).format("0.00")}`
-          : ""
-      }`,
-      extraTextStyle: "price",
-      isCoupon: true,
-      coupons: couponList,
-      arrow: "right",
-      onClick: () => {
-        Taro.navigateTo({
-          url: `/pages/pay/pay.coupon?entry=product.pay${
-            !!selectMember ? `&phone=${selectMember.phoneNumber}` : ""
-          }${!!selectCoupon ? `&selectId=${selectCoupon.id}` : ""}`
-        });
+    const tickerForm: any[] = [
+      {
+        title: "优惠券",
+        extraText: `${
+          !!selectCoupon && selectCoupon.id
+            ? `-￥${numeral(
+                selectCoupon.couponVO && selectCoupon.couponVO.discount
+              ).format("0.00")}`
+            : ""
+        }`,
+        arrow: "right",
+        extraTextStyle: "price",
+        isCoupon: true,
+        coupons: couponList,
+        onClick: () => {
+          Taro.navigateTo({
+            url: `/pages/pay/pay.coupon?entry=product.pay${
+              !!selectMember ? `&phone=${selectMember.phoneNumber}` : ""
+            }${!!selectCoupon ? `&selectId=${selectCoupon.id}` : ""}`
+          });
+        }
       }
-    });
+    ];
     // console.log("totalActivityMoney", totalActivityMoney);
     if (totalActivityMoney !== 0) {
-      formCard.push({
+      tickerForm.push({
         title: "满减优惠",
         extraText: `${
           !!totalActivityMoney
@@ -771,25 +773,22 @@ class ProductPay extends Taro.Component<Props, State> {
       });
     }
 
-    formCard.map((item, index) => {
-      if (index !== formCard.length - 1) {
-        return {
-          ...item,
-          hasBorder: true
-        };
-      }
-      return {
-        ...item,
-        hasBorder: false
-      };
-    });
-
     const point: any = productSdk.getPointPrice();
 
     return (
       <View className={`${cssPrefix}-pay-pos`}>
         <FormCard items={priceForm} />
-        <FormCard items={formCard}>
+        <View
+          className={classnames("component-form", {
+            // 'component-form-shadow': shadow
+          })}
+        >
+          {formCard.map((item, index) => {
+            return <FormRow key={`${index}`} {...item} />;
+          })}
+          {tickerForm.map((item, index) => {
+            return <FormRow key={`${index}`} {...item} />;
+          })}
           {selectMember && !!point.pointPrice && (
             <View
               className={`${cssPrefix}-row ${cssPrefix}-content-item ${cssPrefix}-pay-item`}
@@ -821,7 +820,8 @@ class ProductPay extends Taro.Component<Props, State> {
               </View>
             </View>
           )}
-        </FormCard>
+        </View>
+        {/* <FormCard items={formCard}></FormCard> */}
       </View>
     );
   };
