@@ -151,7 +151,7 @@ class MemberMain extends Taro.Component<MemberMainProps> {
       },
       {
         title: "性别",
-        extraText: memberDetail.sex === "0" ? "先生" : "女士"
+        extraText: memberDetail.sex === "0" ? "先生" : memberDetail.sex === "1" ? "女士" : "未知"
       },
       {
         title: "生日",

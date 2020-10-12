@@ -27,6 +27,7 @@ import { ResponseCode } from "../../constants/index";
 import { store } from "../../app";
 import { connect } from "@tarojs/redux";
 import { getMemberLevel } from "../../reducers/app.member";
+import member from "src/constants/member/member";
 
 const cssPrefix: string = "member";
 
@@ -36,7 +37,7 @@ export interface Props {
 }
 
 interface State {
-  sex: "male" | "female"; // 会员性别
+  sex: "0" | "1" | undefined; // 会员性别 男士 女士 未知
   cardNo: string; // 会员卡号
   phone: string; // 会员手机号
   name: string; // 会员姓名
@@ -48,7 +49,7 @@ interface State {
 
 class MemberMain extends Taro.Component<Props, State> {
   readonly state: State = {
-    sex: "male",
+    sex: undefined,
     cardNo: "",
     phone: "",
     name: "",
@@ -108,16 +109,11 @@ class MemberMain extends Taro.Component<Props, State> {
    * @todo [如果外部传入性别则改为外部传入的性别否则切换性别]
    * @memberof MemberMain
    */
-  public onChangSex = (sex?: "male" | "female") => {
-    this.setState(prevState => {
+  public onChangSex = (sex: "0" | "1" | undefined ) => {
+    this.setState((prevState: State) => {
       return {
         ...prevState,
-        sex:
-          typeof sex === "string"
-            ? sex
-            : prevState.sex === "male"
-            ? "female"
-            : "male"
+        sex
       };
     });
   };
@@ -222,7 +218,8 @@ class MemberMain extends Taro.Component<Props, State> {
         ...result,
         birthDate: this.state.birthday || null,
         merchantId: 1,
-        sex: this.state.sex === "male" ? 0 : 1,
+        sex: this.state.sex,
+        // sex: this.state.sex === "male" ? 0 : 1,
         status: this.state.memberStatus === true ? 0 : 1,
         levelId: memberLevel[levelValue] && memberLevel[levelValue].id
       };
@@ -252,14 +249,28 @@ class MemberMain extends Taro.Component<Props, State> {
         }
       }
 
+      // Taro.showToast({
+      //   title: "添加会员成功",
+      //   icon: "success",
+      //   mask: true,
+      //   success: () => {
+      //     Taro.navigateBack();
+      //   }
+      // });
+
       Taro.showToast({
         title: "添加会员成功",
         icon: "success",
-        mask: true,
-        success: () => {
-          Taro.navigateBack();
-        }
+        duration: 1500
       });
+
+      setTimeout(() => {
+        const pages = Taro.getCurrentPages()
+        const memberPage: Taro.Page = pages[pages.length - 2]
+        memberPage.$component.onTabClick('create_time', 'desc')
+        Taro.navigateBack({});
+      }, 1500);
+      
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -305,13 +316,13 @@ class MemberMain extends Taro.Component<Props, State> {
         buttons: [
           {
             title: "先生",
-            type: this.state.sex === "male" ? "confirm" : "cancel",
-            onPress: () => this.onChangSex("male")
+            type: this.state.sex === "0" ? "confirm" : "cancel",
+            onPress: () => this.onChangSex("0")
           },
           {
             title: "女士",
-            type: this.state.sex !== "male" ? "confirm" : "cancel",
-            onPress: () => this.onChangSex("female")
+            type: this.state.sex === "1" ? "confirm" : "cancel",
+            onPress: () => this.onChangSex("1")
           }
         ]
       }

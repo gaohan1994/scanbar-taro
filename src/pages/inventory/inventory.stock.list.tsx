@@ -13,11 +13,13 @@ import invariant from "invariant";
 import "../style/product.less";
 import "../style/member.less";
 import "../style/inventory.less";
+import "../../component/card/form.card.less";
 import HeaderInput from "../../component/header/header.input";
 import InventoryItem from "../../component/inventory/inventoy.item";
 import ModalLayout from "../../component/layout/modal.layout";
 import dayJs from "dayjs";
 import productSdk from "../../common/sdk/product/product.sdk";
+import classnames from 'classnames'
 
 const cssPrefix = "product";
 let pageNum: number = 1;
@@ -37,6 +39,7 @@ type State = {
   visible: boolean;
   dateMin: string;
   dateMax: string;
+  selectResult: number[];
 };
 
 class InventoryMerchantList extends Taro.Component<Props, State> {
@@ -45,7 +48,8 @@ class InventoryMerchantList extends Taro.Component<Props, State> {
     loading: false,
     visible: false,
     dateMin: dayJs().format("YYYY-MM-DD"),
-    dateMax: dayJs().format("YYYY-MM-DD")
+    dateMax: dayJs().format("YYYY-MM-DD"),
+    selectResult: []
   };
 
   config: Config = {
@@ -90,7 +94,7 @@ class InventoryMerchantList extends Taro.Component<Props, State> {
 
   public fetchData = async (page?: number) => {
     try {
-      const { searchValue, dateMin, dateMax } = this.state;
+      const { searchValue, dateMin, dateMax, selectResult } = this.state;
       const payload: InventoryInterface.InventoryStockListFetchField = {
         pageNum: typeof page === "number" ? page : pageNum,
         pageSize: 20
@@ -110,10 +114,15 @@ class InventoryMerchantList extends Taro.Component<Props, State> {
           payload.endTime = `${dateMax} 00:00:00`;
         }
       }
+
+      if (selectResult.length === 1) {
+        payload.result = selectResult[0];
+      }
+
       const result = await InventoryAction.merchantStockList(payload);
       invariant(result.code === ResponseCode.success, result.msg || " ");
       if (typeof page === "number") {
-        pageNum = page;
+        pageNum = page + 1;
       } else {
         pageNum += 1;
       }
@@ -218,8 +227,35 @@ class InventoryMerchantList extends Taro.Component<Props, State> {
     return <View>kong</View>;
   };
 
+  private changeSelectResult = (status: number) => {    
+    const newData:number[] = [...this.state.selectResult]
+    const index = newData.findIndex((v) => status === v)
+    if(index === -1){
+      newData.push(status)
+    }else{
+      newData.splice(index, 1)
+    }
+    this.setState({ selectResult: newData})
+  }
+
+  private changeSelectResultAll = () => {    
+    this.setState((prev: State) => {
+      if(prev.selectResult.length > 0) {
+        return {
+          ...prev,
+          selectResult: []
+        }
+      }
+      return {
+        ...prev,
+        selectResult: [0, 1]
+      }
+    })
+    
+  }
+
   private renderModal = () => {
-    const { visible, dateMin, dateMax } = this.state;
+    const { visible, dateMin, dateMax, selectResult } = this.state;
 
     return (
       <ModalLayout
@@ -239,7 +275,8 @@ class InventoryMerchantList extends Taro.Component<Props, State> {
         ]}
       >
         <View className={`inventory-select`}>
-          <View className={`inventory-select-item inventory-select-item-nobor`}>
+          {/* <View className={`inventory-select-item inventory-select-item-nobor`}> */}
+          <View className={`inventory-select-item inventory-select-item-border`}>
             <View className={`inventory-select-title`}>日期</View>
             <View className={"inventory-select-item-time"}>
               <Picker
@@ -261,6 +298,43 @@ class InventoryMerchantList extends Taro.Component<Props, State> {
                   {dateMax}
                 </View>
               </Picker>
+            </View>
+          </View>
+
+          <View className={`inventory-select-item inventory-select-item-border`}>
+            <View className={`inventory-select-title`}>盘点结果</View>
+            <View className={`${cssPrefix}-select-content-item-buttons`}>
+              <View
+                onClick={() => this.changeSelectResultAll()}
+                className={classnames("component-form-button", {
+                  [`${cssPrefix}-select-content-button`]: true,
+                  "component-form-button-confirm":
+                    selectResult.length === 2,
+                  "component-form-button-cancel": selectResult.length !== 2
+                })}
+              >
+                全部
+              </View>
+              {[0, 1].map((item) => {
+                return (
+                  <View
+                    key={item}
+                    onClick={() => this.changeSelectResult(item)}
+                    className={classnames("component-form-button", {
+                      [`${cssPrefix}-select-content-button`]: true,
+                      "component-form-button-confirm": selectResult.some(
+                        t => t === item
+                      ),
+                      "component-form-button-cancel": !selectResult.some(
+                        t => t === item
+                      )
+                    })}
+                  >
+                    {item === 0 ? '盘盈' : '盘亏'}
+                  </View>
+                );
+              })}
+
             </View>
           </View>
         </View>

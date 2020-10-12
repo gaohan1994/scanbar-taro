@@ -168,6 +168,7 @@ export declare namespace OrderInterface {
     transType?: number;
     startTime?: string;
     endTime?: string;
+    identity?: string
   }
 
   interface OrderDetailFetchField {

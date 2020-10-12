@@ -143,8 +143,20 @@ class OrderDetail extends Taro.Component<Props, State> {
 
     const Form: FormRowProps[] = [
       {
-        title: "订单号",
-        extraText: `${orderDetail.order && orderDetail.order.orderNo}`
+        title: "订单号码",
+        extraText: `${orderDetail.order && orderDetail.order.orderNo}`,
+        // extraThumb: '//net.huanmusic.com/weapp/icon_copy2.png',
+        // extraThumbStyle:{
+        //   width: 9,
+        //   height: 9
+        // },
+        onClick: () => {
+          Taro.setClipboardData({ data: orderDetail.order && orderDetail.order.orderNo }).then(() => {
+            Taro.showToast({
+              title: "复制成功"
+            });
+          });
+        }
       },
       {
         title: "下单时间",

@@ -51,6 +51,7 @@ export interface FormRowProps {
   maxInput?: boolean; // 右侧450px input
   isCoupon?: boolean;
   coupons?: MerchantInterface.Coupon[];
+  extraThumbStyle?: object; // 右边图片的样式
 }
 
 interface FormRowState {}
@@ -83,6 +84,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
     inputPlaceHolder: "",
     extraTextColor: undefined,
     extraTextSize: undefined,
+    extraThumbStyle: {},
     inputType: "text",
     inputOnChange: () => {
       /** */
@@ -116,6 +118,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
       extraTextColor,
       inputCursorSpacing,
       extraTextSize,
+      extraThumbStyle,
       isCoupon,
       coupons,
       children
@@ -182,7 +185,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
                   [`${prefix}-coupon-normal`]: coupons && coupons.length === 0
                 })}
               >
-                {coupons && coupons.length > 0
+                {coupons && coupons.length > 0 && couponNumber > 0 
                   ? `${couponNumber}张可用`
                   : "无可用优惠券"}
               </View>
@@ -245,7 +248,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
             {children}
 
             {extraThumb && (
-              <View className="item-extra__image" onClick={extraThumbClick}>
+              <View className="item-extra__image" onClick={extraThumbClick} style={extraThumbStyle}>
                 <Image
                   className="item-extra__image-info"
                   mode="aspectFit"

@@ -82,11 +82,18 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
     });
   };
 
-  public onTabClick = (type: MemberQuery) => {
+  public onTabClick = (type: MemberQuery, sort?: MemberSelect) => {
     const { memberQuery } = this.state;
+
     if (memberQuery === type) {
       this.setState(
         prevState => {
+          if(sort) {
+            return {
+              ...prevState,
+              memberSelect: sort
+            }
+          }
           return {
             ...prevState,
             memberSelect: prevState.memberSelect === "desc" ? "asc" : "desc"
@@ -188,7 +195,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
        * @todo [请求结束之后如果外部传入的page那么赋值给全局，如果没传那么默认+1]
        */
       if (typeof page === "number") {
-        pageNum = page;
+        pageNum = page + 1;
       } else {
         pageNum += 1;
       }
@@ -243,7 +250,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
       const result = await MemberAction.memberSearch(params);
       invariant(result.success === true, result.result || "服务器开了个小差");
       if (typeof page === "number") {
-        pageNum = page;
+        pageNum = page + 1;
       } else {
         pageNum += 1;
       }

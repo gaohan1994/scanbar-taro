@@ -113,7 +113,8 @@ class OrderOnlineList extends Taro.Component<Props> {
 
       if (!!value) {
         // 加入搜索
-        payload.orderNo = value;
+        payload.identity = value;
+        
       }
       
       if (selectType.length > 0) {
@@ -124,7 +125,7 @@ class OrderOnlineList extends Taro.Component<Props> {
       this.setState({loading: false});
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       if (typeof page === 'number') {
-        pageNum = page;
+        pageNum = page + 1;
       } else {
         pageNum += 1;
       }

@@ -59,6 +59,7 @@ export declare namespace InventoryInterface {
     status?: number;
     supplierId?: string;
     type?: number;
+    result?: number;
   }
 
   namespace Interfaces {

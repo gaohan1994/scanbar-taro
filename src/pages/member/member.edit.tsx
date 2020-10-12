@@ -21,6 +21,7 @@ import { getMemberDetail, getMemberLevel } from "../../reducers/app.member";
 import { connect } from "@tarojs/redux";
 import { Props as AddProps } from "./member.add";
 import { ResponseCode } from "../../constants/index";
+// import debounce from 'lodash.debounce'
 
 const cssPrefix: string = "member";
 
@@ -29,7 +30,7 @@ interface Props extends AddProps {
 }
 
 interface State {
-  sex: "male" | "female"; // 会员性别
+  sex: "0" | "1" | string | undefined; // 会员性别
   phone: string; // 会员手机号
   name: string; // 会员姓名
   birthday: string; // 会员生日
@@ -39,9 +40,19 @@ interface State {
   levelValue: number;
 }
 
+function debounce(fn,delay){
+  var handle;
+  return function(){
+    clearTimeout(handle) 
+    handle=setTimeout(function(){
+      fn()
+    },delay)
+  }
+}
+
 class MemberMain extends Taro.Component<Props, State> {
   readonly state: State = {
-    sex: "male",
+    sex: "0",
     phone: "",
     name: "",
     birthday: "1990-01-01",
@@ -81,7 +92,7 @@ class MemberMain extends Taro.Component<Props, State> {
       const memberInfo: MemberInterface.MemberInfo = result;
       this.setState(
         {
-          sex: memberInfo.sex === "1" ? "male" : "female",
+          sex: memberInfo.sex || undefined,
           phone: memberInfo.phoneNumber,
           name: memberInfo.username,
           birthday: memberInfo.birthDate || "",
@@ -113,16 +124,11 @@ class MemberMain extends Taro.Component<Props, State> {
    * @todo [如果外部传入性别则改为外部传入的性别否则切换性别]
    * @memberof MemberMain
    */
-  public onChangSex = (sex?: "male" | "female") => {
-    this.setState(prevState => {
+  public onChangSex = (sex: "0" | "1" | undefined) => {
+    this.setState((prevState: State) => {
       return {
         ...prevState,
-        sex:
-          typeof sex === "string"
-            ? sex
-            : prevState.sex === "male"
-            ? "female"
-            : "male"
+        sex
       };
     });
   };
@@ -218,7 +224,7 @@ class MemberMain extends Taro.Component<Props, State> {
       const params: MemberInterface.MemberInfoEditParams = {
         ...result,
         merchantId: memberDetail.merchantId,
-        sex: this.state.sex === "male" ? "1" : "0",
+        sex: this.state.sex,
         status: this.state.memberStatus === true ? 0 : 1,
         birthDate: this.state.birthday,
         cardNo: memberDetail.cardNo,
@@ -235,6 +241,10 @@ class MemberMain extends Taro.Component<Props, State> {
       });
 
       setTimeout(() => {
+        const { id } = this.$router.params;
+        const pages = Taro.getCurrentPages()
+        const memberPage: Taro.Page = pages[pages.length - 2]
+        memberPage.$component.fetchMemberDetail(id)
         Taro.navigateBack({});
       }, 1500);
     } catch (error) {
@@ -278,13 +288,13 @@ class MemberMain extends Taro.Component<Props, State> {
         buttons: [
           {
             title: "先生",
-            type: this.state.sex === "male" ? "confirm" : "cancel",
-            onPress: () => this.onChangSex("male")
+            type: this.state.sex === "0" ? "confirm" : "cancel",
+            onPress: () => this.onChangSex("0")
           },
           {
             title: "女士",
-            type: this.state.sex !== "male" ? "confirm" : "cancel",
-            onPress: () => this.onChangSex("female")
+            type: this.state.sex === "1" ? "confirm" : "cancel",
+            onPress: () => this.onChangSex("1")
           }
         ]
       },
@@ -345,7 +355,7 @@ class MemberMain extends Taro.Component<Props, State> {
             </Picker>
           </View>
           <View className={`${cssPrefix}-edit`}>
-            <AtButton className="theme-button " onClick={this.onSaveMember}>
+            <AtButton className="theme-button " onClick={debounce(this.onSaveMember, 300)}>
               保存
             </AtButton>
           </View>

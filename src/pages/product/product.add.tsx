@@ -106,7 +106,12 @@ class ProductAdd extends Taro.Component<Props, State> {
           typeResult.msg || ResponseCode.error
         );
       }
-
+      
+      const index = productType.findIndex((item) => item.name === '默认分类')
+      this.setState({
+        typeValue: index
+      })
+      
       if (productSupplier.length === 0) {
         const supplierResult = await ProductAction.productInfoSupplier();
         invariant(

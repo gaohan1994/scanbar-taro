@@ -184,7 +184,7 @@ class InventoryList extends Taro.Component<Props, State> {
       Taro.hideLoading();
       invariant(result.code === ResponseCode.success, result.msg || " ");
       if (typeof page === "number") {
-        pageNum = page;
+        pageNum = page + 1;
       } else {
         pageNum += 1;
       }
@@ -240,7 +240,7 @@ class InventoryList extends Taro.Component<Props, State> {
         <ScrollView
           scrollY={true}
           className={`inventory-list`}
-          onScrollToLower={() => {
+          onScrollToLower={() => {            
             if (hasMore) {
               this.fetchData();
             }

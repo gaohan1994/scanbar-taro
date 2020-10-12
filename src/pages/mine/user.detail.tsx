@@ -16,6 +16,9 @@ import { getMerchantDetail, getProfileInfo } from "../../reducers/app.merchant";
 import { connect } from "@tarojs/redux";
 import { MerchantInterface } from "../../constants";
 import merchantAction from "../../actions/merchant.action";
+import getBaseUrl from "../../common/request/base.url";
+import { LoginManager } from "../../common/sdk";
+import { ResponseCode } from "../../constants/index";
 
 const cssPrefix = "user";
 
@@ -56,6 +59,42 @@ class UserMerchant extends Taro.Component<Props, State> {
     }
   };
 
+
+  private uploadAvatarHandle =async () => {
+    try{
+      const chooseImageResult = await Taro.chooseImage({
+        // type: string = "album"
+        // sizeType: ["compressed"],
+        // sourceType: [type],
+        // count: 1,
+      })
+
+      const { result } = LoginManager.getUserToken();
+      const tempFilePaths = chooseImageResult.tempFilePaths
+      console.log(tempFilePaths);
+      
+      const uploadResult = await Taro.uploadFile({
+        url: `${getBaseUrl("")}/profile/uploadAvatar`,
+        filePath: tempFilePaths[0],
+        name: 'avatarfile',
+        header: { Authorization: result }          
+      })
+      const data = JSON.parse(uploadResult.data)
+      console.log(data);
+      if (data.code === ResponseCode.success) {
+        // 保存成功，重新获取用户信息
+        await merchantAction.profileInfo();
+      } else {
+        throw new Error(data.msg || "上传图片失败");
+      }
+    }catch(error) {
+      Taro.showToast({
+        title: error.message || "上传图片失败",
+        icon: "none"
+      });
+    }
+  }
+
   render() {
     const { merchantDetail, userinfo } = this.props;
     const form: FormRowProps[] = [
@@ -74,7 +113,7 @@ class UserMerchant extends Taro.Component<Props, State> {
       <View className="container container-color">
         <View className={`container-color ${cssPrefix}-merchant`}>
           <View className="component-form">
-            <FormRow title="头像" arrow="right">
+            <FormRow title="头像" arrow="right" onClick={() => { this.uploadAvatarHandle()}}>
               {userinfo.avatar && userinfo.avatar.length > 0 ? (
                 <Image
                   src={`${userinfo.avatar}`}

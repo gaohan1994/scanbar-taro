@@ -14,7 +14,17 @@ type Props = {
 };
 
 class OrderComponent extends Taro.Component<Props> {
+
+  public onCopy = (orderNo) => {
+    Taro.setClipboardData({ data: orderNo }).then(() => {
+      Taro.showToast({
+        title: "复制成功"
+      });
+    });
+  }
+
   render() {
+    
     const { orderDetail } = this.props;
     const { order } = orderDetail;
     const status = OrderAction.orderStatus([], orderDetail as any);
@@ -46,13 +56,14 @@ class OrderComponent extends Taro.Component<Props> {
         {
           title: "订单号码",
           extraText: `${order.orderNo}`,
-          onClick: () => {
-            Taro.setClipboardData({ data: order.orderNo }).then(() => {
-              Taro.showToast({
-                title: "复制成功"
-              });
-            });
-          }
+          // onClick: () => {
+          //   Taro.setClipboardData({ data: order.orderNo }).then(() => {
+          //     Taro.showToast({
+          //       title: "复制成功"
+          //     });
+          //   });
+          // }
+          onClick: this.onCopy.bind(null, order.orderNo)
         },
         {
           title: "创建时间",
@@ -66,7 +77,8 @@ class OrderComponent extends Taro.Component<Props> {
       items = order && [
         {
           title: "订单号码",
-          extraText: `${order.orderNo}`
+          extraText: `${order.orderNo}`,
+          onClick: this.onCopy.bind(null, order.orderNo)
         },
         {
           title: "创建时间",
@@ -98,7 +110,7 @@ class OrderComponent extends Taro.Component<Props> {
         border: false
       });
     }
-
+    
     return (
       <View>
         <View

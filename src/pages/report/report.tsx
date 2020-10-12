@@ -1081,7 +1081,7 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
           {
             title: "利润率",
             value: `${numeral(
-              numeral(reportBaseInfo.profitRate || 0).value() * 100
+              numeral(reportBaseInfo.profitRate || 0).value()
             ).format("0.00")}%`
           }
         ],

@@ -169,7 +169,7 @@ class CouponPage extends Taro.Component<Props, State> {
           <ButtonCostom title="确定" onClick={() => this.onCoupon()} />
         </HeaderInput>
 
-        <ScrollView scrollY={true} className={`product-list-container`}>
+        <ScrollView scrollY={true} className={`product-list-container`} style={{bottom: '171rpx'}}>
           <View className={`product-list-right`}>
             {!!searchCoupon &&
               searchCoupon.map(item => {

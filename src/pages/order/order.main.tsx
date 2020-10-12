@@ -173,13 +173,24 @@ class OrderMain extends Taro.Component<Props, State> {
   };
 
   public nextDate = () => {
+    
     this.setState(
       prevState => {
+        const date = dayJs(prevState.date).add(1, "day").format("YYYY-MM-DD")
+        if (
+          dayJs(dayJs().format("YYYY-MM-DD")).valueOf() <
+          dayJs(dayJs(date).format("YYYY-MM-DD")).valueOf()
+        ) {
+          // 已经是最后一天了
+          Taro.showToast({
+            title: "只能选择今天以前的日期",
+            icon: "none"
+          });
+          return
+        }
         return {
           ...prevState,
-          date: dayJs(prevState.date)
-            .add(1, "day")
-            .format("YYYY-MM-DD")
+          date
         };
       },
       () => {
@@ -247,7 +258,7 @@ class OrderMain extends Taro.Component<Props, State> {
       const result = await OrderAction.orderList(payload);
       invariant(result.code === ResponseCode.success, result.msg || " ");
       if (typeof page === "number") {
-        pageNum = page;
+        pageNum = page + 1;
       } else {
         pageNum += 1;
       }

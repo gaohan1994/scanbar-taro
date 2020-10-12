@@ -65,9 +65,13 @@ class ProductSuspension extends Taro.Component<Props, State> {
     type:
       | ProductCartInterface.ProductCartAdd
       | ProductCartInterface.ProductCartReduce,
-    suspension: number
+    suspension: number,
+    productCartList: ProductCartInterface.ProductCartInfo[]
   ) => {
     // 这里要判断一下，是否是最后一个商品如果是，那么可能要删除该挂单
+    if( type === productSdk.productCartManageType.REDUCE && productCartList.length === 1 && product.sellNum === 1 ) {
+      this.onDeleteSuspension(suspension)
+    }
     productSdk.manage({ type, product, suspension });
   };
 
@@ -148,7 +152,7 @@ class ProductSuspension extends Taro.Component<Props, State> {
               src="//net.huanmusic.com/weapp/img_kong.png"
               className={`${cssPrefix}-suspension-image`}
             />
-            <Text className={`${cssPrefix}-suspension-text`}>暂无挂单内容</Text>
+            <Text className={`${cssPrefix}-suspension-text`}>暂无挂单商品</Text>
           </View>
         )}
 
@@ -256,7 +260,8 @@ class ProductSuspension extends Taro.Component<Props, State> {
                             this.manageProduct(
                               product,
                               productSdk.productCartManageType.REDUCE,
-                              currentSuspension
+                              currentSuspension,
+                              productCartList
                             )
                           }
                         />
@@ -273,7 +278,8 @@ class ProductSuspension extends Taro.Component<Props, State> {
                               this.manageProduct(
                                 product,
                                 productSdk.productCartManageType.ADD,
-                                currentSuspension
+                                currentSuspension,
+                                productCartList
                               )
                             }
                           />
