@@ -22,8 +22,12 @@ class ProductAction {
     const result = await ProductService.productInfoList(params);
     if (result.code === ResponseCode.success) {
       store.dispatch({
-        type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_MANAGE_LIST,
-        payload: result.data
+        type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_PAGING_LIST,
+        // payload: result.data
+        payload: {
+          ...result.data,
+          page: (params && params.pageNum) || 1
+        }
       });
       return { success: true, result: result.data };
     } else {
@@ -35,8 +39,12 @@ class ProductAction {
     const result = await ProductService.productInfoList(params);
     if (result.code === ResponseCode.success) {
       store.dispatch({
-        type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_LIST,
-        payload: result.data
+        // type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_LIST,
+        type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_PAGING_LIST,
+        payload: {
+          ...result.data,
+          page: (params && params.pageNum) || 1
+        }
       });
     }
     return result;
@@ -59,8 +67,12 @@ class ProductAction {
     const result = await ProductService.productInfoGetList(params);
     if (result.code === ResponseCode.success) {
       store.dispatch({
-        type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_SEARCH_LIST,
-        payload: result.data
+        // type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_SEARCH_LIST,
+        type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_PAGING_LIST,
+        payload: {
+          ...result.data,
+          page: (params && params.pageNum) || 1
+        }
       });
       return { success: true, result: result.data };
     } else {

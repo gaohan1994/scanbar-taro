@@ -666,7 +666,7 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
           visible={merchantVisible}
           position="left"
           menus={merchantListData}
-          onPress={item => this.onMerchantPress(item)}
+          onPress={item => this.onMerchantPress(item as any)}
           onClose={() => this.onChangeValue("merchantVisible", false)}
         />
         <TabsMenu

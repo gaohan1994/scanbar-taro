@@ -46,6 +46,7 @@ export declare namespace LoginInterface {
     merchantInfoDTO: MerchantInfoDTO;
     roleIds: any[];
     roleNames: string;
+    permissions: string[];
   }
 
   interface MerchantInfoDTO {

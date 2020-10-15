@@ -1,3 +1,4 @@
+import React from 'react'
 import Taro, { Config } from "@tarojs/taro";
 import { View, Image, Picker } from "@tarojs/components";
 import { ProductAction } from "../../actions";
@@ -79,6 +80,7 @@ interface State {
   numberModalVisible: boolean;
   numberLimitModalVisible: boolean;
   supplierValue: number;
+  isEdit: boolean;
 }
 
 class ProductDetail extends Taro.Component<Props, State> {
@@ -115,7 +117,7 @@ class ProductDetail extends Taro.Component<Props, State> {
         updateTime: "",
         imgs: [],
         supplierId: -1,
-        supplierName: ""
+        supplierName: "",
       } as any,
       productChangeDetail: {},
       typeModalVisible: true,
@@ -125,7 +127,8 @@ class ProductDetail extends Taro.Component<Props, State> {
       priceModalVisible: false,
       memberPriceModalVisible: false,
       numberModalVisible: false,
-      numberLimitModalVisible: false
+      numberLimitModalVisible: false,
+      isEdit: false,
     };
   }
 
@@ -308,60 +311,70 @@ class ProductDetail extends Taro.Component<Props, State> {
    * @todo [如果不存在去第三方库中查询，查询到商品信息后显示信息，如果没查到提示没有找到该商品]
    * @memberof ProductDetail
    */
-  public onScanHandle = async () => {
+  public onScanHandle = async () => { 
     Taro.scanCode()
       .then(async scanResult => {
-        Taro.showLoading();
-        const barcode = scanResult.result;
-        const result = await ProductService.productInfoScanGet({ barcode });
-        if (result.code === ResponseCode.success) {
-          // 在升腾库中找到了
+        try{
+          Taro.showLoading();
+          const barcode = scanResult.result;
+          const result = await ProductService.productInfoScanGet({ barcode });
+          if (result.code === ResponseCode.success) {
+            // 在升腾库中找到了
+            Taro.hideLoading();
+            Taro.showModal({
+              title: "提示",
+              content: "该商品已经存在",
+              showCancel: false
+            });
+            return;
+          }
+          const thirdResult = await ProductService.productInfoScan({ barcode });
+          if (thirdResult.code === ResponseCode.success) {
+            // 第三方库中找到了
+            const scanProduct = thirdResult.data;
+            const { productChangeDetail, productDetail } = this.state;
+            const newProductChangeDetail: Partial<ProductInterface.ProductInfo> = merge(
+              {},
+              productChangeDetail
+            );
+  
+            // 条码直接覆盖
+            newProductChangeDetail.barcode = barcode;
+            if (!productDetail.name && !!scanProduct.name) {
+              // 原来的商品没有名称且扫码的商品有名称则把名称填上
+              newProductChangeDetail.name = scanProduct.name;
+            }
+            if (!productDetail.price && !!scanProduct.price) {
+              // 原来的商品没有价格且扫码的商品有价格则把价格填上
+              newProductChangeDetail.price = scanProduct.price;
+            }
+            if (!productDetail.standard && !!scanProduct.standard) {
+              // 原来的商品没有standard ~~
+              newProductChangeDetail.standard = scanProduct.standard;
+            }
+            if (!productDetail.brand && !!scanProduct.brand) {
+              // brand ~~
+              newProductChangeDetail.brand = scanProduct.brand;
+            }
+            this.setState({ productChangeDetail: newProductChangeDetail });
+            Taro.hideLoading();
+            return;
+          }
           Taro.hideLoading();
           Taro.showModal({
             title: "提示",
-            content: "该商品已经存在",
+            content: "没有找到该商品",
             showCancel: false
           });
-          return;
-        }
-        const thirdResult = await ProductService.productInfoScan({ barcode });
-        if (thirdResult.code === ResponseCode.success) {
-          // 第三方库中找到了
-          const scanProduct = thirdResult.data;
-          const { productChangeDetail, productDetail } = this.state;
-          const newProductChangeDetail: Partial<ProductInterface.ProductInfo> = merge(
-            {},
-            productChangeDetail
-          );
-
-          // 条码直接覆盖
-          newProductChangeDetail.barcode = barcode;
-          if (!productDetail.name && !!scanProduct.name) {
-            // 原来的商品没有名称且扫码的商品有名称则把名称填上
-            newProductChangeDetail.name = scanProduct.name;
-          }
-          if (!productDetail.price && !!scanProduct.price) {
-            // 原来的商品没有价格且扫码的商品有价格则把价格填上
-            newProductChangeDetail.price = scanProduct.price;
-          }
-          if (!productDetail.standard && !!scanProduct.standard) {
-            // 原来的商品没有standard ~~
-            newProductChangeDetail.standard = scanProduct.standard;
-          }
-          if (!productDetail.brand && !!scanProduct.brand) {
-            // brand ~~
-            newProductChangeDetail.brand = scanProduct.brand;
-          }
-          this.setState({ productChangeDetail: newProductChangeDetail });
+        } catch (error) {
           Taro.hideLoading();
-          return;
+          Taro.showModal({
+            title: "提示",
+            content: "没有找到该商品",
+            showCancel: false
+          });
         }
-        Taro.hideLoading();
-        Taro.showModal({
-          title: "提示",
-          content: "没有找到该商品",
-          showCancel: false
-        });
+        
       })
       .catch(error => {
         Taro.hideLoading();
@@ -467,7 +480,7 @@ class ProductDetail extends Taro.Component<Props, State> {
   };
 
   render() {
-    const { productDetail, productChangeDetail, typePickerValue } = this.state;
+    const { productDetail, productChangeDetail, typePickerValue, isEdit } = this.state;
     const { productTypeSelector } = this.props;
     const formName: FormRowProps[] = [
       {
@@ -602,7 +615,8 @@ class ProductDetail extends Taro.Component<Props, State> {
     if (productDetail.id !== -1) {
       return (
         <View className="container">
-          <View className={`${cssPrefix}-detail-cover`}>
+          
+          <View className={`${cssPrefix}-detail-cover`} >
             {productDetail.pictures && productDetail.pictures.length > 0 ? (
               <View
                 className={`${cssPrefix}-detail-cover-image ${cssPrefix}-detail-cover-image-background`}
@@ -616,6 +630,7 @@ class ProductDetail extends Taro.Component<Props, State> {
             )}
           </View>
           <View
+            style={isEdit ? {} : {pointerEvents: "none"}}
             className={`${cssPrefix}-detail-list  product-detail product-add`}
           >
             <FormCard items={formName} />
@@ -647,16 +662,12 @@ class ProductDetail extends Taro.Component<Props, State> {
             {this.renderSupplier()}
             <FormCard items={formStatus} />
           </View>
-          <View className={`${cssPrefix}-add-buttons`}>
-            <View className={`${cssPrefix}-detail-submit`}>
-              <AtButton
-                className={`theme-button`}
-                onClick={() => this.submit()}
-              >
-                保存
-              </AtButton>
-            </View>
-          </View>
+         
+          {this.renderFooter()}
+           
+              
+          {/* <View className={`${cssPrefix}-detail-submit`}> */}
+          {/* </View> */}
           {this.renderModals()}
         </View>
       );
@@ -666,6 +677,45 @@ class ProductDetail extends Taro.Component<Props, State> {
         <AtActivityIndicator mode="center" />
       </View>
     );
+  }
+
+  private renderFooter = () => {
+    const { isEdit } = this.state
+    if(isEdit) {
+
+      return <View className={`${cssPrefix}-add-buttons`}>
+        <AtButton
+          className={`${cssPrefix}-add-buttons-button theme-button`}
+          onClick={() => this.setState({isEdit: false})}
+        >
+          取消
+        </AtButton>
+        <AtButton
+          className={`${cssPrefix}-add-buttons-button theme-button`}
+          // className={`theme-button`}
+          onClick={() => this.submit()}
+        >
+          保存
+        </AtButton>
+      </View>
+    }
+    
+    return <View className={`${cssPrefix}-add-buttons`}>
+      <AtButton
+        className={`${cssPrefix}-add-buttons-button theme-button`}
+        onClick={() =>  this.changeModalVisible("numberModalVisible", true)}
+      >
+        调整库存
+      </AtButton>
+      <AtButton
+        className={`${cssPrefix}-add-buttons-button theme-button`}
+        onClick={() => this.setState({isEdit: true})}
+      >
+        编辑
+      </AtButton>
+    </View>
+    
+    
   }
 
   private renderSupplier = () => {
@@ -756,7 +806,7 @@ class ProductDetail extends Taro.Component<Props, State> {
       {
         title: "会员价",
         type: "digit",
-        placeholder: `${productDetail.memberPrice}`,
+        placeholder: `${typeof productDetail.memberPrice === 'undefined' ? "" :  productDetail.memberPrice}`,
         value: `${productChangeDetail.memberPrice || ""}`,
         onInput: ({ detail: { value } }) =>
           this.onNumberValueChange("memberPrice", value)
@@ -769,7 +819,7 @@ class ProductDetail extends Taro.Component<Props, State> {
           String(productChangeDetail.memberPrice) !== ""
             ? numeral(
                 numeral(productChangeDetail.memberPrice).value() -
-                  numeral(productDetail.memberPrice).value()
+                  numeral(typeof productDetail.memberPrice === 'undefined' ? productDetail.price : productDetail.memberPrice).value()
               ).format("0.00")
             : ""
         }`,
@@ -894,7 +944,7 @@ class ProductDetail extends Taro.Component<Props, State> {
         <Modal
           isOpened={memberPriceModalVisible}
           header="会员价调整"
-          tip={`系统会员价：${productDetail.memberPrice}`}
+          tip={`系统会员价：${typeof productDetail.memberPrice === 'undefined' ? productDetail.price : productDetail.memberPrice}`}
           onClose={() =>
             this.changeModalVisible("memberPriceModalVisible", false)
           }

@@ -16,6 +16,7 @@ import { MemberAction } from "../../actions";
 import invariant from "invariant";
 import { MemberInterface } from "../../constants";
 import Validator from "../../common/util/validator";
+import { debounce } from '../../common/util/common'
 import { AppReducer } from "../../reducers";
 import { getMemberDetail, getMemberLevel } from "../../reducers/app.member";
 import { connect } from "@tarojs/redux";
@@ -40,15 +41,7 @@ interface State {
   levelValue: number;
 }
 
-function debounce(fn,delay){
-  var handle;
-  return function(){
-    clearTimeout(handle) 
-    handle=setTimeout(function(){
-      fn()
-    },delay)
-  }
-}
+
 
 class MemberMain extends Taro.Component<Props, State> {
   readonly state: State = {

@@ -343,12 +343,13 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
           throw new Error(thirdProductResult.msg || "没有找到该商品");
         })
         .catch(error => {
-          Taro.showToast({ title: error.message, icon: "none" });
+          Taro.hideLoading()
+          Taro.showToast({ title: error.message || '没有找到该商品', icon: "none" });
         });
     } catch (error) {
       Taro.hideLoading();
       Taro.showToast({
-        title: error.message,
+        title: error.message || '没有找到该商品',
         icon: "none"
       });
     }

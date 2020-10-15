@@ -81,3 +81,17 @@ export function checkNumberInput(input: string) {
   const reg = /([0-9]+\.[0-9]{2})[0-9]*/;
   return input.replace(reg, "$1");
 }
+
+
+/**
+ * 简易防抖
+ */
+export function debounce(fn,delay){
+  var handle;
+  return function(...args){
+    clearTimeout(handle) 
+    handle=setTimeout(function(){
+      fn(...args)
+    },delay)
+  }
+}

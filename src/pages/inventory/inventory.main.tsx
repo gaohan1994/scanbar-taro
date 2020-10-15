@@ -17,8 +17,10 @@ import {
   getProductSearchList,
   getSelectProduct,
   getProductType,
-  getProductList
+  getProductList,
+  getProductManageList, 
 } from "../../reducers/app.product";
+
 import { AppReducer } from "../../reducers";
 import { connect } from "@tarojs/redux";
 import { ProductInterface } from "../../constants";
@@ -27,6 +29,7 @@ import { ResponseCode } from "../../constants/index";
 import productSdk from "../../common/sdk/product/product.sdk";
 import HeaderInput from "../../component/header/header.input";
 import ProductListView from "../../component/product/product.listview";
+// import ProductListView from "../../component/product/product.listview.paging";
 import TabsHeader from "../../component/layout/tabs.header";
 import merge from "lodash.merge";
 
@@ -39,8 +42,9 @@ type Props = {
    * @memberof Props
    */
   productList: ProductInterface.ProductInfo[];
-  productSearchList: ProductInterface.ProductList[];
-  pureProductSearchList: ProductInterface.ProductInfo[];
+  productListTotal: number;
+  // productSearchList: ProductInterface.ProductList[];
+  // pureProductSearchList: ProductInterface.ProductInfo[];
   selectProduct: ProductInterface.ProductInfo;
   productTypeList: ProductInterface.ProductTypeInfo[];
 };
@@ -57,6 +61,9 @@ type State = {
   loading: boolean;
 };
 
+let pageNum = 1
+const pageSize = 20
+
 class InventoryMain extends Taro.Component<Props> {
   config: Config = {
     navigationBarTitleText: "采购进货"
@@ -64,8 +71,8 @@ class InventoryMain extends Taro.Component<Props> {
 
   readonly state: State = {
     currentType: {
-      name: "",
-      id: 0,
+      name: "全部分类",
+      id: 999,
       createTime: ""
     },
     searchValue: "",
@@ -76,7 +83,7 @@ class InventoryMain extends Taro.Component<Props> {
     this.setState({
       searchValue: ""
     });
-    ProductAction.productInfoEmptySearchList();
+    // ProductAction.productInfoEmptySearchList();
     this.init();
   }
 
@@ -86,7 +93,7 @@ class InventoryMain extends Taro.Component<Props> {
   ) => {
     this.setState({ currentType: typeInfo }, async () => {
       if (fetchProduct) {
-        this.fetchData(typeInfo);
+        this.fetchData(typeInfo, 1);
       }
     });
   };
@@ -98,7 +105,10 @@ class InventoryMain extends Taro.Component<Props> {
         productTypeResult.code === ResponseCode.success,
         productTypeResult.msg || " "
       );
-      this.fetchData(undefined as any);
+      // this.fetchData(undefined as any, 1);
+      
+      Object.keys(this.props.productTypeList).length !== 0 && this.changeCurrentType(this.props.productTypeList[0]);
+      
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -107,36 +117,100 @@ class InventoryMain extends Taro.Component<Props> {
     }
   };
 
-  public fetchData = async (type: ProductInterface.ProductTypeInfo) => {
-    this.setState({ loading: true });
-    let payload: ProductInterface.ProductInfoListFetchFidle = {
-      status: 0
-    };
-    if (type && type.id !== 999) {
-      payload.type = `${type.id}`;
+  public fetchData = async (type: ProductInterface.ProductTypeInfo, page?: number) => {
+    try{
+      const { productList, productListTotal} =  this.props
+      const currentPage = page  || pageNum
+      
+      if(currentPage !== 1){
+        if(this.state.loading) {
+          return
+        }
+        if ( productList.length >= productListTotal) {
+          return
+        }
+        this.setState({ loading: true });
+      }
+      
+      Taro.showLoading()
+      
+      
+      let payload: ProductInterface.ProductInfoListFetchFidle = {
+        pageNum: currentPage,
+        pageSize,
+        status: 0
+      };
+
+      if (type && type.id !== 999) {
+        payload.type = `${type.id}`;
+      }
+
+      const result = await ProductAction.productOrderInfoList(payload);
+      Taro.hideLoading()
+      this.setState({ loading: false });
+      invariant(result.code === ResponseCode.success, result.msg || " ")
+      if (typeof page === "number") {
+        pageNum = page + 1;
+      } else {
+        pageNum += 1;
+      }
+      return result;
+
+    } catch (error) {
+      Taro.hideLoading()
+      this.setState({ loading: false });
+      Taro.showToast({
+        title: error.message,
+        icon: "none"
+      })
     }
-    const result = await ProductAction.productOrderInfoList(payload);
-    this.setState({ loading: false });
-    return result;
   };
 
-  public searchData = async () => {
-    const { searchValue } = this.state;
+  public searchData = async (page?: number) => {
+    const { searchValue, currentType } = this.state
     try {
-      if (searchValue === "") {
+      if (!searchValue) {
         /**
          * @todo 如果输入的是空则清空搜索
          */
-        ProductAction.productInfoEmptySearchList();
+        // ProductAction.productInfoEmptySearchList();
+        this.fetchData(currentType, 1)
+        return
+      }
+      const { productList, productListTotal} =  this.props
+      const currentPage = page || pageNum
+      if(currentPage !== 1) {
+        if(this.state.loading) {
+          return
+        }
+        if (productList.length >= productListTotal) {
+          return
+        }
+      }
+
+     
+
+      Taro.showLoading();
+      this.setState({ loading: true });
+      const payload: ProductInterface.ProductInfoGetListFetchFidle = {
+        pageNum: currentPage,
+        pageSize,
+        words: searchValue,
+      }
+      // if(currentType && currentType.id !== 999) {
+      //   payload.type = currentType.id
+      // }
+      const { success, result } = await ProductAction.productInfoSearchList(payload);
+      Taro.hideLoading();
+      this.setState({ loading: false });
+      invariant(success, result || ResponseCode.error);
+      if (typeof page === "number") {
+        pageNum = page + 1;
       } else {
-        Taro.showLoading();
-        const { success, result } = await ProductAction.productInfoSearchList({
-          words: searchValue
-        });
-        Taro.hideLoading();
-        invariant(success, result || ResponseCode.error);
+        pageNum += 1;
       }
     } catch (error) {
+      this.setState({ loading: false });
       Taro.hideLoading();
       Taro.showToast({
         title: error.message,
@@ -144,6 +218,15 @@ class InventoryMain extends Taro.Component<Props> {
       });
     }
   };
+
+  public loadMore = () => {
+    const { searchValue, currentType } = this.state
+    if(!searchValue) {      
+      this.fetchData(currentType)
+      return
+    }
+    this.searchData()
+  }
 
   /**
    * @todo [点击菜单的时候修改当前菜单并跳转至对应商品]
@@ -160,9 +243,9 @@ class InventoryMain extends Taro.Component<Props> {
    *
    * @memberof ProductOrder
    */
-  public onInput = ({ detail }: any) => {
+  public onInput = ({ detail }: any) => {    
     this.setState({ searchValue: detail.value }, () => {
-      this.searchData();
+      this.searchData(1);
     });
   };
 
@@ -223,29 +306,38 @@ class InventoryMain extends Taro.Component<Props> {
   };
 
   private renderList = () => {
-    const { productList, pureProductSearchList } = this.props;
+    // const { productList, pureProductSearchList, productListTotal} = this.props;
+    const { productList, productListTotal} = this.props;
     const { searchValue, loading } = this.state;
-    if (pureProductSearchList.length === 0 && searchValue === "") {
-      return (
-        <View className={`${cssPrefix}-list-right`}>
-          <ProductListView
-            loading={loading}
-            productList={productList}
-            className={`${cssPrefix}-list-right-container ${cssPrefix}-list-right-container-inventory`}
-            sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE}
-          />
-        </View>
-      );
-    }
+    // if (searchValue === "") {
+    // if (pureProductSearchList.length === 0 && searchValue === "") {
     return (
       <View className={`${cssPrefix}-list-right`}>
         <ProductListView
-          productList={pureProductSearchList}
-          className={`${cssPrefix}-list-right-container-search`}
+          page={pageNum}
+          loading={loading}
+          productList={productList}
+          productListTotal={productListTotal}
+          className={`${cssPrefix}-list-right-container ${cssPrefix}-list-right-container-inventory`}
           sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE}
+          onScrollToLower={this.loadMore}
         />
       </View>
     );
+    // }
+    // return (
+    //   <View className={`${cssPrefix}-list-right`}>
+    //     <ProductListView
+    //       // productList={pureProductSearchList}
+    //       // productListTotal={pureProductSearchListTotal}
+    //       productList={productList}
+    //       productListTotal={productListTotal}
+    //       className={`${cssPrefix}-list-right-container-search`}
+    //       sort={productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE}
+    //       onScrollToLower={this.loadMore}
+    //     />
+    //   </View>
+    // );
   };
 }
 
@@ -263,9 +355,11 @@ const mapState = (state: AppReducer.AppState) => {
     createTime: ""
   } as any);
   return {
-    productList,
-    productSearchList,
-    pureProductSearchList,
+    // productList,
+    // productSearchList,
+    // pureProductSearchList,
+    productList: getProductManageList(state).data || [],
+    productListTotal: getProductManageList(state).total || 0,
     selectProduct,
     productTypeList
   };

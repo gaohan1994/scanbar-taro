@@ -119,6 +119,7 @@
       width: 690px;
       background: rgba(255, 255, 255, 1);
       border-radius: 20px;
+      overflow: hidden;
     }
     &-input {
       position: relative;
@@ -127,6 +128,7 @@
       display: flex;
       .padding(30px, lr);
       flex-direction: row;
+      justify-content: space-between;
       .padding(20px, tb);
       &::after {
         .border1px;
@@ -134,6 +136,7 @@
       }
       &-nobar {
         &::after {
+          border-color: transparent !important;
           height: 0px !important;
         }
       }
@@ -145,6 +148,28 @@
         margin-right: 10px;
         font-size: 30px;
         width: 150px;
+      }
+
+      &-vercode {
+        height: 100%;
+        line-height: 50px;
+        color: #2a86fc;
+        font-size: 24px;
+        position: relative;
+        width: 119px;
+        text-align: right;
+        &::before {
+          content: '';
+          width: 1px;
+          height: 50px;
+          display: block;
+          position: absolute;
+          top: 0;
+          left: -30px;
+          bottom: 0;
+          background-color: #2a86fc;
+          z-index: 999;
+        }
       }
     }
     &-phone {

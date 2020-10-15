@@ -218,6 +218,7 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
    */
   public searchMember = async (page?: number): Promise<void> => {
     try {
+      const { memberList, memberListTotal } = this.props
       const { searchValue: value } = this.state;
       this.changeLastIsSearch(true);
       if (value === "") {
@@ -238,9 +239,16 @@ class MemberMain extends Taro.Component<MemberMainProps, State> {
       } else {
         if (this.state.loading === true) {
           return;
-        } else {
-          this.changeLoading(true);
         }
+        if (memberList.length >= memberListTotal) {
+          Taro.showToast({
+            title: "已经到底了",
+            icon: "none"
+          });
+          return;
+        }
+        this.changeLoading(true);
+        
       }
       const params: MemberInterface.MemberInfoSearchFidle = {
         pageSize,

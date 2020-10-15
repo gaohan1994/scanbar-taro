@@ -6,8 +6,10 @@
  *
  * @todo [商品管理页面]
  */
+import React from 'react'
 import Taro from "@tarojs/taro";
 import { View, Image, Input, ScrollView, Text } from "@tarojs/components";
+import ScrollPagingView  from '../../component/product/product.listview.paging'
 import "../style/product.less";
 import "../style/member.less";
 import "../../component/card/form.card.less";
@@ -32,12 +34,18 @@ import classnames from "classnames";
 import productSdk from "../../common/sdk/product/product.sdk";
 import merge from "lodash.merge";
 import ButtonFooter from "../../component/button/button.footer";
+import { debounce } from '../../common/util/common'
+import { AtActivityIndicator } from "taro-ui";
 
 const memberPrefix = "member";
 const cssPrefix = "product";
 
+let pageNum: number = 1
+const pageSize: number = 20
+
 interface Props {
-  productIndexList: ProductInterface.IndexProducList[];
+  productList: ProductInterface.ProductInfo[];
+  productListTotal: number;
   productType: Array<ProductInterface.ProductType>;
   productSupplier: Array<ProductInterface.ProductSupplier>;
 }
@@ -48,9 +56,16 @@ interface State {
   selectSupplierId: number[];
   selectStatus: number[];
   searchValue: string;
+  lastIsSearch: boolean;
+  loading: boolean;
+  refreshing: boolean;
+  scrollTop: number
 }
 
 class ProductManage extends Taro.Component<Props, State> {
+
+  // static ref = React.createRef()
+
   static config: Taro.Config = {
     navigationBarTitleText: "商品管理"
   };
@@ -60,11 +75,19 @@ class ProductManage extends Taro.Component<Props, State> {
     selectTypeId: [],
     selectSupplierId: [],
     selectStatus: [],
-    searchValue: ""
+    searchValue: "",
+    lastIsSearch: false,
+    loading: false,
+    refreshing: false,
+    scrollTop: 0
   };
 
-  componentDidShow() {
-    this.init();
+  // componentDidShow() {
+  //   this.init();
+  // }
+
+  componentWillMount() {
+    this.init()
   }
 
   public changeSelectVisible = (visible?: boolean) => {
@@ -77,15 +100,7 @@ class ProductManage extends Taro.Component<Props, State> {
     });
   };
 
-  public onChangeValue = (e: any) => {
-    const value = e.detail.value;
-    this.setState({ searchValue: value }, () => {
-      this.searchProduct();
-    });
-    return value;
-  };
-
-  public changeAll = (key: string) => {
+   public changeAll = (key: string) => {
     const { productType, productSupplier } = this.props;
     this.setState(prevState => {
       const prevData = merge([], prevState[key]);
@@ -166,7 +181,7 @@ class ProductManage extends Taro.Component<Props, State> {
 
   public onScanProduct = async () => {
     try {
-      const result = await productSdk.scanProduct();
+      const result = await productSdk.scanProduct();      
       Taro.showLoading();
       if (result.code === ResponseCode.success) {
         // 说明有这个商品，去自己的库里查查看
@@ -208,12 +223,46 @@ class ProductManage extends Taro.Component<Props, State> {
     }
   };
 
-  public submit = async () => {
+  public resetScrollTop = (position?: number) => {    
+    this.setState({
+      scrollTop: position ? position : Math.random() * 0.00001
+    },() => {
+      console.log(this.state.scrollTop);
+      
+    })
+  }
+
+  public submit = async (page?: number, sort?: string) => {
     try {
       const { selectStatus, selectSupplierId, selectTypeId } = this.state;
+      const {productList, productListTotal}  = this.props
+      const currentPage = typeof page === "number" ? page : pageNum;
       this.changeSelectVisible(false);
+      if (currentPage === 1) {
+        this.resetScrollTop(0)
+        if (this.state.refreshing === true) {
+          return;
+        }
+        this.setState({refreshing: true});
+      } else {
+        if (this.state.loading === true) {
+          return;
+        }
+        if (productList.length >= productListTotal) {
+          Taro.showToast({
+            title: "已经到底了",
+            icon: "none"
+          });
+          return;
+        }
+        this.setState({loading: true});
+      }
       Taro.showLoading();
-      let payload: ProductInterface.ProductInfoListFetchFidle = {};
+      let payload: ProductInterface.ProductInfoListFetchFidle = {
+        pageNum: page || pageNum,
+        pageSize,
+        orderByColumn : 'number desc'
+      };
       if (selectStatus.length === 1) {
         payload.status = selectStatus[0];
       }
@@ -223,10 +272,23 @@ class ProductManage extends Taro.Component<Props, State> {
       if (selectTypeId.length > 0) {
         payload.type = selectTypeId.join(",");
       }
+
+      if(sort) {
+        payload.orderByColumn = sort
+      }
       const { success, result } = await ProductAction.productInfoList(payload);
       Taro.hideLoading();
       invariant(success, result || ResponseCode.error);
+      pageNum = (page || pageNum) + 1
+      this.setState({
+        refreshing: false,
+        loading: false
+      })
     } catch (error) {
+      this.setState({
+        refreshing: false,
+        loading: false,
+      })
       Taro.hideLoading();
       Taro.showToast({
         title: error.message,
@@ -238,8 +300,9 @@ class ProductManage extends Taro.Component<Props, State> {
   public init = async () => {
     try {
       Taro.showLoading();
-      const { success, result } = await ProductAction.productInfoList();
-      invariant(success, result || ResponseCode.error);
+      // const { success, result } = await ProductAction.productInfoList({pageNum, pageSize});
+      // invariant(success, result || ResponseCode.error);
+      this.submit(1)
 
       const typeResult = await ProductAction.productInfoType();
       invariant(typeResult.code === ResponseCode.success, typeResult.msg);
@@ -260,23 +323,64 @@ class ProductManage extends Taro.Component<Props, State> {
     }
   };
 
-  public searchProduct = async () => {
+  public searchProduct = async (page?: number) => {
     try {
+      this.setState({lastIsSearch: true})
       const { searchValue } = this.state;
+      const { productList, productListTotal } = this.props
+      
       if (searchValue === "") {
-        /**
-         * @todo [如果搜索是''那么回归查询全部]
-         */
-        const { success, result } = await ProductAction.productInfoList();
-        invariant(success, result || ResponseCode.error);
+        this.setState({lastIsSearch: false})
+        this.submit(1)
+        // const { success, result } = await ProductAction.productInfoList({pageNum: 1, pageSize});
+        // invariant(success, result || ResponseCode.error);
         return;
       }
+
+      const currentPage = typeof page === "number" ? page : pageNum;
+      if (currentPage === 1) {
+        this.resetScrollTop()
+        if (this.state.refreshing === true) {
+          return;
+        } else {
+          this.setState({refreshing: true});
+        }
+      } else {
+        if (this.state.loading === true) {
+          return;
+        } 
+
+        if (productList.length >= productListTotal) {
+          Taro.showToast({
+            title: "已经到底了",
+            icon: "none"
+          });
+          return;
+        }
+        this.setState({loading: true});
+        
+      }
+      Taro.showLoading();
       const payload: ProductInterface.ProductInfoListFetchFidle = {
-        words: searchValue
+        pageNum: page || pageNum,
+        pageSize
       };
+      payload.words = searchValue
       const { success, result } = await ProductAction.productInfoList(payload);
       invariant(success, result || ResponseCode.error);
+      pageNum = (page || pageNum) + 1
+      this.setState({
+        refreshing: false,
+        loading: false
+      })
+      Taro.hideLoading();
     } catch (error) {
+      Taro.hideLoading();
+      this.setState({
+        refreshing: false,
+        loading: false,
+        lastIsSearch: false
+      })
       Taro.showToast({
         title: error.message,
         icon: "none"
@@ -284,17 +388,46 @@ class ProductManage extends Taro.Component<Props, State> {
     }
   };
 
+
+  public onChangeValue = (e: any) => {    
+    const value = e.detail.value;
+    this.setState({ searchValue: value }, () => {
+      this.searchProduct(1);
+    });
+    return value;
+  };
+
   public onSelectClick = () => {
     this.changeSelectVisible(true);
   };
 
   public onAddClick = () => {
+    this.resetScrollTop()
     Taro.navigateTo({ url: `/pages/product/product.add` });
   };
 
+  public loadMore = () => {
+    const { lastIsSearch } = this.state;    
+    if (lastIsSearch === false) {
+      this.submit();
+    } else {
+      this.searchProduct();
+    }
+  }
+
+  public refresh = () => {
+    const { lastIsSearch } = this.state;
+    if (lastIsSearch === false) {
+      this.submit(1);
+    } else {
+      this.searchProduct(1);
+    }
+  }
+
   render() {
-    const { searchValue } = this.state;
-    const { productIndexList } = this.props;
+    const { searchValue, loading, scrollTop,selectStatus, selectSupplierId,selectTypeId } = this.state;
+    const { productList, productListTotal } = this.props;
+
     return (
       <View className="container">
         {this.renderSelectModal()}
@@ -310,7 +443,7 @@ class ProductManage extends Taro.Component<Props, State> {
               className={`${memberPrefix}-main-header-search-input`}
               placeholder="请输入商品名称或条码"
               value={searchValue}
-              onInput={this.onChangeValue}
+              onInput={debounce(this.onChangeValue, 500)}
               placeholderClass={`${memberPrefix}-main-header-search-input-holder`}
             />
             <View
@@ -350,11 +483,25 @@ class ProductManage extends Taro.Component<Props, State> {
         </View>
 
         <View className={`${cssPrefix}-manage-list`}>
+          {/* <ScrollPagingView 
+            fetchProductList = {ProductAction.productInfoList}
+            searchValue= {searchValue}
+            productList = {productList}
+            productListTotal= { productListTotal }
+            selectStatus={selectStatus}
+            selectSupplierId={selectSupplierId}
+            selectTypeId={selectTypeId}
+          /> */}
           <ScrollView
             scrollY={true}
             className={`${cssPrefix}-manage-list-container`}
+            onScrollToUpper={this.refresh}
+            onScrollToLower={this.loadMore}
+            enableBackToTop={true}
+            scrollTop={scrollTop}
+            // onScroll={debounce((e) => {this.resetScrollTop(e.detail.scrollTop);console.log(e.detail.scrollTop)}, 500)}
           >
-            {productIndexList.map(list => {
+             {/* {productList.map(list => {
               const { data } = list;
               return (
                 <View key={list.key}>
@@ -374,8 +521,27 @@ class ProductManage extends Taro.Component<Props, State> {
                   })}
                 </View>
               );
+            })}  */}
+            {productList.map(item => {
+              return (
+                <ProductComponent
+                  key={item.id}
+                  product={item}
+                  sort={
+                    productSdk.reducerInterface.PAYLOAD_SORT
+                      .PAYLOAD_MANAGE
+                  }
+                />
+              );
             })}
+            {/* {loading && (
+              <View className={`${memberPrefix}-loading`}>
+                <AtActivityIndicator mode="center" />
+              </View>
+            )} */}
           </ScrollView>
+
+          
         </View>
       </View>
     );
@@ -529,7 +695,7 @@ class ProductManage extends Taro.Component<Props, State> {
             <ButtonFooter
               buttons={[
                 { title: "重置", type: "cancel", onPress: () => this.reset() },
-                { title: "确定", type: "confirm", onPress: () => this.submit() }
+                { title: "确定", type: "confirm", onPress: () => this.submit(1) }
               ]}
             />
           </View>
@@ -539,23 +705,24 @@ class ProductManage extends Taro.Component<Props, State> {
     return <View />;
   };
 
-  private renderSectionHeader = (section: ProductInterface.IndexProducList) => {
-    return (
-      <View className={`${cssPrefix}-list-section`}>
-        <View className={`${cssPrefix}-list-section-icon`} />
-        <Text className={`${cssPrefix}-list-section-title`}>
-          {section.title}
-        </Text>
-      </View>
-    );
-  };
+  // private renderSectionHeader = (section: ProductInterface.IndexProducList) => {
+  //   return (
+  //     <View className={`${cssPrefix}-list-section`}>
+  //       <View className={`${cssPrefix}-list-section-icon`} />
+  //       <Text className={`${cssPrefix}-list-section-title`}>
+  //         {section.title}
+  //       </Text>
+  //     </View>
+  //   );
+  // };
 }
 
 const select = (state: AppReducer.AppState) => {
-  const productManageList = getProductManageList(state);
-  const productIndexList = getProductManageListIndexes(productManageList);
+  // const productManageList = getProductManageList(state);
+  // const productList = getProductManageListIndexes(productManageList);
   return {
-    productIndexList,
+    productList: getProductManageList(state).data || [],
+    productListTotal: getProductManageList(state).total || 0,
     productType: getProductType(state),
     productSupplier: getProductSupplier(state)
   };

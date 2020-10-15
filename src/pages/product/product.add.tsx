@@ -184,6 +184,7 @@ class ProductAdd extends Taro.Component<Props, State> {
         }
 
         if (result.code === "product.not.exist") {
+          Taro.hideLoading()
           Taro.showModal({
             title: "提示",
             content: "请扫码正确的商品码",
@@ -532,6 +533,16 @@ class ProductAdd extends Taro.Component<Props, State> {
         icon: "success",
         duration: 500
       });
+
+      const pages = Taro.getCurrentPages()
+      const page: Taro.Page = pages[pages.length - 2]
+      page.$component.setState({
+        selectStatus: [],
+        selectSupplierId: [],
+        selectTypeId: [],
+      },() => {
+        page.$component.submit(1, 'create_time desc')
+      })
       setTimeout(() => {
         Taro.navigateBack();
       }, 500);

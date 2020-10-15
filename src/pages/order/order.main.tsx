@@ -217,7 +217,7 @@ class OrderMain extends Taro.Component<Props, State> {
       invariant(result.code === ResponseCode.success, result.msg || " ");
       cu.console(`result`, result);
       if (typeof page === "number") {
-        searchPage = page;
+        searchPage = page + 1;
       } else {
         searchPage += 1;
       }

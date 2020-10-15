@@ -8,6 +8,7 @@
 
 import { ProductInterface, ProductInterfaceMap } from "../constants";
 import { AppReducer } from './index';
+import merge from 'lodash.merge';
 
 export declare namespace ProductReducer {
   interface InitState {
@@ -16,6 +17,7 @@ export declare namespace ProductReducer {
     productManageList: {
       total: number;
       data: Array<ProductInterface.ProductInfo>;
+      lastPage?: number;
     };
     productType: Array<ProductInterface.ProductType>;
     productSupplier: Array<ProductInterface.ProductSupplier>;
@@ -85,6 +87,20 @@ export default function productReducer (state: ProductReducer.InitState = initSt
         productManageList: {
           data: rows,
           total: total,
+        }
+      };
+    }
+
+    case ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_PAGING_LIST: {
+      const { payload: { rows, total, page } } = action;
+      const productManageList = merge({}, state.productManageList)
+      const productManageListData = page === 1 ? rows : productManageList.data.concat(rows)
+      return {
+        ...state,
+        productManageList: {
+          data: productManageListData,
+          total: total,
+          lastPage: page
         }
       };
     }
@@ -169,7 +185,7 @@ export const getProductList = (state: AppReducer.AppState) => state.product.prod
 
 export const getProductSearchList = (state: AppReducer.AppState) => state.product.productSearchList;
 
-export const getProductManageList = (state: AppReducer.AppState) => state.product.productManageList.data;
+export const getProductManageList = (state: AppReducer.AppState) => state.product.productManageList;
 
 export const getProductType = (state: AppReducer.AppState) => state.product.productType;
 

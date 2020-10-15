@@ -26,6 +26,7 @@ import {
 } from "../../constants/index";
 import { store } from "../../app";
 import { checkNumberInput } from "../../common/util/common";
+import Modal, { ModalInput } from '../../component/modal/modal'
 
 const Items = [
   {
@@ -164,24 +165,98 @@ class PayReceive extends Taro.Component<Props, State> {
             })
             .catch(error => {
               Taro.hideLoading();
+              // Taro.showModal({
+              //   title: "提示",
+              //   content: error.message,
+              //   showCancel: false
+              // });
               Taro.showModal({
-                title: "提示",
-                content: error.message,
-                showCancel: false
-              });
+                title: '提示',
+                content: error.message || '收款失败',
+                cancelText: '继续收款',
+                confirmText: '重新收款',
+                // cancelColor: '#333',
+                // confirmColor: '#333',
+                success: (res) => {
+                  if (res.confirm) {
+                    Taro.navigateBack()
+                  } else if (res.cancel) {
+                  }                  
+                }
+              })
             });
         } else {
           this.onChangeTab(tab);
         }
       }
     } catch (error) {
+      Taro.hideLoading()
+      // Taro.showModal({
+      //   title: "提示",
+      //   content: error.message,
+      //   showCancel: false
+      // });
       Taro.showModal({
-        title: "提示",
-        content: error.message,
-        showCancel: false
-      });
+        title: '提示',
+        content: error.message || '收款失败',
+        cancelText: '继续收款',
+        confirmText: '重新收款',
+        // cancelColor: '#333',
+        // confirmColor: '#333',
+        success: (res) => {
+          if (res.confirm) {
+            Taro.navigateBack()
+          } else if (res.cancel) {
+          }                  
+        }
+      })
     }
   };
+
+  // private renderModal = () => {
+    
+  //   const nonBarcodeInputs: ModalInput[] = [
+  //     {
+  //       title: "价格",
+  //       prefix: "￥",
+  //       value: '',
+  //       onInput: ({ detail: { value } }) => {},
+  //         // this.onChangeValue("nonBarcodePrice", value),
+  //       placeholder: "请输入商品价格"
+  //       // focus: true,
+  //     },
+  //     {
+  //       title: "备注",
+  //       value: 'nonBarcodeRemark',
+  //       onInput: ({ detail: { value } }) => {},
+  //         // this.onChangeValue("nonBarcodeRemark", value),
+  //       placeholder: "请输入备注信息"
+  //     }
+  //   ];
+  //   const buttons = [
+  //     {
+  //       title: "重新收款",
+  //       type: "confirm",
+  //       onPress: () => {}
+  //     },
+  //     {
+  //       title: "重新开单",
+  //       type: "confirm",
+  //       onPress: () => {}
+  //     }
+  //   ];
+  //   let isOpen = true
+  //   return (
+  //     <Modal
+  //       isOpened={isOpen}
+  //       header={"操作"}
+  //       onClose={() => {isOpen = false}}
+  //       tip='扫码失败。。。'
+  //       buttons={buttons}
+  //       // inputs={nonBarcodeInputs}
+  //     />
+  //   );
+  // };
 
   /**
    * @todo [收款成功之后的处理]

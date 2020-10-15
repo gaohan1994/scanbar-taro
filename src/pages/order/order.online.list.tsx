@@ -104,6 +104,7 @@ class OrderOnlineList extends Taro.Component<Props> {
     try {
       const { currentType, value, selectType } = this.state;
       this.setState({loading: true});
+      Taro.showLoading()
       let payload: OrderInterface.OrderListFetchFidle = {
         pageNum: typeof page === 'number' ? page : pageNum,
         pageSize: 20,
@@ -123,6 +124,7 @@ class OrderOnlineList extends Taro.Component<Props> {
 
       const result = await OrderAction.orderList(payload);
       this.setState({loading: false});
+      Taro.hideLoading()
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       if (typeof page === 'number') {
         pageNum = page + 1;
@@ -131,6 +133,7 @@ class OrderOnlineList extends Taro.Component<Props> {
       }
     } catch (error) {
       this.setState({loading: false});
+      Taro.hideLoading()
       Taro.showToast({
         title: error.message,
         icon: 'none'
@@ -156,8 +159,10 @@ class OrderOnlineList extends Taro.Component<Props> {
 
   render () {
 
-    const { orderList } = this.props;
-    const hasMore = false;
+    const { orderList, orderListTotal } = this.props;
+    console.log('hasmore',orderList.length, orderListTotal, orderList.length < orderListTotal);
+    
+    const hasMore = orderList.length < orderListTotal;
     const { currentType, loading } = this.state;
     return (
       <View className={`container ${cssPrefix}`}>
@@ -188,7 +193,8 @@ class OrderOnlineList extends Taro.Component<Props> {
               />
             </View>
           )}
-          {!loading ? (
+          {/* {!loading ? ( */}
+          {
             orderList && orderList.length > 0
             ? (
               <View>
@@ -214,11 +220,13 @@ class OrderOnlineList extends Taro.Component<Props> {
                 text='还没有订单'
               />
             )
-          ) : (
-            <AtActivityIndicator
-              mode='center'
-            />
-          )}
+          // ) 
+          // : (
+          //   <AtActivityIndicator
+          //     mode='center'
+          //   />
+          // )}
+          }
         </ScrollView>
         {this.renderModal()}
       </View>

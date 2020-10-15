@@ -16,7 +16,8 @@ import {
   getProductSearchList,
   getSelectProduct,
   getProductType,
-  getProductList
+  getProductList,
+  getProductManageList
 } from "../../reducers/app.product";
 import { AppReducer } from "../../reducers";
 import { connect } from "@tarojs/redux";
@@ -34,6 +35,7 @@ import { ProductCartInterface } from "../../common/sdk/product/product.sdk";
 import HeaderInput from "../../component/header/header.input";
 import ButtonCostom from "../../component/button/button";
 import ProductListView from "../../component/product/product.listview";
+import merge from "lodash.merge";
 
 const cssPrefix = "product";
 
@@ -45,8 +47,9 @@ interface Props {
    * @memberof Props
    */
   productList: ProductInterface.ProductInfo[];
-  productSearchList: ProductInterface.ProductList[];
-  pureProductSearchList: ProductInterface.ProductInfo[];
+  productListTotal: number;
+  // productSearchList: ProductInterface.ProductList[];
+  // pureProductSearchList: ProductInterface.ProductInfo[];
   selectProduct: ProductInterface.ProductInfo;
   productTypeList: ProductInterface.ProductTypeInfo[];
   /**
@@ -77,6 +80,10 @@ interface State {
   loading: boolean;
 }
 
+
+let pageNum = 1
+const pageSize = 20
+
 class ProductOrder extends Taro.Component<Props, State> {
   config: Config = {
     navigationBarTitleText: "开单"
@@ -84,8 +91,8 @@ class ProductOrder extends Taro.Component<Props, State> {
 
   readonly state: State = {
     currentType: {
-      name: "",
-      id: 0,
+      name: "全部分类",
+      id: 999,
       createTime: ""
     },
     searchValue: "",
@@ -102,7 +109,7 @@ class ProductOrder extends Taro.Component<Props, State> {
   ) => {
     this.setState({ currentType: typeInfo }, async () => {
       if (fetchProduct) {
-        this.fetchData(typeInfo);
+        this.fetchData(typeInfo, 1);
       }
     });
   };
@@ -114,9 +121,13 @@ class ProductOrder extends Taro.Component<Props, State> {
         productTypeResult.code === ResponseCode.success,
         productTypeResult.msg || " "
       );
-      const { data } = productTypeResult;
-      const firstType = data[0] || {};
-      this.changeCurrentType(firstType);
+      // const { data } = productTypeResult;
+      // const firstType = data[0] || {};
+      // Object.keys(firstType).length !== 0 && this.changeCurrentType(firstType);
+
+      Object.keys(this.props.productTypeList).length !== 0 && this.changeCurrentType(this.props.productTypeList[0]);
+      
+      // this.fetchData(undefined as any, 1)
 
       // const { selectProduct } = this.props;
       // if (selectProduct !== undefined) {
@@ -139,33 +150,101 @@ class ProductOrder extends Taro.Component<Props, State> {
     }
   };
 
-  public fetchData = async (type: ProductInterface.ProductTypeInfo) => {
-    this.setState({ loading: true });
-    const result = await ProductAction.productOrderInfoList({
-      type: `${type.id}`,
-      status: 0
-    });
-    this.setState({ loading: false });
-    return result;
+  public fetchData = async (type: ProductInterface.ProductTypeInfo, page?: number) => {
+    try{
+      const { productList, productListTotal} =  this.props
+      const currentPage = page  || pageNum
+      
+      if(currentPage !== 1){
+        if(this.state.loading) {
+          return
+        }
+        if ( productList.length >= productListTotal) {
+          return
+        }
+        this.setState({ loading: true });
+      }
+      
+      Taro.showLoading()
+      
+      
+      let payload: ProductInterface.ProductInfoListFetchFidle = {
+        pageNum: currentPage,
+        pageSize,
+        status: 0
+      };
+
+      if (type && type.id !== 999) {
+        payload.type = `${type.id}`;
+      }
+
+      const result = await ProductAction.productOrderInfoList(payload);
+      Taro.hideLoading()
+      this.setState({ loading: false });
+      invariant(result.code === ResponseCode.success, result.msg || " ")
+      if (typeof page === "number") {
+        pageNum = page + 1;
+      } else {
+        pageNum += 1;
+      }
+      return result;
+
+    } catch (error) {
+      Taro.hideLoading()
+      this.setState({ loading: false });
+      Taro.showToast({
+        title: error.message,
+        icon: "none"
+      })
+    }
   };
 
-  public searchData = async () => {
-    const { searchValue } = this.state;
+  public searchData = async (page?: number) => {
+
+    const { searchValue, currentType } = this.state
     try {
-      if (searchValue === "") {
+      if (!searchValue) {
         /**
          * @todo 如果输入的是空则清空搜索
          */
-        ProductAction.productInfoEmptySearchList();
+        // ProductAction.productInfoEmptySearchList();
+        this.fetchData(currentType, 1)
+        return
+      }
+      const { productList, productListTotal} =  this.props
+      const currentPage = page || pageNum
+      if(currentPage !== 1) {
+        if(this.state.loading) {
+          return
+        }
+        if (productList.length >= productListTotal) {
+          return
+        }
+      }
+
+     
+
+      Taro.showLoading();
+      this.setState({ loading: true });
+      const payload: ProductInterface.ProductInfoGetListFetchFidle = {
+        pageNum: currentPage,
+        pageSize,
+        words: searchValue,
+      }
+      // if(currentType && currentType.id !== 999) {
+      //   payload.type = currentType.id
+      // }
+      const { success, result } = await ProductAction.productInfoSearchList(payload);
+      Taro.hideLoading();
+      this.setState({ loading: false });
+      invariant(success, result || ResponseCode.error);
+      if (typeof page === "number") {
+        pageNum = page + 1;
       } else {
-        Taro.showLoading();
-        const { success, result } = await ProductAction.productInfoSearchList({
-          words: searchValue
-        });
-        Taro.hideLoading();
-        invariant(success, result || ResponseCode.error);
+        pageNum += 1;
       }
     } catch (error) {
+      this.setState({ loading: false });
       Taro.hideLoading();
       Taro.showToast({
         title: error.message,
@@ -173,6 +252,15 @@ class ProductOrder extends Taro.Component<Props, State> {
       });
     }
   };
+
+  public loadMore = () => {
+    const { searchValue, currentType } = this.state
+    if(!searchValue) {      
+      this.fetchData(currentType)
+      return
+    }
+    this.searchData()
+  }
 
   public onNonBarcodeProductClick = () => {
     const product: any = {
@@ -212,7 +300,7 @@ class ProductOrder extends Taro.Component<Props, State> {
    */
   public onInput = ({ detail }: any) => {
     this.setState({ searchValue: detail.value }, () => {
-      this.searchData();
+      this.searchData(1);
     });
   };
 
@@ -252,7 +340,7 @@ class ProductOrder extends Taro.Component<Props, State> {
    */
   private renderLeft = () => {
     const { currentType, searchValue } = this.state;
-    const { productTypeList, pureProductSearchList } = this.props;
+    const { productTypeList } = this.props;
     return (
       <ScrollView scrollY={true} className={`${cssPrefix}-list-left`}>
         <View
@@ -268,14 +356,12 @@ class ProductOrder extends Taro.Component<Props, State> {
                 key={type.id}
                 className={classnames(`${cssPrefix}-list-left-item`, {
                   [`${cssPrefix}-list-left-item-active`]:
-                    searchValue === "" &&
-                    pureProductSearchList.length === 0 &&
+                    !searchValue &&
                     type.id === currentType.id
                 })}
                 onClick={() => this.onTypeClick(type)}
               >
-                {searchValue === "" &&
-                  pureProductSearchList.length === 0 &&
+                {!searchValue &&
                   type.id === currentType.id && (
                     <View
                       className={`${cssPrefix}-list-left-item-active-bge`}
@@ -293,9 +379,10 @@ class ProductOrder extends Taro.Component<Props, State> {
   };
 
   private renderRight = () => {
-    const { productList, pureProductSearchList } = this.props;
+
+    const { productList, productListTotal } = this.props;
     const { currentType, searchValue, loading } = this.state;
-    if (pureProductSearchList.length === 0 && searchValue === "") {
+    // if (pureProductSearchList.length === 0 && searchValue === "") {
       return (
         <View className={`${cssPrefix}-list-right`}>
           <View
@@ -308,19 +395,13 @@ class ProductOrder extends Taro.Component<Props, State> {
           </View>
           <ProductListView
             loading={loading}
+            page={pageNum}
             productList={productList}
-            className={`${cssPrefix}-list-right-container`}
-          />
-        </View>
-      );
-    }
-    return (
-      <View className={`${cssPrefix}-list-right`}>
-        <ProductListView
-          productList={pureProductSearchList}
-          className={`${cssPrefix}-list-right-container-search`}
-        >
-          {pureProductSearchList.length === 0 ? (
+            productListTotal={productListTotal}
+            className={`${cssPrefix}-list-right-container${searchValue ? '-search' : ''}`}
+            onScrollToLower={this.loadMore}
+          >
+            {productList.length === 0 && pageNum !== 1? (
             <View className={`${cssPrefix}-search-empty`}>
               <View className={`${cssPrefix}-search-empty-img`} />
               <View className={`${cssPrefix}-search-empty-text`}>
@@ -340,28 +421,35 @@ class ProductOrder extends Taro.Component<Props, State> {
           ) : (
             <View />
           )}
-        </ProductListView>
-      </View>
+            </ProductListView>
+        </View>
     );
   };
 }
 
 const mapState = (state: AppReducer.AppState) => {
-  const productList = getProductList(state) || [];
+  // const productList = getProductList(state) || [];
 
-  const productSearchList = getProductSearchList(state) || [];
-  const pureProductSearchList: any[] = productSearchList;
+  // const productSearchList = getProductSearchList(state) || [];
+  // const pureProductSearchList: any[] = productSearchList;
   const selectProduct: any = getSelectProduct(state);
+  const productTypeList: any[] =  merge([], getProductType(state));
+  const shareProduct: any = state.product.shareProduct
+  productTypeList.unshift({
+    id: 999,
+    name: "全部品类",
+    title: "全部品类",
+    createTime: ""
+  } as any);
 
   return {
-    productList,
-    productSearchList,
-    pureProductSearchList,
+    productList: getProductManageList(state).data || [],
+    productListTotal: getProductManageList(state).total || 0,
     selectProduct,
-    productTypeList: getProductType(state),
+    productTypeList,
     productCartList: getProductCartList(state),
     suspensionList: getSuspensionCartList(state),
-    shareProduct: state.product.shareProduct
+    shareProduct
   };
 };
 
