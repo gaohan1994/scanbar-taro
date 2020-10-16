@@ -14,6 +14,7 @@ import merchantAction from '../../actions/merchant.action';
 import { ResponseCode } from '../../constants/index';
 import loginManager from '../../common/sdk/sign/login.manager';
 import HomeMenus from './component/menus';
+import { isPermissedRender } from '../../component/AuthorizedGroup/AuthorizedItem'
 
 const cssPrefix = 'home';
 
@@ -48,10 +49,12 @@ class Home extends Component<Props, State> {
       const payload = {
         merchantId: userinfo.merchantInfoDTO.id
       };
-      ReportAction.reportTodayData(payload);
       this.setState({ userinfo });
       loginManager.getUserInfo();
       
+      if(isPermissedRender('cashier:menu:my')) {
+        ReportAction.reportTodayData(payload);
+      }
       merchantAction.pointConfigDetail();
     } catch (error) {
       Taro.showToast({
@@ -106,7 +109,8 @@ class Home extends Component<Props, State> {
             <Image src="//net.huanmusic.com/weapp/icon_shop.png" className={classnames(['home-name-icon', 'home-icon'])} />
             <Text className="home-name-text">{userinfo.merchantInfoDTO.name || ''}</Text>
           </View>
-          <View className="home-card">
+          {
+            true && <View className="home-card">
             <View className="home-buttons">
               <View
                 className={`home-buttons-button home-buttons-button-border ${cssPrefix}-buttons-button-start`}
@@ -136,12 +140,14 @@ class Home extends Component<Props, State> {
               </View>
             </View>
           </View>
-          <View onClick={() => this.nav('/pages/product/product.order')}>
+          }
+          
+          {isPermissedRender('cashier:menu:billing') && <View onClick={() => this.nav('/pages/product/product.order')}>
             <Card card-class="home-order">
               <Image src="//net.huanmusic.com/weapp/icon_home_bill.png" className="home-order-icon" />
               <Text className="home-order-text" >开单</Text>
             </Card>
-          </View>
+          </View>}
           <HomeMenus />
         </View>
       </View>

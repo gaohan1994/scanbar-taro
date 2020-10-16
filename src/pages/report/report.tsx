@@ -29,6 +29,7 @@ import {
   getMerchantSubList
 } from "../../reducers/app.merchant";
 import { MerchantInterface } from "../../constants";
+import { isPermissedRender } from '../../component/AuthorizedGroup/AuthorizedItem'
 
 const cssPrefix = "report";
 
@@ -91,7 +92,20 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
     };
   }
 
-  componentDidShow() {
+  componentDidShow() {    
+    if(!isPermissedRender('cashier:menu:businessData')) {
+      Taro.showModal({
+        title: '提示',
+        content: '您没有权限，请联系门店管理员添加',
+        showCancel: false,
+        complete: function() {
+          Taro.switchTab({
+            url: '/pages/home/home'
+          })
+        }
+      })
+      return
+    }
     this.init();
   }
 

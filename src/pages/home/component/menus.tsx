@@ -3,82 +3,117 @@ import { View, Image, Text } from "@tarojs/components";
 import "../../style/home.less";
 import loginManager from "../../../common/sdk/sign/login.manager";
 import "../../../component/common/card/card.less";
+import AuthorizedItem, { isPermissedRender } from '../../../component/AuthorizedGroup/AuthorizedItem'
 
 function HomeMenus() {
   const [menus, setMenus] = useState([] as any[]);
 
   useDidShow(() => {
     loginManager.getUserInfo().then((response: any) => {
-      console.log("response", response);
       if (!!response.success) {
         setMenus(response.result.menus);
       }
     });
   });
 
+
   const NavItems = [
     {
       image: "//net.huanmusic.com/weapp/-icon_menu_proceeds.png",
       value: "收款",
       subTitle: "Gathering",
-      url: "/pages/pay/pay.input"
+      url: "/pages/pay/pay.input",
+      funcNo: "cashier:menu:collect"
     },
     {
       image: "//net.huanmusic.com/weapp/v2/icon_menu_details.png",
       value: "查账",
       subTitle: "Inquiry account",
-      url: "/pages/order/order.main"
+      url: "/pages/order/order.main",
+      funcNo: "cashier:menu:audit"
     },
     {
       image: "//net.huanmusic.com/weapp/v2/icon_menu_order.png",
       value: "线上订单",
       subTitle: "Gathering",
-      url: "/pages/order/order.online.list"
+      url: "/pages/order/order.online.list",
+      funcNo: "cashier:menu:onlineOrder"
     },
     {
       image: "//net.huanmusic.com/weapp/icon_menu_more.png",
       value: "退货",
       subTitle: "Even more",
-      url: "/pages/product/product.refund"
-    }
-  ];
-  console.log("menus", menus);
-  const memberToken = menus.some(menu => menu.name === "会员");
-  if (!!memberToken) {
-    NavItems.push({
+      url: "/pages/product/product.refund",
+      funcNo: "cashier:menu:return"
+    },
+    {
       image: "//net.huanmusic.com/weapp/-icon_menu_member.png",
       value: "会员",
       subTitle: "Member management",
-      url: "/pages/member/member"
-    });
-  }
-  const productToken = menus.some(menu => menu.name === "商品");
-  if (!!productToken) {
-    NavItems.push({
+      url: "/pages/member/member",
+      funcNo: "cashier:menu:member"
+    },
+    {
       image: "//net.huanmusic.com/weapp/icon_menu_commodity.png",
       value: "商品",
       subTitle: "Commodity management",
-      url: "/pages/product/product.manage"
-    });
-  }
-  const inventoryToken = menus.some(menu => menu.name === "采购");
-  if (!!inventoryToken) {
-    NavItems.push({
+      url: "/pages/product/product.manage",
+      funcNo: "cashier:menu:commodity"
+    },
+    {
       image: "//net.huanmusic.com/weapp/icon_menu_inventory1.png",
       value: "进货",
       subTitle: "inventory",
-      url: "/pages/inventory/inventory.main"
-    });
-  }
-  const stockToken = menus.some(menu => menu.name === "库存");
-  if (!!stockToken) {
-    NavItems.push({
+      url: "/pages/inventory/inventory.main",
+      funcNo: "cashier:menu:purchase"
+    },
+    {
       image: "//net.huanmusic.com/weapp/icon_menu_procurement1.png",
       value: "盘点",
       subTitle: "Procurement",
-      url: "/pages/inventory/inventory.stock"
-    });
-  }
+      url: "/pages/inventory/inventory.stock",
+      funcNo: "cashier:menu:inventory"
+    }
+
+
+  ];
+  console.log("menus", menus);
+  // const memberToken = menus.some(menu => menu.name === "会员");
+  // if (!!memberToken) {
+  //   NavItems.push({
+  //     image: "//net.huanmusic.com/weapp/-icon_menu_member.png",
+  //     value: "会员",
+  //     subTitle: "Member management",
+  //     url: "/pages/member/member"
+  //   });
+  // }
+  // const productToken = menus.some(menu => menu.name === "商品");
+  // if (!!productToken) {
+  //   NavItems.push({
+  //     image: "//net.huanmusic.com/weapp/icon_menu_commodity.png",
+  //     value: "商品",
+  //     subTitle: "Commodity management",
+  //     url: "/pages/product/product.manage"
+  //   });
+  // }
+  // const inventoryToken = menus.some(menu => menu.name === "采购");
+  // if (!!inventoryToken) {
+  //   NavItems.push({
+  //     image: "//net.huanmusic.com/weapp/icon_menu_inventory1.png",
+  //     value: "进货",
+  //     subTitle: "inventory",
+  //     url: "/pages/inventory/inventory.main"
+  //   });
+  // }
+  // const stockToken = menus.some(menu => menu.name === "库存");
+  // if (!!stockToken) {
+  //   NavItems.push({
+  //     image: "//net.huanmusic.com/weapp/icon_menu_procurement1.png",
+  //     value: "盘点",
+  //     subTitle: "Procurement",
+  //     url: "/pages/inventory/inventory.stock"
+  //   });
+  // }
 
   if (false) {
     // {
@@ -126,7 +161,9 @@ function HomeMenus() {
     <View className="home-bar">
       {NavItems.map((item, index) => {
         return (
-          <View
+          // <AuthorizedItem key={item.funcNo} funcNo={item.funcNo}>
+          isPermissedRender(item.funcNo) && <View 
+          // <View
             key={item.value}
             className={`theme-card common-card card-class home-bar-card ${
               (index + 1) % 3 !== 0 ? "home-bar-card-right" : ""
@@ -141,6 +178,7 @@ function HomeMenus() {
               <Text className="home-small-text">{item.subTitle}</Text>
             </View>
           </View>
+          // </AuthorizedItem>
         );
       })}
     </View>

@@ -14,6 +14,7 @@ import { connect } from "@tarojs/redux";
 import { getProfileInfo } from "../../reducers/app.merchant";
 import { MerchantInterface } from "src/constants";
 import loginManager from "../../common/sdk/sign/login.manager";
+import { isPermissedRender } from '../../component/AuthorizedGroup/AuthorizedItem'
 
 const Rows = [
   {
@@ -59,6 +60,19 @@ class UserMain extends Taro.Component<UserMainProps, UserMainState> {
   };
 
   async componentDidShow() {
+    if(!isPermissedRender('cashier:menu:my')) {
+      Taro.showModal({
+        title: '提示',
+        content: '您没有权限，请联系门店管理员添加',
+        showCancel: false,
+        complete: function() {
+          Taro.switchTab({
+            url: '/pages/home/home'
+          })
+        }
+      })
+      return
+    }
     await this.init();
   }
 

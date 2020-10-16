@@ -164,8 +164,10 @@ export declare namespace OrderInterface {
     payType?: number;
     terminalCd?: string;
     terminalSn?: string;
-    transFlag?: number;
-    transType?: number;
+    transFlag?: number; // 交易/支付状态
+    afterSaleStatus?: string; // 售后状态
+    deliveryStatus?: string; // 配送状态
+    transType?: number; // 交易类型 0=销售,1=退货,2=直接收款,3=储值充值
     startTime?: string;
     endTime?: string;
     identity?: string

@@ -26,6 +26,7 @@ import Modal from "../../component/modal/modal";
 import "../../component/card/form.card.less";
 import numeral from "numeral";
 import { ModalInput } from "../../component/modal/modal";
+import {isPermissedRender} from '../../component/AuthorizedGroup/AuthorizedItem'
 
 export function generateModalButtons(
   confirmCallback: any,
@@ -427,7 +428,7 @@ class ProductDetail extends Taro.Component<Props, State> {
        */
       const keys = Object.keys(productChangeDetail);
       if (keys.length === 0) {
-        Taro.navigateBack();
+        // Taro.navigateBack();
         return;
       }
 
@@ -467,9 +468,9 @@ class ProductDetail extends Taro.Component<Props, State> {
         icon: "success",
         duration: 500
       });
-      setTimeout(() => {
-        Taro.navigateBack();
-      }, 500);
+      // setTimeout(() => {
+      //   Taro.navigateBack();
+      // }, 500);
     } catch (error) {
       Taro.hideLoading();
       Taro.showToast({
@@ -681,8 +682,10 @@ class ProductDetail extends Taro.Component<Props, State> {
 
   private renderFooter = () => {
     const { isEdit } = this.state
+    const numberFlag = isPermissedRender("commodity:manage:inventory")
+    const editFlag = isPermissedRender("commodity:manage:edit")
+    
     if(isEdit) {
-
       return <View className={`${cssPrefix}-add-buttons`}>
         <AtButton
           className={`${cssPrefix}-add-buttons-button theme-button`}
@@ -699,10 +702,15 @@ class ProductDetail extends Taro.Component<Props, State> {
         </AtButton>
       </View>
     }
-    
-    return <View className={`${cssPrefix}-add-buttons`}>
+
+    if(!numberFlag && !editFlag) {
+      return null
+    }
+
+    if(numberFlag && editFlag) {
+      return (<View className={`${cssPrefix}-add-buttons`}>
       <AtButton
-        className={`${cssPrefix}-add-buttons-button theme-button`}
+        className={`${cssPrefix}-add-buttons-button' theme-button`}
         onClick={() =>  this.changeModalVisible("numberModalVisible", true)}
       >
         调整库存
@@ -713,7 +721,23 @@ class ProductDetail extends Taro.Component<Props, State> {
       >
         编辑
       </AtButton>
-    </View>
+    </View>)
+    }
+
+    return (
+      <View className={`${cssPrefix}-add-buttons`}>
+        <View className={`${cssPrefix}-detail-submit`}>
+          <AtButton
+            className={`theme-button`}
+            onClick={numberFlag ? () =>  this.changeModalVisible("numberModalVisible", true) : () => this.setState({isEdit: true})}
+          >
+            {numberFlag ? '调整库存' : '编辑'}
+          </AtButton>
+        </View>
+      </View>
+    )
+    
+    
     
     
   }
