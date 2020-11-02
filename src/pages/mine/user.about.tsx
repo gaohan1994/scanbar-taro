@@ -9,6 +9,7 @@ import { View, Image, Text } from "@tarojs/components";
 import "../style/user.less";
 import "../../component/card/form.card.less";
 import "../style/product.less";
+import logo from '../../assets/tab-bar/pic_logo.png'
 
 const cssPrefix = "user";
 
@@ -24,7 +25,7 @@ class UserAbount extends Taro.Component<Props> {
       <View className="container">
         <View className={`${cssPrefix}-about-box`}>
           <Image
-            src="//net.huanmusic.com/weapp/v2/logo.png"
+            src={logo}
             className={`${cssPrefix}-about-box-img`}
           />
           <Text className={`${cssPrefix}-about-box-title`}>星亿腾</Text>

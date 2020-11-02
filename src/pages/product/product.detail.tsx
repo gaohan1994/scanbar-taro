@@ -468,6 +468,7 @@ class ProductDetail extends Taro.Component<Props, State> {
         icon: "success",
         duration: 500
       });
+      this.setState({isEdit: false})
       // setTimeout(() => {
       //   Taro.navigateBack();
       // }, 500);
@@ -778,7 +779,8 @@ class ProductDetail extends Taro.Component<Props, State> {
       numberModalVisible,
       numberLimitModalVisible,
       productDetail,
-      productChangeDetail
+      productChangeDetail,
+      isEdit
     } = this.state;
 
     const costInputs: ModalInput[] = [
@@ -921,7 +923,10 @@ class ProductDetail extends Taro.Component<Props, State> {
       }
     );
     const numberButtons = generateModalButtons(
-      () => this.changeModalVisible("numberModalVisible", false),
+      () => {
+        this.changeModalVisible("numberModalVisible", false)
+        !isEdit && this.submit()
+      },
       () => {
         this.onNumberValueChange("number", "");
         this.changeModalVisible("numberModalVisible", false);

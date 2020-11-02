@@ -14,7 +14,7 @@ import { ReportAction } from "../../actions";
 import { AppReducer } from "../../reducers";
 import { getReportBaseInfo } from "../../reducers/app.report";
 import { connect } from "@tarojs/redux";
-import { ReportInterface, ResponseCode } from "../../constants";
+import { ReportInterface, ResponseCode, ReportService } from "../../constants";
 import numeral from "numeral";
 import TabsMenu from "../../component/layout/menu";
 import "../../component/layout/header.layout.less";
@@ -30,6 +30,7 @@ import {
 } from "../../reducers/app.merchant";
 import { MerchantInterface } from "../../constants";
 import { isPermissedRender } from '../../component/AuthorizedGroup/AuthorizedItem'
+import icon_commodity from '../../assets/tab-bar/icon_commodity.png'
 
 const cssPrefix = "report";
 
@@ -56,6 +57,7 @@ type State = {
   costomMinDate: string;
   costomMaxDate: string;
   currentMerchant?: MerchantInterface.MerchantDetail;
+  currentInventory?: any
 };
 
 class ReportMain extends Taro.Component<ReportMainProps, State> {
@@ -88,7 +90,8 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
       weekValue: 0,
       costomMinDate: ``,
       costomMaxDate: ``,
-      currentMerchant: undefined
+      currentMerchant: undefined,
+      currentInventory: {}
     };
   }
 
@@ -415,6 +418,7 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
         beginDate: dayJs(minDate).format("YYYY-MM-DD 00:00:00"),
         endDate: dayJs(maxDate).format("YYYY-MM-DD 23:59:59")
       };
+      let inventoryPayload: {merchantId: number} = {} as any
       if (currentDate === "本月") {
         payload = {
           beginDate: dayJs(minDate).format("YYYY-MM-DD 00:00:00"),
@@ -436,9 +440,14 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
        */
       if (!!currentMerchant && currentMerchant.id) {
         payload.merchantId = currentMerchant.id;
+        inventoryPayload.merchantId = currentMerchant.id
       }
 
       ReportAction.reportBaseSaleInfo(payload);
+      const currentInventory = await ReportService.reportCurrentInventory(inventoryPayload)
+      if(currentInventory.code === ResponseCode.success) {
+        this.setState({ currentInventory: {...currentInventory.data} })
+      }
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -1042,6 +1051,7 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
 
   private renderCard = () => {
     const { reportBaseInfo } = this.props;
+    const { currentInventory } = this.state
     const Rows = [
       {
         icon: "//net.huanmusic.com/weapp/icon_sale.png",
@@ -1100,7 +1110,25 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
           }
         ],
         arrow: false
-      }
+      },
+      {
+        icon: icon_commodity,
+        id: "saleVisible",
+        title: "saleVisible",
+        items: [
+          {
+            title: "库存总数量",
+            value: `${numeral(currentInventory.stockNum).format("0.00")}`
+          },
+          {
+            title: "总金额",
+            value: `￥${numeral(
+              numeral(currentInventory.stockAmount || 0).value()
+            ).format("0.00")}`
+          }
+        ],
+        arrow: false
+      },
     ];
     return (
       <View className={`${cssPrefix}-card`}>

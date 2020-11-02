@@ -53,7 +53,7 @@ class ModalLayout extends Taro.Component<Props> {
               })}
             >
               {this.props.children}
-              <View style="height: 20px; width: 100%"  />
+              {/* <View style="height: 20px; width: 100%"  /> */}
             </View>
             {buttons && buttons.length > 0 && (
               <ButtonFooter buttons={buttons} />

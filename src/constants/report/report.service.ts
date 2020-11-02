@@ -31,6 +31,11 @@ class ReportService {
     const result = await requestHttp.get(`${ReportInterfaceMap.reportTodayData}${jsonToQueryString(params)}`);
     return result;
   }
+  public reportCurrentInventory = async (params?: {merchantId: number | undefined}): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.get(`/product/stock/getCurrentInventory${jsonToQueryString(params)}`)
+    return result
+  };
+  
 }
 
 export default new ReportService();

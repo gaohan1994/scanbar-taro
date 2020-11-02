@@ -17,18 +17,20 @@ import invariant from 'invariant';
 import './index.less';
 import "../style/inventory.less";
 import "../style/product.less";
+import "../../component/card/form.card.less";
 import TabsSwitch from '../../component/tabs/tabs.switch';
 import OrderItem from '../../component/order/order.online';
 import Empty from '../../component/empty/index';
 import classnames from 'classnames';
 import merge from 'lodash.merge';
 import ModalLayout from '../../component/layout/modal.layout';
-import { ORDER_STATUS } from '../../actions/order.action';
+import { TRANS_FLAG, DELIVERY_STATUS, AFTER_SALE_STATUS } from '../../actions/order.action';
 
 let pageNum: number = 1;
 const pageSize: number = 20;
 
 const cssPrefix = 'order';
+const productPrefix = 'product'
 
 type Props = { 
   orderList: OrderInterface.OrderDetail[];
@@ -36,16 +38,37 @@ type Props = {
   orderCount: any;
 };
 
+type State = {
+  currentType: number;
+  getUserinfoModal: boolean;
+  loginModal: boolean;
+  loading: boolean;
+  value: string,
+  visible: boolean;
+  selectTransFlags: string[],
+  selectDeliveryStatus: string[],
+  selectAfterSaleStatus: string[],
+  transFlagList: any[],
+  afterSaleStatusList: any[],
+  deliveryStatusList: any[]
+}
+
 class OrderOnlineList extends Taro.Component<Props> {
 
-  state = {
+  state:State = {
     currentType: 0,
     getUserinfoModal: false,
     loginModal: false,
     loading: false,
     value: '',
     visible: false,
-    selectType: [],
+    selectTransFlags: [],
+    selectDeliveryStatus: [],
+    selectAfterSaleStatus: [],
+    transFlagList: [],
+    afterSaleStatusList: [],
+    deliveryStatusList: []
+    
   };
 
   config: Taro.Config = {
@@ -59,6 +82,14 @@ class OrderOnlineList extends Taro.Component<Props> {
   public init = async () => {
     const { currentType } = this.state;
     pageNum = 1;
+    // getDictList({ dictType: 'after_sale_status' }, (list) => this.setState({afterSaleStatusList: list}))
+    // getDictList({ dictType: 'delivery_status' }, (list) => this.setState({deliveryStatusList: list}))
+    // getDictList({ dictType: 'trans_flag' }, (list) => this.setState({transFlagList: list}))
+    this.setState({
+      afterSaleStatusList: AFTER_SALE_STATUS,
+      deliveryStatusList: DELIVERY_STATUS,
+      transFlagList: TRANS_FLAG
+    })
     OrderAction.orderList({ pageNum: pageNum++, pageSize, orderSource: 3, ...OrderAction.getFetchType(currentType) });
     OrderAction.orderCount();
   }
@@ -69,29 +100,31 @@ class OrderOnlineList extends Taro.Component<Props> {
     });
   }
 
-  public changeSelectSupplier = (item: any) => {
+  public changeSelect = (type:string, item: any) => {
     this.setState((prevState: any) => {
-      const prevIds = merge([], prevState.selectType);
+      const prevIds = merge([], prevState[type]);
 
-      const index = prevIds.findIndex(p => p === item.id);
+      const index = prevIds.findIndex(p => p === item.dictValue);
       if (index === -1) {
-        prevIds.push(item.id);
+        prevIds.push(item.dictValue);
       } else {
         prevIds.splice(index, 1);
       }
       return {
         ...prevState,
-        selectType: prevIds
+        [type]: prevIds
       };
     });
   }
 
-  public changeAll = (key: string = 'selectType') => {
+  public changeAll = (key: string, list) => {
+    const { selectAfterSaleStatus, afterSaleStatusList, selectDeliveryStatus, deliveryStatusList, selectTransFlags, transFlagList} = this.state
+    const flag = selectAfterSaleStatus.length === afterSaleStatusList.length && selectTransFlags.length === transFlagList.length && selectDeliveryStatus.length === deliveryStatusList.length
     this.setState(prevState => {
       const prevData = merge([], prevState[key]);
       let nextData: any[] = [];
-      if (prevData.length !== ORDER_STATUS.length) {
-        nextData = ORDER_STATUS.map((s) => s.id);
+      if (!flag) {
+        nextData = list.map((s) => s.dictValue);
       }
       return {
         ...prevState,
@@ -102,13 +135,14 @@ class OrderOnlineList extends Taro.Component<Props> {
 
   public fetchOrder = async (page?: number) => {
     try {
-      const { currentType, value, selectType } = this.state;
+      const { currentType, value, selectTransFlags, selectDeliveryStatus, selectAfterSaleStatus, deliveryStatusList, transFlagList, afterSaleStatusList } = this.state;
       this.setState({loading: true});
       Taro.showLoading()
       let payload: OrderInterface.OrderListFetchFidle = {
         pageNum: typeof page === 'number' ? page : pageNum,
         pageSize: 20,
         orderSource: 3,
+        orderByColumn: 'o.create_time desc',
         ...OrderAction.getFetchType(currentType)
       };
 
@@ -117,9 +151,14 @@ class OrderOnlineList extends Taro.Component<Props> {
         payload.identity = value;
         
       }
-      
-      if (selectType.length > 0) {
-        payload.transFlags = selectType.join(',');
+
+      const checkAll = selectAfterSaleStatus.length === afterSaleStatusList.length && selectTransFlags.length === transFlagList.length && selectDeliveryStatus.length === deliveryStatusList.length
+      const noCheck = selectAfterSaleStatus.length === 0 && selectDeliveryStatus.length === 0 && selectTransFlags.length === 0
+      if(!checkAll && !noCheck){
+        payload.isMultiCondition = true
+        selectTransFlags.length > 0 && (payload.transFlags = selectTransFlags.join(','))
+        selectDeliveryStatus.length > 0 && (payload.deliveryStatus = selectDeliveryStatus.join(','))
+        selectAfterSaleStatus.length > 0 && (payload.afterSaleStatus = selectAfterSaleStatus.join(','))
       }
 
       const result = await OrderAction.orderList(payload);
@@ -144,7 +183,10 @@ class OrderOnlineList extends Taro.Component<Props> {
   public onChangeTab = (tabNum: number) => {
     this.setState({
       currentType: tabNum,
-      selectType: [],
+      selectAfterSaleStatus: [],
+      selectDeliveryStatus: [],
+      selectTransFlags: []
+
     }, () => {
       this.fetchOrder(1);
       OrderAction.orderCount();
@@ -153,15 +195,15 @@ class OrderOnlineList extends Taro.Component<Props> {
 
   public reset = () => {
     this.setState({
-      selectType: [],
+      selectTransFlags: [],
+      selectDeliveryStatus: [],
+      selectAfterSaleStatus: []
     });
   }
 
   render () {
 
     const { orderList, orderListTotal } = this.props;
-    console.log('hasmore',orderList.length, orderListTotal, orderList.length < orderListTotal);
-    
     const hasMore = orderList.length < orderListTotal;
     const { currentType, loading } = this.state;
     return (
@@ -234,7 +276,7 @@ class OrderOnlineList extends Taro.Component<Props> {
   }
   
   private renderModal = () => {
-    const { visible, selectType } = this.state;
+    const { visible, selectTransFlags, selectDeliveryStatus, selectAfterSaleStatus, afterSaleStatusList, transFlagList, deliveryStatusList } = this.state;
     return (
       <ModalLayout
         visible={visible}
@@ -249,37 +291,205 @@ class OrderOnlineList extends Taro.Component<Props> {
           }},
         ]}
       >
-        <View className={`inventory-select`}>
-          <View className={`inventory-select-item`}>
-            <View className={`inventory-select-title`}>订单状态</View>
-            <View className={"inventory-select-item-box"}>
+
+        {/**
+         * 一种分类
+         * */}
+        <View className={`${productPrefix}-select-content`} style={{ padding: 0}}>
+          {transFlagList.length  && (<View className={`${productPrefix}-select-content-item ${productPrefix}-select-border`}>
+            <View className={`${productPrefix}-select-content-item-title`}>订单状态</View>
+            <View className={`${productPrefix}-select-content-item-buttons`}>
               <View
-                onClick={() => this.changeAll()}
-                className={classnames(
-                  'inventory-select-item-button', 
-                  {'inventory-select-item-button-active': selectType.length === ORDER_STATUS.length}
-                )}
+                onClick={() => {
+                  this.changeAll('selectTransFlags', transFlagList);
+                  this.changeAll('selectDeliveryStatus', deliveryStatusList);
+                  this.changeAll('selectAfterSaleStatus', afterSaleStatusList);
+                }}
+                className={
+                  classnames("component-form-button", {
+                    [`${productPrefix}-select-content-button`]: true,
+                    "component-form-button-confirm":
+                      selectTransFlags.length === transFlagList.length && selectAfterSaleStatus.length === afterSaleStatusList.length && selectDeliveryStatus.length === deliveryStatusList.length,
+                    "component-form-button-cancel":
+                      selectTransFlags.length !== transFlagList.length || selectAfterSaleStatus.length !== afterSaleStatusList.length || selectDeliveryStatus.length !== deliveryStatusList.length
+                  })}
+              >
+                全部
+              </View>
+              {transFlagList.length && transFlagList.map((item) => {
+                
+                  if(item.dictValue === 1) { return '' }
+                  return (
+                    <View 
+                      key={item.dictValue}
+                      onClick={() => this.changeSelect('selectTransFlags', item)}
+                      className={classnames("component-form-button", {
+                        [`${productPrefix}-select-content-button`]: true,
+                        "component-form-button-confirm": selectTransFlags.some((t) => t === item.dictValue),
+                        "component-form-button-cancel": !selectTransFlags.some((t) => t === item.dictValue)
+                      })}
+                    >
+                      {item.dictLabel}
+                    </View>
+                  );
+                })
+              }
+              {deliveryStatusList.length && deliveryStatusList.map((item) => {
+                if(item.dictValue === 3) { return '' }
+                return (
+                  <View 
+                    key={item.dictValue}
+                    onClick={() => this.changeSelect('selectDeliveryStatus', item)}
+                    className={classnames("component-form-button", {
+                      [`${productPrefix}-select-content-button`]: true,
+                      'component-form-button-confirm': selectDeliveryStatus.some((t) => t === item.dictValue),
+                      'component-form-button-cancel': !selectDeliveryStatus.some((t) => t === item.dictValue),
+                    })}
+                  >
+                    {item.dictLabel}
+                  </View>
+                );
+              })}
+                  
+
+              {afterSaleStatusList.length && afterSaleStatusList.map((item) => {
+                return (
+                  <View 
+                    key={item.dictValue}
+                    onClick={() => this.changeSelect('selectAfterSaleStatus', item)}
+                    className={classnames("component-form-button", {
+                      [`${productPrefix}-select-content-button`]: true,
+                      'component-form-button-confirm':  selectAfterSaleStatus.some((t) => t === item.dictValue),
+                      'component-form-button-cancel':  !selectAfterSaleStatus.some((t) => t === item.dictValue),
+                    })}
+                  >
+                    {item.dictLabel}
+                  </View>
+                );
+              })}
+            </View>
+          </View>)}
+
+          
+
+        {/**
+         * 三种分类
+         * */}
+        {/* <View className={`${productPrefix}-select-content`} style={{ padding: 0}}>
+          {transFlagList.length && (<View className={`${productPrefix}-select-content-item ${productPrefix}-select-border`}>
+            <View className={`${productPrefix}-select-content-item-title`}>交易状态</View>
+            <View className={`${productPrefix}-select-content-item-buttons`}>
+              <View
+                onClick={() => this.changeAll('selectTransFlags', transFlagList)}
+                className={
+                  classnames("component-form-button", {
+                    [`${productPrefix}-select-content-button`]: true,
+                    "component-form-button-confirm":
+                      selectTransFlags.length === transFlagList.length,
+                    "component-form-button-cancel":
+                      selectTransFlags.length !== transFlagList.length
+                  })}
               >
                 全部
               </View>
               {
-                ORDER_STATUS.map((item) => {
+                transFlagList.map((item) => {
                   return (
                     <View 
-                      key={item.id}
-                      onClick={() => this.changeSelectSupplier(item)}
-                      className={classnames("inventory-select-item-button", {
-                        'inventory-select-item-button-active': selectType.length !== ORDER_STATUS.length && selectType.some((t) => t === item.id),
+                      key={item.dictValue}
+                      onClick={() => this.changeSelect('selectTransFlags', item)}
+                      className={classnames("component-form-button", {
+                        [`${productPrefix}-select-content-button`]: true,
+                        "component-form-button-confirm": selectTransFlags.some((t) => t === item.dictValue),
+                        "component-form-button-cancel": !selectTransFlags.some((t) => t === item.dictValue)
                       })}
                     >
-                      {item.title}
+                      {item.dictLabel}
                     </View>
                   );
                 })
               }
             </View>
-          </View>
-        </View>
+          </View>)}
+ 
+          {deliveryStatusList.length && (<View className={`${productPrefix}-select-content-item ${productPrefix}-select-border`}>
+            <View className={`${productPrefix}-select-content-item-title`}>物流状态</View>
+            <View className={`${productPrefix}-select-content-item-buttons`}>
+              <View
+                onClick={() => this.changeAll('selectDeliveryStatus', deliveryStatusList)}
+                className={classnames(
+                  'component-form-button', 
+                  
+                  {
+                    [`${productPrefix}-select-content-button`]: true,
+                    'component-form-button-confirm': 
+                      selectDeliveryStatus.length === deliveryStatusList.length,
+                    'component-form-button-cancel': 
+                      selectDeliveryStatus.length !== deliveryStatusList.length
+                  }
+                )}
+              >
+                全部
+              </View>
+              {
+                deliveryStatusList.map((item) => {
+                  return (
+                    <View 
+                      key={item.dictValue}
+                      onClick={() => this.changeSelect('selectDeliveryStatus', item)}
+                      className={classnames("component-form-button", {
+                        [`${productPrefix}-select-content-button`]: true,
+                        'component-form-button-confirm': 
+                          selectDeliveryStatus.some((t) => t === item.dictValue),
+                        'component-form-button-cancel': 
+                          !selectDeliveryStatus.some((t) => t === item.dictValue),
+
+                      })}
+                    >
+                      {item.dictLabel}
+                    </View>
+                  );
+                })
+              }
+            </View>
+          </View>)}
+
+          {afterSaleStatusList.length && (<View className={`${productPrefix}-select-content-item ${productPrefix}-select-border`}>
+            <View className={`${productPrefix}-select-content-item-title`}>售后状态</View>
+            <View className={`${productPrefix}-select-content-item-buttons`}>
+              <View
+                onClick={() => this.changeAll('selectAfterSaleStatus', afterSaleStatusList)}
+                className={classnames(
+                  'component-form-button', 
+                  {
+                    [`${productPrefix}-select-content-button`]: true,
+                    'component-form-button-confirm': selectAfterSaleStatus.length === afterSaleStatusList.length,
+                    'component-form-button-cancel': selectAfterSaleStatus.length !== afterSaleStatusList.length
+                  }
+                )}
+              >
+                全部
+              </View>
+              {
+                afterSaleStatusList.map((item) => {
+                  return (
+                    <View 
+                      key={item.dictValue}
+                      onClick={() => this.changeSelect('selectAfterSaleStatus', item)}
+                      className={classnames("component-form-button", {
+                        [`${productPrefix}-select-content-button`]: true,
+                        'component-form-button-confirm':  selectAfterSaleStatus.some((t) => t === item.dictValue),
+                        'component-form-button-cancel':  !selectAfterSaleStatus.some((t) => t === item.dictValue),
+                      })}
+                    >
+                      {item.dictLabel}
+                    </View>
+                  );
+                })
+              }
+            </View>
+          </View>)}*/}
+        </View> 
       </ModalLayout>
     );
   }

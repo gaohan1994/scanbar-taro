@@ -57,8 +57,10 @@ class OrderItem extends Taro.Component<Props, State> {
         <View className={`${cssPrefix}-card-header`}>
           <View 
             className={classnames(`${cssPrefix}-card-header-text`, {
-              [`${cssPrefix}-card-status-red`]: res.id === 10 || res.id === 12 || res.id === 11,
-              [`${cssPrefix}-card-status-orange`]: res.id === 8 || res.id === 5 || res.id === 13,
+              // [`${cssPrefix}-card-status-red`]: res.id === 10 || res.id === 12 || res.id === 11,
+              // [`${cssPrefix}-card-status-orange`]: res.id === 8 || res.id === 5 || res.id === 13,
+              [`${cssPrefix}-card-status-red`]: res.type === 'delivery_status',
+              [`${cssPrefix}-card-status-orange`]: res.type === 'after_sale_status',
             })}
           >
             {res.title}

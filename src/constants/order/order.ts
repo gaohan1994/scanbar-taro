@@ -96,6 +96,8 @@ export declare namespace OrderInterface {
     transAmount: number;
     transFlag: number;
     transType: number;
+    afterSaleStatus: number;
+    deliveryStatus: number;
   }
 
   interface OrderCount {
@@ -170,7 +172,8 @@ export declare namespace OrderInterface {
     transType?: number; // 交易类型 0=销售,1=退货,2=直接收款,3=储值充值
     startTime?: string;
     endTime?: string;
-    identity?: string
+    identity?: string;
+    isMultiCondition?: boolean;
   }
 
   interface OrderDetailFetchField {
