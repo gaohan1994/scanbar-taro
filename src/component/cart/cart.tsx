@@ -366,11 +366,12 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       });
       return;
     }
-    if (changePrice === "" || numeral(changePrice).value() <= 0) {
-      // Taro.showToast({
-      //   title: '请填写商品价格',
-      //   icon: 'none'
-      // });
+    // if (changePrice === "" || numeral(changePrice).value() <= 0) {
+    if (changePrice === "" || numeral(changePrice).value() < 0) {
+      Taro.showToast({
+        title: '请填写商品价格',
+        icon: 'none'
+      });
       return;
     }
 
@@ -608,7 +609,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                     <View className={`${cssPrefix}-product-container-normal`}>
                       <Text
                         className={`${cssPrefix}-product-container-price`}
-                      >{`￥${product.changePrice || product.price}`}</Text>
+                      >{`￥${product.changePrice}`}</Text>
                     </View>
                     {sort ===
                       productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER ||
