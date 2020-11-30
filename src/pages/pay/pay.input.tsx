@@ -63,7 +63,7 @@ class PayInput extends Taro.Component<Props, State> {
       const payload = productSdk.getDirectProductInterfacePayload(
         numeral(inputValue).value()
       );
-      const result = await productSdk.cashierPay(payload);
+      const result = await productSdk.cashierOrder(payload);
       invariant(
         result.code === ResponseCode.success,
         result.msg || ResponseCode.error

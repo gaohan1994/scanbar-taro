@@ -609,7 +609,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                     <View className={`${cssPrefix}-product-container-normal`}>
                       <Text
                         className={`${cssPrefix}-product-container-price`}
-                      >{`￥${product.changePrice}`}</Text>
+                      >{`￥${product.changePrice || product.price}`}</Text>
                     </View>
                     {sort ===
                       productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER ||

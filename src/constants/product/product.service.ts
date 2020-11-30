@@ -63,7 +63,11 @@ class ProductService {
     return requestHttp.post(ProductInterfaceMap.productInfoAdd, params);
   }
 
-  public cashierPay = async (params: ProductCartInterface.ProductPayPayload): Promise<HTTPInterface.ResponseResultBase<any>> => {
+  public cashierOrder = async (params: ProductCartInterface.ProductPayPayload): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.post(ProductInterfaceMap.cashierOrder, params)
+  }
+
+  public cashierPay = async (params: ProductCartInterface.ProductPayForCashierPayload): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.post(ProductInterfaceMap.cashierPay, params);
   }
 

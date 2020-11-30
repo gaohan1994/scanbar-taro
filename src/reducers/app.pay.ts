@@ -11,10 +11,11 @@ export declare namespace PayReducer {
 
   interface State {
     payReceive: PayReceive;
+    orderNo: string[];
   }
 
   interface Action {
-    type: ProductInterface.RECEIVE_PAY_DETAIL;
+    type: ProductInterface.RECEIVE_PAY_DETAIL | ProductInterface.RECEIVE_PAY_ORDERRNO;
     payload: any;
   }
 }
@@ -23,7 +24,8 @@ const initState: PayReducer.State = {
   payReceive: {
     transPayload: undefined,
     transResult: undefined,
-  }
+  },
+  orderNo: []
 };
 
 export default function payReducer (state: PayReducer.State = initState, action: PayReducer.Action): PayReducer.State {
@@ -33,6 +35,13 @@ export default function payReducer (state: PayReducer.State = initState, action:
       return {
         ...state,
         payReceive,
+      };
+    }
+    case ProductInterfaceMap.reducerInterfaces.RECEIVE_PAY_ORDERRNO: {
+      const { payload } = action;
+      return {
+        ...state,
+        orderNo: [...state.orderNo, payload],
       };
     }
     default: {

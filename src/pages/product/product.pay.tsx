@@ -459,7 +459,7 @@ class ProductPay extends Taro.Component<Props, State> {
         productSdk.setErase(eraseValue);
       }
       const payload = productSdk.getProductInterfacePayload();
-      const result = await productSdk.cashierPay(payload);
+      const result = await productSdk.cashierOrder(payload);
       invariant(
         result.code === ResponseCode.success,
         result.msg || ResponseCode.error

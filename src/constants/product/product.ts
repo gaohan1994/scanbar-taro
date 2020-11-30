@@ -203,6 +203,7 @@ export declare namespace ProductInterface {
   type RECEIVE_PRODUCT_SUPPLIER = string;
   type RECEIVE_PRODUCT_DETAIL = string;
   type RECEIVE_PAY_DETAIL = string;
+  type RECEIVE_PAY_ORDERRNO = string;
   type SET_SELECT_PRODUCT = string;
 
   interface ReducerInterface {
@@ -214,6 +215,7 @@ export declare namespace ProductInterface {
     RECEIVE_PRODUCT_SUPPLIER: RECEIVE_PRODUCT_SUPPLIER;
     RECEIVE_PRODUCT_DETAIL: RECEIVE_PRODUCT_DETAIL;
     RECEIVE_PAY_DETAIL: RECEIVE_PAY_DETAIL;
+    RECEIVE_PAY_ORDERRNO: RECEIVE_PAY_ORDERRNO;
     SET_SELECT_PRODUCT: SET_SELECT_PRODUCT;
     TOOGLE_SHARE: string;
     SET_SHARE: string;
@@ -227,6 +229,7 @@ interface ProductInterfaceMap {
   productInfoEdit: string;
   productInfoGetBarcode: string;
   productInfoAdd: string;
+  cashierOrder: string;
   cashierPay: string;
   cashierRefund: string;
   cashierQueryStatus(
@@ -257,6 +260,7 @@ class ProductInterfaceMap {
     RECEIVE_PRODUCT_SUPPLIER: "RECEIVE_PRODUCT_SUPPLIER",
     RECEIVE_PRODUCT_DETAIL: "RECEIVE_PRODUCT_DETAIL",
     RECEIVE_PAY_DETAIL: "RECEIVE_PAY_DETAIL",
+    RECEIVE_PAY_ORDERRNO: "RECEIVE_PAY_ORDERRNO",
     SET_SELECT_PRODUCT: "SET_SELECT_PRODUCT"
   };
 
@@ -265,7 +269,8 @@ class ProductInterfaceMap {
   public productInfoEdit = "/product/productInfo/edit";
   public productInfoGetBarcode = "/product/productInfo/genBarcode";
   public productInfoAdd = "/product/productInfo/add";
-  public cashierPay = "/cashier/pay";
+  public cashierOrder = "/cashier/order";
+  public cashierPay = "/cashier/payForCashier";
   public cashierRefund = "/cashier/refund";
 
   public cashierQueryStatus = (

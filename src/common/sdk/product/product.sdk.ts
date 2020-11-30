@@ -113,6 +113,13 @@ export declare namespace ProductCartInterface {
     transProp: boolean; // true=正常支付流程,false=订单再次支付],直接收款=true
   }
 
+  interface ProductPayForCashierPayload {
+    orderNo: string;
+    payType?: number;
+    authCode?: string;
+    thirdPartFlag?: number;
+  }
+
   interface QueryStatusListItem extends Partial<ProductInterface.ProductInfo> {
     costAmount: number;
     discountAmount: number;
@@ -839,7 +846,7 @@ class ProductSDK {
         memberId: this.member !== undefined ? this.member.id : -1,
         orderNo: "",
         orderSource: 1,
-        payType: 2,
+        payType: 1,
         terminalCd: "-1",
         terminalSn: "-1",
         totalAmount: this.getProductPrice(),
@@ -887,7 +894,7 @@ class ProductSDK {
 
   public getDirectProductInterfacePayload = (
     money: number,
-    payType: number = 2
+    payType: number = 1
   ): ProductCartInterface.ProductPayPayload => {
     return {
       flag: true,
@@ -1146,8 +1153,15 @@ class ProductSDK {
     store.dispatch(reducer);
   };
 
-  public cashierPay = async (
+  public cashierOrder = async (
     params: ProductCartInterface.ProductPayPayload
+  ) => {
+    const result = await ProductService.cashierOrder(params);
+    return result;
+  }
+
+  public cashierPay = async (
+    params: ProductCartInterface.ProductPayForCashierPayload
   ) => {
     const result = await ProductService.cashierPay(params);
     return result;

@@ -25,6 +25,9 @@ export { MerchantInterface, default as MerchantInterfaceMap } from './merchant/m
 export { default as ReportService } from './report/report.service';
 export { ReportInterface, default as ReportInterfaceMap } from './report/report';
 
+export { default as CommonService} from './common/common.service';
+export { CommonInterface, default as CommonInterfaceMap } from './common/common';
+
 export const ResponseCode = {
   success: 'response.success',
   error: '服务器开了个小差',
@@ -43,6 +46,7 @@ export declare namespace HTTPInterface {
   };
 
   type ResponseResultBase<T> = {
+    errMsg: string;
     code: string;
     msg: string;
     data: T

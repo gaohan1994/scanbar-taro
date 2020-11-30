@@ -19,6 +19,7 @@ import numeral from "numeral";
 import invariant from "invariant";
 import productSdk from "../../common/sdk/product/product.sdk";
 import { ProductCartInterface } from "../../common/sdk/product/product.sdk";
+import { ProductInterfaceMap } from "../../constants";
 import {
   ResponseCode,
   ProductInterface,
@@ -26,7 +27,6 @@ import {
 } from "../../constants/index";
 import { store } from "../../app";
 import { checkNumberInput } from "../../common/util/common";
-import Modal, { ModalInput } from '../../component/modal/modal'
 
 const Items = [
   {
@@ -50,10 +50,12 @@ const cssPrefix = "pay";
 
 interface Props {
   payDetail: PayReducer.PayReceive;
+  orderNo: string[];
 }
 interface State {
   tab: "receive" | "cash";
   receiveCash: string;
+  codeUrl: string;
 }
 
 class PayReceive extends Taro.Component<Props, State> {
@@ -61,12 +63,14 @@ class PayReceive extends Taro.Component<Props, State> {
     payDetail: {
       transPayload: undefined,
       transResult: undefined
-    }
+    },
+    orderNo: []
   };
 
   state: State = {
     tab: "receive",
-    receiveCash: ""
+    receiveCash: "",
+    codeUrl: '',
   };
 
   config: Config = {
@@ -74,11 +78,30 @@ class PayReceive extends Taro.Component<Props, State> {
   };
 
   componentDidMount() {
+    const { payDetail } = this.props
+    productSdk.cashierPay({
+      orderNo: (payDetail.transResult as ProductInterface.CashierPay).orderNo,
+      payType: 1,
+    })
+      .then((res) => {
+        if(res.code === ResponseCode.success) {
+          this.setState({codeUrl: res.data.codeUrl})
+          setTimeout(this.queryStatus.bind(null, payDetail.transResult && payDetail.transResult.orderNo), 5000)
+        }
+      })
     productSdk.setSort(productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER);
-    this.queryStatus();
   }
 
-  public queryStatus = async () => {
+  componentWillUnmount() {
+    const { payDetail } = this.props;
+    // 退出的订单保存到redux中
+    store.dispatch({
+      type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PAY_ORDERRNO,
+      payload: (payDetail.transResult as ProductInterface.CashierPay).orderNo
+    });
+  }
+
+  public queryStatus = async (orderNo: string) => {
     try {
       const { payDetail } = this.props;
       invariant(payDetail.transPayload !== undefined, "支付参数设置错误");
@@ -87,24 +110,30 @@ class PayReceive extends Taro.Component<Props, State> {
         orderNo: (payDetail.transResult as ProductInterface.CashierPay).orderNo
       });
 
-      // 取消支付失败的toast
-      // invariant(result.code === ResponseCode.success, result.msg || ResponseCode.error);
-
-      if (result.code === ResponseCode.success) {
+      if(result && result.errMsg === 'request:fail timeout') {
+        this.queryStatus(orderNo)
+        return
+      }
+      if (result && result.code === ResponseCode.success ) {
         const { data } = result;
-        this.receiveCallback(data.status, payDetail.transPayload as any);
+        this.receiveCallback(data.status, payDetail.transResult as any);
+      }else {
+        throw new Error(result && result.msg || ' ')
       }
     } catch (error) {
+      if(error && error.errMsg === 'request:fail timeout') {
+        this.queryStatus(orderNo)
+        return
+      }
       Taro.showToast({
         title: error.message,
-        icon: "none"
+        icon: "none",
       });
     }
   };
 
   public onChangeCash = (value: string) => {
     const newValue = checkNumberInput(value);
-    console.log("newValue", newValue);
     if (Number(newValue) > 99999999) {
       this.setState({ receiveCash: "99999999" });
       return "99999999";
@@ -142,18 +171,10 @@ class PayReceive extends Taro.Component<Props, State> {
               if (barcode.indexOf("ALIPAY") !== -1) {
                 throw new Error("暂不支持支付宝支付码");
               }
-              const payload: ProductCartInterface.ProductPayPayload = {
-                ...(payDetail.transPayload as ProductCartInterface.ProductPayPayload),
-                flag: false,
-                order: {
-                  ...(payDetail.transPayload as ProductCartInterface.ProductPayPayload)
-                    .order,
-                  authCode: barcode,
-                  orderNo: (payDetail.transResult as ProductInterface.CashierPay)
-                    .orderNo,
-                  payType: 4
-                },
-                transProp: false
+              const payload: ProductCartInterface.ProductPayForCashierPayload = {
+                payType: 3,
+                authCode: barcode,
+                orderNo: (payDetail.transResult as ProductInterface.CashierPay).orderNo
               };
               const scanPayResult = await productSdk.cashierPay(payload);
               Taro.hideLoading();
@@ -165,18 +186,11 @@ class PayReceive extends Taro.Component<Props, State> {
             })
             .catch(error => {
               Taro.hideLoading();
-              // Taro.showModal({
-              //   title: "提示",
-              //   content: error.message,
-              //   showCancel: false
-              // });
               Taro.showModal({
                 title: '提示',
                 content: error.message || '收款失败',
                 cancelText: '继续收款',
                 confirmText: '重新收款',
-                // cancelColor: '#333',
-                // confirmColor: '#333',
                 success: (res) => {
                   if (res.confirm) {
                     Taro.navigateBack()
@@ -191,18 +205,11 @@ class PayReceive extends Taro.Component<Props, State> {
       }
     } catch (error) {
       Taro.hideLoading()
-      // Taro.showModal({
-      //   title: "提示",
-      //   content: error.message,
-      //   showCancel: false
-      // });
       Taro.showModal({
         title: '提示',
         content: error.message || '收款失败',
         cancelText: '继续收款',
         confirmText: '重新收款',
-        // cancelColor: '#333',
-        // confirmColor: '#333',
         success: (res) => {
           if (res.confirm) {
             Taro.navigateBack()
@@ -213,51 +220,6 @@ class PayReceive extends Taro.Component<Props, State> {
     }
   };
 
-  // private renderModal = () => {
-    
-  //   const nonBarcodeInputs: ModalInput[] = [
-  //     {
-  //       title: "价格",
-  //       prefix: "￥",
-  //       value: '',
-  //       onInput: ({ detail: { value } }) => {},
-  //         // this.onChangeValue("nonBarcodePrice", value),
-  //       placeholder: "请输入商品价格"
-  //       // focus: true,
-  //     },
-  //     {
-  //       title: "备注",
-  //       value: 'nonBarcodeRemark',
-  //       onInput: ({ detail: { value } }) => {},
-  //         // this.onChangeValue("nonBarcodeRemark", value),
-  //       placeholder: "请输入备注信息"
-  //     }
-  //   ];
-  //   const buttons = [
-  //     {
-  //       title: "重新收款",
-  //       type: "confirm",
-  //       onPress: () => {}
-  //     },
-  //     {
-  //       title: "重新开单",
-  //       type: "confirm",
-  //       onPress: () => {}
-  //     }
-  //   ];
-  //   let isOpen = true
-  //   return (
-  //     <Modal
-  //       isOpened={isOpen}
-  //       header={"操作"}
-  //       onClose={() => {isOpen = false}}
-  //       tip='扫码失败。。。'
-  //       buttons={buttons}
-  //       // inputs={nonBarcodeInputs}
-  //     />
-  //   );
-  // };
-
   /**
    * @todo [收款成功之后的处理]
    * @todo [1.清空购物车]
@@ -267,13 +229,17 @@ class PayReceive extends Taro.Component<Props, State> {
    */
   public receiveCallback = (
     success: boolean,
-    payload: ProductCartInterface.ProductPayPayload
+    payload: ProductCartInterface.ProductPayForCashierPayload
   ) => {
     const params = {
       status: success,
-      orderNo: payload.order.orderNo,
+      orderNo: payload.orderNo,
       entry: "pay.receive"
     };
+    // 如果退出的订单号中包含此订单，不执行
+    if(this.props.orderNo.indexOf(payload.orderNo) !== -1) {
+      return
+    }
     if (success === true) {
       // 清空购物车
       store.dispatch({
@@ -328,14 +294,9 @@ class PayReceive extends Taro.Component<Props, State> {
         payDetail.transPayload !== undefined &&
         payDetail.transResult !== undefined
       ) {
-        const payload: ProductCartInterface.ProductPayPayload = {
-          ...payDetail.transPayload,
-          order: {
-            ...payDetail.transPayload.order,
-            payType: 0,
-            orderNo: payDetail.transResult.orderNo
-          },
-          transProp: false
+        const payload: ProductCartInterface.ProductPayForCashierPayload = {
+          payType: 0,
+          orderNo: (payDetail.transResult as ProductInterface.CashierPay).orderNo
         };
         const result = await productSdk.cashierPay(payload);
         Taro.hideLoading();
@@ -343,7 +304,7 @@ class PayReceive extends Taro.Component<Props, State> {
           result.code === ResponseCode.success,
           result.msg || ResponseCode.error
         );
-        this.receiveCallback(true, payload);
+        this.receiveCallback(result.data.status, payload);
       }
     } catch (error) {
       Taro.hideLoading();
@@ -397,18 +358,18 @@ class PayReceive extends Taro.Component<Props, State> {
    * @memberof PayReceive
    */
   private renderContent = () => {
-    const { tab, receiveCash } = this.state;
+    const { tab, receiveCash, codeUrl } = this.state;
     const { payDetail } = this.props;
 
     if (tab === "receive") {
       return (
         <View className={`${cssPrefix}-receive-content`}>
           <View className={`${cssPrefix}-receive-content-code`}>
-            {payDetail.transResult !== undefined ? (
+            {codeUrl ? (
               <Image
                 className={`${cssPrefix}-receive-content-code-image`}
                 // src={`${getBaseUrl('').replace('inventory-app/api', '')}${payDetail.transResult.codeUrl}`}
-                src={`${payDetail.transResult.codeUrl}`}
+                src={`${codeUrl}`}
               />
             ) : (
               <AtActivityIndicator mode="center" />
@@ -490,7 +451,8 @@ class PayReceive extends Taro.Component<Props, State> {
 }
 
 const select = (state: AppReducer.AppState) => ({
-  payDetail: getPayReceive(state)
+  payDetail: getPayReceive(state),
+  orderNo: state.pay.orderNo
 });
 
 export default connect(select)(PayReceive);
