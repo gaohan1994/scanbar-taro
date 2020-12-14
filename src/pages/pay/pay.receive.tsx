@@ -114,10 +114,11 @@ class PayReceive extends Taro.Component<Props, State> {
         this.queryStatus(orderNo)
         return
       }
-      if (result && result.code === ResponseCode.success ) {
-        const { data } = result;
-        this.receiveCallback(data.status, payDetail.transResult as any);
-      }else {
+      if (result && result.code) {
+        // const { data } = result;
+        this.receiveCallback(result.code === ResponseCode.success, payDetail.transResult as any);
+      }
+      else {
         throw new Error(result && result.msg || ' ')
       }
     } catch (error) {

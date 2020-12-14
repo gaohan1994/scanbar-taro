@@ -234,7 +234,10 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
           minDate: dayJs(minDate)
             .subtract(24, "hour")
             .format("YYYY-MM-DD HH:mm:ss"),
-          maxDate: dayJs(minDate).format("YYYY-MM-DD HH:mm:ss")
+          // maxDate: dayJs(minDate).format("YYYY-MM-DD HH:mm:ss")
+          maxDate: dayJs(minDate)
+            .subtract(24, "hour")
+            .format("YYYY-MM-DD HH:mm:ss")
         },
         () => {
           this.fetchData();
