@@ -1,10 +1,10 @@
 import Taro from "@tarojs/taro";
 import { HTTP_STATUS } from "./config";
 
-const customInterceptor = chain => {
+const customInterceptor = (chain) => {
   const requestParams = chain.requestParams;
 
-  return chain.proceed(requestParams).then(res => {
+  return chain.proceed(requestParams).then((res) => {
     console.log("res.data", res.data);
     if (res.statusCode === HTTP_STATUS.NOT_FOUND) {
       return Promise.reject("请求资源不存在");
@@ -22,8 +22,14 @@ const customInterceptor = chain => {
     } else if (res.data && (res.data.msg as string).indexOf("权限") !== -1) {
       return {
         ...res.data,
-        msg: "您还没有权限"
+        msg: "您还没有权限",
       };
+    } else if (res.data && res.data.code === "unauthorized") {
+      const timeId = setTimeout(() => {
+        clearTimeout(timeId);
+        Taro.redirectTo({ url: "/pages/sign/login" });
+      }, 1000);
+      return { ...res.data, msg: res.msg || '还未授权或已过期，请重新登陆'};
     } else if (res.statusCode === HTTP_STATUS.SUCCESS) {
       return res.data;
     }

@@ -103,12 +103,11 @@ class OrderDetail extends Taro.Component<Props, State> {
 
   private renderStatus = () => {
     const { orderDetail } = this.props;
-    const { order } = orderDetail;
-    const { transFlag } = order;
-    // 交易状态 0=未支付,1=已支付,-1支付失败，2交易关闭
+    const orderStatus = OrderAction.orderStatus([], orderDetail)
+
     return (
       <View className={`${cssPrefix}-detail-status`}>
-        {transFlag === -1 ? (
+        {!orderStatus.status ? (
           <Image
             src="//net.huanmusic.com/weapp/v1/icon_fail.png"
             className={`${cssPrefix}-detail-status-icon`}
@@ -122,13 +121,9 @@ class OrderDetail extends Taro.Component<Props, State> {
 
         {orderDetail.order && (
           <View className={`${cssPrefix}-detail-status-title`}>
-            {transFlag === -1
-              ? "交易失败"
-              : transFlag === 0
-              ? "未支付"
-              : transFlag === 1
-              ? "交易成功"
-              : "交易关闭"}
+            {
+              orderStatus.title
+            }
           </View>
         )}
       </View>
@@ -172,6 +167,7 @@ class OrderDetail extends Taro.Component<Props, State> {
       });
     }
 
+    // transType:交易类型 0=销售,1=退货,2=直接收款,3=储值充值
     const Form2: FormRowProps[] = orderDetail.order && [
       {
         title: `${orderDetail.order.transType !== 1 ? "应收金额" : "应退金额"}`,
@@ -187,7 +183,7 @@ class OrderDetail extends Taro.Component<Props, State> {
           orderDetail.order.transType !== 1 ? "收款" : "退款"
         }`,
         extraText:
-          orderDetail.order.transFlag === -1
+          [-1, -2].indexOf(orderDetail.order.transFlag) !== -1
             ? `${orderDetail.order.transType !== 1 ? "收款" : "退款"}失败`
             : `${symbol}￥ ${numeral(orderDetail.order.transAmount).format(
                 "0.00"
@@ -280,7 +276,7 @@ class OrderDetail extends Taro.Component<Props, State> {
             className={`${cssPrefix}-detail-card container-color`}
             onClick={() => {
               Taro.navigateTo({
-                url: `/pages/order/order.detail?id=${orderDetail.originOrder.orderNo}`
+                url: `/pages/order/order.detail?id=${orderDetail.originOrder && orderDetail.originOrder.orderNo}`
               });
             }}
           >

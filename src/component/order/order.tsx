@@ -31,7 +31,7 @@ class OrderItem extends Taro.Component<Props, State> {
       <View className={`${cssPrefix}`} onClick={() => this.onClickOrder(data)}>
         {data.order && (
           <View className={`${cssPrefix}-left`}>
-            {data.order.transFlag === -1 ? (
+            {[-1, -2].indexOf(data.order.transFlag) !== -1 ? (
               <Image
                 src="//net.huanmusic.com/weapp/v1/icon_failorder.png"
                 className={imageClassName}

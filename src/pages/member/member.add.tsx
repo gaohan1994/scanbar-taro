@@ -267,7 +267,7 @@ class MemberMain extends Taro.Component<Props, State> {
       setTimeout(() => {
         const pages = Taro.getCurrentPages()
         const memberPage: Taro.Page = pages[pages.length - 2]
-        memberPage.$component.onTabClick('create_time', 'desc')
+        memberPage.$component.onTabClick && memberPage.$component.onTabClick('create_time', 'desc')
         Taro.navigateBack({});
       }, 1500);
       

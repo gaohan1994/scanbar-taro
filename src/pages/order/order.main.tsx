@@ -241,8 +241,8 @@ class OrderMain extends Taro.Component<Props, State> {
       let payload: OrderInterface.OrderListFetchFidle = {
         pageNum: typeof page === "number" ? page : pageNum,
         pageSize: 20,
-        startTime: date,
-        endTime: date
+        startTime: dayJs(date).format("YYYY-MM-DD 00:00:00"),
+        endTime: dayJs(date).format("YYYY-MM-DD 23:59:59")
       };
       if (selectStatus && selectStatus.length === 1) {
         const fetchType = selectStatus[0];
@@ -288,8 +288,8 @@ class OrderMain extends Taro.Component<Props, State> {
     OrderAction.orderList({
       pageNum: pageNum++,
       pageSize,
-      startTime: today,
-      endTime: today
+      startTime: dayJs(today).format("YYYY-MM-DD 00:00:00"),
+      endTime: dayJs(today).format("YYYY-MM-DD 23:59:59")
     });
   };
 
