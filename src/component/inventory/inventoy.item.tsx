@@ -35,7 +35,7 @@ class InventoryItem extends Taro.Component<Props> {
   render () {
     const { inventory, sort } = this.props;
     // 是否大于0
-    const absToken: boolean = numeral(inventory.amount).value() > 0;
+    const absToken: boolean = numeral(inventory.amount).value() >= 0;
     return (
       <View 
         className={`${cssPrefix}`}

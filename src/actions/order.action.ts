@@ -269,12 +269,12 @@ export const TRANS_FLAG = [
     detail: "",
     status: false
   },
-  {
-    dictValue: 1,
-    dictLabel: "已完成",
-    detail: "支付完成",
-    status: false
-  },
+  // {
+  //   dictValue: 1,
+  //   dictLabel: "支付完成",
+  //   detail: "支付完成",
+  //   status: false
+  // },
   {
     dictValue: 2,
     dictLabel: "交易关闭",
@@ -283,7 +283,7 @@ export const TRANS_FLAG = [
   },
   {
     dictValue: 3,
-    dictLabel: "已完成",
+    dictLabel: "交易完成",
     detail: "订单已完成",
     status: true
   },

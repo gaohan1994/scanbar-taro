@@ -1,30 +1,20 @@
 Arguments: 
-  /usr/local/bin/node /Users/Gao/.yarn/bin/yarn.js add src/common/sdk/product/product.sdk --silent --no-progress
+  D:\devTools\node\node.exe D:\devTools\node\global\node_modules\yarn\bin\yarn.js add react --silent --no-progress
 
 PATH: 
-  /usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/Gao/Desktop/macdesktop/scanbar/node_modules/.bin:/usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/Gao/Desktop/macdesktop/scanbar/node_modules/.bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bind:/usr/local/mongodb/bind:/usr/local/mongodb/bin:/Users/Gao/.yarn/bin:/Users/Gao/.config/yarn/global/node_modules/.bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Tomcat/bin:/Users/Gao/Library/Android/sdk/tools:/Users/Gao/Library/Android/sdk/platform-tools:
+  D:\devTools\node\node_modules\npm\node_modules\npm-lifecycle\node-gyp-bin;D:\workspace\miniProgram\scanbar-taro\node_modules\.bin;D:\devTools\node\node_modules\npm\node_modules\npm-lifecycle\node-gyp-bin;D:\workspace\miniProgram\scanbar-taro\node_modules\.bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;D:\devTools\TortoiseSVN\bin;D:\devTools\node\;D:\devTools\WeixunClient\WeixunClient extend components;D:\devTools\Git\cmd;D:\devTools\TortoiseGit\bin;C:\Users\kangxin\AppData\Local\Microsoft\WindowsApps;D:\devTools\node\global;
 
 Yarn version: 
-  1.15.2
+  1.22.4
 
 Node version: 
-  12.4.0
+  12.18.3
 
 Platform: 
-  darwin x64
+  win32 x64
 
 Trace: 
-  Error: https://registry.npm.taobao.org/src%2fcommon/sdk/product/product.sdk: [not_found] document not found
-      at Request.params.callback [as _callback] (/Users/Gao/.yarn/lib/cli.js:66058:18)
-      at Request.self.callback (/Users/Gao/.yarn/lib/cli.js:129541:22)
-      at Request.emit (events.js:200:13)
-      at Request.<anonymous> (/Users/Gao/.yarn/lib/cli.js:130513:10)
-      at Request.emit (events.js:200:13)
-      at Gunzip.<anonymous> (/Users/Gao/.yarn/lib/cli.js:130435:12)
-      at Object.onceWrapper (events.js:288:20)
-      at Gunzip.emit (events.js:205:15)
-      at endReadableNT (_stream_readable.js:1154:12)
-      at processTicksAndRejections (internal/process/task_queues.js:84:9)
+  Error: EPERM: operation not permitted, unlink 'D:\workspace\miniProgram\scanbar-taro\node_modules\node-sass\vendor\win32-x64-72\binding.node'
 
 npm manifest: 
   {

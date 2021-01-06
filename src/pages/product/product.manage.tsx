@@ -9,7 +9,7 @@
 import React from 'react'
 import Taro from "@tarojs/taro";
 import { View, Image, Input, ScrollView, Text } from "@tarojs/components";
-import ScrollPagingView  from '../../component/product/product.listview.paging'
+// import ScrollPagingView  from '../../component/product/product.listview.paging'
 import "../style/product.less";
 import "../style/member.less";
 import "../../component/card/form.card.less";
@@ -266,10 +266,10 @@ class ProductManage extends Taro.Component<Props, State> {
       if (selectStatus.length === 1) {
         payload.status = selectStatus[0];
       }
-      if (selectSupplierId.length > 0) {
+      if (selectSupplierId.length > 0 && selectSupplierId.length !== this.props.productSupplier.length) {
         payload.supplierId = selectSupplierId.join(",");
       }
-      if (selectTypeId.length > 0) {
+      if (selectTypeId.length > 0 && selectTypeId.length !== this.props.productType.length) {
         payload.type = selectTypeId.join(",");
       }
 

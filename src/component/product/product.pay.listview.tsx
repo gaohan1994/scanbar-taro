@@ -95,7 +95,7 @@ class ProductPayListView extends Taro.Component<Props> {
                               `${cssPrefix}-row-bold`,
                               {
                                 [`${cssPrefix}-row-stock-item-red`]:
-                                  item.cost < 0
+                                  item.number < 0
                               }
                             )}
                           >

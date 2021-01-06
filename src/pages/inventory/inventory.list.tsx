@@ -112,12 +112,12 @@ class InventoryList extends Taro.Component<Props, State> {
     this.setState(prevState => {
       const prevIds = merge([], prevState.selectSupplierId);
 
-      if (prevIds.length === suppliers.length) {
-        return {
-          ...prevState,
-          selectSupplierId: [supplier.id]
-        };
-      }
+      // if (prevIds.length === suppliers.length) {
+      //   return {
+      //     ...prevState,
+      //     selectSupplierId: [supplier.id]
+      //   };
+      // }
 
       const index = prevIds.findIndex(p => p === supplier.id);
       if (index === -1) {
@@ -172,7 +172,7 @@ class InventoryList extends Taro.Component<Props, State> {
       if (searchValue !== "") {
         payload.businessNumber = searchValue as any;
       }
-      if (selectSupplierId && selectSupplierId.length > 0) {
+      if (selectSupplierId && selectSupplierId.length > 0 && selectSupplierId.length !== this.props.supplier.length) {
         payload.supplierId = selectSupplierId.join(",");
       }
       const today = dayJs().format("YYYY-MM-DD");
@@ -347,9 +347,7 @@ class InventoryList extends Taro.Component<Props, State> {
                     key={item.id}
                     onClick={() => this.changeSelectSupplier(item)}
                     className={classnames("inventory-select-item-button", {
-                      "inventory-select-item-button-active":
-                        selectSupplierId.length !== supplier.length &&
-                        selectSupplierId.some(t => t === item.id)
+                      "inventory-select-item-button-active": selectSupplierId.some(t => t === item.id)
                     })}
                   >
                     {item.name}

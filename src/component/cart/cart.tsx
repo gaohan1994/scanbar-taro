@@ -359,7 +359,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     const { changeProduct, sort } = this.props;
     const { changeSellNum, changePrice } = this.state;
 
-    if (changeSellNum === "" || numeral(changeSellNum).value() <= 0) {
+    if (changeSellNum === "" || numeral(changeSellNum).value() <= 0 && sort !== productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK) {
       Taro.showToast({
         title: "不可为0",
         icon: "none"
