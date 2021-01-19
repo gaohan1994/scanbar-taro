@@ -23,6 +23,11 @@ class ButtonFooter extends Taro.Component<Props> {
 
   render () {
     const { className, buttons } = this.props;
+    
+    if(!buttons.length) {
+      return null
+    }
+
     return (
       <View className={classnames(`product-add-buttons`, className)}>
         {

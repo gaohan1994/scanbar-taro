@@ -207,9 +207,11 @@ class OrderOnline extends Taro.Component<Props> {
 
   public getButtons = () => {
     const { orderDetail } = this.props;
+    const order = orderDetail.order
     const status = OrderAction.orderStatus([], orderDetail as any);
 
-    if (status.id === 0) {
+    // 待支付
+    if (status.type ==='trans_flag' && status.id === 0) {
       return [{
         title: '取消订单',
         onPress: () => {
@@ -227,7 +229,7 @@ class OrderOnline extends Taro.Component<Props> {
     }
 
     // 退货中
-    if (status.id === 5) {
+    if (status.type === 'after_sale_status' &&  status.id === 4 && order.transType === 1) {
       return [{
         title: '拒绝退货',
         type: 'cancel',
@@ -253,7 +255,8 @@ class OrderOnline extends Taro.Component<Props> {
       }];
     }
 
-    if (status.id === 10) {
+    // 待发货
+    if (status.type === 'delivery_status' && status.id === 0) {
       return [{
         title: '取消并退款',
         type: 'cancel',
@@ -274,7 +277,8 @@ class OrderOnline extends Taro.Component<Props> {
       }];
     }
 
-    if (status.id === 11) {
+    // 待自提
+    if (status.type === 'delivery_status' && status.id === 1) {
       return [{
         title: '取消并退款',
         type: 'cancel',
@@ -295,7 +299,8 @@ class OrderOnline extends Taro.Component<Props> {
       }];
     }
 
-    if (status.id === 12) {
+    // 待收货状态
+    if (status.type === 'delivery_status' && status.id === 2) {
       return [{
         title: '已送达',
         onPress: () => this.orderReceive()
@@ -303,7 +308,7 @@ class OrderOnline extends Taro.Component<Props> {
     }
 
     // 申请取消订单
-    if (status.id === 13) {
+    if (status.type === 'after_sale_status' && status.id === 0) {
       return [{
         title: '拒绝',
         type: 'cancel',
@@ -325,7 +330,7 @@ class OrderOnline extends Taro.Component<Props> {
     }
 
     // 申请退货
-    if (status.id === 8) {
+    if (status.type === 'after_sale_status' && status.id === 1 && order.transType === 1) {
       return [{
         title: '拒绝',
         type: 'cancel',
@@ -341,6 +346,7 @@ class OrderOnline extends Taro.Component<Props> {
       }];
     }
 
+    // 有原订单
     if (orderDetail.order.originOrderNo) {
       return [{
         title: '查看原订单',
@@ -378,7 +384,7 @@ class OrderOnline extends Taro.Component<Props> {
           <AtActivityIndicator mode='center' />
         )}
         
-        {!loading && status.id !== -1 && status.id !== 2 && status.id !== 1 && (
+        {!loading && (
           <ButtonFooter
             buttons={this.getButtons()}
           />

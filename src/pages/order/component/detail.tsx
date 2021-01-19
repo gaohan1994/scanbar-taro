@@ -1,8 +1,7 @@
 import Taro from '@tarojs/taro';
-import { View, Text } from '@tarojs/components';
+import { View } from '@tarojs/components';
 import './index.less';
 import numeral from 'numeral';
-import { CartItem } from '../order.refund';
 import { OrderInterface } from 'src/constants';
 import { OrderAction } from '../../../actions';
 
@@ -20,7 +19,9 @@ class OrderComponent extends Taro.Component<Props> {
     /**
      * @todo [isDelivery] true是自提
      */
-    const isDelivery = orderDetail && orderDetail.order && orderDetail.order.deliveryType === 0;
+    // const isDelivery = orderDetail && orderDetail.order && orderDetail.order.deliveryType === 2;
+    const isDelivery = orderDetail && orderDetail.order && orderDetail.order.deliveryStatus === 1;
+
     const status = OrderAction.orderStatus([], orderDetail as any);
     return (
       <View className={`${prefix}-detail`}>
@@ -36,7 +37,8 @@ class OrderComponent extends Taro.Component<Props> {
             </View>
           </View>
         )}
-        {(status.id === 5 || status.id === 6 || status.id === 7 || status.id === 8 || status.id === 9) ? (
+        {/* {(status.id === 5 || status.id === 6 || status.id === 7 || status.id === 8 || status.id === 9) ? ( */}
+        {(status.type === 'after_sale_status') ? (
           <View className={`${prefix}-detail-item`}> 
             <View 
               className={`${prefix}-detail-icon`} 
@@ -65,12 +67,13 @@ class OrderComponent extends Taro.Component<Props> {
             </View>
           </View>
         )}
-        {(status.id === 5 || status.id === 6 || status.id === 7 || status.id === 8 || status.id === 9) 
+        {/* {(status.id === 5 || status.id === 6 || status.id === 7 || status.id === 8 || status.id === 9)  */}
+        {(status.type === 'after_sale_status') 
         ? (
           <View className={`${prefix}-detail-item`}> 
             <View 
               className={`${prefix}-detail-icon`} 
-              style='background-image: url(//net.huanmusic.com/weapp/icon_order_location.png)'
+              style={`background-image: url(${require('../../../assets/icon_order_location.png')})`}
             />
             <View className={`${prefix}-detail-box`}>
               <View className={`${prefix}-detail-box-text ${prefix}-detail-title ${prefix}-detail-mar`}>
@@ -86,7 +89,7 @@ class OrderComponent extends Taro.Component<Props> {
           <View className={`${prefix}-detail-item`}> 
             <View 
               className={`${prefix}-detail-icon`} 
-              style='background-image: url(//net.huanmusic.com/weapp/icon_order_location.png)'
+              style={`background-image: url(${require('../../../assets/icon_order_location.png')})`}
             />
             <View className={`${prefix}-detail-box`}>
               <View className={`${prefix}-detail-box-text ${prefix}-detail-title ${prefix}-detail-mar`}>

@@ -25,14 +25,8 @@ class OrderComponent extends Taro.Component<Props> {
   componentWillMount () {
     const { orderDetail } = this.props;
     const status = OrderAction.orderStatus([], orderDetail as any);
-    if (status.id === 0) {
-      this.setTimer(orderDetail.order.createTime);
-      return;
-    }
-
-    if (status.id === 10 || status.id === 11 || status.id === 13) {
-      this.setTimer(orderDetail.order.transTime);
-      return;
+    if(status.showTime) {
+      this.setTimer(orderDetail.order[status.showTime])
     }
   }
 
@@ -74,56 +68,6 @@ class OrderComponent extends Taro.Component<Props> {
     });
   }
 
-  public statusImage = (status: any) => {
-    // bg_order_wait
-    // bg_order_cancel
-    // bg_order_complete
-    // bg_order_refound
-    switch (status.id) {
-      case -1:
-        return 'background-image: url(//net.huanmusic.com/weapp/bg_order_cancel.png)';
-      case 0:
-        return 'background-image: url(//net.huanmusic.com/weapp/bg_order_wait.png)';
-      case 1:
-        return 'background-image: url(//net.huanmusic.com/weapp/bg_order_complete.png)';
-      case 2:
-        return 'background-image: url(//net.huanmusic.com/weapp/bg_order_cancel.png)';
-      case 3: {
-        return 'background-image: url(//net.huanmusic.com/weapp/bg_order_wait.png)';
-      }
-      case 4: {
-        return 'background-image: url(//net.huanmusic.com/weapp/bg_order_wait.png)';
-      }
-      case 5: {
-        return 'background-image: url(//net.huanmusic.com/weapp/bg_order_refound.png)';
-      }
-      case 6: {
-        return 'background-image: url(//net.huanmusic.com/weapp/bg_order_refound.png)';
-      }
-      case 7: {
-        return 'background-image: url(//net.huanmusic.com/weapp/bg_order_refound.png)';
-      }
-      case 8: {
-        return 'background-image: url(//net.huanmusic.com/weapp/bg_order_refound.png)';
-      }
-      case 9: {
-        return 'background-image: url(//net.huanmusic.com/weapp/bg_order_refound.png)';
-      }
-      case 10: {
-        return 'background-image: url(//net.huanmusic.com/weapp/bg_order_wait.png)';
-      }
-      case 13: {
-        return 'background-image: url(//net.huanmusic.com/weapp/bg_order_cancel.png)';
-      }
-      case 12:
-        return 'background-image: url(//net.huanmusic.com/weapp/bg_order_wait.png)';
-      case 11:
-        return 'background-image: url(//net.huanmusic.com/weapp/bg_order_wait.png)';
-      default:
-        return 'background-image: url(//net.huanmusic.com/weapp/bg_order_wait.png)';
-    }
-  }
-
   public setTime = (time: number): string => {
     const hour = Math.floor(time / 60);
     const min = time % 60;
@@ -139,20 +83,10 @@ class OrderComponent extends Taro.Component<Props> {
         <View className={`${prefix}-status-bg`} />
         <View 
           className={`${prefix}-status-card`} 
-          style={`${this.statusImage(status)}`}
+          style={`background-image: url(//net.huanmusic.com/weapp/bg_order_${status.bg}.png)`}
         >
           <View className={`${prefix}-status-title`} >{status.title}</View>
-          {status.id === 0 
-          ? (
-            <View className={`${prefix}-status-tip`} >{`买家已下单${this.setTime(time)}`}</View>
-          ) 
-          : status.id === 10 || status.id === 11 || status.id === 13
-            ? (
-              <View className={`${prefix}-status-tip`} >{`买家已付款${this.setTime(time)}`}</View>
-            )
-            : (
-            <View className={`${prefix}-status-tip`} >{status.detail}</View>
-          )}
+          <View className={`${prefix}-status-tip`} >{status.detail}{status.showTime && this.setTime(time)}</View>
           
           <View 
             className={`${prefix}-status-button`}

@@ -73,88 +73,137 @@ class OrderAction {
   public getFetchType = (currentType: any) => {
     switch (currentType) {
       case 0:
-        return { deliveryStatus: '0' };
+        return { deliveryStatus: "0" };
       case 1:
-        return { deliveryStatus: '2' };
+        return { deliveryStatus: "2" };
       case 2:
-        return { deliveryStatus: '1' };
+        return { deliveryStatus: "1" };
       case 3:
-        return { afterSaleStatus: '1' };
+        return { afterSaleStatus: "1" };
       default:
         return {};
     }
   };
 
   /**
-   * @todo 根据订单的交易状态，物流状态，售后状态，确定订单状态
-   * @param afterSaleStatus 
-   * @param deliveryStatus 
-   * @param transFlag 
+   * 获取订单状态
    */
-  getListItem = (value: string | undefined, list: any[] = []) => {
-    if(!value) {
-      return undefined
+  getListItem = (value, list) => {
+    if (typeof value !== "number") {
+      return undefined;
     }
-    const res = list.find((item: any) => item.dictValue === value)
-    return res
-  }
-  getAfterSaleStatus = (afterSaleStatus, deliveryStatus, transFlag) => {
-    const res = this.getListItem(afterSaleStatus, AFTER_SALE_STATUS)
-    if(!res) {
-      return this.getDeliveryStatus(deliveryStatus, transFlag)
+    const res = list.find((item) => item.id === value);
+    return res;
+  };
+
+  getAfterSaleStatus = (afterSaleStatus) => {
+    const res = this.getListItem(afterSaleStatus, AFTER_SALE_STATUS);
+    if (!res) {
+      return null;
     }
     return {
-      type: 'AFTER_SALE_STATUS',
-      title: res && res.dictLabel || '',
-      id: res && res.dictValue || -1,
-      detail: '',
-      status: res && res.status || false
+      type: "after_sale_status",
+      ...res,
     };
   };
-  getDeliveryStatus = (deliveryStatus, transFlag) => {
-    const res = this.getListItem(deliveryStatus, DELIVERY_STATUS)
-    if(!res) {
-      return this.getTransFlag(transFlag)
+
+  getDeliveryStatus = (deliveryStatus) => {
+    const res = this.getListItem(deliveryStatus, DELIVERY_STATUS);
+    if (!res) {
+      return null;
     }
     return {
       type: "delivery_status",
-      title: res && res.dictLabel || '',
-      id: res && res.dictValue || -1,
-      detail: '',
-      status: res && res.status || false
+      ...res,
     };
   };
   getTransFlag = (transFlag) => {
-    const res = this.getListItem(transFlag, TRANS_FLAG)
-    // 如果没找到就后面的默认值
-    return {
-      type: '',
-      title: res && res.dictLabel || '',
-      id: res && res.dictValue || -1,
-      detail: '',
-      status: res && res.status || false
+    const res = this.getListItem(transFlag, TRANS_FLAG);
+    if (!res) {
+      return null;
     }
+    return {
+      type: "trans_flag",
+      ...res,
+    };
   };
 
-  /**
-   * @todo 获取订单对应的状态
-   */
-  public orderStatus = (
-    orderAllStatus: any[],
-    params: OrderInterface.OrderDetail,
-  ): {title: string, type: string, detail: string, id: number, status: boolean} => {
-    const { order } = params;
-    console.log(
-      'order.afterSaleStatus',order.afterSaleStatus,
-      'order.deliveryStatus',order.deliveryStatus,
-      'order.transFlag',order.transFlag,
-    )
-    const obj = this.getAfterSaleStatus(
-      order.afterSaleStatus,
-      order.deliveryStatus,
-      order.transFlag
-    );
-    return obj;
+  orderStatus = (r, orderDetail: any = {}) => {
+    const transFlag = orderDetail.order && orderDetail.order.transFlag;
+    const deliveryStatus =
+      orderDetail.order && orderDetail.order.deliveryStatus;
+    const afterSaleStatus =
+      orderDetail.order && orderDetail.order.afterSaleStatus;
+
+    // 如果只有交易状态显示交易状态
+    if (
+      typeof deliveryStatus !== "number" &&
+      typeof afterSaleStatus !== "number"
+    ) {
+      const status = this.getTransFlag(transFlag);
+      if (status) {
+        return { ...status };
+      }
+    }
+
+    // 如果只有交易以及物流显示物流
+    if (typeof afterSaleStatus !== "number" && deliveryStatus !== 3) {
+      const status = this.getDeliveryStatus(deliveryStatus);
+      if (status) {
+        return { ...status };
+      }
+    }
+
+    // 售后的三种情况直接显示
+    if ([0, 1, 4].indexOf(afterSaleStatus) !== -1) {
+      const status = this.getAfterSaleStatus(afterSaleStatus);
+      if (status) {
+        return { ...status };
+      }
+    }
+
+    // 售后其他情况状态显示上一次的(除了0 )，描述显示售后的
+    let status;
+    if (transFlag === 1) {
+      status = this.getDeliveryStatus(deliveryStatus);
+    }
+
+    if (transFlag === 2) {
+      status = {
+        type: "trans_flag",
+        id: 2,
+        title: "交易关闭",
+        detail: "该订单已关闭",
+        status: false,
+        bg: "cancel",
+      };
+    }
+
+    if (transFlag === 3) {
+      status = {
+        type: "trans_flag",
+        id: 3,
+        title: "交易完成",
+        detail: "订单已完成",
+        status: true,
+        bg: "complete",
+      };
+    }
+
+    const { detail } = this.getAfterSaleStatus(afterSaleStatus) || { detail: '订单已完成'};
+    if (status) {
+      return { ...status, detail };
+    }
+
+    // 都不符合
+    return {
+      type: "trans_flag",
+      id: 3,
+      title: "交易完成",
+      detail: "订单已完成",
+      status: true,
+      bg: "complete",
+    }
   };
 
   /**
@@ -211,7 +260,7 @@ class OrderAction {
   public orderPayType = (
     params: number | OrderInterface.OrderDetail
   ): string => {
-    const type = typeof params === "number" ? params : params.order.payType;
+    const type = typeof params === "number" ? params : params.order && params.order.payType;
     switch (type) {
       case 0: {
         return "现金";
@@ -249,320 +298,186 @@ class OrderAction {
 
 export default new OrderAction();
 
+type IOrderStatus = {
+  id: number; // 状态值
+  title: string; // 状态
+  detail: string; // 状态描述
+  showTime?: string; // 描述是否带时间(值表示时间值取决于哪个字段)
+  status: boolean; //
+  bg: "wait" | "cancel" | "complete" | "refound"; // 线上订单详情背景图
+  selectable: boolean; // 提供给筛选，有些没有必要展示出给用户筛选
+};
 // 交易状态	trans_flag
-export const TRANS_FLAG = [
+export const TRANS_FLAG: IOrderStatus[] = [
   {
-    dictValue: -1,
-    dictLabel: "支付失败",
+    id: -1,
+    title: "支付失败",
     detail: "请重新下单",
-    status: false
+    status: false,
+    bg: "cancel",
+    selectable: true
   },
   {
-    dictValue: -2,
-    dictLabel: "订单异常",
-    detail: "订单异常",
-    status: false
+    id: -2,
+    title: "订单异常",
+    detail: "请重新下单",
+    status: false,
+    bg: "cancel",
+    selectable: true
   },
   {
-    dictValue: 0,
-    dictLabel: "待支付",
-    detail: "",
-    status: false
+    id: 0,
+    title: "待支付",
+    detail: "买家已下单",
+    status: false,
+    bg: "wait",
+    showTime: "createTime",
+    selectable: true
   },
   // {
-  //   dictValue: 1,
-  //   dictLabel: "支付完成",
+  //   id: 1,
+  //   title: "支付完成",
   //   detail: "支付完成",
-  //   status: false
+  //   status: false,
+  //   bg:''
   // },
   {
-    dictValue: 2,
-    dictLabel: "交易关闭",
+    id: 2,
+    title: "交易关闭",
     detail: "该订单已关闭",
-    status: false
+    status: false,
+    bg: "cancel",
+    selectable: true
   },
   {
-    dictValue: 3,
-    dictLabel: "交易完成",
+    id: 3,
+    title: "交易完成",
     detail: "订单已完成",
-    status: true
+    status: true,
+    bg: "complete",
+    selectable: true
   },
   {
-    dictValue: 4,
-    dictLabel: "交易取消",
+    id: 4,
+    title: "交易取消",
     detail: "交易取消",
-    status: false
+    status: false,
+    bg: "cancel",
+    selectable: true
   },
   {
-    dictValue: 5,
-    dictLabel: "支付中",
+    id: 5,
+    title: "支付中",
     detail: "支付中",
-    status: false
-  }
+    status: false,
+    bg: "wait",
+    selectable: false
+  },
 ];
 
 // 配送状态 delivery_status
-export const DELIVERY_STATUS = [
+export const DELIVERY_STATUS: IOrderStatus[] = [
   {
-    dictValue: 0,
-    dictLabel: "待发货",
-    detail: "",
-    status: false
+    id: 0,
+    title: "待发货",
+    detail: "买家已付款",
+    status: false,
+    bg: "wait",
+    showTime: "transTime",
+    selectable: true
   },
   {
-    dictValue: 1,
-    dictLabel: "待自提",
-    detail: "",
-    status: false
+    id: 1,
+    title: "待自提",
+    detail: "买家已付款",
+    status: false,
+    bg: "wait",
+    showTime: "transTime",
+    selectable: true
   },
   {
-    dictValue: 2,
-    dictLabel: "待收货",
-    detail: "",
-    status: false
+    id: 2,
+    title: "待收货",
+    detail: "待收货",
+    status: false,
+    bg: "wait",
+    selectable: true
   },
-  // {
-  //   dictValue: 3,
-  //   dictLabel: "配送完成",
-  //   detail: "",
-  //   status: false
-  // },
+  {
+    id: 3,
+    title: "配送完成",
+    detail: "",
+    status: false,
+    bg: "complete",
+    selectable: false
+  },
 ];
 
 // 售后状态 after_sale_status
-export const AFTER_SALE_STATUS = [
+export const AFTER_SALE_STATUS: IOrderStatus[] = [
   {
-    dictValue: 0,
-    dictLabel: "申请取消订单",
-    detail: "",
-    status: false
+    id: 0,
+    title: "申请取消订单",
+    detail: "买家已付款",
+    status: false,
+    bg: "wait",
+    showTime: "transTime",
+    selectable: true
   },
   {
-    dictValue: 1,
-    dictLabel: "申请退货",
-    detail: "",
-    status: false
+    id: 1,
+    title: "申请退货",
+    detail: "买家申请退货",
+    status: false,
+    bg: "wait",
+    selectable: true
   },
-  // {
-  //   dictValue: 2,
-  //   dictLabel: "用户撤销取消订单",
-  //   detail: "",
-  //   status: false,
-  // },
-  // {
-  //   dictValue: 3,
-  //   dictLabel: "买家取消退货",
-  //   detail: "",
-  //   status: false
-  // },
   {
-    dictValue: 4,
-    dictLabel: "退货退款中",
-    detail: "",
-    status: false
+    id: 2,
+    title: "用户撤销取消订单",
+    detail: "用户撤销取消订单",
+    status: false,
+    bg: "cancel",
+    selectable: false
   },
-  // {
-  //   dictValue: 5,
-  //   dictLabel: "卖家拒绝退货",
-  //   detail: "",
-  //   status: false
-  // },
-  // {
-  //   dictValue: 6,
-  //   dictLabel: "交易完成",
-  //   detail: "已退货",
-  //   status: true
-  // },
-  // {
-  //   dictValue: 7,
-  //   dictLabel: "拒绝取消订单",
-  //   detail: "",
-  //   status: false
-  // },
+  {
+    id: 3,
+    title: "用户撤销退货退款订单",
+    detail: "用户撤销退货退款订单",
+    status: false,
+    bg: "cancel",
+    selectable: false
+  },
+  {
+    id: 4,
+    title: "退货退款中",
+    detail: "退货退款中",
+    status: false,
+    bg: "wait",
+    selectable: true
+  },
+  {
+    id: 5,
+    title: "商家拒绝退货退款申请",
+    detail: "商家拒绝退货退款申请",
+    status: false,
+    bg: "complete",
+    selectable: false
+  },
+  {
+    id: 6,
+    title: "交易完成",
+    detail: "已退货退款",
+    status: true,
+    bg: "complete",
+    selectable: false
+  },
+  {
+    id: 7,
+    title: "商家拒绝取消订单",
+    detail: "商家拒绝取消订单申请",
+    status: false,
+    bg: "complete",
+    selectable: false
+  },
 ];
-
-
-
-/**
- * C端订单状态逻辑
- */
-// public orderStatus = (orderAllStatus: OrderInterface.OrderAllStatus[], params: OrderInterface.OrderDetail, time?: number): any => {
-//   const { order } = params;
-//   // const { transFlag } = order;
-//   // 待发货的退款状态
-//   if (order.deliveryStatus === 0 && order.transFlag === 1 && order.afterSaleStatus === 0) {
-//     return {
-//       title: "等待商家处理",
-//       detail: "取消订单申请已提交，等待商家处理"
-//     }
-//   } 
-//   else if (order.deliveryStatus === 0 && order.transFlag === 1 && order.afterSaleStatus === 2) {
-//     return {
-//       // title: "您已撤销取消订单申请",
-//       title: "待发货",
-//       detail: "您已撤销取消订单申请，等待商家发货"
-//     };
-//   }  
-//   else if (order.deliveryStatus === 0 && order.transFlag === 1 && order.afterSaleStatus === 4) {
-//     return {
-//       title: "商家同意取消订单",
-//       detail: "商家同意取消订单，金额将原路退回"
-//     };
-//   } else if (order.deliveryStatus === 0 && order.transFlag === 1 && order.afterSaleStatus === 5) {
-//     return {
-//       // title: "商家拒绝了取消订单",
-//       title: "待发货",
-//       detail: "商家拒绝了您的取消订单申请"
-//     };
-//   } else if (order.deliveryStatus === 0 && order.transFlag === 2 && order.afterSaleStatus === 6) {
-//     return {
-//       title: "取消订单成功",
-//       detail: "取消订单成功，金额已原路退回"
-//     };
-//   }
-//   // 待自提的退款状态
-//    else if (order.deliveryStatus === 1 && order.transFlag === 1 && order.afterSaleStatus === 0) {
-//     return {
-//       title: "等待商家处理",
-//       detail: "取消订单申请已提交，等待商家处理"
-//     };
-//   }
-//   else if (order.deliveryStatus === 1 && order.transFlag === 1 && order.afterSaleStatus === 4) {
-//     return {
-//       title: "商家同意取消订单",
-//       detail: "商家同意取消订单，金额将原路退回"
-//     };
-//   } else if (order.deliveryStatus === 1 && order.transFlag === 1 && order.afterSaleStatus === 5) {
-//     return {
-//       // title: "商家拒绝了取消订单",
-//       title: "待自提",
-//       detail: "商家拒绝了您的取消订单申请"
-//     };
-//   } else if (order.deliveryStatus === 1 && order.transFlag === 2 && order.afterSaleStatus === 6) {
-//     return {
-//       title: "取消订单成功",
-//       detail: "取消订单成功，金额已原路退回"
-//     };
-//   }
-
-//   // // 待收货
-//   else if (order.deliveryStatus === 2 && order.transFlag === 1 && order.afterSaleStatus === 1) {
-//     return {
-//       title: "等待商家处理",
-//       detail: "取消退货申请成功"
-//     };
-//   } 
-//   else if (order.deliveryStatus === 2 && order.transFlag === 1 && order.afterSaleStatus === 3) {
-//     return {
-//       // title: "您已撤销退货申请",
-//       title: "待收货",
-//       detail: "您已撤销退货申请"
-//     };
-//   }  
-//   else if (order.deliveryStatus === 2 && order.transFlag === 1 && order.afterSaleStatus === 4) {
-//     if(order.refundStatus === 1) {
-//       return {
-//         title: "部分商品已成功退回",
-//         detail: "退货金额已原路退回"
-//       };
-//     } else {
-//       return {
-//         title: "商家同意退货",
-//         detail: "商家同意退货，请您将商品退回"
-//       };
-//     }
-//   } else if (order.deliveryStatus === 1 && order.transFlag === 1 && order.afterSaleStatus === 5 || order.deliveryStatus === 2 && order.transFlag === 1 && order.afterSaleStatus === 5) {
-//     return {
-//       // title: "商家拒绝退货",
-//       title: "待收货",
-//       detail: "商家拒绝了您的退货申请"
-//     };
-//   } else if (order.deliveryStatus === 1 && order.transFlag === 2 && order.afterSaleStatus === 6) {
-//     return {
-//       title: "退货成功",
-//       detail: "退货金额已原路退回"
-//     };
-//   }
-
-//   // 配送完成
-//   else if (order.deliveryStatus === 3 && order.transFlag === 3 && order.afterSaleStatus === 1) {
-//     return {
-//       title: "待商家处理",
-//       detail: "申请退货"
-//     };
-//   } 
-//   else if (order.deliveryStatus === 3 && order.transFlag === 3 && order.afterSaleStatus === 3) {
-//     return {
-//       title: "已完成",
-//       detail: "您已撤销退货申请"
-//     };
-//   }  else if (order.deliveryStatus === 3 && order.transFlag === 3 && order.afterSaleStatus === 4) {
-//     return {
-//       title: "商家同意退货",
-//       detail: "商家同意退货，请您将商品退回"
-//     };
-//   } else if (order.deliveryStatus === 3 && order.transFlag === 3 && order.afterSaleStatus === 5) {
-//     return {
-//       title: "商家拒绝退货",
-//       detail: "商家拒绝了您的退货申请"
-//     };
-//   } else if (order.deliveryStatus === 3 && order.transFlag === 3 && order.afterSaleStatus === 6) {
-//     return {
-//       title: "退货成功",
-//       detail: "退货金额已原路退回"
-//     };
-//   } else if (order.deliveryStatus === 2 && order.transFlag === 2 && order.afterSaleStatus === 6 && order.refundStatus === 2) {
-//     return {
-//       title: "退货成功",
-//       detail: "退货金额已原路退回"
-//     };
-//   }
-//   // 其他状态
-//    else if (order.transFlag === -1 || order.transFlag === -2) {
-//     return {
-//       title: "支付失败",
-//       detail: "请重新下单"
-//     };
-//   } else if (order.transFlag === 0) {
-//     return {
-//       title: "待支付",
-//       detail: ""
-//     };
-//   } else if (order.transFlag === 1 && order.deliveryStatus === 0) {
-//     return {
-//       title: "待发货",
-//       detail: "商品待商家配送，请耐心等待"
-//     };
-//   } else if (order.transFlag === 1 && order.deliveryStatus === 1) {
-//     return {
-//       title: "待自提",
-//       detail: "请去门店自提商品"
-//     };
-//   } else if (order.transFlag === 1 && order.deliveryStatus === 2) {
-//     return {
-//       title: "待收货",
-//       detail: "商品已发货，请耐心等待"
-//     };
-//   } else if (order.transFlag === 1 && order.deliveryStatus === 3) {
-//     return {
-//       title: "已完成",
-//       detail: "订单已完成，感谢您的信任"
-//     };
-//   } else if (order.transFlag == 2) {
-//     return {
-//       title: "交易关闭",
-//       detail: "超时未支付或您已取消，订单已关闭"
-//     };
-//   } else if (order.transFlag === 3) {
-//     return {
-//       title: "已完成",
-//       detail: "订单已完成，感谢您的信任"
-//     };
-//   }
-//    else if (order.transFlag === 4) {
-//     return {
-//       title: "交易取消",
-//       detail: "您已取消交易"
-//     };
-//   }
-// }
