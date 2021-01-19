@@ -18,7 +18,7 @@ import { ReportInterface, ResponseCode, ReportService } from "../../constants";
 import numeral from "numeral";
 import TabsMenu from "../../component/layout/menu";
 import "../../component/layout/header.layout.less";
-import dayJs from "dayjs";
+import dayJs from "dayjs"; 
 import { getMonthEndDate, createMonth } from "../../common/util/common";
 import classnames from "classnames";
 import loginManager from "../../common/sdk/sign/login.manager";
@@ -122,7 +122,8 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
       this.setState(
         {
           currentDate: "今日",
-          monthData: cmonth.slice(0, currentMonth + 1),
+          // monthData: cmonth.slice(0, currentMonth + 1),
+          monthData: cmonth,
           weeksData: weeks.data,
           weekValue: weeks.data.length - 1,
           minDate: `${dayJs().format("YYYY-MM-DD HH:mm:ss")}`,
@@ -459,8 +460,33 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
     }
   };
 
+  /**
+   * 检测自定义起始时间和结束时间
+   */
+  public checkCostomVulue = (startTime: string | number, endTime: string | number) => {
+    startTime = dayJs(dayJs(startTime).format("YYYY-MM-DD")).valueOf()
+    endTime = dayJs(dayJs(endTime).format("YYYY-MM-DD")).valueOf()
+    const now = dayJs(dayJs().format('YYYY-MM-DD')).valueOf()
+    if(startTime > now || endTime > now) {
+      return '只能选择今天以前的日期'
+    }
+    if(startTime > endTime) {
+      return '起始时间不能大于结束时间'
+    }
+    return null
+  }
+
+  /**
+   * 修改自定义起始时间
+   */
   public onCostomMinChange = (event: any) => {
+    const {costomMaxDate} = this.state
     const { value } = event.detail;
+    const title = this.checkCostomVulue(value, costomMaxDate)
+    if(!!title) {
+      Taro.showToast({title, icon: 'none' })
+      return
+    }
     this.setState(
       {
         costomMinDate: dayJs(value).format("YYYY-MM-DD HH:mm:ss")
@@ -471,8 +497,17 @@ class ReportMain extends Taro.Component<ReportMainProps, State> {
     );
   };
 
+  /**
+   * 修改自定义结束时间
+   */
   public onCostomMaxChange = (event: any) => {
+    const {costomMinDate} = this.state
     const { value } = event.detail;
+    const title = this.checkCostomVulue(costomMinDate, value)
+    if(!!title) {
+      Taro.showToast({title, icon: 'none' })
+      return
+    }
     this.setState(
       {
         costomMaxDate: dayJs(value).format("YYYY-MM-DD HH:mm:ss")

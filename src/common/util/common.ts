@@ -31,17 +31,24 @@ export class ConsoleUtil {
 }
 
 /**
- * @todo [返回该年份的所有月份]
+ * @todo [返回该年份至今的所有月份]
  */
 export function createMonth(year: number = 2020) {
-  const month = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(item => {
-    return {
-      month: item + 1,
-      monthStr: `${year}年${item + 1}月`,
-      startDate: new Date(year, item, 1),
-      endDate: new Date(year, item, getMonthEndDate(item, year))
-    };
-  });
+  const now = new Date()
+  const currentYear = now.getFullYear()
+  let month: any[] = []
+  while(currentYear - year >= 0) {
+    const length = currentYear - year === 0 ? now.getMonth() + 1 : 12
+    new Array( length ).fill('').filter((_, index) => {
+      month.push({
+        month: index + 1,
+        monthStr: `${year}年${index + 1}月`,
+        startDate: new Date(year, index, 1),
+        endDate: new Date(year, index, getMonthEndDate(index, year))
+      })
+    })
+    year++
+  }
   return month;
 }
 
