@@ -122,7 +122,7 @@ class ProductAdd extends Taro.Component<Props, State> {
 
       const { params } = this.$router.params;
       if (params !== undefined) {
-        const { scanProduct: scan, needCallback } = JSON.parse(params);
+        const { scanProduct: scan, needCallback } = JSON.parse(decodeURIComponent(params));
         if (needCallback) {
           this.setState({ needCallback });
         }
@@ -183,15 +183,15 @@ class ProductAdd extends Taro.Component<Props, State> {
           return;
         }
 
-        if (result.code === "product.not.exist") {
-          Taro.hideLoading()
-          Taro.showModal({
-            title: "提示",
-            content: "请扫码正确的商品码",
-            showCancel: false
-          });
-          return;
-        }
+        // if (result.code === "product.not.exist") {
+        //   Taro.hideLoading()
+        //   Taro.showModal({
+        //     title: "提示",
+        //     content: "请扫码正确的商品码",
+        //     showCancel: false
+        //   });
+        //   return;
+        // }
 
         if ((barcode.result as string).startsWith("http")) {
           // 如果扫码出http说明不是商品码
@@ -235,14 +235,23 @@ class ProductAdd extends Taro.Component<Props, State> {
           Taro.hideLoading();
           return;
         } else {
+          Taro.hideLoading()
           Taro.showModal({
             title: "提示",
-            content: "请扫码正确的商品码",
+            content: "请扫码正确的条码",
             showCancel: false
           });
           return;
         }
-      });
+      }).catch(error => {
+        Taro.hideLoading();
+        if(error.errMsg !== 'scanCode:fail cancel') {
+          Taro.showToast({
+            title: error.message || '请扫码正确的条码',
+            icon: "none"
+          });
+        }
+      })
     } catch (error) {
       Taro.hideLoading();
       Taro.showToast({

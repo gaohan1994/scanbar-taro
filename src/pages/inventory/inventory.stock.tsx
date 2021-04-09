@@ -77,7 +77,8 @@ class InventoryStock extends Taro.Component<Props, State> {
     loading: false
   };
 
-  componentDidShow() {
+  // componentDidShow() {
+  componentDidMount() {
     this.setState({
       searchValue: ""
     });

@@ -547,13 +547,13 @@ class ProductSDK {
         return prevTotal + item.changePrice * item.sellNum;
       }
       /**
-       * @todo [如果是进货，则用进价]
+       * @todo [如果是收货，则用进价]
        */
       if (key === "productPurchaseList") {
         return prevTotal + item.cost * item.sellNum;
       }
       /**
-       * @todo [如果没有改价，但是是进货则返回进价]
+       * @todo [如果没有改价，但是是收货则返回进价]
        */
       return prevTotal + item.price * item.sellNum;
     };

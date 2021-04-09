@@ -4,7 +4,7 @@
  * @Last Modified by: Ghan
  * @Last Modified time: 2020-07-10 11:18:17
  *
- * @todo 进货
+ * @todo 收货
  */
 import Taro, { Config } from "@tarojs/taro";
 import { View, Image, Text } from "@tarojs/components";
@@ -66,7 +66,7 @@ const pageSize = 20
 
 class InventoryMain extends Taro.Component<Props> {
   config: Config = {
-    navigationBarTitleText: "采购进货"
+    navigationBarTitleText: "采购收货"
   };
 
   readonly state: State = {
@@ -279,7 +279,7 @@ class InventoryMain extends Taro.Component<Props> {
               src="//net.huanmusic.com/weapp/icon_record.png"
               className={`inventory-header-item-purchase`}
             />
-            <Text className="inventory-header-item-text">进货记录</Text>
+            <Text className="inventory-header-item-text">收货记录</Text>
           </View>
         </HeaderInput>
         {this.renderTabs()}

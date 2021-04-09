@@ -23,7 +23,7 @@ export declare namespace ProductInterface {
 
   /**
    *
-   * @param {cost} 进货价
+   * @param {cost} 收货价
    * @param {limitNum} 库存下限预警
    * @param {memberPrice} 会员价
    * @param {merchantId} 商户id
@@ -45,8 +45,8 @@ export declare namespace ProductInterface {
     id: number;
     enableMemberDiscount: boolean; // 是否使用折扣价
     activityInfos: ProductActivity[]; // 活动信息
-    cost: number; // 进货价
-    avgCost: number; // 平均进货价
+    cost: number; // 收货价
+    avgCost: number; // 平均收货价
     limitNum: number; // 库存下限预警
     memberPrice: number; // 会员价
     merchantId: number; // 商户id

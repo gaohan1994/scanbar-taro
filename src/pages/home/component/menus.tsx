@@ -18,13 +18,13 @@ function HomeMenus() {
 
 
   const NavItems = [
-    {
-      image: "//net.huanmusic.com/weapp/-icon_menu_proceeds.png",
-      value: "收款",
-      subTitle: "Gathering",
-      url: "/pages/pay/pay.input",
-      funcNo: "cashier:menu:collect"
-    },
+    // {
+    //   image: "//net.huanmusic.com/weapp/-icon_menu_proceeds.png",
+    //   value: "收款",
+    //   subTitle: "Gathering",
+    //   url: "/pages/pay/pay.input",
+    //   funcNo: "cashier:menu:collect"
+    // },
     {
       image: "//net.huanmusic.com/weapp/v2/icon_menu_details.png",
       value: "查账",
@@ -32,20 +32,20 @@ function HomeMenus() {
       url: "/pages/order/order.main",
       funcNo: "cashier:menu:audit"
     },
-    {
-      image: "//net.huanmusic.com/weapp/v2/icon_menu_order.png",
-      value: "线上订单",
-      subTitle: "Gathering",
-      url: "/pages/order/order.online.list",
-      funcNo: "cashier:menu:onlineOrder"
-    },
-    {
-      image: "//net.huanmusic.com/weapp/icon_menu_more.png",
-      value: "退货",
-      subTitle: "Even more",
-      url: "/pages/product/product.refund",
-      funcNo: "cashier:menu:return"
-    },
+    // {
+    //   image: "//net.huanmusic.com/weapp/v2/icon_menu_order.png",
+    //   value: "线上订单",
+    //   subTitle: "Gathering",
+    //   url: "/pages/order/order.online.list",
+    //   funcNo: "cashier:menu:onlineOrder"
+    // },
+    // {
+    //   image: "//net.huanmusic.com/weapp/icon_menu_more.png",
+    //   value: "退货",
+    //   subTitle: "Even more",
+    //   url: "/pages/product/product.refund",
+    //   funcNo: "cashier:menu:return"
+    // },
     {
       image: "//net.huanmusic.com/weapp/-icon_menu_member.png",
       value: "会员",
@@ -62,7 +62,7 @@ function HomeMenus() {
     },
     {
       image: "//net.huanmusic.com/weapp/icon_menu_inventory1.png",
-      value: "进货",
+      value: "采购收货",
       subTitle: "inventory",
       url: "/pages/inventory/inventory.main",
       funcNo: "cashier:menu:purchase"
@@ -100,7 +100,7 @@ function HomeMenus() {
   // if (!!inventoryToken) {
   //   NavItems.push({
   //     image: "//net.huanmusic.com/weapp/icon_menu_inventory1.png",
-  //     value: "进货",
+  //     value: "收货",
   //     subTitle: "inventory",
   //     url: "/pages/inventory/inventory.main"
   //   });

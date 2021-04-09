@@ -30,7 +30,7 @@ class InventoryAction {
   }
 
   /**
-   * @todo [根据businessNumber查询进货单详情并存入redux]
+   * @todo [根据businessNumber查询收货单详情并存入redux]
    *
    * @memberof InventoryAction
    */
@@ -62,7 +62,7 @@ class InventoryAction {
   }
 
   /**
-   * @todo [进货/退货成功之后的回调]
+   * @todo [收货/退货成功之后的回调]
    * @todo [清空购物车]
    */
   public stockSuccessCallback = (sort: string = productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE) => {
@@ -104,7 +104,7 @@ class InventoryAction {
   }
 
   /**
-   * @todo [把进货详情里的商品从新组合数据并返回]
+   * @todo [把收货详情里的商品从新组合数据并返回]
    *
    * @memberof InventoryAction
    */

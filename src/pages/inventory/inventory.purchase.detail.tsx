@@ -26,7 +26,7 @@ type Props = {
 class InventoryPurchaseDetail extends Taro.Component<Props> {
 
   config: Config = {
-    navigationBarTitleText: '进货详情'
+    navigationBarTitleText: '收货详情'
   };
 
   componentWillMount() {
@@ -35,7 +35,7 @@ class InventoryPurchaseDetail extends Taro.Component<Props> {
   }
 
   /**
-   * @todo [继续进货，这里直接返回上一级路由]
+   * @todo [继续收货，这里直接返回上一级路由]
    */
   public onPurchase = () => {
     const { entry } = this.$router.params;
@@ -95,7 +95,7 @@ class InventoryPurchaseDetail extends Taro.Component<Props> {
       return (
         <ButtonFooter
           buttons={[{
-            title: "继续进货",
+            title: "继续收货",
             onPress: () => this.onPurchase(),
           }]}
         />
@@ -151,7 +151,7 @@ class InventoryPurchaseDetail extends Taro.Component<Props> {
         extraTextBold: 'bold',
       },
       {
-        title: `进货数量`,
+        title: `收货数量`,
         extraText: `${num || 0}`,
         extraTextStyle: 'title',
         extraTextBold: 'bold',

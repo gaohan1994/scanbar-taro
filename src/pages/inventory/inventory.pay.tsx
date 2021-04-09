@@ -42,7 +42,7 @@ class InventoryPay extends Taro.Component<Props, State> {
   };
 
   config: Config = {
-    navigationBarTitleText: '进货'
+    navigationBarTitleText: '收货'
   };
 
   componentDidMount() {
@@ -70,8 +70,8 @@ class InventoryPay extends Taro.Component<Props, State> {
   }
 
   /**
-   * @todo [进货]
-   * @todo [进货成功之后toast，1秒之后跳转到这次进货详情页面]
+   * @todo [收货]
+   * @todo [收货成功之后toast，1秒之后跳转到这次收货详情页面]
    *
    * @memberof InventoryPay
    */
@@ -91,7 +91,7 @@ class InventoryPay extends Taro.Component<Props, State> {
       const result = await InventoryAction.stockAdd(payload);
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       Taro.showToast({ 
-        title: '进货成功', 
+        title: '收货成功', 
         icon: 'success',
         duration: 10000
       });
@@ -132,7 +132,7 @@ class InventoryPay extends Taro.Component<Props, State> {
     return (
       <ButtonFooter
         buttons={[{
-          title: '进货',
+          title: '收货',
           onPress: () => this.onPayHandle()
         }]}
       />
@@ -161,7 +161,7 @@ class InventoryPay extends Taro.Component<Props, State> {
         extraTextSize: '36',
       },
       {
-        title: '进货数量',
+        title: '收货数量',
         extraText: `${productSdk.getProductNumber()}`,
         extraTextColor: '#333333',
         extraTextBold: 'bold',

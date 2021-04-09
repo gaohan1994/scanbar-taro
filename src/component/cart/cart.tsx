@@ -97,7 +97,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     const { sort } = this.props;
     if (nextProps.changeProduct && nextProps.changeProduct.id) {
       /**
-       * @todo [进货显示进价]
+       * @todo [收货显示进价]
        */
       const nextChangePrice: string = nextProps.changeProduct.changePrice
         ? `${nextProps.changeProduct.changePrice}`
@@ -122,14 +122,14 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
      */
     if (selectProduct !== undefined) {
       /**
-       * @todo [如果是盘点/进货的话弹出弹窗]
+       * @todo [如果是盘点/收货的话弹出弹窗]
        */
       if (
         sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK ||
         sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE
       ) {
         productSdk.changeProductVisible(true, selectProduct, sort);
-        return;
+        // return;
       } else {
         productSdk.manage({
           type: productSdk.productCartManageType.ADD,
@@ -283,7 +283,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
        * @todo [如果不存在，则去第三方库里查询商品，如果存在则提示是否建档]
        * @todo [如果第三方库里也不存在则提示没有找到该商品]
        */
-      const { sort } = this.props;
+      const { sort , productCartList} = this.props;
       Taro.scanCode()
         .then(async res => {
           Taro.showLoading();
@@ -293,19 +293,24 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
           if (result.code === ResponseCode.success) {
             Taro.hideLoading();
             // 找到了商品 显示modal名称
-            Taro.showToast({
-              title: `${result.data.name}`,
-              icon: "none"
-            });
+            // Taro.showToast({
+            //   title: `${result.data.name}`,
+            //   icon: "none"
+            // });
 
             /**
-             * @todo [如果是盘点、进货的话弹出弹窗]
+             * @todo [如果是盘点、收货的话弹出弹窗]
              */
             if (
               sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK ||
               sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE
             ) {
-              productSdk.changeProductVisible(true, result.data, sort);
+              // 如果商品存在购物车，取购物车中的商品，目的：显示盘点数量等
+              const resultProduct = result.data || {}
+              const curProduct = productCartList.find(item => {
+                return item && item.id === resultProduct.id
+              }) || result.data
+              productSdk.changeProductVisible(true, curProduct, sort);
               return;
             }
             productSdk.manage({
@@ -330,11 +335,14 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                     scanProduct: thirdProductResult.data,
                     needCallback: true
                   };
+                  // Taro.navigateTo({
+                  //   url: `/pages/product/product.add?params=${JSON.stringify(
+                  //     params
+                  //   )}`
+                  // });
                   Taro.navigateTo({
-                    url: `/pages/product/product.add?params=${JSON.stringify(
-                      params
-                    )}`
-                  });
+                    url: `/pages/product/product.add?params=${encodeURIComponent(JSON.stringify(params))}`
+                  })
                 }
               }
             });
@@ -800,7 +808,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
   };
 
   private onChangeProductClose = () => {
-    productSdk.changeProductVisible(false);
+    productSdk.changeProductVisible(false, undefined);
   };
 
   private renderChangeProductModal = () => {
@@ -822,6 +830,35 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
               this.onChangeValue("changeSellNum", value),
             placeholder: "请输入盘点数量",
             endfix: changeProduct && changeProduct.unit
+          }
+        ];
+        break;
+      }
+      case productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE: {
+        inputs = [
+          {
+            title: `${
+              !!changeProduct
+                ? !productSdk.isWeighProduct(changeProduct as any)
+                  ? "数量"
+                  : "重量"
+                : "数量"
+            }`,
+            value: `${changeSellNum}`,
+            placeholder: "请输入数量",
+            // type: "digit",
+            type: "digit" as any,
+            endfix: changeProduct && changeProduct.unit,
+            onInput: ({ detail: { value } }) =>
+              this.onChangeValue("changeSellNum", value)
+          },
+          {
+            title: "进价",
+            prefix: "￥",
+            value: changePrice || `0`,
+            type: "digit",
+            onInput: ({ detail: { value } }) =>
+              this.onChangeValue("changePrice", value)
           }
         ];
         break;

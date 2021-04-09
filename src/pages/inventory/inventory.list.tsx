@@ -60,7 +60,7 @@ class InventoryList extends Taro.Component<Props, State> {
   };
 
   config: Config = {
-    navigationBarTitleText: "进货记录"
+    navigationBarTitleText: "收货记录"
   };
 
   componentDidShow() {
